@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Sessions from './pages/Sessions';
 import Notes from './pages/Notes';
+import Materials from './pages/Materials';
 
 export default function App() {
   return (
@@ -44,6 +45,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Notes />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/materials"
+            element={
+              <ProtectedRoute>
+                <Materials />
               </ProtectedRoute>
             }
           />

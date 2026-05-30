@@ -10,7 +10,7 @@ const stats = [
 
 const quickActions = [
   { label: 'New Session', desc: 'Start an AI-guided study session', icon: '▶', to: '/sessions' },
-  { label: 'Upload Material', desc: 'Add notes, PDFs or slides', icon: '↑', to: null },
+  { label: 'Upload Material', desc: 'Add notes, PDFs or slides', icon: '↑', to: '/materials' },
   { label: 'View Progress', desc: 'See your learning analytics', icon: '◎', to: null },
 ];
 
@@ -28,6 +28,7 @@ export default function Dashboard() {
         <div style={s.navRight}>
           <Link to="/sessions" style={s.navLink}>Sessions</Link>
           <Link to="/notes" style={s.navLink}>Notes</Link>
+          <Link to="/materials" style={s.navLink}>Materials</Link>
           <Link to="/profile" style={s.navUser}>{user?.full_name}</Link>
           <button onClick={logout} style={s.signOut}>Sign out</button>
         </div>
