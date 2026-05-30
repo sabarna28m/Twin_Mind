@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+
   backend:
     build:
       context: ./Backend
@@ -8,9 +9,17 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      # Bind-mount source for hot reload; DB and uploads persist on host too.
       - ./Backend:/app
     environment:
       - DEBUG=true
+      - SECRET_KEY=dev-secret-change-in-production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   frontend:
     build:
@@ -19,7 +28,14 @@ services:
     ports:
       - "5173:5173"
     volumes:
+      # Bind-mount source for hot reload.
+      # Anonymous volume keeps container's node_modules intact.
       - ./Frontend:/app
       - /app/node_modules
+    environment:
+      # Browser connects to localhost:8000 (the exposed host port).
+      - VITE_API_URL=http://localhost:8000/api/v1
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
