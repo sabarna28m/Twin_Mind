@@ -10,6 +10,7 @@ import Notes from './pages/Notes';
 import Materials from './pages/Materials';
 import Progress from './pages/Progress';
 import ProfileSetup from './pages/ProfileSetup';
+import CheckIn from './pages/CheckIn';
 
 export default function App() {
   return (
@@ -63,6 +64,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Progress />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkin"
+            element={
+              <ProtectedRoute>
+                <CheckIn />
               </ProtectedRoute>
             }
           />
