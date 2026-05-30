@@ -12,6 +12,7 @@ import Progress from './pages/Progress';
 import ProfileSetup from './pages/ProfileSetup';
 import CheckIn from './pages/CheckIn';
 import Predict from './pages/Predict';
+import Simulate from './pages/Simulate';
 
 export default function App() {
   return (
@@ -73,6 +74,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Predict />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/simulate"
+            element={
+              <ProtectedRoute>
+                <Simulate />
               </ProtectedRoute>
             }
           />

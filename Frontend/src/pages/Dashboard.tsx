@@ -13,6 +13,7 @@ const quickActions = [
   { label: 'Upload Material', desc: 'Add notes, PDFs or slides', icon: '↑', to: '/materials' },
   { label: 'View Progress', desc: 'See your learning analytics', icon: '◎', to: '/progress' },
   { label: 'Predict Score', desc: 'ML-powered exam score prediction', icon: '🎯', to: '/predict' },
+  { label: 'What-If Simulator', desc: 'Explore how habit changes affect your score', icon: '⚡', to: '/simulate' },
 ];
 
 export default function Dashboard() {
@@ -31,6 +32,7 @@ export default function Dashboard() {
           <Link to="/notes" style={s.navLink}>Notes</Link>
           <Link to="/materials" style={s.navLink}>Materials</Link>
           <Link to="/checkin" style={s.navLink}>Check-in</Link>
+          <Link to="/simulate" style={s.navLink}>Simulate</Link>
           <Link to="/profile" style={s.navUser}>{user?.full_name}</Link>
           <button onClick={logout} style={s.signOut}>Sign out</button>
         </div>
