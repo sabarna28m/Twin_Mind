@@ -9,7 +9,8 @@ from app.models import note  # noqa: F401
 from app.models import material  # noqa: F401
 from app.models import student_profile  # noqa: F401
 from app.models import learning_data  # noqa: F401
-from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes
+from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes
+from app.ml.predictor import get_model  # warm up model at startup
 
 Base.metadata.create_all(bind=engine)
 
@@ -34,6 +35,7 @@ app.include_router(materials.router, prefix=settings.api_v1_prefix)
 app.include_router(analytics.router, prefix=settings.api_v1_prefix)
 app.include_router(sp_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(ld_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(pred_routes.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/")

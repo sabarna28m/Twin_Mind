@@ -12,6 +12,7 @@ const quickActions = [
   { label: 'New Session', desc: 'Start an AI-guided study session', icon: '▶', to: '/sessions' },
   { label: 'Upload Material', desc: 'Add notes, PDFs or slides', icon: '↑', to: '/materials' },
   { label: 'View Progress', desc: 'See your learning analytics', icon: '◎', to: '/progress' },
+  { label: 'Predict Score', desc: 'ML-powered exam score prediction', icon: '🎯', to: '/predict' },
 ];
 
 export default function Dashboard() {
