@@ -9,9 +9,9 @@ const stats = [
 ];
 
 const quickActions = [
-  { label: 'New Session', desc: 'Start an AI-guided study session', icon: '▶' },
-  { label: 'Upload Material', desc: 'Add notes, PDFs or slides', icon: '↑' },
-  { label: 'View Progress', desc: 'See your learning analytics', icon: '◎' },
+  { label: 'New Session', desc: 'Start an AI-guided study session', icon: '▶', to: '/sessions' },
+  { label: 'Upload Material', desc: 'Add notes, PDFs or slides', icon: '↑', to: null },
+  { label: 'View Progress', desc: 'See your learning analytics', icon: '◎', to: null },
 ];
 
 export default function Dashboard() {
@@ -26,6 +26,7 @@ export default function Dashboard() {
       <header style={s.nav}>
         <span style={s.navLogo}>TwinMind</span>
         <div style={s.navRight}>
+          <Link to="/sessions" style={s.navLink}>Sessions</Link>
           <Link to="/profile" style={s.navUser}>{user?.full_name}</Link>
           <button onClick={logout} style={s.signOut}>Sign out</button>
         </div>
@@ -67,13 +68,21 @@ export default function Dashboard() {
             <h2 style={s.panelTitle}>Quick Actions</h2>
             <div style={s.actionList}>
               {quickActions.map(a => (
-                <button key={a.label} style={s.actionCard}>
-                  <span style={s.actionIcon}>{a.icon}</span>
-                  <div style={s.actionText}>
-                    <p style={s.actionLabel}>{a.label}</p>
-                    <p style={s.actionDesc}>{a.desc}</p>
-                  </div>
-                </button>
+                a.to
+                  ? <Link key={a.label} to={a.to} style={{ ...s.actionCard, textDecoration: 'none' }}>
+                      <span style={s.actionIcon}>{a.icon}</span>
+                      <div style={s.actionText}>
+                        <p style={s.actionLabel}>{a.label}</p>
+                        <p style={s.actionDesc}>{a.desc}</p>
+                      </div>
+                    </Link>
+                  : <button key={a.label} style={s.actionCard}>
+                      <span style={s.actionIcon}>{a.icon}</span>
+                      <div style={s.actionText}>
+                        <p style={s.actionLabel}>{a.label}</p>
+                        <p style={s.actionDesc}>{a.desc}</p>
+                      </div>
+                    </button>
               ))}
             </div>
           </section>
@@ -114,6 +123,12 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     gap: '1rem',
+  },
+  navLink: {
+    fontSize: '0.875rem',
+    color: 'var(--text)',
+    textDecoration: 'none',
+    fontWeight: 500,
   },
   navUser: {
     fontSize: '0.9rem',
