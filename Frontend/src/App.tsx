@@ -13,6 +13,7 @@ import ProfileSetup from './pages/ProfileSetup';
 import CheckIn from './pages/CheckIn';
 import Predict from './pages/Predict';
 import Simulate from './pages/Simulate';
+import Mentor from './pages/Mentor';
 
 export default function App() {
   return (
@@ -74,6 +75,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Predict />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mentor"
+            element={
+              <ProtectedRoute>
+                <Mentor />
               </ProtectedRoute>
             }
           />

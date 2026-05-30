@@ -14,6 +14,7 @@ const quickActions = [
   { label: 'View Progress', desc: 'See your learning analytics', icon: '◎', to: '/progress' },
   { label: 'Predict Score', desc: 'ML-powered exam score prediction', icon: '🎯', to: '/predict' },
   { label: 'What-If Simulator', desc: 'Explore how habit changes affect your score', icon: '⚡', to: '/simulate' },
+  { label: 'AI Mentor', desc: 'Get personalised advice from your AI mentor', icon: '💬', to: '/mentor' },
 ];
 
 export default function Dashboard() {
@@ -33,6 +34,7 @@ export default function Dashboard() {
           <Link to="/materials" style={s.navLink}>Materials</Link>
           <Link to="/checkin" style={s.navLink}>Check-in</Link>
           <Link to="/simulate" style={s.navLink}>Simulate</Link>
+          <Link to="/mentor" style={s.navLink}>Mentor</Link>
           <Link to="/profile" style={s.navUser}>{user?.full_name}</Link>
           <button onClick={logout} style={s.signOut}>Sign out</button>
         </div>
