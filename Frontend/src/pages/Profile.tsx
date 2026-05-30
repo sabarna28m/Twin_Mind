@@ -61,7 +61,10 @@ export default function Profile() {
     <div style={s.shell}>
       <header style={s.nav}>
         <Link to="/" style={s.navLogo}>TwinMind</Link>
-        <Link to="/" style={s.backLink}>← Dashboard</Link>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <Link to="/profile/setup" style={s.backLink}>Student Profile</Link>
+          <Link to="/" style={s.backLink}>← Dashboard</Link>
+        </div>
       </header>
 
       <main style={s.main}>

@@ -9,6 +9,7 @@ import Sessions from './pages/Sessions';
 import Notes from './pages/Notes';
 import Materials from './pages/Materials';
 import Progress from './pages/Progress';
+import ProfileSetup from './pages/ProfileSetup';
 
 export default function App() {
   return (
@@ -62,6 +63,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Progress />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/setup"
+            element={
+              <ProtectedRoute requireProfile={false}>
+                <ProfileSetup />
               </ProtectedRoute>
             }
           />

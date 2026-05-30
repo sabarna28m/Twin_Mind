@@ -8,12 +8,25 @@ interface User {
   is_active: boolean;
 }
 
+export interface StudentProfile {
+  id: number;
+  user_id: number;
+  institution: string;
+  course: string;
+  semester: string;
+  academic_goals: string;
+  learning_preferences: string;
+}
+
 interface AuthContextValue {
   user: User | null;
   token: string | null;
+  studentProfile: StudentProfile | null;
+  profileLoaded: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, fullName: string, password: string) => Promise<void>;
   logout: () => void;
+  refreshStudentProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -21,17 +34,52 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [user, setUser] = useState<User | null>(null);
+  const [studentProfile, setStudentProfile] = useState<StudentProfile | null>(null);
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
   useEffect(() => {
-    if (!token) { setUser(null); return; }
-    api.get<User>('/auth/me', { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => setUser(r.data))
-      .catch(() => { localStorage.removeItem('token'); setToken(null); });
+    if (!token) {
+      setUser(null);
+      setStudentProfile(null);
+      setProfileLoaded(false);
+      return;
+    }
+    const headers = { Authorization: `Bearer ${token}` };
+    api.get<User>('/auth/me', { headers })
+      .then(async r => {
+        setUser(r.data);
+        try {
+          const { data } = await api.get<StudentProfile>('/student-profile', { headers });
+          setStudentProfile(data);
+        } catch (err: unknown) {
+          const status = (err as { response?: { status?: number } })?.response?.status;
+          if (status === 404) setStudentProfile(null);
+        }
+        setProfileLoaded(true);
+      })
+      .catch(() => {
+        localStorage.removeItem('token');
+        setToken(null);
+        setProfileLoaded(false);
+      });
   }, [token]);
+
+  async function refreshStudentProfile() {
+    if (!token) return;
+    try {
+      const { data } = await api.get<StudentProfile>('/student-profile', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setStudentProfile(data);
+    } catch {
+      setStudentProfile(null);
+    }
+  }
 
   async function login(email: string, password: string) {
     const { data } = await api.post<{ access_token: string }>('/auth/login', { email, password });
     localStorage.setItem('token', data.access_token);
+    setProfileLoaded(false);
     setToken(data.access_token);
   }
 
@@ -43,10 +91,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
+    setStudentProfile(null);
+    setProfileLoaded(false);
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, studentProfile, profileLoaded, login, register, logout, refreshStudentProfile }}>
       {children}
     </AuthContext.Provider>
   );
