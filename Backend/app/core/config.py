@@ -10,6 +10,10 @@ class Settings(BaseSettings):
         "http://localhost:5174",
     ]
 
+    secret_key: str = "change-me-in-production-use-a-long-random-string"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 1440  # 24 hours
+
     class Config:
         env_file = ".env"
 

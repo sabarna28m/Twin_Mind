@@ -2,7 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api.routes import health
+from app.core.database import engine, Base
+from app.models import user  # noqa: F401 — registers model with Base metadata
+from app.api.routes import health, auth
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.app_name,
@@ -18,6 +22,7 @@ app.add_middleware(
 )
 
 app.include_router(health.router, prefix=settings.api_v1_prefix, tags=["health"])
+app.include_router(auth.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/")
