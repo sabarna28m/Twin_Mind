@@ -7,7 +7,7 @@ from app.models import user  # noqa: F401
 from app.models import session  # noqa: F401
 from app.models import note  # noqa: F401
 from app.models import material  # noqa: F401
-from app.api.routes import health, auth, sessions, notes, materials
+from app.api.routes import health, auth, sessions, notes, materials, analytics
 
 Base.metadata.create_all(bind=engine)
 
@@ -29,6 +29,7 @@ app.include_router(auth.router, prefix=settings.api_v1_prefix)
 app.include_router(sessions.router, prefix=settings.api_v1_prefix)
 app.include_router(notes.router, prefix=settings.api_v1_prefix)
 app.include_router(materials.router, prefix=settings.api_v1_prefix)
+app.include_router(analytics.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/")

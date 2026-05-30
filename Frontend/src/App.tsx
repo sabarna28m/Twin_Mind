@@ -8,6 +8,7 @@ import Profile from './pages/Profile';
 import Sessions from './pages/Sessions';
 import Notes from './pages/Notes';
 import Materials from './pages/Materials';
+import Progress from './pages/Progress';
 
 export default function App() {
   return (
@@ -53,6 +54,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Materials />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/progress"
+            element={
+              <ProtectedRoute>
+                <Progress />
               </ProtectedRoute>
             }
           />
