@@ -27,6 +27,7 @@ export default function Dashboard() {
         <span style={s.navLogo}>TwinMind</span>
         <div style={s.navRight}>
           <Link to="/sessions" style={s.navLink}>Sessions</Link>
+          <Link to="/notes" style={s.navLink}>Notes</Link>
           <Link to="/profile" style={s.navUser}>{user?.full_name}</Link>
           <button onClick={logout} style={s.signOut}>Sign out</button>
         </div>
