@@ -137,6 +137,7 @@ const s: Record<string, React.CSSProperties> = {
     width: '100%',
     margin: '0 auto',
     boxSizing: 'border-box',
+    textAlign: 'left',
   },
 
   // Hero
