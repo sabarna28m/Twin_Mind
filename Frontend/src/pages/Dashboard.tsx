@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const stats = [
@@ -25,7 +26,7 @@ export default function Dashboard() {
       <header style={s.nav}>
         <span style={s.navLogo}>TwinMind</span>
         <div style={s.navRight}>
-          <span style={s.navUser}>{user?.full_name}</span>
+          <Link to="/profile" style={s.navUser}>{user?.full_name}</Link>
           <button onClick={logout} style={s.signOut}>Sign out</button>
         </div>
       </header>
@@ -117,6 +118,7 @@ const s: Record<string, React.CSSProperties> = {
   navUser: {
     fontSize: '0.9rem',
     color: 'var(--text)',
+    textDecoration: 'none',
   },
   signOut: {
     padding: '0.4rem 0.9rem',
