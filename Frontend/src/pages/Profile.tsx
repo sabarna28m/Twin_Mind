@@ -1,6 +1,7 @@
 import { FormEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import ThemeToggle from '../components/ThemeToggle';
 import api from '../services/api';
 
 const BACKEND = 'http://localhost:8000';
@@ -96,6 +97,7 @@ export default function Profile() {
       <header style={s.nav}>
         <Link to="/" style={s.navLogo}>TwinMind</Link>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <ThemeToggle />
           <Link to="/profile/setup" style={s.backLink}>Student Profile</Link>
           <Link to="/" style={s.backLink}>← Dashboard</Link>
         </div>

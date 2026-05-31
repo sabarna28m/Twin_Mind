@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import ThemeToggle from '../components/ThemeToggle';
 
 const stats = [
   { label: 'Sessions',      value: '0',  icon: '▶', grad: 'linear-gradient(135deg,#6366f1,#818cf8)' },
@@ -48,6 +49,7 @@ export default function Dashboard() {
           ))}
         </nav>
         <div style={s.navRight}>
+          <ThemeToggle />
           <Link to="/profile" style={s.navUser}>{user?.full_name}</Link>
           <button className="sign-out-btn" onClick={logout}>Sign out</button>
         </div>
