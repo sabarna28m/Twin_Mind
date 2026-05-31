@@ -294,12 +294,19 @@ export default function Mentor() {
           if (payload === '[DONE]') break;
           try {
             const obj = JSON.parse(payload);
+            if (obj.error) throw new Error(obj.error);
             if (obj.delta) setPlanText(prev => prev + obj.delta);
-          } catch { /* ignore */ }
+          } catch (innerErr) {
+            if (innerErr instanceof Error && innerErr.message !== 'SyntaxError') throw innerErr;
+          }
         }
       }
-    } catch {
-      setPlanText('Failed to generate study plan. Please try again.');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      const display = msg.startsWith('HTTP 404')
+        ? 'Endpoint not found (HTTP 404). The backend server needs to be restarted to load the new study-plan endpoint.\n\nRun: docker-compose restart backend\nor restart your uvicorn process.'
+        : `Failed to generate study plan: ${msg}\n\nPlease try again.`;
+      setPlanText(display);
     } finally {
       setGeneratingPlan(false);
     }
@@ -491,12 +498,18 @@ export default function Mentor() {
 
             <div style={mc.modalBody}>
               {planText
-                ? <PlanContent text={planText} />
-                : <div style={mc.planLoading}>
-                    <span style={mc.cursor}>▍</span> Generating your personalized plan…
-                  </div>
+                ? <>
+                    <PlanContent text={planText} />
+                    {generatingPlan && <span style={mc.cursor}>▍</span>}
+                  </>
+                : generatingPlan
+                  ? <div style={mc.planLoading}>
+                      <span style={mc.cursor}>▍</span> Generating your personalized plan…
+                    </div>
+                  : <div style={mc.planIdle}>
+                      Click <strong>Generate 30-Day Plan</strong> in the sidebar to create your plan.
+                    </div>
               }
-              {generatingPlan && planText && <span style={mc.cursor}>▍</span>}
               <div ref={planBottomRef} />
             </div>
 
@@ -664,6 +677,10 @@ const mc: Record<string, React.CSSProperties> = {
   },
   planLoading: {
     color: 'var(--text)', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
+  },
+  planIdle: {
+    color: 'var(--text)', fontSize: '0.875rem', textAlign: 'center' as const,
+    padding: '2rem 0', lineHeight: '1.6',
   },
   modalFooter: {
     display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem',
