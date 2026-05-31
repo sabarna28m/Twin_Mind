@@ -121,86 +121,79 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
   const ft = twin.future_twin;
   if (!ft) return null;
 
-  const rows = [
-    { label: 'Overall Score', cur: twin.overall_score, fut: ft.overall_score, grad: SCORE_GRADS[0] },
-    { label: 'Academic',      cur: twin.academic_score, fut: ft.academic_score, grad: SCORE_GRADS[1] },
-    { label: 'Wellness',      cur: twin.wellness_score, fut: ft.wellness_score, grad: SCORE_GRADS[2] },
-    { label: 'Consistency',   cur: twin.consistency_score, fut: ft.consistency_score, grad: SCORE_GRADS[3] },
+  const metrics = [
+    { label: 'Overall',     cur: twin.overall_score,    fut: ft.overall_score,    grad: SCORE_GRADS[0] },
+    { label: 'Academic',    cur: twin.academic_score,   fut: ft.academic_score,   grad: SCORE_GRADS[1] },
+    { label: 'Wellness',    cur: twin.wellness_score,   fut: ft.wellness_score,   grad: SCORE_GRADS[2] },
+    { label: 'Consistency', cur: twin.consistency_score, fut: ft.consistency_score, grad: SCORE_GRADS[3] },
   ];
 
   return (
-    <div style={s.card}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-        <div>
-          <h3 style={s.cardTitle}>Future Twin</h3>
-          <p style={{ fontSize: '0.78rem', color: '#475569', marginTop: '0.2rem' }}>30-day projection if current habits continue</p>
+    <div style={{ ...s.card, ...s.fullWidth, padding: '1.25rem 1.5rem' }}>
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem' }}>
+          <h3 style={{ ...s.cardTitle, marginBottom: 0 }}>Future Twin</h3>
+          <span style={{ fontSize: '0.75rem', color: '#475569' }}>30-day projection</span>
         </div>
-        <div style={{ padding: '0.3rem 0.75rem', borderRadius: '99px', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', fontSize: '0.72rem', color: '#818cf8', fontWeight: 600 }}>
+        <div style={{ padding: '0.2rem 0.6rem', borderRadius: '99px', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', fontSize: '0.7rem', color: '#818cf8', fontWeight: 600 }}>
           +30 days
         </div>
       </div>
 
-      {/* Comparison rows */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <div style={s.cmpHeader}>
-          <span style={s.cmpLabelCol}>Metric</span>
-          <span style={s.cmpNowCol}>Now</span>
-          <span style={s.cmpFutCol}>30 Days</span>
-          <span style={s.cmpDeltaCol}>Δ</span>
-          <span style={s.cmpBarCol} />
-        </div>
-        {rows.map(row => {
-          const delta = row.fut - row.cur;
+      {/* 2×2 metric grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', marginBottom: '0.9rem' }}>
+        {metrics.map(m => {
+          const delta = m.fut - m.cur;
           const dc = delta >= 2 ? '#10b981' : delta <= -2 ? '#ef4444' : '#64748b';
-          const barWidth = Math.max(row.cur, row.fut);
           return (
-            <div key={row.label} style={s.cmpRow}>
-              <span style={s.cmpLabelCol}>{row.label}</span>
-              <span style={{ ...s.cmpNowCol, color: '#94a3b8' }}>{Math.round(row.cur)}</span>
-              <span style={{ ...s.cmpFutCol, color: '#f1f5f9', fontWeight: 700 }}>{Math.round(row.fut)}</span>
-              <span style={{ ...s.cmpDeltaCol, color: dc, fontWeight: 700 }}>{delta >= 0 ? '+' : ''}{Math.round(delta)}</span>
-              <div style={s.cmpBarCol}>
-                <div style={{ height: '5px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden', position: 'relative' }}>
-                  <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${(row.cur / barWidth) * 100}%`, background: 'rgba(255,255,255,0.15)', borderRadius: '99px' }} />
-                  <div className="score-bar-fill" style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${(row.fut / barWidth) * 100}%`, background: delta >= 0 ? row.grad : 'linear-gradient(90deg,#ef4444,#f87171)', borderRadius: '99px' }} />
-                </div>
+            <div key={m.label} style={{ padding: '0.6rem 0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>{m.label}</span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: dc }}>{delta >= 0 ? '+' : ''}{Math.round(delta)}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3rem', marginBottom: '0.4rem' }}>
+                <span style={{ fontSize: '0.78rem', color: '#475569' }}>{Math.round(m.cur)}</span>
+                <span style={{ fontSize: '0.7rem', color: '#334155' }}>→</span>
+                <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f1f5f9' }}>{Math.round(m.fut)}</span>
+              </div>
+              <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
+                <div className="score-bar-fill" style={{ height: '100%', width: `${m.fut}%`, background: delta >= 0 ? m.grad : 'linear-gradient(90deg,#ef4444,#f87171)', borderRadius: '99px' }} />
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Predicted exam score */}
-      {ft.predicted_exam_score !== null && (
-        <div style={s.examBox}>
-          <span style={{ fontSize: '0.82rem', color: '#94a3b8', fontWeight: 500 }}>Predicted Exam Score</span>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
-            <span style={{ fontSize: '1.6rem', fontWeight: 800, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              {ft.predicted_exam_score}
-            </span>
-            <span style={{ fontSize: '0.85rem', color: '#475569' }}>/100</span>
+      {/* Exam score + message side by side */}
+      <div style={{ display: 'grid', gridTemplateColumns: ft.predicted_exam_score !== null ? '140px 1fr' : '1fr', gap: '0.6rem', marginBottom: ft.tips.length > 0 ? '0.75rem' : 0 }}>
+        {ft.predicted_exam_score !== null && (
+          <div style={{ padding: '0.6rem 0.75rem', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em', marginBottom: '0.2rem' }}>Exam Score</span>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem' }}>
+              <span style={{ fontSize: '1.5rem', fontWeight: 800, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                {ft.predicted_exam_score}
+              </span>
+              <span style={{ fontSize: '0.75rem', color: '#475569' }}>/100</span>
+            </div>
           </div>
+        )}
+        <div style={{ padding: '0.6rem 0.75rem', background: MSG_BG[twin.trend], border: `1px solid ${MSG_BORDER[twin.trend]}`, borderRadius: '10px', display: 'flex', alignItems: 'center' }}>
+          <p style={{ margin: 0, fontSize: '0.8rem', color: MSG_COLOR[twin.trend], lineHeight: 1.5 }}>
+            {ft.motivational_message}
+          </p>
         </div>
-      )}
-
-      {/* Motivational message */}
-      <div style={{ ...s.msgBox, background: MSG_BG[twin.trend], borderColor: MSG_BORDER[twin.trend] }}>
-        <p style={{ margin: 0, fontSize: '0.875rem', color: MSG_COLOR[twin.trend], lineHeight: 1.65 }}>
-          {ft.motivational_message}
-        </p>
       </div>
 
-      {/* Tips */}
+      {/* Tips — compact inline list */}
       {ft.tips.length > 0 && (
-        <div>
-          <p style={{ margin: '0 0 0.6rem', fontSize: '0.72rem', fontWeight: 700, color: '#475569', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
-            Actionable steps
-          </p>
-          <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            {ft.tips.map((tip, i) => (
-              <li key={i} style={{ fontSize: '0.84rem', color: '#94a3b8', lineHeight: 1.55 }}>{tip}</li>
-            ))}
-          </ul>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          {ft.tips.map((tip, i) => (
+            <div key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+              <span style={{ color: '#6366f1', fontWeight: 700, fontSize: '0.75rem', flexShrink: 0, marginTop: '0.1rem' }}>→</span>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b', lineHeight: 1.5 }}>{tip}</p>
+            </div>
+          ))}
         </div>
       )}
     </div>
