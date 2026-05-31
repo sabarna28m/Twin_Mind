@@ -15,6 +15,8 @@ import Predict from './pages/Predict';
 import Simulate from './pages/Simulate';
 import Mentor from './pages/Mentor';
 import Twin from './pages/Twin';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 export default function App() {
   return (
@@ -23,6 +25,8 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/"
             element={

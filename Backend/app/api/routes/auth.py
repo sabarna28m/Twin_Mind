@@ -1,14 +1,35 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+import secrets
+from datetime import datetime, timedelta, timezone
+
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import hash_password, verify_password, create_access_token, decode_token
 from app.models.user import User
-from app.api.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserResponse, UpdateProfileRequest
+from app.models.password_reset import PasswordResetToken
+from app.api.schemas.auth import (
+    RegisterRequest, LoginRequest, TokenResponse, UserResponse,
+    UpdateProfileRequest, ForgotPasswordRequest, ResetPasswordRequest,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 bearer = HTTPBearer()
+
+_mail_conf = ConnectionConfig(
+    MAIL_USERNAME=settings.mail_username,
+    MAIL_PASSWORD=settings.mail_password,
+    MAIL_FROM=settings.mail_from,
+    MAIL_PORT=settings.mail_port,
+    MAIL_SERVER=settings.mail_server,
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False,
+    USE_CREDENTIALS=True,
+    VALIDATE_CERTS=True,
+)
 
 
 def get_current_user(
@@ -72,3 +93,96 @@ def update_me(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+async def _send_reset_email(email: str, reset_link: str) -> None:
+    message = MessageSchema(
+        subject="TwinMind — Reset your password",
+        recipients=[email],
+        body=f"""
+        <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#0f172a;color:#f1f5f9;border-radius:16px;">
+          <h1 style="color:#818cf8;font-size:1.5rem;margin-bottom:8px;">◈ TwinMind</h1>
+          <h2 style="font-size:1.1rem;font-weight:600;margin-bottom:16px;">Password Reset Request</h2>
+          <p style="color:#94a3b8;margin-bottom:24px;">
+            We received a request to reset your TwinMind password. Click the button below to choose a new password.
+            This link expires in <strong style="color:#f1f5f9;">1 hour</strong>.
+          </p>
+          <a href="{reset_link}"
+             style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#6366f1,#8b5cf6);
+                    color:#fff;text-decoration:none;border-radius:10px;font-weight:700;font-size:0.95rem;">
+            Reset Password →
+          </a>
+          <p style="margin-top:24px;color:#475569;font-size:0.8rem;">
+            If you didn't request this, you can safely ignore this email. Your password won't change.
+          </p>
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:24px 0;" />
+          <p style="color:#334155;font-size:0.75rem;">TwinMind · Your AI-powered academic twin</p>
+        </div>
+        """,
+        subtype=MessageType.html,
+    )
+    fm = FastMail(_mail_conf)
+    await fm.send_message(message)
+
+
+@router.post("/forgot-password", status_code=status.HTTP_200_OK)
+async def forgot_password(
+    payload: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.email == payload.email).first()
+    # Always return success to avoid email enumeration
+    if not user:
+        return {"message": "If that email is registered, a reset link has been sent."}
+
+    # Invalidate any existing unused tokens for this user
+    db.query(PasswordResetToken).filter(
+        PasswordResetToken.user_id == user.id,
+        PasswordResetToken.used == False,  # noqa: E712
+    ).update({"used": True})
+    db.commit()
+
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    reset_record = PasswordResetToken(user_id=user.id, token=token, expires_at=expires_at)
+    db.add(reset_record)
+    db.commit()
+
+    reset_link = f"{settings.frontend_url}/reset-password?token={token}"
+    background_tasks.add_task(_send_reset_email, user.email, reset_link)
+
+    return {"message": "If that email is registered, a reset link has been sent."}
+
+
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db)):
+    record = db.query(PasswordResetToken).filter(
+        PasswordResetToken.token == payload.token,
+        PasswordResetToken.used == False,  # noqa: E712
+    ).first()
+
+    if not record:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired reset token")
+
+    now = datetime.now(timezone.utc)
+    expires = record.expires_at
+    # Make expires_at timezone-aware if stored as naive UTC
+    if expires.tzinfo is None:
+        from datetime import timezone as tz
+        expires = expires.replace(tzinfo=tz.utc)
+
+    if now > expires:
+        record.used = True
+        db.commit()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reset token has expired")
+
+    user = db.query(User).filter(User.id == record.user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
+
+    user.hashed_password = hash_password(payload.new_password)
+    record.used = True
+    db.commit()
+
+    return {"message": "Password updated successfully"}

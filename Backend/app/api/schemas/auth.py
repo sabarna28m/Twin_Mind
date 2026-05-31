@@ -33,3 +33,12 @@ class UpdateProfileRequest(BaseModel):
     full_name: Optional[str] = None
     current_password: Optional[str] = None
     new_password: Optional[str] = None
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str

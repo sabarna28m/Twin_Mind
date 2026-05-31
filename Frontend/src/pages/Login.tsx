@@ -52,6 +52,7 @@ export default function Login() {
             <input className="dark-input" type="password" value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••" required />
+            <Link to="/forgot-password" style={s.forgotLink}>Forgot Password?</Link>
           </label>
           <button className="grad-btn" type="submit" disabled={loading} style={{ marginTop: '0.5rem' }}>
             {loading ? 'Signing in…' : 'Sign in →'}
@@ -117,4 +118,8 @@ const s: Record<string, React.CSSProperties> = {
   },
   footer: { marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#475569' },
   link: { color: '#818cf8', textDecoration: 'none', fontWeight: 600 },
+  forgotLink: {
+    alignSelf: 'flex-end', fontSize: '0.75rem', color: '#6366f1',
+    textDecoration: 'none', fontWeight: 500, marginTop: '2px',
+  },
 };
