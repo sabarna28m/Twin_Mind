@@ -131,6 +131,26 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
   from { transform: scaleX(0); }
   to   { transform: scaleX(1); }
 }
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.045); }
+}
+@keyframes glow-pulse-green {
+  0%, 100% { box-shadow: 0 0 12px rgba(16,185,129,0.4), 0 0 25px rgba(16,185,129,0.15); }
+  50%       { box-shadow: 0 0 35px rgba(16,185,129,0.85), 0 0 70px rgba(16,185,129,0.4); }
+}
+@keyframes glow-pulse-amber {
+  0%, 100% { box-shadow: 0 0 12px rgba(245,158,11,0.4), 0 0 25px rgba(245,158,11,0.15); }
+  50%       { box-shadow: 0 0 35px rgba(245,158,11,0.85), 0 0 70px rgba(245,158,11,0.4); }
+}
+@keyframes glow-pulse-red {
+  0%, 100% { box-shadow: 0 0 12px rgba(239,68,68,0.4), 0 0 25px rgba(239,68,68,0.15); }
+  50%       { box-shadow: 0 0 35px rgba(239,68,68,0.85), 0 0 70px rgba(239,68,68,0.4); }
+}
+@keyframes particle-float {
+  0%, 100% { opacity: 0.15; transform: scale(0.7) translateY(0px); }
+  50%       { opacity: 0.85; transform: scale(1.4) translateY(-6px); }
+}
 
 /* ══════════════════════════════
    Utility Classes

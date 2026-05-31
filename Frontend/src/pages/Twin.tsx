@@ -51,12 +51,76 @@ const SCORE_GRADS = [
   'linear-gradient(90deg,#8b5cf6,#d946ef)',
 ];
 
+const GLOW_ANIM = {
+  low:    'glow-pulse-green 2.5s ease-in-out infinite',
+  medium: 'glow-pulse-amber 2s ease-in-out infinite',
+  high:   'glow-pulse-red 1.5s ease-in-out infinite',
+};
+
+const PARTICLE_CONFIG = [
+  { angle: 0,   r: 85, size: 3, dur: 3.2, delay: 0.0 },
+  { angle: 45,  r: 82, size: 2, dur: 2.8, delay: 0.6 },
+  { angle: 90,  r: 88, size: 4, dur: 3.6, delay: 1.2 },
+  { angle: 135, r: 80, size: 2, dur: 2.5, delay: 0.3 },
+  { angle: 180, r: 86, size: 3, dur: 3.0, delay: 0.9 },
+  { angle: 225, r: 83, size: 2, dur: 2.7, delay: 1.5 },
+  { angle: 270, r: 87, size: 4, dur: 3.4, delay: 0.5 },
+  { angle: 315, r: 81, size: 2, dur: 2.9, delay: 1.1 },
+];
+
+function useCounter(target: number, duration = 1000, delay = 0): number {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (target === 0) { setVal(0); return; }
+    let startTime = -1;
+    let rafId: number;
+    const tid = setTimeout(() => {
+      const tick = (now: number) => {
+        if (startTime < 0) startTime = now;
+        const t = Math.min((now - startTime) / duration, 1);
+        setVal(Math.round((1 - Math.pow(1 - t, 3)) * target));
+        if (t < 1) rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
+    }, delay);
+    return () => { clearTimeout(tid); cancelAnimationFrame(rafId); };
+  }, [target, duration, delay]);
+  return val;
+}
+
+function Particles({ riskLevel }: { riskLevel: 'low' | 'medium' | 'high' }) {
+  const color = RISK_COLOR[riskLevel];
+  return (
+    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+      {PARTICLE_CONFIG.map((p, i) => {
+        const rad = (p.angle * Math.PI) / 180;
+        const x = Math.round(p.r * Math.sin(rad));
+        const y = Math.round(-p.r * Math.cos(rad));
+        return (
+          <div key={i} style={{
+            position: 'absolute',
+            width: `${p.size}px`, height: `${p.size}px`,
+            borderRadius: '50%',
+            background: color,
+            boxShadow: `0 0 ${p.size * 3}px ${color}`,
+            top: `calc(50% + ${y}px)`, left: `calc(50% + ${x}px)`,
+            marginTop: `-${p.size / 2}px`, marginLeft: `-${p.size / 2}px`,
+            animation: `particle-float ${p.dur}s ease-in-out infinite`,
+            animationDelay: `${p.delay}s`,
+          }} />
+        );
+      })}
+    </div>
+  );
+}
+
 function ScoreBar({ label, value, grad, delay = 0 }: { label: string; value: number; grad: string; delay?: number }) {
+  const count = useCounter(value, 1200, delay);
   return (
     <div style={{ marginBottom: '1rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
         <span style={{ fontSize: '0.82rem', color: '#94a3b8', fontWeight: 500 }}>{label}</span>
-        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f1f5f9' }}>{Math.round(value)}</span>
+        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f1f5f9' }}>{count}</span>
       </div>
       <div className="score-bar-track">
         <div
@@ -206,6 +270,9 @@ export default function Twin() {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
 
+  const ageCount  = useCounter(twin?.twin_age ?? 0, 900);
+  const dataCount = useCounter(twin?.data_points ?? 0, 800);
+
   useEffect(() => {
     api.get('/twin', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => setTwin(r.data))
@@ -252,8 +319,11 @@ export default function Twin() {
           <div style={s.grid}>
             {/* Avatar card */}
             <div style={s.avatarCard} className="animate-slide-up">
-              {/* Animated rings */}
+              {/* Avatar with rings + particles */}
               <div style={{ position: 'relative', width: '130px', height: '130px', marginBottom: '1rem' }}>
+                {/* Floating particles */}
+                <Particles riskLevel={twin.risk_level} />
+
                 {/* Outer spinning ring */}
                 <div style={{
                   position: 'absolute', inset: '-8px', borderRadius: '50%',
@@ -261,14 +331,13 @@ export default function Twin() {
                   borderTopColor: RISK_COLOR[twin.risk_level],
                   borderRightColor: RISK_COLOR[twin.risk_level],
                   animation: 'ring-spin 3s linear infinite',
-                  opacity: 0.6,
+                  opacity: 0.55,
                 }} />
-                {/* Middle glow ring */}
+                {/* Middle glow ring — risk-specific pulse */}
                 <div style={{
                   position: 'absolute', inset: 0, borderRadius: '50%',
                   border: `2px solid ${RISK_COLOR[twin.risk_level]}`,
-                  boxShadow: RISK_GLOW[twin.risk_level],
-                  animation: 'glow-pulse 2.5s ease-in-out infinite',
+                  animation: GLOW_ANIM[twin.risk_level],
                 }} />
                 {/* Inner ring counter-spin */}
                 <div style={{
@@ -277,15 +346,16 @@ export default function Twin() {
                   borderBottomColor: `${RISK_COLOR[twin.risk_level]}60`,
                   animation: 'ring-spin-rev 6s linear infinite',
                 }} />
-                {/* Avatar circle */}
+                {/* Avatar circle — breathing animation */}
                 <div style={{
                   position: 'absolute', inset: '4px', borderRadius: '50%',
-                  background: `radial-gradient(circle at 35% 35%, ${RISK_COLOR[twin.risk_level]}25 0%, rgba(15,23,42,0.95) 70%)`,
+                  background: `radial-gradient(circle at 35% 35%, ${RISK_COLOR[twin.risk_level]}30 0%, rgba(15,23,42,0.95) 70%)`,
                   border: '1px solid rgba(255,255,255,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '2rem', fontWeight: 800, color: RISK_COLOR[twin.risk_level],
                   letterSpacing: '-1px',
                   textShadow: `0 0 20px ${RISK_COLOR[twin.risk_level]}80`,
+                  animation: 'breathe 4s ease-in-out infinite',
                 }}>
                   {initials}
                 </div>
@@ -313,12 +383,12 @@ export default function Twin() {
               {/* Meta */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9', lineHeight: 1 }}>{twin.twin_age}</p>
+                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9', lineHeight: 1 }}>{ageCount}</p>
                   <p style={{ fontSize: '0.68rem', color: '#475569', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginTop: '0.25rem' }}>days old</p>
                 </div>
                 <div style={{ width: '1px', height: '36px', background: 'rgba(255,255,255,0.08)' }} />
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9', lineHeight: 1 }}>{twin.data_points}</p>
+                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9', lineHeight: 1 }}>{dataCount}</p>
                   <p style={{ fontSize: '0.68rem', color: '#475569', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginTop: '0.25rem' }}>check-ins</p>
                 </div>
               </div>
