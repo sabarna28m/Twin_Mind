@@ -155,25 +155,27 @@ const ch: Record<string, React.CSSProperties> = {
 
 // ── Data constants ─────────────────────────────────────────────────
 const navItems = [
-  { label: 'Sessions',  to: '/sessions'  },
-  { label: 'Notes',     to: '/notes'     },
-  { label: 'Materials', to: '/materials' },
-  { label: 'Progress',  to: '/progress'  },
-  { label: 'Check-in',  to: '/checkin'   },
-  { label: 'Simulate',  to: '/simulate'  },
-  { label: 'Mentor',    to: '/mentor'    },
-  { label: 'Twin',      to: '/twin'      },
+  { label: 'Sessions',     to: '/sessions'     },
+  { label: 'Notes',        to: '/notes'        },
+  { label: 'Materials',    to: '/materials'    },
+  { label: 'Progress',     to: '/progress'     },
+  { label: 'Check-in',     to: '/checkin'      },
+  { label: 'Achievements', to: '/achievements' },
+  { label: 'Simulate',     to: '/simulate'     },
+  { label: 'Mentor',       to: '/mentor'       },
+  { label: 'Twin',         to: '/twin'         },
 ];
 
 const quickActions = [
-  { label: 'Sessions',  icon: '▶',  grad: 'linear-gradient(135deg,#6366f1,#8b5cf6)', to: '/sessions',  desc: 'Study' },
-  { label: 'Materials', icon: '↑',  grad: 'linear-gradient(135deg,#3b82f6,#06b6d4)', to: '/materials', desc: 'Upload' },
-  { label: 'Progress',  icon: '◎',  grad: 'linear-gradient(135deg,#10b981,#34d399)', to: '/progress',  desc: 'Analytics' },
-  { label: 'Predict',   icon: '🎯', grad: 'linear-gradient(135deg,#8b5cf6,#d946ef)', to: '/predict',   desc: 'ML Score' },
-  { label: 'Simulate',  icon: '⚡', grad: 'linear-gradient(135deg,#f59e0b,#ef4444)', to: '/simulate',  desc: 'What-If' },
-  { label: 'Mentor',    icon: '💬', grad: 'linear-gradient(135deg,#ec4899,#8b5cf6)', to: '/mentor',    desc: 'AI Advice' },
-  { label: 'Twin',      icon: '◈',  grad: 'linear-gradient(135deg,#06b6d4,#6366f1)', to: '/twin',      desc: 'Digital Twin' },
-  { label: 'Check-in',  icon: '✓',  grad: 'linear-gradient(135deg,#34d399,#10b981)', to: '/checkin',   desc: 'Log Today' },
+  { label: 'Sessions',     icon: '▶',  grad: 'linear-gradient(135deg,#6366f1,#8b5cf6)', to: '/sessions',     desc: 'Study' },
+  { label: 'Materials',    icon: '↑',  grad: 'linear-gradient(135deg,#3b82f6,#06b6d4)', to: '/materials',    desc: 'Upload' },
+  { label: 'Progress',     icon: '◎',  grad: 'linear-gradient(135deg,#10b981,#34d399)', to: '/progress',     desc: 'Analytics' },
+  { label: 'Predict',      icon: '🎯', grad: 'linear-gradient(135deg,#8b5cf6,#d946ef)', to: '/predict',      desc: 'ML Score' },
+  { label: 'Achievements', icon: '🏆', grad: 'linear-gradient(135deg,#f59e0b,#fbbf24)', to: '/achievements', desc: 'Badges' },
+  { label: 'Simulate',     icon: '⚡', grad: 'linear-gradient(135deg,#f59e0b,#ef4444)', to: '/simulate',     desc: 'What-If' },
+  { label: 'Mentor',       icon: '💬', grad: 'linear-gradient(135deg,#ec4899,#8b5cf6)', to: '/mentor',       desc: 'AI Advice' },
+  { label: 'Twin',         icon: '◈',  grad: 'linear-gradient(135deg,#06b6d4,#6366f1)', to: '/twin',         desc: 'Digital Twin' },
+  { label: 'Check-in',     icon: '✓',  grad: 'linear-gradient(135deg,#34d399,#10b981)', to: '/checkin',      desc: 'Log Today' },
 ];
 
 // ── Main component ─────────────────────────────────────────────────
@@ -188,6 +190,7 @@ export default function Dashboard() {
   const [entries, setEntries]           = useState<LearningEntry[]>([]);
   const [sessionCount, setSessionCount] = useState(0);
   const [noteCount, setNoteCount]       = useState(0);
+  const [badgeCount, setBadgeCount]     = useState(0);
   const [wsConnected, setWsConnected]   = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -196,10 +199,12 @@ export default function Dashboard() {
       api.get<LearningEntry[]>('/learning-data?limit=60'),
       api.get<unknown[]>('/sessions'),
       api.get<unknown[]>('/notes'),
-    ]).then(([ld, sess, notes]) => {
+      api.get<{ earned: boolean }[]>('/achievements'),
+    ]).then(([ld, sess, notes, ach]) => {
       setEntries(ld.data);
       setSessionCount(sess.data.length);
       setNoteCount(notes.data.length);
+      setBadgeCount(ach.data.filter(b => b.earned).length);
     }).catch(() => {});
   }, []);
 
@@ -344,6 +349,9 @@ export default function Dashboard() {
           <StatCard icon="⏱"  grad="linear-gradient(135deg,#8b5cf6,#a78bfa)" value={totalHours}  unit="h" label="Hours Studied" delay={70}  />
           <StatCard icon="🔥" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={streak}      label="Day Streak"    delay={140} />
           <StatCard icon="📝" grad="linear-gradient(135deg,#10b981,#34d399)" value={noteCount}   label="Notes"         delay={210} />
+          <Link to="/achievements" style={{ textDecoration: 'none' }}>
+            <StatCard icon="🏆" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={badgeCount} label="Badges Earned" delay={280} />
+          </Link>
         </section>
 
         {/* ── Chart + Actions ── */}

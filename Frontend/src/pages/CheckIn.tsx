@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import BadgeNotification, { Badge } from '../components/BadgeNotification';
 
 interface LearningEntry {
   id: number;
@@ -54,6 +55,7 @@ export default function CheckIn() {
 
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [newBadges, setNewBadges] = useState<Badge[]>([]);
 
   // Entry that exists for the selected date
   const existingEntry = entries.find(e => e.date === date) ?? null;
@@ -158,6 +160,11 @@ export default function CheckIn() {
         setEntries(prev => [saved, ...prev].sort((a, b) => b.date.localeCompare(a.date)));
       }
       setMsg({ ok: true, text: isEditing ? 'Entry updated.' : 'Entry logged!' });
+      // Check for newly earned badges
+      try {
+        const { data } = await api.post<{ new_badges: Badge[] }>('/achievements/check', {}, { headers });
+        if (data.new_badges?.length > 0) setNewBadges(data.new_badges);
+      } catch { /* badge check failure is non-critical */ }
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setMsg({ ok: false, text: detail ?? 'Failed to save.' });
@@ -177,6 +184,9 @@ export default function CheckIn() {
 
   return (
     <div style={s.shell}>
+      {newBadges.length > 0 && (
+        <BadgeNotification badges={newBadges} onDone={() => setNewBadges([])} />
+      )}
       <header style={s.nav}>
         <div style={s.navLeft}>
           <Link to="/" style={s.navLogo}>TwinMind</Link>

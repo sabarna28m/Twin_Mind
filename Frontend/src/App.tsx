@@ -16,6 +16,7 @@ import Predict from './pages/Predict';
 import Simulate from './pages/Simulate';
 import Mentor from './pages/Mentor';
 import Twin from './pages/Twin';
+import Achievements from './pages/Achievements';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
@@ -122,6 +123,14 @@ export default function App() {
             element={
               <ProtectedRoute requireProfile={false}>
                 <ProfileSetup />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/achievements"
+            element={
+              <ProtectedRoute>
+                <Achievements />
               </ProtectedRoute>
             }
           />
