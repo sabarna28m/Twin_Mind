@@ -14,6 +14,7 @@ from app.models import student_profile  # noqa: F401
 from app.models import learning_data  # noqa: F401
 from app.models import password_reset  # noqa: F401
 from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes
+from app.api.routes import websocket as ws_routes
 from app.ml.predictor import get_model  # warm up model at startup
 
 Base.metadata.create_all(bind=engine)
@@ -51,6 +52,7 @@ app.include_router(pred_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(sim_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(mentor_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(twin_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(ws_routes.router)
 
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"
 _uploads_dir.mkdir(exist_ok=True)

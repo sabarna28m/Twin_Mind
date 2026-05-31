@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
@@ -177,7 +177,7 @@ const quickActions = [
 
 // ── Main component ─────────────────────────────────────────────────
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const hour = new Date().getHours();
   const greeting = hour < 5 ? 'Burning midnight oil' : hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const firstName = user?.full_name?.split(' ')[0] ?? '';
@@ -187,8 +187,10 @@ export default function Dashboard() {
   const [entries, setEntries]           = useState<LearningEntry[]>([]);
   const [sessionCount, setSessionCount] = useState(0);
   const [noteCount, setNoteCount]       = useState(0);
+  const [wsConnected, setWsConnected]   = useState(false);
+  const wsRef = useRef<WebSocket | null>(null);
 
-  useEffect(() => {
+  const refreshData = useCallback(() => {
     Promise.all([
       api.get<LearningEntry[]>('/learning-data?limit=60'),
       api.get<unknown[]>('/sessions'),
@@ -199,6 +201,49 @@ export default function Dashboard() {
       setNoteCount(notes.data.length);
     }).catch(() => {});
   }, []);
+
+  useEffect(() => { refreshData(); }, [refreshData]);
+
+  // WebSocket — connect on mount, auto-reconnect on drop
+  useEffect(() => {
+    if (!user?.id || !token) return;
+
+    let dead = false;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const connect = () => {
+      if (dead) return;
+      const ws = new WebSocket(
+        `ws://localhost:8000/ws/${user.id}?token=${encodeURIComponent(token)}`
+      );
+      wsRef.current = ws;
+
+      ws.onopen = () => setWsConnected(true);
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data) as { type: string };
+          if (msg.type === 'checkin_update') refreshData();
+        } catch { /* ignore */ }
+      };
+
+      ws.onclose = () => {
+        setWsConnected(false);
+        if (!dead) reconnectTimer = setTimeout(connect, 3000);
+      };
+
+      ws.onerror = () => ws.close();
+    };
+
+    connect();
+
+    return () => {
+      dead = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      wsRef.current?.close();
+      wsRef.current = null;
+    };
+  }, [user?.id, token, refreshData]);
 
   const streak     = computeStreak(entries);
   const totalHours = Math.round(entries.reduce((s, e) => s + e.study_hours, 0));
@@ -214,6 +259,12 @@ export default function Dashboard() {
         <div style={s.navLeft}>
           <span style={s.logoIcon}>◈</span>
           <span style={s.navLogo}>TwinMind</span>
+          {wsConnected && (
+            <div style={s.liveBadge}>
+              <span style={s.liveDot} className="live-dot" />
+              Live
+            </div>
+          )}
         </div>
         <nav style={s.navCenter}>
           {navItems.map(n => <Link key={n.to} to={n.to} className="nav-link">{n.label}</Link>)}
@@ -362,6 +413,8 @@ const s: Record<string, React.CSSProperties> = {
   navLogo:    { fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.3px' },
   navCenter:  { display: 'flex', alignItems: 'center', gap: '0.15rem' },
   navRight:   { display: 'flex', alignItems: 'center', gap: '0.75rem' },
+  liveBadge:  { display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.2rem 0.6rem', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 700, color: '#10b981', letterSpacing: '0.04em' },
+  liveDot:    { width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981', flexShrink: 0 },
   navUser:    { display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', color: 'var(--text)', textDecoration: 'none', fontWeight: 500 },
   navAvatar:  { width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' as const, border: '1.5px solid var(--accent-border)' },
   navInitials:{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--accent-bg)', border: '1.5px solid var(--accent-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 700, color: 'var(--accent)', flexShrink: 0 },
