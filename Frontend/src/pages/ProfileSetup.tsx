@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -28,6 +28,8 @@ export default function ProfileSetup() {
   const [semester, setSemester] = useState('');
   const [academicGoals, setAcademicGoals] = useState('');
   const [selectedPrefs, setSelectedPrefs] = useState<string[]>([]);
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [subjectInput, setSubjectInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -45,6 +47,7 @@ export default function ProfileSetup() {
           ? studentProfile.learning_preferences.split(',').map(s => s.trim()).filter(Boolean)
           : []
       );
+      setSubjects(studentProfile.subjects ?? []);
     }
   }, [studentProfile]);
 
@@ -52,6 +55,27 @@ export default function ProfileSetup() {
     setSelectedPrefs(prev =>
       prev.includes(pref) ? prev.filter(p => p !== pref) : [...prev, pref]
     );
+  }
+
+  function addSubject() {
+    const val = subjectInput.trim();
+    if (val && !subjects.includes(val)) {
+      setSubjects(prev => [...prev, val]);
+    }
+    setSubjectInput('');
+  }
+
+  function removeSubject(sub: string) {
+    setSubjects(prev => prev.filter(s => s !== sub));
+  }
+
+  function handleSubjectKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addSubject();
+    } else if (e.key === 'Backspace' && subjectInput === '' && subjects.length > 0) {
+      setSubjects(prev => prev.slice(0, -1));
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -64,6 +88,7 @@ export default function ProfileSetup() {
       semester,
       academic_goals: academicGoals.trim(),
       learning_preferences: selectedPrefs.join(','),
+      subjects,
     };
     try {
       if (isEditing) {
@@ -149,6 +174,35 @@ export default function ProfileSetup() {
               rows={3}
             />
           </label>
+
+          {/* Subjects */}
+          <div>
+            <p style={s.prefLabel}>Subjects / Modules</p>
+            <p style={s.prefHint}>Type a subject name and press Enter to add it</p>
+            <div style={s.tagBox} onClick={() => (document.getElementById('subject-input') as HTMLInputElement)?.focus()}>
+              {subjects.map(sub => (
+                <span key={sub} style={s.tag}>
+                  {sub}
+                  <button
+                    type="button"
+                    onClick={e => { e.stopPropagation(); removeSubject(sub); }}
+                    style={s.tagX}
+                    aria-label={`Remove ${sub}`}
+                  >×</button>
+                </span>
+              ))}
+              <input
+                id="subject-input"
+                type="text"
+                value={subjectInput}
+                onChange={e => setSubjectInput(e.target.value)}
+                onKeyDown={handleSubjectKeyDown}
+                onBlur={addSubject}
+                placeholder={subjects.length === 0 ? 'e.g. Mathematics, Physics…' : 'Add another…'}
+                style={s.tagInput}
+              />
+            </div>
+          </div>
 
           {/* Learning Preferences */}
           <div>
@@ -289,6 +343,53 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexWrap: 'wrap' as const,
     gap: '0.5rem',
+  },
+  tagBox: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '0.35rem',
+    padding: '0.45rem 0.6rem',
+    border: '1px solid var(--border)',
+    borderRadius: '8px',
+    background: 'var(--bg)',
+    cursor: 'text',
+    minHeight: '42px',
+    alignItems: 'center',
+  },
+  tag: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.25rem',
+    padding: '0.2rem 0.5rem 0.2rem 0.6rem',
+    background: 'var(--accent-bg)',
+    border: '1px solid var(--accent-border)',
+    borderRadius: '99px',
+    fontSize: '0.8rem',
+    color: 'var(--accent)',
+    fontWeight: 600,
+    whiteSpace: 'nowrap' as const,
+  },
+  tagX: {
+    background: 'transparent',
+    border: 'none',
+    color: 'var(--accent)',
+    cursor: 'pointer',
+    fontSize: '1rem',
+    lineHeight: 1,
+    padding: '0',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  tagInput: {
+    flex: '1 1 120px',
+    border: 'none',
+    outline: 'none',
+    background: 'transparent',
+    fontSize: '0.875rem',
+    color: 'var(--text-h)',
+    fontFamily: 'inherit',
+    padding: '0.15rem 0.25rem',
+    minWidth: '80px',
   },
   prefChip: {
     padding: '0.4rem 0.85rem',

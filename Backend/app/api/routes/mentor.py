@@ -135,14 +135,25 @@ def _build_study_plan_prompt(
     if profile:
         goals = profile.academic_goals or "Not specified"
         course = profile.course
+        raw_subjects = profile.subjects or ""
+        subject_list = [s.strip() for s in raw_subjects.split(",") if s.strip()]
+        subjects_str = ", ".join(subject_list) if subject_list else "Not specified"
         profile_section = (
             f"- Course: {course}\n"
             f"- Semester: {profile.semester}\n"
+            f"- Subjects: {subjects_str}\n"
             f"- Academic Goals: {goals}\n"
             f"- Learning Preferences: {profile.learning_preferences or 'Not specified'}\n"
         )
+        subjects_instruction = (
+            f"\nThe student studies these subjects: {subjects_str}. "
+            f"Distribute the 30-day plan across ALL these subjects proportionally, "
+            f"giving extra focus to subjects related to their weak areas.\n"
+            if subject_list else ""
+        )
     else:
         profile_section = "- No academic profile set up yet\n"
+        subjects_instruction = ""
 
     if entries:
         latest = entries[0]
@@ -183,17 +194,19 @@ def _build_study_plan_prompt(
         f"for {name}.\n\n"
         f"**Student Info:**\n{profile_section}"
         f"{data_section}"
-        f"{pred_str}\n"
+        f"{pred_str}"
+        f"{subjects_instruction}\n"
         f"**Instructions:** Generate a structured 30-day plan with these exact sections:\n\n"
         f"1. **Executive Summary** — 2-3 sentences about {name}'s current situation and the plan's focus\n"
-        f"2. **Week 1: Foundation (Days 1–7)** — Build core habits, include daily goals\n"
-        f"3. **Week 2: Building Momentum (Days 8–14)** — Strengthen weak areas, daily targets\n"
-        f"4. **Week 3: Acceleration (Days 15–21)** — Push performance higher, daily milestones\n"
-        f"5. **Week 4: Peak Performance (Days 22–30)** — Exam prep, daily review goals\n"
+        f"2. **Week 1: Foundation (Days 1–7)** — Build core habits, include daily goals per subject\n"
+        f"3. **Week 2: Building Momentum (Days 8–14)** — Strengthen weak areas, daily targets per subject\n"
+        f"4. **Week 3: Acceleration (Days 15–21)** — Push performance higher, daily milestones per subject\n"
+        f"5. **Week 4: Peak Performance (Days 22–30)** — Exam prep, daily review goals per subject\n"
         f"6. **Key Habits to Build** — 5 specific, measurable habits (with exact numbers)\n"
         f"7. **Success Metrics** — How to measure progress week by week\n\n"
-        f"Be SPECIFIC: reference the student's actual numbers. Give exact time allocations "
-        f"(e.g. 'study 3h/day', 'sleep by 11pm'). Make every day actionable. Use markdown formatting."
+        f"Be SPECIFIC: reference the student's actual numbers and subject names. Give exact time "
+        f"allocations (e.g. '45 min Mathematics, 30 min Physics'). Make every day actionable. "
+        f"Use markdown formatting."
     )
 
 

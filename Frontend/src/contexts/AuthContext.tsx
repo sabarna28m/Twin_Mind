@@ -17,6 +17,7 @@ export interface StudentProfile {
   semester: string;
   academic_goals: string;
   learning_preferences: string;
+  subjects: string[];
 }
 
 interface AuthContextValue {

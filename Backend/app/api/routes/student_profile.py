@@ -36,6 +36,7 @@ def create_student_profile(
         semester=payload.semester,
         academic_goals=payload.academic_goals or "",
         learning_preferences=payload.learning_preferences or "",
+        subjects=",".join(payload.subjects),
     )
     db.add(profile)
     db.commit()
@@ -52,8 +53,12 @@ def update_student_profile(
     profile = db.query(StudentProfile).filter(StudentProfile.user_id == current_user.id).first()
     if not profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student profile not found — use POST to create")
-    for field, value in payload.model_dump(exclude_none=True).items():
-        setattr(profile, field, value)
+    data = payload.model_dump(exclude_none=True)
+    for field, value in data.items():
+        if field == "subjects":
+            setattr(profile, field, ",".join(value))
+        else:
+            setattr(profile, field, value)
     db.commit()
     db.refresh(profile)
     return profile

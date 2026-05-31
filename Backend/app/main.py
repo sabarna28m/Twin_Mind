@@ -20,13 +20,17 @@ from app.ml.predictor import get_model  # warm up model at startup
 
 Base.metadata.create_all(bind=engine)
 
-# Add avatar_url column to existing DBs that predate this migration
+# Add columns to existing DBs that predate these migrations
 with engine.connect() as _conn:
-    try:
-        _conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url TEXT"))
-        _conn.commit()
-    except Exception:
-        pass  # column already exists
+    for _sql in [
+        "ALTER TABLE users ADD COLUMN avatar_url TEXT",
+        "ALTER TABLE student_profiles ADD COLUMN subjects TEXT DEFAULT ''",
+    ]:
+        try:
+            _conn.execute(text(_sql))
+            _conn.commit()
+        except Exception:
+            pass  # column already exists
 
 app = FastAPI(
     title=settings.app_name,

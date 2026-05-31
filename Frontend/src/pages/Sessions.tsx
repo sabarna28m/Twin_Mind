@@ -15,7 +15,8 @@ interface Session {
 }
 
 export default function Sessions() {
-  const { user, token } = useAuth();
+  const { user, token, studentProfile } = useAuth();
+  const profileSubjects = studentProfile?.subjects ?? [];
   const headers = { Authorization: `Bearer ${token}` };
   const wsConnected = useWebSocket(user?.id, token, () => {});
 
@@ -97,13 +98,26 @@ export default function Sessions() {
               required
               autoFocus
             />
-            <input
-              type="text"
-              placeholder="Subject (optional)"
-              value={subject}
-              onChange={e => setSubject(e.target.value)}
-              style={s.input}
-            />
+            {profileSubjects.length > 0 ? (
+              <select
+                value={subject}
+                onChange={e => setSubject(e.target.value)}
+                style={{ ...s.input, cursor: 'pointer' }}
+              >
+                <option value="">Subject (optional)</option>
+                {profileSubjects.map(sub => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                placeholder="Subject (optional)"
+                value={subject}
+                onChange={e => setSubject(e.target.value)}
+                style={s.input}
+              />
+            )}
             <button type="submit" disabled={creating} style={s.createBtn}>
               {creating ? 'Creating…' : 'Create'}
             </button>

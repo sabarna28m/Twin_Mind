@@ -13,5 +13,6 @@ class StudentProfile(Base):
     semester = Column(String, nullable=False)
     academic_goals = Column(Text, default="")
     learning_preferences = Column(String, default="")  # comma-separated
+    subjects = Column(Text, default="")               # comma-separated
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
