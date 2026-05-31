@@ -307,3 +307,8 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
   background: rgba(99,102,241,0.1);
   border-color: rgba(99,102,241,0.55);
 }
+
+/* Avatar upload overlay */
+.avatar-wrap:hover .avatar-overlay {
+  opacity: 1 !important;
+}

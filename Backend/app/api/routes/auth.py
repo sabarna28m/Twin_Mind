@@ -1,10 +1,16 @@
 import secrets
+import uuid
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from sqlalchemy.orm import Session
+
+UPLOAD_DIR = Path(__file__).resolve().parent.parent.parent.parent / "uploads" / "avatars"
+ALLOWED_MIME = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+MAX_SIZE = 5 * 1024 * 1024  # 5 MB
 
 from app.core.config import settings
 from app.core.database import get_db
@@ -186,3 +192,37 @@ def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db))
     db.commit()
 
     return {"message": "Password updated successfully"}
+
+
+@router.post("/me/avatar", response_model=UserResponse)
+async def upload_avatar(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if file.content_type not in ALLOWED_MIME:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Only JPEG, PNG, GIF, or WebP images are allowed")
+
+    content = await file.read()
+    if len(content) > MAX_SIZE:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="File too large (max 5 MB)")
+
+    ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else "jpg"
+    filename = f"{uuid.uuid4().hex}.{ext}"
+
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    (UPLOAD_DIR / filename).write_bytes(content)
+
+    # Delete old avatar file
+    if current_user.avatar_url:
+        old_name = current_user.avatar_url.rsplit("/", 1)[-1]
+        old_file = UPLOAD_DIR / old_name
+        if old_file.exists():
+            old_file.unlink()
+
+    current_user.avatar_url = f"/uploads/avatars/{filename}"
+    db.commit()
+    db.refresh(current_user)
+    return current_user

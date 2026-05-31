@@ -6,6 +6,7 @@ interface User {
   email: string;
   full_name: string;
   is_active: boolean;
+  avatar_url?: string | null;
 }
 
 export interface StudentProfile {
@@ -27,6 +28,7 @@ interface AuthContextValue {
   register: (email: string, fullName: string, password: string) => Promise<void>;
   logout: () => void;
   refreshStudentProfile: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -64,6 +66,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
   }, [token]);
 
+  async function refreshUser() {
+    if (!token) return;
+    try {
+      const { data } = await api.get<User>('/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(data);
+    } catch {
+      // ignore
+    }
+  }
+
   async function refreshStudentProfile() {
     if (!token) return;
     try {
@@ -96,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, studentProfile, profileLoaded, login, register, logout, refreshStudentProfile }}>
+    <AuthContext.Provider value={{ user, token, studentProfile, profileLoaded, login, register, logout, refreshStudentProfile, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

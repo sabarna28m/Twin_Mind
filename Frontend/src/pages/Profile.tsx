@@ -1,19 +1,25 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 
+const BACKEND = 'http://localhost:8000';
+
 export default function Profile() {
-  const { user, token } = useAuth();
+  const { user, token, refreshUser } = useAuth();
 
   const [fullName, setFullName] = useState(user?.full_name ?? '');
-  const [nameMsg, setNameMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [nameMsg, setNameMsg]   = useState<{ ok: boolean; text: string } | null>(null);
   const [nameSaving, setNameSaving] = useState(false);
 
   const [currentPw, setCurrentPw] = useState('');
-  const [newPw, setNewPw] = useState('');
-  const [pwMsg, setPwMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  const [pwSaving, setPwSaving] = useState(false);
+  const [newPw, setNewPw]         = useState('');
+  const [pwMsg, setPwMsg]         = useState<{ ok: boolean; text: string } | null>(null);
+  const [pwSaving, setPwSaving]   = useState(false);
+
+  const [avatarMsg, setAvatarMsg]       = useState<{ ok: boolean; text: string } | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function saveName(e: FormEvent) {
     e.preventDefault();
@@ -21,6 +27,7 @@ export default function Profile() {
     setNameSaving(true);
     try {
       await api.put('/auth/me', { full_name: fullName }, { headers: { Authorization: `Bearer ${token}` } });
+      await refreshUser();
       setNameMsg({ ok: true, text: 'Name updated.' });
     } catch {
       setNameMsg({ ok: false, text: 'Failed to update name.' });
@@ -50,12 +57,39 @@ export default function Profile() {
     }
   }
 
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarMsg(null);
+    setAvatarUploading(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      await api.post('/auth/me/avatar', form, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      await refreshUser();
+      setAvatarMsg({ ok: true, text: 'Profile picture updated.' });
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setAvatarMsg({ ok: false, text: detail ?? 'Upload failed.' });
+    } finally {
+      setAvatarUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
   const initials = (user?.full_name ?? '?')
     .split(' ')
     .map(w => w[0])
     .join('')
     .toUpperCase()
     .slice(0, 2);
+
+  const avatarSrc = user?.avatar_url ? BACKEND + user.avatar_url : null;
 
   return (
     <div style={s.shell}>
@@ -72,10 +106,38 @@ export default function Profile() {
 
         {/* Identity card */}
         <section style={s.card}>
-          <div style={s.avatar}>{initials}</div>
+          {/* Clickable avatar */}
+          <div
+            className="avatar-wrap"
+            style={s.avatarWrap}
+            onClick={() => !avatarUploading && fileInputRef.current?.click()}
+            title="Click to change profile picture"
+          >
+            {avatarSrc ? (
+              <img src={avatarSrc} alt="avatar" style={s.avatarImg} />
+            ) : (
+              <div style={s.avatarInitials}>{initials}</div>
+            )}
+            <div className="avatar-overlay" style={s.avatarOverlay}>
+              {avatarUploading ? '…' : '📷'}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              style={{ display: 'none' }}
+              onChange={handleAvatarChange}
+            />
+          </div>
+
           <div>
             <p style={s.identityName}>{user?.full_name}</p>
             <p style={s.identityEmail}>{user?.email}</p>
+            {avatarMsg && (
+              <p style={avatarMsg.ok ? { ...s.avatarFeedback, color: '#16a34a' } : { ...s.avatarFeedback, color: '#dc2626' }}>
+                {avatarMsg.text}
+              </p>
+            )}
           </div>
         </section>
 
@@ -194,9 +256,28 @@ const s: Record<string, React.CSSProperties> = {
     marginBottom: '1.5rem',
     background: 'var(--bg)',
   },
-  avatar: {
-    width: '52px',
-    height: '52px',
+
+  // Avatar
+  avatarWrap: {
+    position: 'relative',
+    width: '64px',
+    height: '64px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    cursor: 'pointer',
+    overflow: 'hidden',
+  },
+  avatarImg: {
+    width: '64px',
+    height: '64px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    display: 'block',
+    border: '2px solid var(--accent-border)',
+  },
+  avatarInitials: {
+    width: '64px',
+    height: '64px',
     borderRadius: '50%',
     background: 'var(--accent-bg)',
     border: '2px solid var(--accent-border)',
@@ -204,10 +285,28 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '1.1rem',
+    fontSize: '1.25rem',
     fontWeight: 700,
-    flexShrink: 0,
   },
+  avatarOverlay: {
+    position: 'absolute',
+    inset: 0,
+    borderRadius: '50%',
+    background: 'rgba(0,0,0,0.45)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '1.25rem',
+    opacity: 0,
+    transition: 'opacity 0.15s',
+  },
+
+  avatarFeedback: {
+    margin: '0.3rem 0 0',
+    fontSize: '0.8rem',
+    fontWeight: 500,
+  },
+
   identityName: {
     margin: '0 0 0.2rem',
     fontWeight: 600,

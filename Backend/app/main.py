@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
+from sqlalchemy import text
 
 from app.core.config import settings
 from app.core.database import engine, Base
@@ -14,6 +17,14 @@ from app.api.routes import health, auth, sessions, notes, materials, analytics, 
 from app.ml.predictor import get_model  # warm up model at startup
 
 Base.metadata.create_all(bind=engine)
+
+# Add avatar_url column to existing DBs that predate this migration
+with engine.connect() as _conn:
+    try:
+        _conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url TEXT"))
+        _conn.commit()
+    except Exception:
+        pass  # column already exists
 
 app = FastAPI(
     title=settings.app_name,
@@ -40,6 +51,10 @@ app.include_router(pred_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(sim_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(mentor_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(twin_routes.router, prefix=settings.api_v1_prefix)
+
+_uploads_dir = Path(__file__).resolve().parent.parent / "uploads"
+_uploads_dir.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")
 
 
 @app.get("/")
