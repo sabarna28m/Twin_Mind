@@ -14,7 +14,7 @@ services:
       - SECRET_KEY=dev-secret-change-in-production
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/')"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,8 +31,8 @@ services:
       - ./Frontend:/app
       - /app/node_modules
     environment:
-      # Browser connects to localhost:8000 (the exposed host port).
-      - VITE_API_URL=http://localhost:8000/api/v1
+      # Browser connects to 127.0.0.1:8000; localhost resolves to ::1 on Windows 11.
+      - VITE_API_URL=http://127.0.0.1:8000/api/v1
     depends_on:
       backend:
         condition: service_healthy
