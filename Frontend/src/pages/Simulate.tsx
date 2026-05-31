@@ -2,6 +2,8 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { useWebSocket } from '../hooks/useWebSocket';
+import LiveBadge from '../components/LiveBadge';
 
 interface SimParams {
   study_hours: number;
@@ -111,8 +113,10 @@ function SliderRow({
 }
 
 export default function Simulate() {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   const headers = { Authorization: `Bearer ${token}` };
+  // No auto-refresh on checkin_update — would reset the user's slider state
+  const wsConnected = useWebSocket(user?.id, token, () => {});
 
   const [current,     setCurrent]     = useState<SimParams>(DEFAULTS);
   const [hypothetical, setHypo]       = useState<SimParams>(DEFAULTS);
@@ -177,7 +181,10 @@ export default function Simulate() {
   return (
     <div style={sc.shell}>
       <header style={sc.nav}>
-        <Link to="/" style={sc.navLogo}>TwinMind</Link>
+        <div style={sc.navLeft}>
+          <Link to="/" style={sc.navLogo}>TwinMind</Link>
+          {wsConnected && <LiveBadge />}
+        </div>
         <nav style={sc.navRight}>
           <Link to="/predict" style={sc.navLink}>Predict</Link>
           <Link to="/" style={sc.backLink}>← Dashboard</Link>
@@ -330,6 +337,7 @@ const sc: Record<string, React.CSSProperties> = {
     padding: '0 2rem', height: '60px', borderBottom: '1px solid var(--border)',
     background: 'var(--bg)', position: 'sticky', top: 0, zIndex: 10,
   },
+  navLeft:  { display: 'flex', alignItems: 'center', gap: '0.5rem' },
   navLogo:  { fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.5px', textDecoration: 'none' },
   navRight: { display: 'flex', alignItems: 'center', gap: '1.25rem' },
   navLink:  { fontSize: '0.875rem', color: 'var(--text)', textDecoration: 'none', fontWeight: 500 },

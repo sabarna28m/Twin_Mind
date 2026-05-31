@@ -1,7 +1,9 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useCallback, useEffect, useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { useWebSocket } from '../hooks/useWebSocket';
+import LiveBadge from '../components/LiveBadge';
 
 interface LearningEntry {
   study_hours: number; attendance_percentage: number;
@@ -75,7 +77,7 @@ const g: Record<string, React.CSSProperties> = {
 };
 
 export default function Predict() {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   const headers = { Authorization: `Bearer ${token}` };
 
   const [studyHours,  setStudyHours]  = useState('');
@@ -90,8 +92,7 @@ export default function Predict() {
   const [result,   setResult]   = useState<PredictionResult | null>(null);
   const [error,    setError]    = useState('');
 
-  // Pre-fill from most recent check-in
-  useEffect(() => {
+  const prefillFromLatest = useCallback(() => {
     api.get<LearningEntry[]>('/learning-data?limit=1', { headers })
       .then(r => {
         if (r.data.length > 0) {
@@ -106,7 +107,11 @@ export default function Predict() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [token]);
+
+  useEffect(() => { prefillFromLatest(); }, [prefillFromLatest]);
+
+  const wsConnected = useWebSocket(user?.id, token, prefillFromLatest);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -138,7 +143,10 @@ export default function Predict() {
   return (
     <div style={s.shell}>
       <header style={s.nav}>
-        <Link to="/" style={s.navLogo}>TwinMind</Link>
+        <div style={s.navLeft}>
+          <Link to="/" style={s.navLogo}>TwinMind</Link>
+          {wsConnected && <LiveBadge />}
+        </div>
         <Link to="/" style={s.backLink}>← Dashboard</Link>
       </header>
 
@@ -275,6 +283,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: '0 2rem', height: '60px', borderBottom: '1px solid var(--border)',
     background: 'var(--bg)', position: 'sticky', top: 0, zIndex: 10,
   },
+  navLeft:  { display: 'flex', alignItems: 'center', gap: '0.5rem' },
   navLogo: { fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.5px', textDecoration: 'none' },
   backLink: { fontSize: '0.875rem', color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 },
   main: { flex: 1, padding: '2rem', maxWidth: '960px', width: '100%', margin: '0 auto', boxSizing: 'border-box', textAlign: 'left' },

@@ -2,6 +2,8 @@ import { useEffect, useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { useWebSocket } from '../hooks/useWebSocket';
+import LiveBadge from '../components/LiveBadge';
 
 interface Session {
   id: number;
@@ -13,8 +15,9 @@ interface Session {
 }
 
 export default function Sessions() {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   const headers = { Authorization: `Bearer ${token}` };
+  const wsConnected = useWebSocket(user?.id, token, () => {});
 
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +71,10 @@ export default function Sessions() {
   return (
     <div style={s.shell}>
       <header style={s.nav}>
-        <Link to="/" style={s.navLogo}>TwinMind</Link>
+        <div style={s.navLeft}>
+          <Link to="/" style={s.navLogo}>TwinMind</Link>
+          {wsConnected && <LiveBadge />}
+        </div>
         <Link to="/" style={s.backLink}>← Dashboard</Link>
       </header>
 
@@ -162,6 +168,7 @@ const s: Record<string, React.CSSProperties> = {
     top: 0,
     zIndex: 10,
   },
+  navLeft: { display: 'flex', alignItems: 'center', gap: '0.5rem' },
   navLogo: {
     fontSize: '1.2rem',
     fontWeight: 700,

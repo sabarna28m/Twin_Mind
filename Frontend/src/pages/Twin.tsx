@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { useWebSocket } from '../hooks/useWebSocket';
+import LiveBadge from '../components/LiveBadge';
 
 interface HistoryPoint { date: string; overall_score: number; }
 
@@ -273,12 +275,20 @@ export default function Twin() {
   const ageCount  = useCounter(twin?.twin_age ?? 0, 900);
   const dataCount = useCounter(twin?.data_points ?? 0, 800);
 
+  const refreshTwin = useCallback(() => {
+    api.get('/twin', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => setTwin(r.data))
+      .catch(() => {});
+  }, [token]);
+
   useEffect(() => {
     api.get('/twin', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => setTwin(r.data))
       .catch(() => setError('Failed to load twin data.'))
       .finally(() => setLoading(false));
   }, [token]);
+
+  const wsConnected = useWebSocket(user?.id, token, refreshTwin);
 
   const initials = user?.full_name
     ? user.full_name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
@@ -294,6 +304,7 @@ export default function Twin() {
         <div style={s.navLeft}>
           <span style={{ fontSize: '1rem', color: '#6366f1' }}>◈</span>
           <span style={s.navLogo}>TwinMind</span>
+          {wsConnected && <LiveBadge />}
         </div>
         <div style={s.navRight}>
           <Link to="/" className="nav-link">← Dashboard</Link>

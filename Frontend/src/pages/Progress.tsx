@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { useWebSocket } from '../hooks/useWebSocket';
+import LiveBadge from '../components/LiveBadge';
 
 interface SubjectStat { subject: string; count: number; total_minutes: number; }
 interface DayActivity  { date: string; sessions: number; minutes: number; }
@@ -29,15 +31,23 @@ function shortDate(iso: string) {
 }
 
 export default function Progress() {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const refreshData = useCallback(() => {
+    api.get<Analytics>('/analytics', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => setData(r.data))
+      .catch(() => {});
+  }, [token]);
 
   useEffect(() => {
     api.get<Analytics>('/analytics', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => setData(r.data))
       .finally(() => setLoading(false));
   }, []);
+
+  const wsConnected = useWebSocket(user?.id, token, refreshData);
 
   const completionRate = data && data.total_sessions > 0
     ? Math.round((data.completed_sessions / data.total_sessions) * 100)
@@ -54,7 +64,10 @@ export default function Progress() {
   return (
     <div style={s.shell}>
       <header style={s.nav}>
-        <Link to="/" style={s.navLogo}>TwinMind</Link>
+        <div style={s.navLeft}>
+          <Link to="/" style={s.navLogo}>TwinMind</Link>
+          {wsConnected && <LiveBadge />}
+        </div>
         <Link to="/" style={s.backLink}>← Dashboard</Link>
       </header>
 
@@ -188,6 +201,7 @@ const s: Record<string, React.CSSProperties> = {
     top: 0,
     zIndex: 10,
   },
+  navLeft:  { display: 'flex', alignItems: 'center', gap: '0.5rem' },
   navLogo: { fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.5px', textDecoration: 'none' },
   backLink: { fontSize: '0.875rem', color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 },
   main: {

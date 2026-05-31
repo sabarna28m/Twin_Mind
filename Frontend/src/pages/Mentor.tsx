@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState, KeyboardEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { useWebSocket } from '../hooks/useWebSocket';
+import LiveBadge from '../components/LiveBadge';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000/api/v1';
 
@@ -71,14 +73,8 @@ export default function Mentor() {
   const bottomRef  = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load sidebar data
-  useEffect(() => {
+  const refreshSidebar = useCallback(() => {
     const h = { Authorization: `Bearer ${token}` };
-
-    api.get<Profile>('/student-profile', { headers: h })
-      .then(r => setProfile(r.data))
-      .catch(() => {});
-
     api.get<LatestEntry[]>('/learning-data?limit=1', { headers: h })
       .then(r => {
         if (r.data.length > 0) {
@@ -97,7 +93,18 @@ export default function Mentor() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [token]);
+
+  const wsConnected = useWebSocket(user?.id, token, refreshSidebar);
+
+  // Load sidebar data on mount
+  useEffect(() => {
+    const h = { Authorization: `Bearer ${token}` };
+    api.get<Profile>('/student-profile', { headers: h })
+      .then(r => setProfile(r.data))
+      .catch(() => {});
+    refreshSidebar();
+  }, [refreshSidebar]);
 
   // Scroll to bottom when messages update
   useEffect(() => {
@@ -188,7 +195,10 @@ export default function Mentor() {
     <div style={mc.shell}>
       {/* Navbar */}
       <header style={mc.nav}>
-        <Link to="/" style={mc.navLogo}>TwinMind</Link>
+        <div style={mc.navLeft}>
+          <Link to="/" style={mc.navLogo}>TwinMind</Link>
+          {wsConnected && <LiveBadge />}
+        </div>
         <nav style={mc.navRight}>
           <Link to="/predict" style={mc.navLink}>Predict</Link>
           <Link to="/simulate" style={mc.navLink}>Simulate</Link>
@@ -343,6 +353,7 @@ const mc: Record<string, React.CSSProperties> = {
     padding: '0 2rem', height: '60px', borderBottom: '1px solid var(--border)',
     background: 'var(--bg)', position: 'sticky', top: 0, zIndex: 10,
   },
+  navLeft:  { display: 'flex', alignItems: 'center', gap: '0.5rem' },
   navLogo:  { fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.5px', textDecoration: 'none' },
   navRight: { display: 'flex', alignItems: 'center', gap: '1.25rem' },
   navLink:  { fontSize: '0.875rem', color: 'var(--text)', textDecoration: 'none', fontWeight: 500 },
