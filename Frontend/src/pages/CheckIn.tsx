@@ -1,4 +1,4 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -33,11 +33,13 @@ function stressLabel(level: number) {
 }
 
 export default function CheckIn() {
-  const { token } = useAuth();
+  const { user, token } = useAuth();
   const headers = { Authorization: `Bearer ${token}` };
 
   const [entries, setEntries] = useState<LearningEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [wsConnected, setWsConnected] = useState(false);
+  const wsRef = useRef<WebSocket | null>(null);
 
   // Form state
   const [date, setDate] = useState(today());
@@ -57,11 +59,58 @@ export default function CheckIn() {
   const existingEntry = entries.find(e => e.date === date) ?? null;
   const isEditing = !!existingEntry;
 
+  const refreshEntries = useCallback(() => {
+    api.get<LearningEntry[]>('/learning-data')
+      .then(r => setEntries(r.data))
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     api.get<LearningEntry[]>('/learning-data', { headers })
       .then(r => setEntries(r.data))
       .finally(() => setLoading(false));
   }, []);
+
+  // WebSocket — connect on mount, auto-reconnect on drop
+  useEffect(() => {
+    if (!user?.id || !token) return;
+
+    let dead = false;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const connect = () => {
+      if (dead) return;
+      const ws = new WebSocket(
+        `ws://localhost:8000/ws/${user.id}?token=${encodeURIComponent(token)}`
+      );
+      wsRef.current = ws;
+
+      ws.onopen = () => setWsConnected(true);
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data) as { type: string };
+          if (msg.type === 'checkin_update') refreshEntries();
+        } catch { /* ignore */ }
+      };
+
+      ws.onclose = () => {
+        setWsConnected(false);
+        if (!dead) reconnectTimer = setTimeout(connect, 3000);
+      };
+
+      ws.onerror = () => ws.close();
+    };
+
+    connect();
+
+    return () => {
+      dead = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      wsRef.current?.close();
+      wsRef.current = null;
+    };
+  }, [user?.id, token, refreshEntries]);
 
   // Pre-fill form when date changes and an entry exists
   useEffect(() => {
@@ -129,7 +178,15 @@ export default function CheckIn() {
   return (
     <div style={s.shell}>
       <header style={s.nav}>
-        <Link to="/" style={s.navLogo}>TwinMind</Link>
+        <div style={s.navLeft}>
+          <Link to="/" style={s.navLogo}>TwinMind</Link>
+          {wsConnected && (
+            <div style={s.liveBadge}>
+              <span style={s.liveDot} className="live-dot" />
+              Live
+            </div>
+          )}
+        </div>
         <Link to="/" style={s.backLink}>← Dashboard</Link>
       </header>
 
@@ -318,8 +375,11 @@ const s: Record<string, React.CSSProperties> = {
     padding: '0 2rem', height: '60px', borderBottom: '1px solid var(--border)',
     background: 'var(--bg)', position: 'sticky', top: 0, zIndex: 10,
   },
-  navLogo: { fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.5px', textDecoration: 'none' },
+  navLeft:  { display: 'flex', alignItems: 'center', gap: '0.5rem' },
+  navLogo:  { fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.5px', textDecoration: 'none' },
   backLink: { fontSize: '0.875rem', color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 },
+  liveBadge: { display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.2rem 0.6rem', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 700, color: '#10b981', letterSpacing: '0.04em' },
+  liveDot:   { width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981', flexShrink: 0 },
   main: {
     flex: 1, padding: '2rem', maxWidth: '860px', width: '100%',
     margin: '0 auto', boxSizing: 'border-box', textAlign: 'left',
