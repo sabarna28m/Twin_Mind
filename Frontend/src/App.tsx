@@ -14,6 +14,7 @@ import CheckIn from './pages/CheckIn';
 import Predict from './pages/Predict';
 import Simulate from './pages/Simulate';
 import Mentor from './pages/Mentor';
+import Twin from './pages/Twin';
 
 export default function App() {
   return (
@@ -91,6 +92,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Simulate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/twin"
+            element={
+              <ProtectedRoute>
+                <Twin />
               </ProtectedRoute>
             }
           />

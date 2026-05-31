@@ -15,6 +15,7 @@ const quickActions = [
   { label: 'Predict Score', desc: 'ML-powered exam score prediction', icon: '🎯', to: '/predict' },
   { label: 'What-If Simulator', desc: 'Explore how habit changes affect your score', icon: '⚡', to: '/simulate' },
   { label: 'AI Mentor', desc: 'Get personalised advice from your AI mentor', icon: '💬', to: '/mentor' },
+  { label: 'Digital Twin', desc: 'View your living academic model', icon: '◈', to: '/twin' },
 ];
 
 export default function Dashboard() {
