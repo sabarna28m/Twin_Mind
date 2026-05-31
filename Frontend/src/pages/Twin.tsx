@@ -5,6 +5,17 @@ import api from '../services/api';
 
 interface HistoryPoint { date: string; overall_score: number; }
 
+interface FutureTwin {
+  overall_score: number;
+  consistency_score: number;
+  wellness_score: number;
+  academic_score: number;
+  risk_level: 'low' | 'medium' | 'high';
+  predicted_exam_score: number | null;
+  motivational_message: string;
+  tips: string[];
+}
+
 interface TwinState {
   overall_score: number;
   consistency_score: number;
@@ -17,6 +28,7 @@ interface TwinState {
   strengths: string[];
   areas_to_improve: string[];
   history: HistoryPoint[];
+  future_twin: FutureTwin | null;
 }
 
 const RISK_COLOR = { low: '#16a34a', medium: '#d97706', high: '#dc2626' };
@@ -77,6 +89,90 @@ function SparkLine({ history }: { history: HistoryPoint[] }) {
         );
       })}
     </svg>
+  );
+}
+
+const MSG_COLOR = { improving: '#14532d', declining: '#7f1d1d', stable: '#78350f' };
+const MSG_BG    = { improving: 'rgba(34,197,94,0.1)', declining: 'rgba(239,68,68,0.1)', stable: 'rgba(217,119,6,0.1)' };
+const MSG_BORDER = { improving: '#22c55e', declining: '#ef4444', stable: '#f59e0b' };
+
+function FutureTwinCard({ twin }: { twin: TwinState }) {
+  const ft = twin.future_twin;
+  if (!ft) return null;
+
+  const rows = [
+    { label: 'Overall Score', cur: twin.overall_score, fut: ft.overall_score, color: 'var(--accent)' },
+    { label: 'Academic', cur: twin.academic_score, fut: ft.academic_score, color: '#3b82f6' },
+    { label: 'Wellness', cur: twin.wellness_score, fut: ft.wellness_score, color: '#10b981' },
+    { label: 'Consistency', cur: twin.consistency_score, fut: ft.consistency_score, color: '#8b5cf6' },
+  ];
+
+  return (
+    <div style={{ ...s.card, ...s.fullWidth }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+        <h3 style={s.cardTitle}>Future Twin — 30 Days</h3>
+        <span style={{ fontSize: '0.72rem', color: 'var(--text)', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)', borderRadius: '99px', padding: '0.2rem 0.65rem', fontWeight: 500 }}>
+          if current habits continue
+        </span>
+      </div>
+
+      {/* Side-by-side comparison */}
+      <div style={s.cmpTable}>
+        <div style={s.cmpHeader}>
+          <span style={s.cmpLabelCol}>Metric</span>
+          <span style={s.cmpNowCol}>Now</span>
+          <span style={s.cmpFutCol}>30 Days</span>
+          <span style={s.cmpDeltaCol}>Change</span>
+          <span style={s.cmpBarCol} />
+        </div>
+        {rows.map(row => {
+          const delta = row.fut - row.cur;
+          const dc = delta >= 2 ? '#16a34a' : delta <= -2 ? '#dc2626' : '#6b7280';
+          return (
+            <div key={row.label} style={s.cmpRow}>
+              <span style={s.cmpLabelCol}>{row.label}</span>
+              <span style={{ ...s.cmpNowCol, color: 'var(--text-h)' }}>{Math.round(row.cur)}</span>
+              <span style={{ ...s.cmpFutCol, color: dc, fontWeight: 700 }}>{Math.round(row.fut)}</span>
+              <span style={{ ...s.cmpDeltaCol, color: dc, fontWeight: 700 }}>
+                {delta >= 0 ? '+' : ''}{Math.round(delta)}
+              </span>
+              <div style={s.cmpBarCol}>
+                <div style={{ height: '6px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${row.cur}%`, background: 'var(--border)', filter: 'brightness(0.7)', borderRadius: '99px' }} />
+                  <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${row.fut}%`, background: delta >= 0 ? row.color : '#ef4444', borderRadius: '99px', opacity: 0.85, transition: 'width 0.8s ease' }} />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Predicted exam score */}
+      {ft.predicted_exam_score !== null && (
+        <div style={s.examBox}>
+          <span style={s.examLabel}>Predicted Exam Score in 30 Days</span>
+          <span style={s.examValue}>
+            {ft.predicted_exam_score}
+            <span style={{ fontSize: '0.85rem', fontWeight: 400, color: 'var(--text)' }}>/100</span>
+          </span>
+        </div>
+      )}
+
+      {/* Motivational message */}
+      <div style={{ ...s.msgBox, background: MSG_BG[twin.trend], borderColor: MSG_BORDER[twin.trend] }}>
+        <p style={{ ...s.msgText, color: MSG_COLOR[twin.trend] }}>{ft.motivational_message}</p>
+      </div>
+
+      {/* Tips */}
+      {ft.tips.length > 0 && (
+        <div>
+          <p style={s.tipsHeading}>Actionable steps</p>
+          <ul style={s.tipsList}>
+            {ft.tips.map((tip, i) => <li key={i} style={s.tipItem}>{tip}</li>)}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -192,7 +288,7 @@ export default function Twin() {
             </div>
 
             {/* Evolution card */}
-            <div style={{ ...s.card, ...s.fullWidth }}>
+            <div style={{ ...s.card, ...s.fullWidth, marginBottom: '0' }}>
               <h3 style={s.cardTitle}>Twin Evolution</h3>
               {twin.history.length < 2 ? (
                 <p style={{ color: 'var(--text)', fontSize: '0.875rem' }}>
@@ -223,6 +319,9 @@ export default function Twin() {
                 </>
               )}
             </div>
+
+            {/* Future Twin card */}
+            <FutureTwinCard twin={twin} />
           </div>
         )}
       </main>
@@ -479,5 +578,102 @@ const s: Record<string, React.CSSProperties> = {
     color: 'var(--text-h)',
     width: '28px',
     textAlign: 'right' as const,
+  },
+
+  // Future Twin comparison table
+  cmpTable: {
+    marginBottom: '1.25rem',
+  },
+  cmpHeader: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 52px 72px 64px 1fr',
+    gap: '0.5rem',
+    paddingBottom: '0.5rem',
+    borderBottom: '1px solid var(--border)',
+    marginBottom: '0.25rem',
+    fontSize: '0.72rem',
+    fontWeight: 600,
+    color: 'var(--text)',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.5px',
+  },
+  cmpRow: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 52px 72px 64px 1fr',
+    gap: '0.5rem',
+    padding: '0.55rem 0',
+    borderBottom: '1px solid var(--border)',
+    alignItems: 'center',
+  },
+  cmpLabelCol: {
+    fontSize: '0.85rem',
+    color: 'var(--text)',
+  },
+  cmpNowCol: {
+    fontSize: '0.85rem',
+    textAlign: 'right' as const,
+    color: 'var(--text)',
+  },
+  cmpFutCol: {
+    fontSize: '0.92rem',
+    textAlign: 'right' as const,
+  },
+  cmpDeltaCol: {
+    fontSize: '0.85rem',
+    textAlign: 'right' as const,
+  },
+  cmpBarCol: {
+    paddingLeft: '0.5rem',
+  },
+  examBox: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '0.75rem 1rem',
+    background: 'var(--accent-bg)',
+    border: '1px solid var(--accent-border)',
+    borderRadius: '10px',
+    marginBottom: '1rem',
+  },
+  examLabel: {
+    fontSize: '0.875rem',
+    color: 'var(--text)',
+    fontWeight: 500,
+  },
+  examValue: {
+    fontSize: '1.5rem',
+    fontWeight: 700,
+    color: 'var(--accent)',
+  },
+  msgBox: {
+    padding: '0.875rem 1rem',
+    borderRadius: '10px',
+    border: '1px solid',
+    marginBottom: '1rem',
+  },
+  msgText: {
+    margin: 0,
+    fontSize: '0.875rem',
+    lineHeight: '1.6',
+  },
+  tipsHeading: {
+    margin: '0 0 0.5rem',
+    fontSize: '0.72rem',
+    fontWeight: 600,
+    color: 'var(--text)',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.5px',
+  },
+  tipsList: {
+    margin: 0,
+    paddingLeft: '1.25rem',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '0.35rem',
+  },
+  tipItem: {
+    fontSize: '0.85rem',
+    color: 'var(--text)',
+    lineHeight: '1.5',
   },
 };
