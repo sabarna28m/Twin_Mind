@@ -2,11 +2,12 @@ import json
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from google import genai
+from google.genai import types
+
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session as DBSession
-
-from anthropic import Anthropic
 
 from app.core.config import settings
 from app.core.database import get_db
@@ -20,18 +21,22 @@ from app.ml.predictor import predict
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/mentor", tags=["mentor"])
 
-_client: Optional[Anthropic] = None
+_client: Optional[genai.Client] = None
 
 
-def _get_client() -> Anthropic:
+def _get_client() -> genai.Client:
     global _client
     if _client is None:
-        api_key = settings.anthropic_api_key or None
-        _client = Anthropic(api_key=api_key)
+        _client = genai.Client(api_key=settings.gemini_api_key)
     return _client
 
 
-def _build_system_prompt(user: User, profile: Optional[StudentProfile], entries: list, prediction: Optional[dict]) -> str:
+def _build_system_prompt(
+    user: User,
+    profile: Optional[StudentProfile],
+    entries: list,
+    prediction: Optional[dict],
+) -> str:
     name = user.full_name
 
     if profile:
@@ -68,9 +73,9 @@ def _build_system_prompt(user: User, profile: Optional[StudentProfile], entries:
 
         if len(entries) > 1:
             n = len(entries)
-            avg_study = sum(e.study_hours for e in entries) / n
+            avg_study  = sum(e.study_hours for e in entries) / n
             avg_attend = sum(e.attendance_percentage for e in entries) / n
-            avg_sleep = sum(e.sleep_duration for e in entries) / n
+            avg_sleep  = sum(e.sleep_duration for e in entries) / n
             avg_stress = sum(e.stress_level for e in entries) / n
             data_section += (
                 f"\n**{n}-entry averages:**\n"
@@ -153,30 +158,35 @@ def mentor_chat(
 
     system_prompt = _build_system_prompt(current_user, profile, entries, prediction)
 
-    # Build message list: history + current user message
-    messages = [{"role": m.role, "content": m.content} for m in payload.history]
-    messages.append({"role": "user", "content": payload.message})
-
-    client = _get_client()
+    # Build contents list: history (assistant → model) + current message
+    contents: list[types.ContentDict] = [
+        {
+            "role": "model" if m.role == "assistant" else "user",
+            "parts": [{"text": m.content}],
+        }
+        for m in payload.history
+    ]
+    contents.append({"role": "user", "parts": [{"text": payload.message}]})
 
     def event_stream():
         try:
-            with client.messages.stream(
-                model="claude-opus-4-8",
-                max_tokens=2048,
-                thinking={"type": "adaptive"},
-                system=[
-                    {
-                        "type": "text",
-                        "text": system_prompt,
-                        # Cache the system prompt for 1h — reused across turns
-                        "cache_control": {"type": "ephemeral", "ttl": "1h"},
-                    }
-                ],
-                messages=messages,
-            ) as stream:
-                for text in stream.text_stream:
-                    yield f"data: {json.dumps({'delta': text})}\n\n"
+            client = _get_client()
+            response = client.models.generate_content_stream(
+                model="gemini-1.5-flash",
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    max_output_tokens=2048,
+                    temperature=0.7,
+                ),
+            )
+            for chunk in response:
+                try:
+                    text = chunk.text
+                    if text:
+                        yield f"data: {json.dumps({'delta': text})}\n\n"
+                except Exception:
+                    pass  # skip blocked/empty chunks
             yield "data: [DONE]\n\n"
         except Exception as exc:
             logger.error("Mentor stream error: %s", exc)
