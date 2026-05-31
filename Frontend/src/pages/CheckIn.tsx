@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import BadgeNotification, { Badge } from '../components/BadgeNotification';
+import BadgeNotification, { type Badge } from '../components/BadgeNotification';
 
 interface LearningEntry {
   id: number;
