@@ -158,6 +158,7 @@ const navItems = [
   { label: 'Sessions',  to: '/sessions'  },
   { label: 'Notes',     to: '/notes'     },
   { label: 'Materials', to: '/materials' },
+  { label: 'Progress',  to: '/progress'  },
   { label: 'Check-in',  to: '/checkin'   },
   { label: 'Simulate',  to: '/simulate'  },
   { label: 'Mentor',    to: '/mentor'    },
