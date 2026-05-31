@@ -41,8 +41,9 @@ class PredictionRequest(BaseModel):
 
 class PredictionResponse(BaseModel):
     predicted_score: float
-    risk_level: str                 # low | medium | high
-    risk_label: str                 # human-readable label
-    confidence_range: List[float]   # [low, high] ±uncertainty
+    risk_level: str                  # low | medium | high
+    risk_label: str                  # human-readable label
+    confidence_range: List[float]    # [low, high] ±uncertainty
     recommendations: List[str]
-    feature_contributions: dict     # relative impact of each feature
+    feature_contributions: dict      # personalised per-input contributions
+    feature_importance: dict         # XGBoost gain-based importance (%)

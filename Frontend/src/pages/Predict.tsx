@@ -16,6 +16,7 @@ interface PredictionResult {
   confidence_range: [number, number];
   recommendations: string[];
   feature_contributions: Record<string, number>;
+  feature_importance: Record<string, number>;
 }
 
 const RISK_COLORS = { low: '#16a34a', medium: '#d97706', high: '#dc2626' };
@@ -130,6 +131,9 @@ export default function Predict() {
   }
 
   const maxContrib = result ? Math.max(...Object.values(result.feature_contributions)) : 1;
+  const sortedImportance = result
+    ? Object.entries(result.feature_importance).sort(([, a], [, b]) => b - a)
+    : [];
 
   return (
     <div style={s.shell}>
@@ -221,25 +225,32 @@ export default function Predict() {
                 </div>
               </section>
 
-              {/* Feature contributions */}
+              {/* XGBoost Feature Importance */}
               <section style={s.panel}>
-                <h2 style={s.panelTitle}>What's driving this prediction</h2>
+                <div style={s.panelHeader}>
+                  <h2 style={s.panelTitle}>Feature Importance</h2>
+                  <span style={s.xgbBadge}>XGBoost</span>
+                </div>
+                <p style={s.importanceDesc}>How much each factor influences the model's prediction (% of total importance)</p>
                 <div style={s.barList}>
-                  {Object.entries(result.feature_contributions).map(([key, val]) => (
-                    <div key={key} style={s.barRow}>
-                      <span style={s.barLabel}>{FEATURE_LABELS[key] ?? key}</span>
-                      <div style={s.barTrack}>
-                        <div style={{ ...s.barFill, width: `${Math.round((val / maxContrib) * 100)}%` }} />
+                  {sortedImportance.map(([key, pct], idx) => {
+                    const barColor = idx === 0 ? '#6366f1' : idx === 1 ? '#8b5cf6' : idx === 2 ? '#06b6d4' : 'var(--accent)';
+                    return (
+                      <div key={key} style={s.barRow}>
+                        <span style={s.barLabel}>{FEATURE_LABELS[key] ?? key}</span>
+                        <div style={s.barTrack}>
+                          <div style={{ ...s.barFill, width: `${pct}%`, background: barColor }} />
+                        </div>
+                        <span style={s.barPct}>{pct}%</span>
                       </div>
-                      <span style={s.barVal}>{val}</span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
 
               {/* Recommendations */}
               <section style={s.panel}>
-                <h2 style={s.panelTitle}>Recommendations</h2>
+                <h2 style={{ ...s.panelTitle, marginBottom: '1rem' }}>Recommendations</h2>
                 <ul style={s.recList}>
                   {result.recommendations.map((rec, i) => (
                     <li key={i} style={s.recItem}>
@@ -292,17 +303,25 @@ const s: Record<string, React.CSSProperties> = {
 
   resultCol: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   panel: { border: '1px solid var(--border)', borderRadius: '12px', padding: '1.25rem', background: 'var(--bg)' },
-  panelTitle: { margin: '0 0 1rem', fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-h)' },
+  panelTitle: { margin: 0, fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-h)' },
 
   confRange: { margin: 0, fontSize: '0.78rem', color: 'var(--text)', textAlign: 'center' as const },
   riskBadge: { marginTop: '0.75rem', padding: '0.5rem 0.75rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700, textAlign: 'center' as const },
 
-  barList: { display: 'flex', flexDirection: 'column', gap: '0.6rem' },
+  panelHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' },
+  xgbBadge: {
+    fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.05em',
+    padding: '0.2rem 0.55rem', borderRadius: '99px',
+    background: 'rgba(99,102,241,0.15)', color: '#818cf8',
+    border: '1px solid rgba(99,102,241,0.35)',
+  },
+  importanceDesc: { margin: '0 0 0.9rem', fontSize: '0.75rem', color: 'var(--text)' },
+  barList: { display: 'flex', flexDirection: 'column', gap: '0.65rem' },
   barRow: { display: 'flex', alignItems: 'center', gap: '0.6rem' },
-  barLabel: { width: '140px', fontSize: '0.78rem', color: 'var(--text-h)', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
-  barTrack: { flex: 1, height: '7px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' },
-  barFill: { height: '100%', background: 'var(--accent)', borderRadius: '99px', transition: 'width 0.5s' },
-  barVal: { width: '28px', fontSize: '0.75rem', color: 'var(--text)', textAlign: 'right' as const, flexShrink: 0 },
+  barLabel: { width: '150px', fontSize: '0.78rem', color: 'var(--text-h)', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
+  barTrack: { flex: 1, height: '8px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' },
+  barFill: { height: '100%', borderRadius: '99px', transition: 'width 0.6s ease' },
+  barPct: { width: '38px', fontSize: '0.75rem', color: 'var(--text)', textAlign: 'right' as const, flexShrink: 0 },
 
   recList: { listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem' },
   recItem: { display: 'flex', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-h)', lineHeight: '1.4', alignItems: 'flex-start' },
