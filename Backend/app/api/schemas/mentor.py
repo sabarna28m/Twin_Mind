@@ -17,3 +17,8 @@ class MentorMessage(BaseModel):
 class MentorChatRequest(BaseModel):
     message: str
     history: List[MentorMessage] = []
+
+
+class HistoryMessage(BaseModel):
+    role: str
+    content: str

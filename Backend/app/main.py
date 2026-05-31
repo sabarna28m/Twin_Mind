@@ -13,6 +13,7 @@ from app.models import material  # noqa: F401
 from app.models import student_profile  # noqa: F401
 from app.models import learning_data  # noqa: F401
 from app.models import password_reset  # noqa: F401
+from app.models import mentor_conversation  # noqa: F401
 from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes
 from app.api.routes import websocket as ws_routes
 from app.ml.predictor import get_model  # warm up model at startup
