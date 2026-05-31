@@ -71,7 +71,7 @@ def _project(values: list, entries_ahead: float, lo: float, hi: float) -> float:
 
 
 def _build_motivation(
-    trend: str, delta: float, entry: LearningData
+    trend: str, delta: float, entry: LearningData, days: int = 30
 ) -> tuple[str, list[str]]:
     tips: list[str] = []
     if entry.study_hours < 4:
@@ -85,33 +85,94 @@ def _build_motivation(
     if entry.stress_level >= 7:
         tips.append("Try 10 minutes of deep breathing daily — sustained high stress is a major performance drain.")
 
-    if trend == "improving":
-        msg = (
-            f"You're building real momentum. Keep these habits for 30 days and your overall score "
-            f"will shift by {delta:+.0f} points. Every consistent day compounds into long-term success."
-        )
-        tips = tips[:2] or [
-            "Keep logging daily to maintain this streak.",
-            "Challenge yourself to push attendance above 90%.",
-        ]
-    elif trend == "declining":
-        msg = (
-            "Your twin is on a downward trend. Without changes, scores could fall further over the next "
-            "30 days. The good news: improving just one habit is enough to reverse the direction."
-        )
-        tips = tips[:3] or [
-            "Pick your single lowest metric and focus only on that for one week.",
-            "Log a check-in every day this week to rebuild consistency.",
-        ]
-    else:
-        msg = (
-            "Your twin is holding steady — a solid base to build from. Targeting your weakest area "
-            "could shift you from stable to improving within two weeks."
-        )
-        tips = tips[:3] or [
-            "Increase study hours by 30 minutes a day to break out of the plateau.",
-            "Focus on your lowest-scoring metric — even a 10-point gain changes your risk level.",
-        ]
+    if days == 60:
+        if trend == "improving":
+            msg = (
+                f"Two months of consistent effort will shift your score by {delta:+.0f} points. "
+                f"The habits you lock in now will define your exam performance this semester."
+            )
+            tips = tips[:2] or [
+                "Set a weekly review session to measure your progress against last month.",
+                "Aim to raise your weakest metric by 10 points before the 60-day mark.",
+            ]
+        elif trend == "declining":
+            msg = (
+                "A 60-day window is enough to fully reverse a downward trend. "
+                "Pick the two habits that need the most work and track them every week — "
+                "small corrections now prevent a much harder climb later."
+            )
+            tips = tips[:3] or [
+                "Set a weekly check-in goal and treat missing it like missing class.",
+                "Pair study sessions with a consistent schedule to rebuild discipline.",
+            ]
+        else:
+            msg = (
+                "Sixty days of targeted improvement can move you from stable to thriving. "
+                "Focus on your two weakest metrics and review them bi-weekly — "
+                "steady increments beat occasional bursts."
+            )
+            tips = tips[:3] or [
+                "Schedule two study blocks per day to gradually increase your hours.",
+                "Track attendance weekly — a 5% improvement compunds into a meaningful score bump.",
+            ]
+    elif days == 90:
+        if trend == "improving":
+            msg = (
+                f"Ninety days of your current trajectory means a {delta:+.0f}-point overall shift — "
+                f"a transformation, not just progress. This is the window where habits become identity."
+            )
+            tips = tips[:2] or [
+                "Set a 90-day goal card: write your target scores and review it every Sunday.",
+                "Mentor a peer — teaching reinforces your own mastery and keeps you accountable.",
+            ]
+        elif trend == "declining":
+            msg = (
+                "Three months is a full academic quarter — more than enough time to rebuild from here. "
+                "One focused week of habit repair will compound into a completely different outcome "
+                "by the end of this projection."
+            )
+            tips = tips[:3] or [
+                "Break the 90 days into three 30-day sprints, each with a single target habit.",
+                "Review your twin data every two weeks and adjust your focus area accordingly.",
+            ]
+        else:
+            msg = (
+                "A 90-day commitment to intentional improvement is what separates good students from great ones. "
+                "Your base is solid — now build the ceiling. Consistent effort over this window "
+                "can move you an entire risk level."
+            )
+            tips = tips[:3] or [
+                "Block out a dedicated deep-work hour daily — protect it like an exam slot.",
+                "Use the first two weeks of each month to set targets; the last two to review them.",
+            ]
+    else:  # 30 days (default)
+        if trend == "improving":
+            msg = (
+                f"You're building real momentum. Keep these habits for 30 days and your overall score "
+                f"will shift by {delta:+.0f} points. Every consistent day compounds into long-term success."
+            )
+            tips = tips[:2] or [
+                "Keep logging daily to maintain this streak.",
+                "Challenge yourself to push attendance above 90%.",
+            ]
+        elif trend == "declining":
+            msg = (
+                "Your twin is on a downward trend. Without changes, scores could fall further over the next "
+                "30 days. The good news: improving just one habit is enough to reverse the direction."
+            )
+            tips = tips[:3] or [
+                "Pick your single lowest metric and focus only on that for one week.",
+                "Log a check-in every day this week to rebuild consistency.",
+            ]
+        else:
+            msg = (
+                "Your twin is holding steady — a solid base to build from. Targeting your weakest area "
+                "could shift you from stable to improving within two weeks."
+            )
+            tips = tips[:3] or [
+                "Increase study hours by 30 minutes a day to break out of the plateau.",
+                "Focus on your lowest-scoring metric — even a 10-point gain changes your risk level.",
+            ]
 
     return msg, tips
 
@@ -122,13 +183,14 @@ def _compute_future_twin(
     twin_age: int,
     trend: str,
     overall_score: float,
+    days: int = 30,
 ) -> Optional[FutureTwin]:
     n = len(entries)
     if n == 0:
         return None
 
     days_per_entry = (twin_age / (n - 1)) if n > 1 else 1.0
-    ea = 30.0 / max(days_per_entry, 1.0)  # entries equivalent to 30 days ahead
+    ea = days / max(days_per_entry, 1.0)  # entries equivalent to `days` days ahead
 
     study_v  = [e.study_hours for e in entries]
     attend_v = [e.attendance_percentage for e in entries]
@@ -152,7 +214,7 @@ def _compute_future_twin(
     f_overall  = 0.6 * f_academic + 0.4 * f_wellness
 
     future_n    = n + int(ea)
-    future_span = twin_age + 30
+    future_span = twin_age + days
     ideal       = max(1.0, future_span / 7.0 * 3.0)
     f_freq      = min(100.0, (future_n / ideal) * 100.0)
     overalls    = [s["overall"] for s in scored]
@@ -182,7 +244,7 @@ def _compute_future_twin(
         f_risk = "high"
 
     delta = f_overall - overall_score
-    msg, tips = _build_motivation(trend, delta, entries[-1])
+    msg, tips = _build_motivation(trend, delta, entries[-1], days=days)
 
     return FutureTwin(
         overall_score=round(f_overall, 1),
@@ -298,7 +360,9 @@ def get_twin(
         for i in range(n)
     ]
 
-    future = _compute_future_twin(entries, scored, twin_age, trend, overall_score)
+    future_30 = _compute_future_twin(entries, scored, twin_age, trend, overall_score, days=30)
+    future_60 = _compute_future_twin(entries, scored, twin_age, trend, overall_score, days=60)
+    future_90 = _compute_future_twin(entries, scored, twin_age, trend, overall_score, days=90)
 
     return TwinState(
         overall_score=overall_score,
@@ -312,5 +376,7 @@ def get_twin(
         strengths=strengths,
         areas_to_improve=areas_to_improve,
         history=history,
-        future_twin=future,
+        future_twin=future_30,
+        future_twin_60=future_60,
+        future_twin_90=future_90,
     )

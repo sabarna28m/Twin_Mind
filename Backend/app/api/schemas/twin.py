@@ -31,3 +31,5 @@ class TwinState(BaseModel):
     areas_to_improve: list[str]
     history: list[TwinHistoryPoint]
     future_twin: Optional[FutureTwin] = None
+    future_twin_60: Optional[FutureTwin] = None
+    future_twin_90: Optional[FutureTwin] = None

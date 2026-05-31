@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -31,6 +31,8 @@ interface TwinState {
   areas_to_improve: string[];
   history: HistoryPoint[];
   future_twin: FutureTwin | null;
+  future_twin_60: FutureTwin | null;
+  future_twin_90: FutureTwin | null;
 }
 
 const RISK_COLOR  = { low: '#10b981', medium: '#f59e0b', high: '#ef4444' };
@@ -183,27 +185,104 @@ function SparkLine({ history }: { history: HistoryPoint[] }) {
   );
 }
 
+const TAB_CONFIG = {
+  30: {
+    label: '+30 days',
+    accent: '#6366f1',
+    accentBg: 'rgba(99,102,241,0.12)',
+    accentBorder: 'rgba(99,102,241,0.25)',
+    accentGrad: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+    examGrad: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+    examBg: 'rgba(99,102,241,0.08)',
+    examBorder: 'rgba(99,102,241,0.2)',
+    tipArrow: '#6366f1',
+    activeGrad: 'linear-gradient(135deg,rgba(99,102,241,0.25),rgba(139,92,246,0.18))',
+    activeBorder: 'rgba(99,102,241,0.35)',
+  },
+  60: {
+    label: '+60 days',
+    accent: '#3b82f6',
+    accentBg: 'rgba(59,130,246,0.12)',
+    accentBorder: 'rgba(59,130,246,0.25)',
+    accentGrad: 'linear-gradient(135deg,#3b82f6,#6366f1)',
+    examGrad: 'linear-gradient(135deg,#3b82f6,#6366f1)',
+    examBg: 'rgba(59,130,246,0.08)',
+    examBorder: 'rgba(59,130,246,0.2)',
+    tipArrow: '#3b82f6',
+    activeGrad: 'linear-gradient(135deg,rgba(59,130,246,0.22),rgba(99,102,241,0.15))',
+    activeBorder: 'rgba(59,130,246,0.35)',
+  },
+  90: {
+    label: '+90 days',
+    accent: '#a855f7',
+    accentBg: 'rgba(168,85,247,0.12)',
+    accentBorder: 'rgba(168,85,247,0.25)',
+    accentGrad: 'linear-gradient(135deg,#a855f7,#d946ef)',
+    examGrad: 'linear-gradient(135deg,#a855f7,#d946ef)',
+    examBg: 'rgba(168,85,247,0.08)',
+    examBorder: 'rgba(168,85,247,0.2)',
+    tipArrow: '#a855f7',
+    activeGrad: 'linear-gradient(135deg,rgba(168,85,247,0.22),rgba(217,70,239,0.12))',
+    activeBorder: 'rgba(168,85,247,0.35)',
+  },
+} as const;
+
+type TabDays = 30 | 60 | 90;
+
 function FutureTwinCard({ twin }: { twin: TwinState }) {
-  const ft = twin.future_twin;
+  const [activeTab, setActiveTab] = useState<TabDays>(30);
+  const prevFt = useRef<FutureTwin | null>(null);
+
+  const ftMap: Record<TabDays, FutureTwin | null> = {
+    30: twin.future_twin,
+    60: twin.future_twin_60,
+    90: twin.future_twin_90,
+  };
+  const ft = ftMap[activeTab] ?? prevFt.current;
+  if (ft) prevFt.current = ft;
   if (!ft) return null;
 
+  const cfg = TAB_CONFIG[activeTab];
+
   const metrics = [
-    { label: 'Overall',     cur: twin.overall_score,    fut: ft.overall_score,    grad: SCORE_GRADS[0] },
-    { label: 'Academic',    cur: twin.academic_score,   fut: ft.academic_score,   grad: SCORE_GRADS[1] },
-    { label: 'Wellness',    cur: twin.wellness_score,   fut: ft.wellness_score,   grad: SCORE_GRADS[2] },
+    { label: 'Overall',     cur: twin.overall_score,     fut: ft.overall_score,     grad: SCORE_GRADS[0] },
+    { label: 'Academic',    cur: twin.academic_score,    fut: ft.academic_score,    grad: SCORE_GRADS[1] },
+    { label: 'Wellness',    cur: twin.wellness_score,    fut: ft.wellness_score,    grad: SCORE_GRADS[2] },
     { label: 'Consistency', cur: twin.consistency_score, fut: ft.consistency_score, grad: SCORE_GRADS[3] },
   ];
 
   return (
     <div style={{ ...s.card, ...s.fullWidth, padding: '1.25rem 1.5rem' }}>
-      {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem' }}>
-          <h3 style={{ ...s.cardTitle, marginBottom: 0 }}>Future Twin</h3>
-          <span style={{ fontSize: '0.75rem', color: '#475569' }}>30-day projection</span>
-        </div>
-        <div style={{ padding: '0.2rem 0.6rem', borderRadius: '99px', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', fontSize: '0.7rem', color: '#818cf8', fontWeight: 600 }}>
-          +30 days
+      {/* Header row with tabs */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.1rem', flexWrap: 'wrap', gap: '0.6rem' }}>
+        <h3 style={{ ...s.cardTitle, marginBottom: 0 }}>Future Twin</h3>
+
+        {/* Tab switcher */}
+        <div style={{ display: 'flex', gap: '0.25rem', padding: '3px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}>
+          {([30, 60, 90] as TabDays[]).map(days => {
+            const c = TAB_CONFIG[days];
+            const isActive = activeTab === days;
+            return (
+              <button
+                key={days}
+                onClick={() => setActiveTab(days)}
+                style={{
+                  padding: '0.3rem 0.75rem',
+                  borderRadius: '9px',
+                  border: isActive ? `1px solid ${c.activeBorder}` : '1px solid transparent',
+                  background: isActive ? c.activeGrad : 'transparent',
+                  color: isActive ? c.accent : '#475569',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.18s ease',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                {c.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -234,10 +313,10 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
       {/* Exam score + message side by side */}
       <div style={{ display: 'grid', gridTemplateColumns: ft.predicted_exam_score !== null ? '140px 1fr' : '1fr', gap: '0.6rem', marginBottom: ft.tips.length > 0 ? '0.75rem' : 0 }}>
         {ft.predicted_exam_score !== null && (
-          <div style={{ padding: '0.6rem 0.75rem', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ padding: '0.6rem 0.75rem', background: cfg.examBg, border: `1px solid ${cfg.examBorder}`, borderRadius: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em', marginBottom: '0.2rem' }}>Exam Score</span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem' }}>
-              <span style={{ fontSize: '1.5rem', fontWeight: 800, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ fontSize: '1.5rem', fontWeight: 800, background: cfg.examGrad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 {ft.predicted_exam_score}
               </span>
               <span style={{ fontSize: '0.75rem', color: '#475569' }}>/100</span>
@@ -256,7 +335,7 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
           {ft.tips.map((tip, i) => (
             <div key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-              <span style={{ color: '#6366f1', fontWeight: 700, fontSize: '0.75rem', flexShrink: 0, marginTop: '0.1rem' }}>→</span>
+              <span style={{ color: cfg.tipArrow, fontWeight: 700, fontSize: '0.75rem', flexShrink: 0, marginTop: '0.1rem' }}>→</span>
               <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b', lineHeight: 1.5 }}>{tip}</p>
             </div>
           ))}
