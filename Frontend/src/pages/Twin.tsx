@@ -31,28 +31,38 @@ interface TwinState {
   future_twin: FutureTwin | null;
 }
 
-const RISK_COLOR = { low: '#16a34a', medium: '#d97706', high: '#dc2626' };
-const RISK_BG    = { low: 'rgba(34,197,94,0.12)', medium: 'rgba(217,119,6,0.12)', high: 'rgba(239,68,68,0.12)' };
-const RISK_RING  = { low: '#22c55e', medium: '#f59e0b', high: '#ef4444' };
-const TREND_ICON = { improving: '↑', declining: '↓', stable: '→' };
-const TREND_COLOR = { improving: '#16a34a', declining: '#dc2626', stable: '#6b7280' };
+const RISK_COLOR  = { low: '#10b981', medium: '#f59e0b', high: '#ef4444' };
+const RISK_BG     = { low: 'rgba(16,185,129,0.12)', medium: 'rgba(245,158,11,0.12)', high: 'rgba(239,68,68,0.12)' };
+const RISK_BORDER = { low: 'rgba(16,185,129,0.4)', medium: 'rgba(245,158,11,0.4)', high: 'rgba(239,68,68,0.4)' };
+const RISK_GLOW   = { low: '0 0 40px rgba(16,185,129,0.4)', medium: '0 0 40px rgba(245,158,11,0.4)', high: '0 0 40px rgba(239,68,68,0.4)' };
+
+const TREND_ICON  = { improving: '↑', declining: '↓', stable: '→' };
+const TREND_COLOR = { improving: '#10b981', declining: '#ef4444', stable: '#94a3b8' };
 const TREND_LABEL = { improving: 'Improving', declining: 'Declining', stable: 'Stable' };
 
-function ScoreBar({ label, value, color }: { label: string; value: number; color: string }) {
+const MSG_COLOR  = { improving: '#6ee7b7', declining: '#fca5a5', stable: '#fde68a' };
+const MSG_BG     = { improving: 'rgba(16,185,129,0.08)', declining: 'rgba(239,68,68,0.08)', stable: 'rgba(245,158,11,0.08)' };
+const MSG_BORDER = { improving: 'rgba(16,185,129,0.25)', declining: 'rgba(239,68,68,0.25)', stable: 'rgba(245,158,11,0.25)' };
+
+const SCORE_GRADS = [
+  'linear-gradient(90deg,#6366f1,#8b5cf6)',
+  'linear-gradient(90deg,#3b82f6,#6366f1)',
+  'linear-gradient(90deg,#10b981,#06b6d4)',
+  'linear-gradient(90deg,#8b5cf6,#d946ef)',
+];
+
+function ScoreBar({ label, value, grad, delay = 0 }: { label: string; value: number; grad: string; delay?: number }) {
   return (
-    <div style={{ marginBottom: '0.85rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
-        <span style={{ fontSize: '0.82rem', color: 'var(--text)', fontWeight: 500 }}>{label}</span>
-        <span style={{ fontSize: '0.82rem', fontWeight: 700, color }}>{Math.round(value)}</span>
+    <div style={{ marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+        <span style={{ fontSize: '0.82rem', color: '#94a3b8', fontWeight: 500 }}>{label}</span>
+        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f1f5f9' }}>{Math.round(value)}</span>
       </div>
-      <div style={{ height: '7px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' }}>
-        <div style={{
-          height: '100%',
-          width: `${value}%`,
-          background: color,
-          borderRadius: '99px',
-          transition: 'width 0.8s ease',
-        }} />
+      <div className="score-bar-track">
+        <div
+          className="score-bar-fill"
+          style={{ width: `${value}%`, background: grad, animationDelay: `${delay}ms`, boxShadow: `0 0 8px rgba(99,102,241,0.4)` }}
+        />
       </div>
     </div>
   );
@@ -60,7 +70,7 @@ function ScoreBar({ label, value, color }: { label: string; value: number; color
 
 function SparkLine({ history }: { history: HistoryPoint[] }) {
   if (history.length < 2) return null;
-  const W = 340, H = 80, pad = 8;
+  const W = 340, H = 90, pad = 10;
   const vals = history.map(h => h.overall_score);
   const min = Math.min(...vals);
   const max = Math.max(...vals);
@@ -70,76 +80,89 @@ function SparkLine({ history }: { history: HistoryPoint[] }) {
     const y = H - pad - ((v - min) / range) * (H - pad * 2);
     return `${x},${y}`;
   }).join(' ');
+  const firstPt = pts.split(' ')[0];
+  const [fx, fy] = firstPt.split(',').map(Number);
 
   return (
     <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block', overflow: 'visible' }}>
-      <polyline
-        points={pts}
-        fill="none"
-        stroke="var(--accent)"
-        strokeWidth="2.5"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
+      <defs>
+        <linearGradient id="sparkGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#6366f1" />
+          <stop offset="100%" stopColor="#8b5cf6" />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+      </defs>
+      {/* Glow copy */}
+      <polyline points={pts} fill="none" stroke="#6366f1" strokeWidth="4" strokeLinejoin="round" strokeLinecap="round" opacity="0.3" filter="url(#glow)" />
+      {/* Main line */}
+      <polyline points={pts} fill="none" stroke="url(#sparkGrad)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+      {/* Dots */}
       {vals.map((v, i) => {
         const x = pad + (i / (vals.length - 1)) * (W - pad * 2);
         const y = H - pad - ((v - min) / range) * (H - pad * 2);
-        return (
-          <circle key={i} cx={x} cy={y} r="4" fill="var(--accent)" />
-        );
+        return <circle key={i} cx={x} cy={y} r="4" fill="#8b5cf6" stroke="#1e1b4b" strokeWidth="2" />;
       })}
+      {/* Start label */}
+      <text x={fx} y={fy - 10} fill="#64748b" fontSize="9" textAnchor="middle">{Math.round(vals[0])}</text>
+      {/* End label */}
+      {(() => {
+        const lx = pad + (W - pad * 2);
+        const ly = H - pad - ((vals[vals.length - 1] - min) / range) * (H - pad * 2);
+        return <text x={lx} y={ly - 10} fill="#f1f5f9" fontSize="9" textAnchor="middle" fontWeight="700">{Math.round(vals[vals.length - 1])}</text>;
+      })()}
     </svg>
   );
 }
-
-const MSG_COLOR = { improving: '#14532d', declining: '#7f1d1d', stable: '#78350f' };
-const MSG_BG    = { improving: 'rgba(34,197,94,0.1)', declining: 'rgba(239,68,68,0.1)', stable: 'rgba(217,119,6,0.1)' };
-const MSG_BORDER = { improving: '#22c55e', declining: '#ef4444', stable: '#f59e0b' };
 
 function FutureTwinCard({ twin }: { twin: TwinState }) {
   const ft = twin.future_twin;
   if (!ft) return null;
 
   const rows = [
-    { label: 'Overall Score', cur: twin.overall_score, fut: ft.overall_score, color: 'var(--accent)' },
-    { label: 'Academic', cur: twin.academic_score, fut: ft.academic_score, color: '#3b82f6' },
-    { label: 'Wellness', cur: twin.wellness_score, fut: ft.wellness_score, color: '#10b981' },
-    { label: 'Consistency', cur: twin.consistency_score, fut: ft.consistency_score, color: '#8b5cf6' },
+    { label: 'Overall Score', cur: twin.overall_score, fut: ft.overall_score, grad: SCORE_GRADS[0] },
+    { label: 'Academic',      cur: twin.academic_score, fut: ft.academic_score, grad: SCORE_GRADS[1] },
+    { label: 'Wellness',      cur: twin.wellness_score, fut: ft.wellness_score, grad: SCORE_GRADS[2] },
+    { label: 'Consistency',   cur: twin.consistency_score, fut: ft.consistency_score, grad: SCORE_GRADS[3] },
   ];
 
   return (
-    <div style={{ ...s.card, ...s.fullWidth }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-        <h3 style={s.cardTitle}>Future Twin — 30 Days</h3>
-        <span style={{ fontSize: '0.72rem', color: 'var(--text)', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)', borderRadius: '99px', padding: '0.2rem 0.65rem', fontWeight: 500 }}>
-          if current habits continue
-        </span>
+    <div style={s.card}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        <div>
+          <h3 style={s.cardTitle}>Future Twin</h3>
+          <p style={{ fontSize: '0.78rem', color: '#475569', marginTop: '0.2rem' }}>30-day projection if current habits continue</p>
+        </div>
+        <div style={{ padding: '0.3rem 0.75rem', borderRadius: '99px', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', fontSize: '0.72rem', color: '#818cf8', fontWeight: 600 }}>
+          +30 days
+        </div>
       </div>
 
-      {/* Side-by-side comparison */}
-      <div style={s.cmpTable}>
+      {/* Comparison rows */}
+      <div style={{ marginBottom: '1.5rem' }}>
         <div style={s.cmpHeader}>
           <span style={s.cmpLabelCol}>Metric</span>
           <span style={s.cmpNowCol}>Now</span>
           <span style={s.cmpFutCol}>30 Days</span>
-          <span style={s.cmpDeltaCol}>Change</span>
+          <span style={s.cmpDeltaCol}>Δ</span>
           <span style={s.cmpBarCol} />
         </div>
         {rows.map(row => {
           const delta = row.fut - row.cur;
-          const dc = delta >= 2 ? '#16a34a' : delta <= -2 ? '#dc2626' : '#6b7280';
+          const dc = delta >= 2 ? '#10b981' : delta <= -2 ? '#ef4444' : '#64748b';
+          const barWidth = Math.max(row.cur, row.fut);
           return (
             <div key={row.label} style={s.cmpRow}>
               <span style={s.cmpLabelCol}>{row.label}</span>
-              <span style={{ ...s.cmpNowCol, color: 'var(--text-h)' }}>{Math.round(row.cur)}</span>
-              <span style={{ ...s.cmpFutCol, color: dc, fontWeight: 700 }}>{Math.round(row.fut)}</span>
-              <span style={{ ...s.cmpDeltaCol, color: dc, fontWeight: 700 }}>
-                {delta >= 0 ? '+' : ''}{Math.round(delta)}
-              </span>
+              <span style={{ ...s.cmpNowCol, color: '#94a3b8' }}>{Math.round(row.cur)}</span>
+              <span style={{ ...s.cmpFutCol, color: '#f1f5f9', fontWeight: 700 }}>{Math.round(row.fut)}</span>
+              <span style={{ ...s.cmpDeltaCol, color: dc, fontWeight: 700 }}>{delta >= 0 ? '+' : ''}{Math.round(delta)}</span>
               <div style={s.cmpBarCol}>
-                <div style={{ height: '6px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden', position: 'relative' }}>
-                  <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${row.cur}%`, background: 'var(--border)', filter: 'brightness(0.7)', borderRadius: '99px' }} />
-                  <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${row.fut}%`, background: delta >= 0 ? row.color : '#ef4444', borderRadius: '99px', opacity: 0.85, transition: 'width 0.8s ease' }} />
+                <div style={{ height: '5px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${(row.cur / barWidth) * 100}%`, background: 'rgba(255,255,255,0.15)', borderRadius: '99px' }} />
+                  <div className="score-bar-fill" style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${(row.fut / barWidth) * 100}%`, background: delta >= 0 ? row.grad : 'linear-gradient(90deg,#ef4444,#f87171)', borderRadius: '99px' }} />
                 </div>
               </div>
             </div>
@@ -150,25 +173,33 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
       {/* Predicted exam score */}
       {ft.predicted_exam_score !== null && (
         <div style={s.examBox}>
-          <span style={s.examLabel}>Predicted Exam Score in 30 Days</span>
-          <span style={s.examValue}>
-            {ft.predicted_exam_score}
-            <span style={{ fontSize: '0.85rem', fontWeight: 400, color: 'var(--text)' }}>/100</span>
-          </span>
+          <span style={{ fontSize: '0.82rem', color: '#94a3b8', fontWeight: 500 }}>Predicted Exam Score</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
+            <span style={{ fontSize: '1.6rem', fontWeight: 800, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              {ft.predicted_exam_score}
+            </span>
+            <span style={{ fontSize: '0.85rem', color: '#475569' }}>/100</span>
+          </div>
         </div>
       )}
 
       {/* Motivational message */}
       <div style={{ ...s.msgBox, background: MSG_BG[twin.trend], borderColor: MSG_BORDER[twin.trend] }}>
-        <p style={{ ...s.msgText, color: MSG_COLOR[twin.trend] }}>{ft.motivational_message}</p>
+        <p style={{ margin: 0, fontSize: '0.875rem', color: MSG_COLOR[twin.trend], lineHeight: 1.65 }}>
+          {ft.motivational_message}
+        </p>
       </div>
 
       {/* Tips */}
       {ft.tips.length > 0 && (
         <div>
-          <p style={s.tipsHeading}>Actionable steps</p>
-          <ul style={s.tipsList}>
-            {ft.tips.map((tip, i) => <li key={i} style={s.tipItem}>{tip}</li>)}
+          <p style={{ margin: '0 0 0.6rem', fontSize: '0.72rem', fontWeight: 700, color: '#475569', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
+            Actionable steps
+          </p>
+          <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            {ft.tips.map((tip, i) => (
+              <li key={i} style={{ fontSize: '0.84rem', color: '#94a3b8', lineHeight: 1.55 }}>{tip}</li>
+            ))}
           </ul>
         </div>
       )}
@@ -178,9 +209,9 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
 
 export default function Twin() {
   const { user, token } = useAuth();
-  const [twin, setTwin] = useState<TwinState | null>(null);
+  const [twin, setTwin]       = useState<TwinState | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError]     = useState('');
 
   useEffect(() => {
     api.get('/twin', { headers: { Authorization: `Bearer ${token}` } })
@@ -195,92 +226,141 @@ export default function Twin() {
 
   return (
     <div style={s.shell}>
+      {/* Background orb */}
+      <div style={s.bgOrb} />
+
       {/* Navbar */}
       <header style={s.nav}>
-        <span style={s.navLogo}>TwinMind</span>
+        <div style={s.navLeft}>
+          <span style={{ fontSize: '1rem', color: '#6366f1' }}>◈</span>
+          <span style={s.navLogo}>TwinMind</span>
+        </div>
         <div style={s.navRight}>
-          <Link to="/" style={s.navLink}>← Dashboard</Link>
-          <Link to="/checkin" style={s.navLink}>Log Check-in</Link>
+          <Link to="/" className="nav-link">← Dashboard</Link>
+          <Link to="/checkin" className="nav-link" style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', color: '#818cf8' }}>Log Check-in</Link>
         </div>
       </header>
 
       <main style={s.main}>
-        <h1 style={s.pageTitle}>Your Digital Twin</h1>
-        <p style={s.pageSub}>A living model of your academic self, built from your data.</p>
+        <div style={{ marginBottom: '2rem' }} className="animate-slide-up">
+          <h1 style={s.pageTitle}>Your Digital Twin</h1>
+          <p style={s.pageSub}>A living model of your academic self, built from your data.</p>
+        </div>
 
-        {loading && <p style={{ color: 'var(--text)', textAlign: 'center', marginTop: '3rem' }}>Loading twin…</p>}
-        {error && <p style={{ color: '#dc2626', textAlign: 'center', marginTop: '3rem' }}>{error}</p>}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '4rem', color: '#475569' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '1rem', animation: 'float 2s ease-in-out infinite' }}>◈</div>
+            <p>Loading your twin…</p>
+          </div>
+        )}
+        {error && <p style={{ color: '#f87171', textAlign: 'center', marginTop: '3rem' }}>{error}</p>}
 
         {twin && (
           <div style={s.grid}>
             {/* Avatar card */}
-            <div style={s.avatarCard}>
-              <div style={{ ...s.avatarRing, borderColor: RISK_RING[twin.risk_level] }}>
-                <div style={s.avatar}>{initials}</div>
+            <div style={s.avatarCard} className="animate-slide-up">
+              {/* Animated rings */}
+              <div style={{ position: 'relative', width: '130px', height: '130px', marginBottom: '1rem' }}>
+                {/* Outer spinning ring */}
+                <div style={{
+                  position: 'absolute', inset: '-8px', borderRadius: '50%',
+                  border: '2px solid transparent',
+                  borderTopColor: RISK_COLOR[twin.risk_level],
+                  borderRightColor: RISK_COLOR[twin.risk_level],
+                  animation: 'ring-spin 3s linear infinite',
+                  opacity: 0.6,
+                }} />
+                {/* Middle glow ring */}
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '50%',
+                  border: `2px solid ${RISK_COLOR[twin.risk_level]}`,
+                  boxShadow: RISK_GLOW[twin.risk_level],
+                  animation: 'glow-pulse 2.5s ease-in-out infinite',
+                }} />
+                {/* Inner ring counter-spin */}
+                <div style={{
+                  position: 'absolute', inset: '8px', borderRadius: '50%',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  borderBottomColor: `${RISK_COLOR[twin.risk_level]}60`,
+                  animation: 'ring-spin-rev 6s linear infinite',
+                }} />
+                {/* Avatar circle */}
+                <div style={{
+                  position: 'absolute', inset: '4px', borderRadius: '50%',
+                  background: `radial-gradient(circle at 35% 35%, ${RISK_COLOR[twin.risk_level]}25 0%, rgba(15,23,42,0.95) 70%)`,
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '2rem', fontWeight: 800, color: RISK_COLOR[twin.risk_level],
+                  letterSpacing: '-1px',
+                  textShadow: `0 0 20px ${RISK_COLOR[twin.risk_level]}80`,
+                }}>
+                  {initials}
+                </div>
               </div>
 
-              <h2 style={s.twinName}>{user?.full_name?.split(' ')[0]}'s Twin</h2>
+              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.6rem' }}>
+                {user?.full_name?.split(' ')[0]}'s Twin
+              </h2>
 
               {/* Risk badge */}
               <div style={{
-                ...s.riskBadge,
-                color: RISK_COLOR[twin.risk_level],
-                background: RISK_BG[twin.risk_level],
+                padding: '0.3rem 0.9rem', borderRadius: '99px', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em',
+                color: RISK_COLOR[twin.risk_level], background: RISK_BG[twin.risk_level], border: `1px solid ${RISK_BORDER[twin.risk_level]}`,
+                marginBottom: '0.5rem',
               }}>
                 {twin.risk_level.toUpperCase()} RISK
               </div>
 
               {/* Trend */}
-              <div style={{ ...s.trendRow, color: TREND_COLOR[twin.trend] }}>
-                <span style={s.trendIcon}>{TREND_ICON[twin.trend]}</span>
-                <span style={s.trendLabel}>{TREND_LABEL[twin.trend]}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '1rem', color: TREND_COLOR[twin.trend], fontWeight: 700, fontSize: '0.95rem' }}>
+                <span style={{ fontSize: '1.1rem' }}>{TREND_ICON[twin.trend]}</span>
+                <span>{TREND_LABEL[twin.trend]}</span>
               </div>
 
-              {/* Twin meta */}
-              <div style={s.metaRow}>
-                <div style={s.metaItem}>
-                  <span style={s.metaValue}>{twin.twin_age}</span>
-                  <span style={s.metaLabel}>days old</span>
+              {/* Meta */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9', lineHeight: 1 }}>{twin.twin_age}</p>
+                  <p style={{ fontSize: '0.68rem', color: '#475569', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginTop: '0.25rem' }}>days old</p>
                 </div>
-                <div style={s.metaDivider} />
-                <div style={s.metaItem}>
-                  <span style={s.metaValue}>{twin.data_points}</span>
-                  <span style={s.metaLabel}>check-ins</span>
+                <div style={{ width: '1px', height: '36px', background: 'rgba(255,255,255,0.08)' }} />
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9', lineHeight: 1 }}>{twin.data_points}</p>
+                  <p style={{ fontSize: '0.68rem', color: '#475569', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginTop: '0.25rem' }}>check-ins</p>
                 </div>
               </div>
 
               {twin.data_points === 0 && (
-                <Link to="/checkin" style={s.ctaBtn}>Log your first check-in →</Link>
+                <Link to="/checkin" style={{ display: 'inline-block', marginTop: '1.25rem', padding: '0.55rem 1.25rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 700, boxShadow: '0 4px 15px rgba(99,102,241,0.4)' }}>
+                  Log first check-in →
+                </Link>
               )}
             </div>
 
-            {/* Scores card */}
-            <div style={s.card}>
+            {/* Vitals card */}
+            <div style={s.card} className="animate-slide-up">
               <h3 style={s.cardTitle}>Twin Vitals</h3>
-              <div style={{ marginBottom: '0.5rem' }}>
-                <ScoreBar label="Overall Score" value={twin.overall_score} color="var(--accent)" />
-                <ScoreBar label="Academic Performance" value={twin.academic_score} color="#3b82f6" />
-                <ScoreBar label="Wellness" value={twin.wellness_score} color="#10b981" />
-                <ScoreBar label="Consistency" value={twin.consistency_score} color="#8b5cf6" />
-              </div>
+              <ScoreBar label="Overall Score"       value={twin.overall_score}    grad={SCORE_GRADS[0]} delay={0} />
+              <ScoreBar label="Academic Performance" value={twin.academic_score}   grad={SCORE_GRADS[1]} delay={100} />
+              <ScoreBar label="Wellness"             value={twin.wellness_score}   grad={SCORE_GRADS[2]} delay={200} />
+              <ScoreBar label="Consistency"          value={twin.consistency_score} grad={SCORE_GRADS[3]} delay={300} />
 
-              {/* Strengths & areas */}
               {twin.strengths.length > 0 && (
-                <div style={s.tagSection}>
+                <div style={{ marginTop: '1.25rem' }}>
                   <p style={s.tagHeading}>Strengths</p>
                   <div style={s.tagRow}>
-                    {twin.strengths.map(s2 => (
-                      <span key={s2} style={{ ...s.tag, ...s.tagGreen }}>{s2}</span>
+                    {twin.strengths.map(str => (
+                      <span key={str} style={{ ...s.tag, background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.25)' }}>{str}</span>
                     ))}
                   </div>
                 </div>
               )}
               {twin.areas_to_improve.length > 0 && (
-                <div style={s.tagSection}>
+                <div style={{ marginTop: '1rem' }}>
                   <p style={s.tagHeading}>Focus Areas</p>
                   <div style={s.tagRow}>
                     {twin.areas_to_improve.map(a => (
-                      <span key={a} style={{ ...s.tag, ...s.tagAmber }}>{a}</span>
+                      <span key={a} style={{ ...s.tag, background: 'rgba(245,158,11,0.1)', color: '#fbbf24', border: '1px solid rgba(245,158,11,0.25)' }}>{a}</span>
                     ))}
                   </div>
                 </div>
@@ -288,33 +368,32 @@ export default function Twin() {
             </div>
 
             {/* Evolution card */}
-            <div style={{ ...s.card, ...s.fullWidth, marginBottom: '0' }}>
+            <div style={{ ...s.card, ...s.fullWidth }}>
               <h3 style={s.cardTitle}>Twin Evolution</h3>
               {twin.history.length < 2 ? (
-                <p style={{ color: 'var(--text)', fontSize: '0.875rem' }}>
+                <p style={{ color: '#475569', fontSize: '0.875rem' }}>
                   Log at least 2 check-ins to see your twin evolving over time.
                 </p>
               ) : (
                 <>
                   <SparkLine history={twin.history} />
-                  <div style={s.historyDates}>
-                    <span style={s.historyDate}>{twin.history[0].date}</span>
-                    <span style={s.historyDate}>{twin.history[twin.history.length - 1].date}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
+                    <span style={{ fontSize: '0.72rem', color: '#475569' }}>{twin.history[0].date}</span>
+                    <span style={{ fontSize: '0.72rem', color: '#475569' }}>{twin.history[twin.history.length - 1].date}</span>
                   </div>
-                  <div style={s.historyList}>
-                    {[...twin.history].reverse().slice(0, 5).map(h => (
-                      <div key={h.date} style={s.historyRow}>
-                        <span style={s.historyDateLabel}>{h.date}</span>
-                        <div style={s.historyBarWrap}>
-                          <div style={{
-                            ...s.historyBar,
-                            width: `${h.overall_score}%`,
-                            background: h.overall_score >= 70 ? '#22c55e' : h.overall_score >= 50 ? '#f59e0b' : '#ef4444',
-                          }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {[...twin.history].reverse().slice(0, 5).map(h => {
+                      const barColor = h.overall_score >= 70 ? '#10b981' : h.overall_score >= 50 ? '#f59e0b' : '#ef4444';
+                      return (
+                        <div key={h.date} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <span style={{ fontSize: '0.75rem', color: '#475569', width: '90px', flexShrink: 0 }}>{h.date}</span>
+                          <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
+                            <div className="score-bar-fill" style={{ width: `${h.overall_score}%`, height: '100%', background: barColor, borderRadius: '99px' }} />
+                          </div>
+                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#f1f5f9', width: '28px', textAlign: 'right' as const }}>{Math.round(h.overall_score)}</span>
                         </div>
-                        <span style={s.historyScore}>{Math.round(h.overall_score)}</span>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </>
               )}
@@ -334,346 +413,73 @@ const s: Record<string, React.CSSProperties> = {
     minHeight: '100svh',
     display: 'flex',
     flexDirection: 'column',
-    background: 'var(--bg)',
+    background: 'linear-gradient(180deg,#080d1a 0%,#0a0f20 100%)',
+    position: 'relative',
+  },
+  bgOrb: {
+    position: 'fixed', width: '800px', height: '800px', borderRadius: '50%',
+    background: 'radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 70%)',
+    top: '-200px', right: '-200px', pointerEvents: 'none', zIndex: 0,
   },
   nav: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0 2rem',
-    height: '60px',
-    borderBottom: '1px solid var(--border)',
-    background: 'var(--bg)',
-    position: 'sticky',
-    top: 0,
-    zIndex: 10,
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '0 1.75rem', height: '60px',
+    borderBottom: '1px solid rgba(255,255,255,0.06)',
+    background: 'rgba(8,13,26,0.85)',
+    backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    position: 'sticky', top: 0, zIndex: 50,
   },
-  navLogo: {
-    fontSize: '1.2rem',
-    fontWeight: 700,
-    color: 'var(--accent)',
-    letterSpacing: '-0.5px',
-  },
-  navRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1.25rem',
-  },
-  navLink: {
-    fontSize: '0.875rem',
-    color: 'var(--text)',
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
+  navLeft: { display: 'flex', alignItems: 'center', gap: '0.45rem' },
+  navLogo: { fontSize: '1.05rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.3px' },
+  navRight: { display: 'flex', alignItems: 'center', gap: '0.75rem' },
   main: {
-    flex: 1,
-    padding: '2rem',
-    maxWidth: '960px',
-    width: '100%',
-    margin: '0 auto',
-    boxSizing: 'border-box',
+    flex: 1, padding: '2.5rem 2rem', maxWidth: '1000px',
+    width: '100%', margin: '0 auto', boxSizing: 'border-box', position: 'relative', zIndex: 1,
   },
-  pageTitle: {
-    margin: '0 0 0.25rem',
-    fontSize: '1.75rem',
-    fontWeight: 700,
-    color: 'var(--text-h)',
-  },
-  pageSub: {
-    margin: '0 0 2rem',
-    color: 'var(--text)',
-    fontSize: '0.95rem',
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: '240px 1fr',
-    gap: '1.25rem',
-    alignItems: 'start',
-  },
+  pageTitle: { fontSize: '1.9rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.5px', marginBottom: '0.4rem' },
+  pageSub: { color: '#475569', fontSize: '0.95rem' },
+  grid: { display: 'grid', gridTemplateColumns: '200px 1fr', gap: '1.25rem', alignItems: 'start' },
   avatarCard: {
-    border: '1px solid var(--border)',
-    borderRadius: '16px',
-    padding: '2rem 1.5rem',
-    background: 'var(--bg)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '0.75rem',
-    textAlign: 'center',
-  },
-  avatarRing: {
-    width: '100px',
-    height: '100px',
-    borderRadius: '50%',
-    border: '4px solid',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 0 0 6px rgba(139,92,246,0.08)',
-  },
-  avatar: {
-    width: '84px',
-    height: '84px',
-    borderRadius: '50%',
-    background: 'var(--accent-bg)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '1.75rem',
-    fontWeight: 700,
-    color: 'var(--accent)',
-  },
-  twinName: {
-    margin: 0,
-    fontSize: '1rem',
-    fontWeight: 700,
-    color: 'var(--text-h)',
-  },
-  riskBadge: {
-    padding: '0.3rem 0.8rem',
-    borderRadius: '99px',
-    fontSize: '0.72rem',
-    fontWeight: 700,
-    letterSpacing: '0.8px',
-  },
-  trendRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.35rem',
-    fontSize: '0.9rem',
-    fontWeight: 600,
-  },
-  trendIcon: {
-    fontSize: '1.1rem',
-    fontWeight: 800,
-  },
-  trendLabel: {
-    fontSize: '0.875rem',
-  },
-  metaRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-    marginTop: '0.25rem',
-  },
-  metaItem: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '0.1rem',
-  },
-  metaValue: {
-    fontSize: '1.4rem',
-    fontWeight: 700,
-    color: 'var(--text-h)',
-  },
-  metaLabel: {
-    fontSize: '0.72rem',
-    color: 'var(--text)',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
-  },
-  metaDivider: {
-    width: '1px',
-    height: '32px',
-    background: 'var(--border)',
-  },
-  ctaBtn: {
-    display: 'inline-block',
-    marginTop: '0.5rem',
-    padding: '0.5rem 1rem',
-    background: 'var(--accent)',
-    color: '#fff',
-    borderRadius: '8px',
-    textDecoration: 'none',
-    fontSize: '0.82rem',
-    fontWeight: 600,
+    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '20px', padding: '2rem 1.5rem',
+    display: 'flex', flexDirection: 'column', alignItems: 'center',
+    textAlign: 'center', backdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
   },
   card: {
-    border: '1px solid var(--border)',
-    borderRadius: '16px',
-    padding: '1.5rem',
-    background: 'var(--bg)',
+    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '20px', padding: '1.75rem',
+    backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
   },
-  fullWidth: {
-    gridColumn: '1 / -1',
-  },
-  cardTitle: {
-    margin: '0 0 1.25rem',
-    fontSize: '1rem',
-    fontWeight: 600,
-    color: 'var(--text-h)',
-  },
-  tagSection: {
-    marginTop: '1rem',
-  },
-  tagHeading: {
-    margin: '0 0 0.5rem',
-    fontSize: '0.78rem',
-    fontWeight: 600,
-    color: 'var(--text)',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
-  },
-  tagRow: {
-    display: 'flex',
-    flexWrap: 'wrap' as const,
-    gap: '0.4rem',
-  },
-  tag: {
-    padding: '0.25rem 0.6rem',
-    borderRadius: '99px',
-    fontSize: '0.78rem',
-    fontWeight: 500,
-  },
-  tagGreen: {
-    background: 'rgba(34,197,94,0.12)',
-    color: '#16a34a',
-  },
-  tagAmber: {
-    background: 'rgba(217,119,6,0.12)',
-    color: '#d97706',
-  },
-  historyDates: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: '0.25rem',
-    marginBottom: '1.25rem',
-  },
-  historyDate: {
-    fontSize: '0.75rem',
-    color: 'var(--text)',
-  },
-  historyList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
-  },
-  historyRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem',
-  },
-  historyDateLabel: {
-    fontSize: '0.78rem',
-    color: 'var(--text)',
-    width: '90px',
-    flexShrink: 0,
-  },
-  historyBarWrap: {
-    flex: 1,
-    height: '8px',
-    background: 'var(--border)',
-    borderRadius: '99px',
-    overflow: 'hidden',
-  },
-  historyBar: {
-    height: '100%',
-    borderRadius: '99px',
-    transition: 'width 0.6s ease',
-  },
-  historyScore: {
-    fontSize: '0.78rem',
-    fontWeight: 700,
-    color: 'var(--text-h)',
-    width: '28px',
-    textAlign: 'right' as const,
-  },
+  fullWidth: { gridColumn: '1 / -1' },
+  cardTitle: { fontSize: '0.95rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '1.25rem', letterSpacing: '-0.1px' },
+  tagHeading: { margin: '0 0 0.5rem', fontSize: '0.7rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase' as const, letterSpacing: '0.07em' },
+  tagRow: { display: 'flex', flexWrap: 'wrap' as const, gap: '0.4rem' },
+  tag: { padding: '0.25rem 0.65rem', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 600 },
 
-  // Future Twin comparison table
-  cmpTable: {
-    marginBottom: '1.25rem',
-  },
+  /* Future Twin comparison */
   cmpHeader: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 52px 72px 64px 1fr',
-    gap: '0.5rem',
-    paddingBottom: '0.5rem',
-    borderBottom: '1px solid var(--border)',
-    marginBottom: '0.25rem',
-    fontSize: '0.72rem',
-    fontWeight: 600,
-    color: 'var(--text)',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
+    display: 'grid', gridTemplateColumns: '1fr 52px 72px 56px 1fr',
+    gap: '0.5rem', paddingBottom: '0.6rem',
+    borderBottom: '1px solid rgba(255,255,255,0.06)', marginBottom: '0.25rem',
+    fontSize: '0.68rem', fontWeight: 700, color: '#475569',
+    textTransform: 'uppercase' as const, letterSpacing: '0.07em',
   },
   cmpRow: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 52px 72px 64px 1fr',
-    gap: '0.5rem',
-    padding: '0.55rem 0',
-    borderBottom: '1px solid var(--border)',
-    alignItems: 'center',
+    display: 'grid', gridTemplateColumns: '1fr 52px 72px 56px 1fr',
+    gap: '0.5rem', padding: '0.6rem 0',
+    borderBottom: '1px solid rgba(255,255,255,0.05)', alignItems: 'center',
   },
-  cmpLabelCol: {
-    fontSize: '0.85rem',
-    color: 'var(--text)',
-  },
-  cmpNowCol: {
-    fontSize: '0.85rem',
-    textAlign: 'right' as const,
-    color: 'var(--text)',
-  },
-  cmpFutCol: {
-    fontSize: '0.92rem',
-    textAlign: 'right' as const,
-  },
-  cmpDeltaCol: {
-    fontSize: '0.85rem',
-    textAlign: 'right' as const,
-  },
-  cmpBarCol: {
-    paddingLeft: '0.5rem',
-  },
+  cmpLabelCol: { fontSize: '0.83rem', color: '#94a3b8' },
+  cmpNowCol:   { fontSize: '0.83rem', textAlign: 'right' as const },
+  cmpFutCol:   { fontSize: '0.9rem',  textAlign: 'right' as const },
+  cmpDeltaCol: { fontSize: '0.83rem', textAlign: 'right' as const },
+  cmpBarCol:   { paddingLeft: '0.5rem' },
   examBox: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0.75rem 1rem',
-    background: 'var(--accent-bg)',
-    border: '1px solid var(--accent-border)',
-    borderRadius: '10px',
-    marginBottom: '1rem',
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '0.85rem 1.1rem', margin: '0 0 1rem',
+    background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)',
+    borderRadius: '12px',
   },
-  examLabel: {
-    fontSize: '0.875rem',
-    color: 'var(--text)',
-    fontWeight: 500,
-  },
-  examValue: {
-    fontSize: '1.5rem',
-    fontWeight: 700,
-    color: 'var(--accent)',
-  },
-  msgBox: {
-    padding: '0.875rem 1rem',
-    borderRadius: '10px',
-    border: '1px solid',
-    marginBottom: '1rem',
-  },
-  msgText: {
-    margin: 0,
-    fontSize: '0.875rem',
-    lineHeight: '1.6',
-  },
-  tipsHeading: {
-    margin: '0 0 0.5rem',
-    fontSize: '0.72rem',
-    fontWeight: 600,
-    color: 'var(--text)',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
-  },
-  tipsList: {
-    margin: 0,
-    paddingLeft: '1.25rem',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '0.35rem',
-  },
-  tipItem: {
-    fontSize: '0.85rem',
-    color: 'var(--text)',
-    lineHeight: '1.5',
-  },
+  msgBox: { padding: '0.9rem 1.1rem', borderRadius: '12px', border: '1px solid', marginBottom: '1rem' },
 };

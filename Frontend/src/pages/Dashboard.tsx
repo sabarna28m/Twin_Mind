@@ -2,73 +2,91 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const stats = [
-  { label: 'Sessions', value: '0', icon: '📚' },
-  { label: 'Hours Studied', value: '0h', icon: '⏱' },
-  { label: 'Topics Covered', value: '0', icon: '🧠' },
-  { label: 'Day Streak', value: '0', icon: '🔥' },
+  { label: 'Sessions',      value: '0',  icon: '▶', grad: 'linear-gradient(135deg,#6366f1,#818cf8)' },
+  { label: 'Hours Studied', value: '0h', icon: '⏱', grad: 'linear-gradient(135deg,#8b5cf6,#a78bfa)' },
+  { label: 'Topics',        value: '0',  icon: '🧠', grad: 'linear-gradient(135deg,#10b981,#34d399)' },
+  { label: 'Day Streak',    value: '0',  icon: '🔥', grad: 'linear-gradient(135deg,#f59e0b,#fbbf24)' },
 ];
 
 const quickActions = [
-  { label: 'New Session', desc: 'Start an AI-guided study session', icon: '▶', to: '/sessions' },
-  { label: 'Upload Material', desc: 'Add notes, PDFs or slides', icon: '↑', to: '/materials' },
-  { label: 'View Progress', desc: 'See your learning analytics', icon: '◎', to: '/progress' },
-  { label: 'Predict Score', desc: 'ML-powered exam score prediction', icon: '🎯', to: '/predict' },
-  { label: 'What-If Simulator', desc: 'Explore how habit changes affect your score', icon: '⚡', to: '/simulate' },
-  { label: 'AI Mentor', desc: 'Get personalised advice from your AI mentor', icon: '💬', to: '/mentor' },
-  { label: 'Digital Twin', desc: 'View your living academic model', icon: '◈', to: '/twin' },
+  { label: 'New Session',      desc: 'Start an AI-guided study session',          icon: '▶', grad: 'linear-gradient(135deg,#6366f1,#8b5cf6)', to: '/sessions' },
+  { label: 'Upload Material',  desc: 'Add notes, PDFs or slides',                 icon: '↑', grad: 'linear-gradient(135deg,#3b82f6,#06b6d4)', to: '/materials' },
+  { label: 'View Progress',    desc: 'See your learning analytics',               icon: '◎', grad: 'linear-gradient(135deg,#10b981,#34d399)', to: '/progress' },
+  { label: 'Predict Score',    desc: 'ML-powered exam score prediction',          icon: '🎯', grad: 'linear-gradient(135deg,#8b5cf6,#d946ef)', to: '/predict' },
+  { label: 'What-If Simulator',desc: 'Explore how habit changes affect your score',icon: '⚡', grad: 'linear-gradient(135deg,#f59e0b,#ef4444)', to: '/simulate' },
+  { label: 'AI Mentor',        desc: 'Get personalised advice from your mentor',  icon: '💬', grad: 'linear-gradient(135deg,#ec4899,#8b5cf6)', to: '/mentor' },
+  { label: 'Digital Twin',     desc: 'View your living academic model',           icon: '◈', grad: 'linear-gradient(135deg,#06b6d4,#6366f1)', to: '/twin' },
+];
+
+const navItems = [
+  { label: 'Sessions',  to: '/sessions'  },
+  { label: 'Notes',     to: '/notes'     },
+  { label: 'Materials', to: '/materials' },
+  { label: 'Check-in',  to: '/checkin'   },
+  { label: 'Simulate',  to: '/simulate'  },
+  { label: 'Mentor',    to: '/mentor'    },
+  { label: 'Twin',      to: '/twin'      },
 ];
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
-
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const firstName = user?.full_name?.split(' ')[0] ?? '';
 
   return (
     <div style={s.shell}>
-      {/* Navbar */}
+      {/* ── Navbar ── */}
       <header style={s.nav}>
-        <span style={s.navLogo}>TwinMind</span>
+        <div style={s.navLeft}>
+          <span style={s.logoIcon}>◈</span>
+          <span style={s.navLogo}>TwinMind</span>
+        </div>
+        <nav style={s.navCenter}>
+          {navItems.map(n => (
+            <Link key={n.to} to={n.to} className="nav-link">{n.label}</Link>
+          ))}
+        </nav>
         <div style={s.navRight}>
-          <Link to="/sessions" style={s.navLink}>Sessions</Link>
-          <Link to="/notes" style={s.navLink}>Notes</Link>
-          <Link to="/materials" style={s.navLink}>Materials</Link>
-          <Link to="/checkin" style={s.navLink}>Check-in</Link>
-          <Link to="/simulate" style={s.navLink}>Simulate</Link>
-          <Link to="/mentor" style={s.navLink}>Mentor</Link>
           <Link to="/profile" style={s.navUser}>{user?.full_name}</Link>
-          <button onClick={logout} style={s.signOut}>Sign out</button>
+          <button className="sign-out-btn" onClick={logout}>Sign out</button>
         </div>
       </header>
 
-      {/* Main */}
       <main style={s.main}>
-        {/* Greeting */}
-        <section style={s.hero}>
-          <h1 style={s.heroTitle}>{greeting}, {user?.full_name?.split(' ')[0]} 👋</h1>
-          <p style={s.heroSub}>Here's your learning overview.</p>
+        {/* ── Hero ── */}
+        <section style={s.hero} className="animate-slide-up">
+          <p style={s.greetingLabel}>{greeting}</p>
+          <h1 style={s.heroTitle}>{firstName} <span style={s.wave}>👋</span></h1>
+          <p style={s.heroSub}>Here's your learning overview for today.</p>
         </section>
 
-        {/* Stats */}
+        {/* ── Stats ── */}
         <section style={s.statsGrid}>
-          {stats.map(stat => (
-            <div key={stat.label} style={s.statCard}>
-              <span style={s.statIcon}>{stat.icon}</span>
-              <p style={s.statValue}>{stat.value}</p>
-              <p style={s.statLabel}>{stat.label}</p>
+          {stats.map((stat, i) => (
+            <div key={stat.label} style={{ ...s.statCard, animationDelay: `${i * 80}ms` }} className="animate-slide-up">
+              <div style={{ ...s.statIconWrap, background: stat.grad }}>
+                <span style={s.statIcon}>{stat.icon}</span>
+              </div>
+              <div>
+                <p style={s.statValue}>{stat.value}</p>
+                <p style={s.statLabel}>{stat.label}</p>
+              </div>
             </div>
           ))}
         </section>
 
-        {/* Two-col layout */}
+        {/* ── Two-col ── */}
         <div style={s.cols}>
           {/* Recent sessions */}
           <section style={s.panel}>
             <h2 style={s.panelTitle}>Recent Sessions</h2>
             <div style={s.empty}>
+              <div style={s.emptyOrb} />
               <p style={s.emptyIcon}>📖</p>
-              <p style={s.emptyText}>No sessions yet.</p>
+              <p style={s.emptyText}>No sessions yet</p>
               <p style={s.emptySub}>Start your first session to see it here.</p>
+              <Link to="/sessions" style={s.emptyBtn}>Start a session →</Link>
             </div>
           </section>
 
@@ -77,21 +95,15 @@ export default function Dashboard() {
             <h2 style={s.panelTitle}>Quick Actions</h2>
             <div style={s.actionList}>
               {quickActions.map(a => (
-                a.to
-                  ? <Link key={a.label} to={a.to} style={{ ...s.actionCard, textDecoration: 'none' }}>
-                      <span style={s.actionIcon}>{a.icon}</span>
-                      <div style={s.actionText}>
-                        <p style={s.actionLabel}>{a.label}</p>
-                        <p style={s.actionDesc}>{a.desc}</p>
-                      </div>
-                    </Link>
-                  : <button key={a.label} style={s.actionCard}>
-                      <span style={s.actionIcon}>{a.icon}</span>
-                      <div style={s.actionText}>
-                        <p style={s.actionLabel}>{a.label}</p>
-                        <p style={s.actionDesc}>{a.desc}</p>
-                      </div>
-                    </button>
+                <Link key={a.label} to={a.to} className="action-card">
+                  <div style={{ ...s.actionIconBadge, background: a.grad }}>
+                    <span style={s.actionIconInner}>{a.icon}</span>
+                  </div>
+                  <div>
+                    <p style={s.actionLabel}>{a.label}</p>
+                    <p style={s.actionDesc}>{a.desc}</p>
+                  </div>
+                </Link>
               ))}
             </div>
           </section>
@@ -106,192 +118,116 @@ const s: Record<string, React.CSSProperties> = {
     minHeight: '100svh',
     display: 'flex',
     flexDirection: 'column',
-    background: 'var(--bg)',
+    background: 'linear-gradient(180deg, #080d1a 0%, #0a0f20 100%)',
   },
 
-  // Navbar
+  /* Navbar */
   nav: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '0 2rem',
+    padding: '0 1.75rem',
     height: '60px',
-    borderBottom: '1px solid var(--border)',
-    background: 'var(--bg)',
+    borderBottom: '1px solid rgba(255,255,255,0.06)',
+    background: 'rgba(8,13,26,0.85)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
     position: 'sticky',
     top: 0,
-    zIndex: 10,
+    zIndex: 50,
   },
-  navLogo: {
-    fontSize: '1.2rem',
-    fontWeight: 700,
-    color: 'var(--accent)',
-    letterSpacing: '-0.5px',
-  },
-  navRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-  },
-  navLink: {
-    fontSize: '0.875rem',
-    color: 'var(--text)',
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
-  navUser: {
-    fontSize: '0.9rem',
-    color: 'var(--text)',
-    textDecoration: 'none',
-  },
-  signOut: {
-    padding: '0.4rem 0.9rem',
-    background: 'transparent',
-    color: 'var(--accent)',
-    border: '1px solid var(--accent-border)',
-    borderRadius: '6px',
-    fontSize: '0.85rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-  },
+  navLeft: { display: 'flex', alignItems: 'center', gap: '0.45rem' },
+  logoIcon: { fontSize: '1.1rem', color: '#6366f1' },
+  navLogo: { fontSize: '1.05rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.3px' },
+  navCenter: { display: 'flex', alignItems: 'center', gap: '0.15rem' },
+  navRight: { display: 'flex', alignItems: 'center', gap: '0.75rem' },
+  navUser: { fontSize: '0.8rem', color: '#94a3b8', textDecoration: 'none', fontWeight: 500 },
 
-  // Main
+  /* Main */
   main: {
     flex: 1,
-    padding: '2rem',
-    maxWidth: '960px',
+    padding: '2.5rem 2rem',
+    maxWidth: '1000px',
     width: '100%',
     margin: '0 auto',
     boxSizing: 'border-box',
-    textAlign: 'left',
   },
 
-  // Hero
-  hero: {
-    marginBottom: '2rem',
-    textAlign: 'left',
-  },
-  heroTitle: {
-    margin: '0 0 0.25rem',
-    fontSize: '1.75rem',
-    color: 'var(--text-h)',
-    fontWeight: 600,
-  },
-  heroSub: {
-    margin: 0,
-    color: 'var(--text)',
-    fontSize: '1rem',
-  },
+  /* Hero */
+  hero: { marginBottom: '2.25rem' },
+  greetingLabel: { fontSize: '0.8rem', color: '#6366f1', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginBottom: '0.4rem' },
+  heroTitle: { fontSize: '2rem', fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.5px', marginBottom: '0.35rem' },
+  wave: { display: 'inline-block', animation: 'float 3s ease-in-out infinite' },
+  heroSub: { fontSize: '0.95rem', color: '#64748b' },
 
-  // Stats
+  /* Stats */
   statsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+    gridTemplateColumns: 'repeat(4, 1fr)',
     gap: '1rem',
     marginBottom: '2rem',
   },
   statCard: {
-    padding: '1.25rem',
-    border: '1px solid var(--border)',
-    borderRadius: '12px',
-    textAlign: 'center',
-    background: 'var(--bg)',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-  },
-  statIcon: {
-    fontSize: '1.5rem',
-  },
-  statValue: {
-    margin: '0.5rem 0 0.25rem',
-    fontSize: '1.75rem',
-    fontWeight: 700,
-    color: 'var(--text-h)',
-  },
-  statLabel: {
-    margin: 0,
-    fontSize: '0.8rem',
-    color: 'var(--text)',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
-  },
-
-  // Two-col
-  cols: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '1.5rem',
-  },
-  panel: {
-    border: '1px solid var(--border)',
-    borderRadius: '12px',
-    padding: '1.5rem',
-    background: 'var(--bg)',
-  },
-  panelTitle: {
-    margin: '0 0 1.25rem',
-    fontSize: '1rem',
-    fontWeight: 600,
-    color: 'var(--text-h)',
-  },
-
-  // Empty state
-  empty: {
-    padding: '2rem 1rem',
-    textAlign: 'center',
-  },
-  emptyIcon: {
-    margin: '0 0 0.5rem',
-    fontSize: '2rem',
-  },
-  emptyText: {
-    margin: '0 0 0.25rem',
-    color: 'var(--text-h)',
-    fontWeight: 500,
-    fontSize: '0.95rem',
-  },
-  emptySub: {
-    margin: 0,
-    color: 'var(--text)',
-    fontSize: '0.85rem',
-  },
-
-  // Quick actions
-  actionList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.75rem',
-  },
-  actionCard: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.875rem',
-    padding: '0.875rem 1rem',
-    background: 'var(--accent-bg)',
-    border: '1px solid var(--accent-border)',
-    borderRadius: '10px',
-    cursor: 'pointer',
-    textAlign: 'left',
-    width: '100%',
+    gap: '1rem',
+    padding: '1.25rem',
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.07)',
+    borderRadius: '14px',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+    backdropFilter: 'blur(10px)',
   },
-  actionIcon: {
-    fontSize: '1.1rem',
-    color: 'var(--accent)',
-    flexShrink: 0,
-  },
-  actionText: {
+  statIconWrap: {
+    width: '44px',
+    height: '44px',
+    borderRadius: '12px',
     display: 'flex',
-    flexDirection: 'column',
-    gap: '0.1rem',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
   },
-  actionLabel: {
-    margin: 0,
-    fontSize: '0.9rem',
-    fontWeight: 600,
-    color: 'var(--text-h)',
+  statIcon: { fontSize: '1.1rem' },
+  statValue: { fontSize: '1.6rem', fontWeight: 700, color: '#f1f5f9', lineHeight: 1.1, marginBottom: '0.2rem' },
+  statLabel: { fontSize: '0.72rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' as const },
+
+  /* Two-col */
+  cols: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' },
+  panel: {
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.07)',
+    borderRadius: '16px',
+    padding: '1.5rem',
+    backdropFilter: 'blur(10px)',
   },
-  actionDesc: {
-    margin: 0,
-    fontSize: '0.78rem',
-    color: 'var(--text)',
+  panelTitle: { fontSize: '0.9rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '1.25rem', letterSpacing: '-0.1px' },
+
+  /* Empty state */
+  empty: { padding: '1.5rem 1rem', textAlign: 'center', position: 'relative' as const },
+  emptyOrb: {
+    position: 'absolute', width: '160px', height: '160px', borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)',
+    top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none',
   },
+  emptyIcon: { fontSize: '2rem', marginBottom: '0.75rem', filter: 'grayscale(0.4)' },
+  emptyText: { fontWeight: 600, color: '#94a3b8', marginBottom: '0.35rem', fontSize: '0.95rem' },
+  emptySub: { fontSize: '0.82rem', color: '#475569', marginBottom: '1.25rem' },
+  emptyBtn: {
+    display: 'inline-block', padding: '0.5rem 1.1rem',
+    background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.35)',
+    borderRadius: '8px', color: '#818cf8', fontSize: '0.82rem', fontWeight: 600,
+    textDecoration: 'none', transition: 'background 0.2s',
+  },
+
+  /* Action cards */
+  actionList: { display: 'flex', flexDirection: 'column', gap: '0.6rem' },
+  actionIconBadge: {
+    width: '36px', height: '36px', borderRadius: '10px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+  },
+  actionIconInner: { fontSize: '0.95rem' },
+  actionLabel: { fontSize: '0.875rem', fontWeight: 600, color: '#e2e8f0', marginBottom: '0.1rem' },
+  actionDesc: { fontSize: '0.75rem', color: '#64748b' },
 };

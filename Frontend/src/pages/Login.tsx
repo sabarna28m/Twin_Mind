@@ -5,10 +5,10 @@ import { useAuth } from '../contexts/AuthContext';
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -25,135 +25,96 @@ export default function Login() {
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <h1 style={styles.logo}>TwinMind</h1>
-        <h2 style={styles.title}>Sign in</h2>
+    <div style={s.page}>
+      <div style={s.orb1} />
+      <div style={s.orb2} />
+      <div style={s.orb3} />
 
-        {error && <p style={styles.error}>{error}</p>}
+      <div className="glass animate-slide-up" style={s.card}>
+        <div style={s.logoWrap}>
+          <span style={s.logoIcon}>◈</span>
+          <span className="grad-text" style={s.logoText}>TwinMind</span>
+        </div>
+        <p style={s.tagline}>Your AI-powered academic twin</p>
+        <h2 style={s.title}>Welcome back</h2>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <label style={styles.label}>
+        {error && <div style={s.error}>{error}</div>}
+
+        <form onSubmit={handleSubmit} style={s.form}>
+          <label style={s.label}>
             Email
-            <input
-              type="email"
-              value={email}
+            <input className="dark-input" type="email" value={email}
               onChange={e => setEmail(e.target.value)}
-              style={styles.input}
-              placeholder="you@example.com"
-              required
-              autoFocus
-            />
+              placeholder="you@example.com" required autoFocus />
           </label>
-
-          <label style={styles.label}>
+          <label style={s.label}>
             Password
-            <input
-              type="password"
-              value={password}
+            <input className="dark-input" type="password" value={password}
               onChange={e => setPassword(e.target.value)}
-              style={styles.input}
-              placeholder="••••••••"
-              required
-            />
+              placeholder="••••••••" required />
           </label>
-
-          <button type="submit" disabled={loading} style={styles.button}>
-            {loading ? 'Signing in…' : 'Sign in'}
+          <button className="grad-btn" type="submit" disabled={loading} style={{ marginTop: '0.5rem' }}>
+            {loading ? 'Signing in…' : 'Sign in →'}
           </button>
         </form>
 
-        <p style={styles.footer}>
-          No account? <Link to="/register" style={styles.link}>Create one</Link>
+        <p style={s.footer}>
+          No account? <Link to="/register" style={s.link}>Create one</Link>
         </p>
       </div>
     </div>
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
+const s: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100svh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '1rem',
-    background: 'var(--bg)',
+    padding: '1.5rem',
+    background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.18) 0%, transparent 70%), #080d1a',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  orb1: {
+    position: 'absolute', width: '600px', height: '600px', borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 65%)',
+    top: '-200px', left: '-200px', animation: 'orb-drift-1 12s ease-in-out infinite', pointerEvents: 'none',
+  },
+  orb2: {
+    position: 'absolute', width: '500px', height: '500px', borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(139,92,246,0.14) 0%, transparent 65%)',
+    bottom: '-150px', right: '-150px', animation: 'orb-drift-2 14s ease-in-out infinite', pointerEvents: 'none',
+  },
+  orb3: {
+    position: 'absolute', width: '300px', height: '300px', borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 65%)',
+    bottom: '15%', left: '15%', animation: 'orb-drift-3 10s ease-in-out infinite', pointerEvents: 'none',
   },
   card: {
-    width: '100%',
-    maxWidth: '400px',
-    padding: '2.5rem 2rem',
-    border: '1px solid var(--border)',
-    borderRadius: '12px',
-    boxShadow: 'var(--shadow)',
-    background: 'var(--bg)',
-    textAlign: 'left',
+    position: 'relative', zIndex: 1, width: '100%', maxWidth: '420px',
+    padding: '2.75rem 2.25rem', borderRadius: '20px',
+    boxShadow: '0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
   },
-  logo: {
-    margin: '0 0 1.5rem',
-    fontSize: '1.5rem',
-    letterSpacing: '-0.5px',
-    color: 'var(--accent)',
-    textAlign: 'center',
+  logoWrap: {
+    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.4rem',
   },
-  title: {
-    margin: '0 0 1.5rem',
-    fontSize: '1.25rem',
-    color: 'var(--text-h)',
-    textAlign: 'center',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-  },
+  logoIcon: { fontSize: '1.6rem', color: '#6366f1', lineHeight: 1 },
+  logoText: { fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' },
+  tagline: { textAlign: 'center', fontSize: '0.8rem', color: '#475569', marginBottom: '1.75rem' },
+  title: { fontSize: '1.25rem', fontWeight: 700, color: '#f1f5f9', textAlign: 'center', marginBottom: '1.5rem' },
+  form: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   label: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.375rem',
-    fontSize: '0.875rem',
-    color: 'var(--text)',
-    fontWeight: 500,
-  },
-  input: {
-    padding: '0.6rem 0.75rem',
-    border: '1px solid var(--border)',
-    borderRadius: '8px',
-    fontSize: '1rem',
-    color: 'var(--text-h)',
-    background: 'var(--bg)',
-    outline: 'none',
-  },
-  button: {
-    marginTop: '0.5rem',
-    padding: '0.7rem',
-    background: 'var(--accent)',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '1rem',
-    fontWeight: 600,
-    cursor: 'pointer',
+    display: 'flex', flexDirection: 'column', gap: '0.45rem',
+    fontSize: '0.75rem', fontWeight: 600, color: '#64748b',
+    letterSpacing: '0.06em', textTransform: 'uppercase' as const,
   },
   error: {
-    margin: '0 0 1rem',
-    padding: '0.6rem 0.75rem',
-    background: 'rgba(239,68,68,0.1)',
-    border: '1px solid rgba(239,68,68,0.4)',
-    borderRadius: '8px',
-    color: '#dc2626',
-    fontSize: '0.875rem',
+    marginBottom: '1rem', padding: '0.65rem 1rem',
+    background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+    borderRadius: '10px', color: '#f87171', fontSize: '0.875rem',
   },
-  footer: {
-    marginTop: '1.5rem',
-    textAlign: 'center',
-    fontSize: '0.875rem',
-    color: 'var(--text)',
-  },
-  link: {
-    color: 'var(--accent)',
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
+  footer: { marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#475569' },
+  link: { color: '#818cf8', textDecoration: 'none', fontWeight: 600 },
 };
