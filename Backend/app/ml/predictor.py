@@ -129,7 +129,8 @@ def _get_feature_importance(model: XGBRegressor) -> dict[str, float]:
     raw = model.feature_importances_          # ndarray, shape (n_features,)
     total = raw.sum() or 1.0
     pct = (raw / total * 100).round(1)
-    return {key: round(float(pct[i]), 1) for i, key in enumerate(FEATURE_KEYS)}
+    unsorted = {key: round(float(pct[i]), 1) for i, key in enumerate(FEATURE_KEYS)}
+    return dict(sorted(unsorted.items(), key=lambda kv: kv[1], reverse=True))
 
 
 # ── Public prediction interface ────────────────────────────────────────────
