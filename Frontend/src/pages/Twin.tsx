@@ -316,7 +316,7 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
           <div style={{ padding: '0.6rem 0.75rem', background: cfg.examBg, border: `1px solid ${cfg.examBorder}`, borderRadius: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em', marginBottom: '0.2rem' }}>Exam Score</span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem' }}>
-              <span style={{ fontSize: '1.5rem', fontWeight: 800, background: cfg.examGrad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span key={activeTab} style={{ fontSize: '1.5rem', fontWeight: 800, display: 'inline-block', background: cfg.examGrad, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 {ft.predicted_exam_score}
               </span>
               <span style={{ fontSize: '0.75rem', color: '#475569' }}>/100</span>
