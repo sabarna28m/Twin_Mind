@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
+import BackButton from '../components/BackButton';
 
 interface SimParams {
   study_hours: number;
@@ -182,12 +183,12 @@ export default function Simulate() {
     <div style={sc.shell}>
       <header style={sc.nav}>
         <div style={sc.navLeft}>
+          <BackButton />
           <Link to="/" style={sc.navLogo}>TwinMind</Link>
           {wsConnected && <LiveBadge />}
         </div>
         <nav style={sc.navRight}>
           <Link to="/predict" style={sc.navLink}>Predict</Link>
-          <Link to="/" style={sc.backLink}>← Dashboard</Link>
         </nav>
       </header>
 

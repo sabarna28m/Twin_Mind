@@ -5,6 +5,7 @@ import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import PlanContent from '../components/PlanContent';
+import BackButton from '../components/BackButton';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000/api/v1';
 
@@ -351,6 +352,7 @@ export default function Mentor() {
       {/* Navbar */}
       <header style={mc.nav}>
         <div style={mc.navLeft}>
+          <BackButton />
           <Link to="/" style={mc.navLogo}>TwinMind</Link>
           {wsConnected && <LiveBadge />}
         </div>
@@ -364,7 +366,6 @@ export default function Mentor() {
           </button>
           <Link to="/predict" style={mc.navLink}>Predict</Link>
           <Link to="/simulate" style={mc.navLink}>Simulate</Link>
-          <Link to="/" style={mc.backLink}>← Dashboard</Link>
         </nav>
       </header>
 

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
+import BackButton from '../components/BackButton';
 
 interface Note {
   id: number;
@@ -113,10 +114,10 @@ export default function Notes() {
     <div style={s.shell}>
       <header style={s.nav}>
         <div style={s.navLeft}>
+          <BackButton />
           <Link to="/" style={s.navLogo}>TwinMind</Link>
           {wsConnected && <LiveBadge />}
         </div>
-        <Link to="/" style={s.backLink}>← Dashboard</Link>
       </header>
 
       <div style={s.body}>

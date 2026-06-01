@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
+import BackButton from '../components/BackButton';
 
 interface LearningEntry {
   study_hours: number; attendance_percentage: number;
@@ -144,10 +145,10 @@ export default function Predict() {
     <div style={s.shell}>
       <header style={s.nav}>
         <div style={s.navLeft}>
+          <BackButton />
           <Link to="/" style={s.navLogo}>TwinMind</Link>
           {wsConnected && <LiveBadge />}
         </div>
-        <Link to="/" style={s.backLink}>← Dashboard</Link>
       </header>
 
       <main style={s.main}>

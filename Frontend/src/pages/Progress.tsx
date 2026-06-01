@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
+import BackButton from '../components/BackButton';
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -318,12 +319,12 @@ export default function Progress() {
       {/* Nav */}
       <header style={s.nav}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <BackButton />
           <span style={{ fontSize: '1rem', color: '#6366f1' }}>◈</span>
           <span style={s.navLogo}>TwinMind</span>
           {wsConnected && <LiveBadge />}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Link to="/" className="nav-link">← Dashboard</Link>
           <button
             onClick={handleDownload}
             disabled={pdfBusy || !summary}

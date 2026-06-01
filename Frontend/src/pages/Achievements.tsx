@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import BackButton from '../components/BackButton';
 
 interface AchievementItem {
   id: string;
@@ -78,8 +79,10 @@ export default function Achievements() {
   return (
     <div style={s.shell}>
       <header style={s.nav}>
-        <Link to="/" style={s.navLogo}>TwinMind</Link>
-        <Link to="/" style={s.backLink}>← Dashboard</Link>
+        <div style={s.navLeft}>
+          <BackButton />
+          <Link to="/" style={s.navLogo}>TwinMind</Link>
+        </div>
       </header>
 
       <main style={s.main}>
@@ -121,8 +124,8 @@ const s: Record<string, React.CSSProperties> = {
     padding: '0 2rem', height: '60px', borderBottom: '1px solid var(--border)',
     background: 'var(--bg)', position: 'sticky', top: 0, zIndex: 10,
   },
+  navLeft: { display: 'flex', alignItems: 'center', gap: '0.65rem' },
   navLogo: { fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.5px', textDecoration: 'none' },
-  backLink: { fontSize: '0.875rem', color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 },
   main: { flex: 1, padding: '2rem', maxWidth: '960px', width: '100%', margin: '0 auto', boxSizing: 'border-box' as const },
   titleRow: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap' as const, gap: '1rem' },
   pageTitle: { margin: '0 0 0.25rem', fontSize: '1.6rem', fontWeight: 700, color: 'var(--text-h)' },

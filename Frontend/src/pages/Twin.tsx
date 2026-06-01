@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
+import BackButton from '../components/BackButton';
 
 interface HistoryPoint { date: string; overall_score: number; }
 
@@ -381,12 +382,12 @@ export default function Twin() {
       {/* Navbar */}
       <header style={s.nav}>
         <div style={s.navLeft}>
+          <BackButton />
           <span style={{ fontSize: '1rem', color: '#6366f1' }}>◈</span>
           <span style={s.navLogo}>TwinMind</span>
           {wsConnected && <LiveBadge />}
         </div>
         <div style={s.navRight}>
-          <Link to="/" className="nav-link">← Dashboard</Link>
           <Link to="/checkin" className="nav-link" style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', color: '#818cf8' }}>Log Check-in</Link>
         </div>
       </header>
