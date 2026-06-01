@@ -191,23 +191,47 @@ def _build_study_plan_prompt(
         )
 
     return (
-        f"You are TwinMind AI Mentor. Create a detailed, personalized 30-day study improvement plan "
+        f"You are TwinMind AI Mentor. Create a complete, detailed, personalized 30-day study improvement plan "
         f"for {name}.\n\n"
         f"**Student Info:**\n{profile_section}"
         f"{data_section}"
         f"{pred_str}"
         f"{subjects_instruction}\n"
-        f"**Instructions:** Generate a structured 30-day plan with these exact sections:\n\n"
-        f"1. **Executive Summary** — 2-3 sentences about {name}'s current situation and the plan's focus\n"
-        f"2. **Week 1: Foundation (Days 1–7)** — Build core habits, include daily goals per subject\n"
-        f"3. **Week 2: Building Momentum (Days 8–14)** — Strengthen weak areas, daily targets per subject\n"
-        f"4. **Week 3: Acceleration (Days 15–21)** — Push performance higher, daily milestones per subject\n"
-        f"5. **Week 4: Peak Performance (Days 22–30)** — Exam prep, daily review goals per subject\n"
-        f"6. **Key Habits to Build** — 5 specific, measurable habits (with exact numbers)\n"
-        f"7. **Success Metrics** — How to measure progress week by week\n\n"
-        f"Be SPECIFIC: reference the student's actual numbers and subject names. Give exact time "
-        f"allocations (e.g. '45 min Mathematics, 30 min Physics'). Make every day actionable. "
-        f"Use markdown formatting."
+        f"**CRITICAL REQUIREMENT — READ CAREFULLY:**\n"
+        f"You MUST write out ALL 30 days individually, one by one, labeled exactly as:\n"
+        f"**Day 1:** ... **Day 2:** ... **Day 3:** ... all the way through **Day 30:**\n"
+        f"Do NOT summarize weeks. Do NOT write 'Days 8–14: repeat the above'. "
+        f"Do NOT stop before Day 30. Every single day from Day 1 to Day 30 must appear explicitly.\n\n"
+        f"**Output Structure:**\n\n"
+        f"## Executive Summary\n"
+        f"2-3 sentences about {name}'s current situation and this plan's focus.\n\n"
+        f"## Week 1: Foundation (Days 1–7)\n"
+        f"**Day 1:** [specific tasks with exact time allocations, e.g. '45 min Mathematics — chapter review, 30 min Physics — problem set']\n"
+        f"**Day 2:** [specific tasks]\n"
+        f"**Day 3:** [specific tasks]\n"
+        f"**Day 4:** [specific tasks]\n"
+        f"**Day 5:** [specific tasks]\n"
+        f"**Day 6:** [specific tasks]\n"
+        f"**Day 7:** [specific tasks + weekly review]\n\n"
+        f"## Week 2: Building Momentum (Days 8–14)\n"
+        f"**Day 8:** [specific tasks]\n"
+        f"... continue through **Day 14:** [specific tasks + weekly review]\n\n"
+        f"## Week 3: Acceleration (Days 15–21)\n"
+        f"**Day 15:** [specific tasks]\n"
+        f"... continue through **Day 21:** [specific tasks + weekly review]\n\n"
+        f"## Week 4: Peak Performance (Days 22–30)\n"
+        f"**Day 22:** [specific tasks]\n"
+        f"... continue through **Day 30:** [specific tasks + final review]\n\n"
+        f"## Key Habits to Build\n"
+        f"5 specific, measurable habits with exact numbers.\n\n"
+        f"## Success Metrics\n"
+        f"How to measure progress week by week.\n\n"
+        f"**Formatting rules:**\n"
+        f"- Reference {name}'s actual numbers and subject names in the daily tasks\n"
+        f"- Each day entry must include exact time allocations per subject\n"
+        f"- Use markdown formatting throughout\n"
+        f"- You MUST reach Day 30 — do not stop early under any circumstances\n"
+        f"- Do not write placeholder text like '[repeat]' or '[similar to Day X]' — write the actual content for every day"
     )
 
 
@@ -347,7 +371,7 @@ def generate_study_plan(
                 contents=[{"role": "user", "parts": [{"text": "Generate my personalized 30-day study plan."}]}],
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
-                    max_output_tokens=3000,
+                    max_output_tokens=8000,
                     temperature=0.6,
                 ),
             )
