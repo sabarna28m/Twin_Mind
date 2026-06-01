@@ -5,7 +5,6 @@ import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
-import { useLanguage } from '../contexts/LanguageContext';
 
 interface LearningEntry {
   study_hours: number; attendance_percentage: number;

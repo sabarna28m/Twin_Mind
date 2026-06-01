@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../services/api';
-import { useLanguage } from '../contexts/LanguageContext';
 
 interface Notification {
   id: number;
@@ -33,7 +32,6 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { t } = useLanguage();
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   const fetchNotifications = useCallback(async () => {
@@ -82,8 +80,8 @@ export default function NotificationBell() {
           if (!open) fetchNotifications();
         }}
         style={s.bell}
-        title={t('notif.title')}
-        aria-label={`${t('notif.title')}${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+        title="Notifications"
+        aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
       >
         🔔
         {unreadCount > 0 && (
@@ -94,17 +92,17 @@ export default function NotificationBell() {
       {open && (
         <div style={s.dropdown}>
           <div style={s.dropHeader}>
-            <span style={s.dropTitle}>{t('notif.title')}</span>
+            <span style={s.dropTitle}>Notifications</span>
             {unreadCount > 0 && (
               <button style={s.markAllBtn} onClick={markAllRead}>
-                {t('notif.markAll')}
+                Mark all read
               </button>
             )}
           </div>
 
           <div style={s.list}>
             {notifications.length === 0 ? (
-              <p style={s.empty}>{t('notif.empty')}</p>
+              <p style={s.empty}>No notifications yet.</p>
             ) : (
               notifications.map(n => (
                 <div

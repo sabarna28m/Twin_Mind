@@ -5,7 +5,6 @@ import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
-import { useLanguage } from '../contexts/LanguageContext';
 
 interface HistoryPoint { date: string; overall_score: number; }
 
@@ -349,7 +348,6 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
 
 export default function Twin() {
   const { user, token } = useAuth();
-  const { t } = useLanguage();
   const [twin, setTwin]       = useState<TwinState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
@@ -396,8 +394,8 @@ export default function Twin() {
 
       <main style={s.main}>
         <div style={{ marginBottom: '2rem' }} className="animate-slide-up">
-          <h1 style={s.pageTitle}>{t('twin.title')}</h1>
-          <p style={s.pageSub}>{t('twin.subtitle')}</p>
+          <h1 style={s.pageTitle}>Your Digital Twin</h1>
+          <p style={s.pageSub}>A living model of your academic self, built from your data.</p>
         </div>
 
         {loading && (

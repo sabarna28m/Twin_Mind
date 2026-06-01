@@ -5,7 +5,6 @@ import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
-import { useLanguage } from '../contexts/LanguageContext';
 
 interface Session {
   id: number;
@@ -18,7 +17,6 @@ interface Session {
 
 export default function Sessions() {
   const { user, token, studentProfile } = useAuth();
-  const { t } = useLanguage();
   const profileSubjects = studentProfile?.subjects ?? [];
   const headers = { Authorization: `Bearer ${token}` };
   const wsConnected = useWebSocket(user?.id, token, () => {});
@@ -84,9 +82,9 @@ export default function Sessions() {
 
       <main style={s.main}>
         <div style={s.titleRow}>
-          <h1 style={s.pageTitle}>{t('sessions.title')}</h1>
+          <h1 style={s.pageTitle}>Sessions</h1>
           <button onClick={() => setShowForm(v => !v)} style={s.newBtn}>
-            {showForm ? t('mentor.cancel') : t('sessions.new')}
+            {showForm ? 'Cancel' : '+ New session'}
           </button>
         </div>
 

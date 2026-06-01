@@ -5,7 +5,6 @@ import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
-import { useLanguage } from '../contexts/LanguageContext';
 
 interface Material {
   id: number;
@@ -40,7 +39,6 @@ function formatDate(iso: string | null) {
 
 export default function Materials() {
   const { user, token } = useAuth();
-  const { t } = useLanguage();
   const headers = { Authorization: `Bearer ${token}` };
   const wsConnected = useWebSocket(user?.id, token, () => {});
 
@@ -123,7 +121,7 @@ export default function Materials() {
       </header>
 
       <main style={s.main}>
-        <h1 style={s.pageTitle}>{t('materials.title')}</h1>
+        <h1 style={s.pageTitle}>Materials</h1>
 
         {/* Drop zone */}
         <div

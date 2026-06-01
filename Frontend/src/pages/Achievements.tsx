@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import BackButton from '../components/BackButton';
-import { useLanguage } from '../contexts/LanguageContext';
 
 interface AchievementItem {
   id: string;
@@ -62,7 +61,6 @@ function BadgeCard({ badge }: { badge: AchievementItem }) {
 
 export default function Achievements() {
   const { token } = useAuth();
-  const { t } = useLanguage();
   const [badges, setBadges] = useState<AchievementItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -90,8 +88,8 @@ export default function Achievements() {
       <main style={s.main}>
         <div style={s.titleRow}>
           <div>
-            <h1 style={s.pageTitle}>{t('achievements.title')}</h1>
-            <p style={s.pageSubtitle}>{t('achievements.subtitle')}</p>
+            <h1 style={s.pageTitle}>Achievements</h1>
+            <p style={s.pageSubtitle}>Earn badges by building great study habits</p>
           </div>
           {!loading && (
             <div style={s.progressChip}>
