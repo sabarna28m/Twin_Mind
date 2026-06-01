@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
 import NotificationBell from '../components/NotificationBell';
+import PlanContent from '../components/PlanContent';
 import api from '../services/api';
 
 const BACKEND = 'http://localhost:8000';
@@ -179,6 +180,8 @@ const quickActions = [
   { label: 'Check-in',     icon: '✓',  grad: 'linear-gradient(135deg,#34d399,#10b981)', to: '/checkin',      desc: 'Log Today' },
 ];
 
+interface SavedPlan { id: number; plan_text: string; created_at: string }
+
 // ── Main component ─────────────────────────────────────────────────
 export default function Dashboard() {
   const { user, token, logout } = useAuth();
@@ -195,6 +198,9 @@ export default function Dashboard() {
   const [wsConnected, setWsConnected]   = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
 
+  const [savedPlan,      setSavedPlan]      = useState<SavedPlan | null>(null);
+  const [showPlanModal,  setShowPlanModal]  = useState(false);
+
   const refreshData = useCallback(() => {
     Promise.all([
       api.get<LearningEntry[]>('/learning-data?limit=60'),
@@ -210,6 +216,12 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => { refreshData(); }, [refreshData]);
+
+  useEffect(() => {
+    api.get<SavedPlan>('/mentor/study-plan/saved')
+      .then(r => setSavedPlan(r.data))
+      .catch(() => setSavedPlan(null));
+  }, []);
 
   // WebSocket — connect on mount, auto-reconnect on drop
   useEffect(() => {
@@ -402,7 +414,74 @@ export default function Dashboard() {
           </section>
 
         </div>
+
+        {/* ── My Study Plan card ── */}
+        <section style={s.panel}>
+          <div style={s.panelHead}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '1rem' }}>📋</span>
+              <h2 style={s.panelTitle}>My Study Plan</h2>
+            </div>
+            <Link to="/mentor" style={s.panelCta}>Generate new →</Link>
+          </div>
+
+          {savedPlan ? (
+            <div>
+              <p style={s.planDate}>
+                Saved {new Date(savedPlan.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </p>
+              <div style={s.planPreview}>
+                {savedPlan.plan_text
+                  .split('\n')
+                  .filter(l => l.trim())
+                  .slice(0, 4)
+                  .map((line, i) => {
+                    const clean = line.replace(/^#{1,3}\s*/, '').replace(/\*\*/g, '');
+                    return <p key={i} style={i === 0 ? s.planPreviewHead : s.planPreviewLine}>{clean}</p>;
+                  })}
+                <p style={s.planFade}>…</p>
+              </div>
+              <button onClick={() => setShowPlanModal(true)} style={s.viewPlanBtn}>
+                View Full Plan
+              </button>
+            </div>
+          ) : (
+            <div style={s.emptyState}>
+              <p style={s.emptyIcon}>📋</p>
+              <p style={s.emptyText}>No saved study plan yet</p>
+              <p style={s.emptySub}>Generate a personalized 30-day plan in the AI Mentor.</p>
+              <Link to="/mentor" style={s.emptyBtn}>Go to Mentor →</Link>
+            </div>
+          )}
+        </section>
+
       </main>
+
+      {/* ── Full Plan Modal ── */}
+      {showPlanModal && savedPlan && (
+        <div style={s.modalOverlay} onClick={() => setShowPlanModal(false)}>
+          <div style={s.modalBox} onClick={e => e.stopPropagation()}>
+            <div style={s.modalHeader}>
+              <div>
+                <p style={s.modalTitle}>30-Day Study Plan</p>
+                <p style={s.modalSub}>
+                  Saved {new Date(savedPlan.created_at).toLocaleDateString('en', { month: 'long', day: 'numeric', year: 'numeric' })}
+                </p>
+              </div>
+              <button onClick={() => setShowPlanModal(false)} style={s.modalClose}>✕</button>
+            </div>
+            <div style={s.modalBody}>
+              <PlanContent text={savedPlan.plan_text} />
+            </div>
+            <div style={s.modalFooter}>
+              <Link to="/mentor" style={s.modalMentorLink} onClick={() => setShowPlanModal(false)}>
+                Regenerate in Mentor →
+              </Link>
+              <button onClick={() => setShowPlanModal(false)} style={s.modalCloseBtn}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -513,4 +592,45 @@ const s: Record<string, React.CSSProperties> = {
   actionIconGlyph: { fontSize: '1.2rem' },
   actionTileLabel: { fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-h)', margin: 0, lineHeight: 1.2 },
   actionTileDesc:  { fontSize: '0.62rem', color: 'var(--text)', margin: 0, lineHeight: 1.2 },
+
+  /* Study plan card */
+  planDate:        { fontSize: '0.7rem', color: 'var(--text)', marginBottom: '0.75rem', fontWeight: 500 },
+  planPreview:     { background: 'var(--bg-elevated, var(--bg))', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.9rem 1rem', marginBottom: '0.85rem' },
+  planPreviewHead: { fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-h)', margin: '0 0 0.3rem', lineHeight: 1.35 },
+  planPreviewLine: { fontSize: '0.78rem', color: 'var(--text)', margin: '0 0 0.15rem', lineHeight: 1.4 },
+  planFade:        { fontSize: '0.78rem', color: 'var(--text)', margin: '0.2rem 0 0', opacity: 0.5 },
+  viewPlanBtn:     {
+    padding: '0.45rem 1.1rem', background: 'var(--accent)', color: '#fff',
+    border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600,
+    cursor: 'pointer', fontFamily: 'inherit',
+  },
+
+  /* Full-plan modal */
+  modalOverlay: {
+    position: 'fixed' as const, inset: 0,
+    background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    zIndex: 100, padding: '1rem',
+  },
+  modalBox: {
+    background: 'var(--bg)', border: '1px solid var(--border)',
+    borderRadius: '16px', width: '100%', maxWidth: '760px',
+    maxHeight: '85vh', display: 'flex', flexDirection: 'column',
+    boxShadow: '0 24px 64px rgba(0,0,0,0.4)',
+  },
+  modalHeader: {
+    display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+    padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', flexShrink: 0,
+  },
+  modalTitle:  { margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--text-h)' },
+  modalSub:    { margin: '0.2rem 0 0', fontSize: '0.78rem', color: 'var(--text)' },
+  modalClose:  { background: 'transparent', border: 'none', color: 'var(--text)', fontSize: '1.1rem', cursor: 'pointer', padding: '0.2rem 0.4rem', borderRadius: '6px', lineHeight: 1 },
+  modalBody:   { flex: 1, overflowY: 'auto' as const, padding: '1.25rem 1.5rem' },
+  modalFooter: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem', padding: '1rem 1.5rem', borderTop: '1px solid var(--border)', flexShrink: 0 },
+  modalMentorLink: { fontSize: '0.82rem', color: '#818cf8', textDecoration: 'none', fontWeight: 500 },
+  modalCloseBtn: {
+    padding: '0.45rem 1.25rem', background: 'var(--accent)', border: 'none',
+    borderRadius: '8px', color: '#fff', fontSize: '0.82rem', fontWeight: 600,
+    fontFamily: 'inherit', cursor: 'pointer',
+  },
 };

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from pydantic import BaseModel, field_validator
 
@@ -22,3 +23,16 @@ class MentorChatRequest(BaseModel):
 class HistoryMessage(BaseModel):
     role: str
     content: str
+
+
+class StudyPlanSaveRequest(BaseModel):
+    plan_text: str
+
+
+class StudyPlanResponse(BaseModel):
+    id: int
+    plan_text: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

@@ -16,7 +16,8 @@ from app.models.student_profile import StudentProfile
 from app.models.learning_data import LearningData
 from app.models.mentor_conversation import MentorConversation
 from app.api.routes.auth import get_current_user
-from app.api.schemas.mentor import MentorChatRequest, HistoryMessage
+from app.api.schemas.mentor import MentorChatRequest, HistoryMessage, StudyPlanSaveRequest, StudyPlanResponse
+from app.models.study_plan import StudyPlan
 from app.ml.predictor import predict
 
 logger = logging.getLogger(__name__)
@@ -368,3 +369,45 @@ def generate_study_plan(
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+@router.post("/study-plan/save", response_model=StudyPlanResponse)
+def save_study_plan(
+    payload: StudyPlanSaveRequest,
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    from sqlalchemy.sql import func as sqlfunc
+    existing = db.query(StudyPlan).filter(StudyPlan.user_id == current_user.id).first()
+    if existing:
+        existing.plan_text = payload.plan_text
+        existing.created_at = sqlfunc.now()
+        db.commit()
+        db.refresh(existing)
+        return existing
+    plan = StudyPlan(user_id=current_user.id, plan_text=payload.plan_text)
+    db.add(plan)
+    db.commit()
+    db.refresh(plan)
+    return plan
+
+
+@router.get("/study-plan/saved", response_model=StudyPlanResponse)
+def get_saved_study_plan(
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    from fastapi import HTTPException, status as http_status
+    plan = db.query(StudyPlan).filter(StudyPlan.user_id == current_user.id).first()
+    if not plan:
+        raise HTTPException(status_code=http_status.HTTP_404_NOT_FOUND, detail="No saved study plan")
+    return plan
+
+
+@router.delete("/study-plan/saved", status_code=204)
+def delete_saved_study_plan(
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    db.query(StudyPlan).filter(StudyPlan.user_id == current_user.id).delete()
+    db.commit()

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
+import PlanContent from '../components/PlanContent';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000/api/v1';
 
@@ -82,43 +83,6 @@ function getSmartStarters(entry: LatestEntry | null, prediction: {score: number;
   return result;
 }
 
-function renderInline(text: string): React.ReactNode {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return (
-    <>
-      {parts.map((part, i) =>
-        part.startsWith('**') && part.endsWith('**')
-          ? <strong key={i}>{part.slice(2, -2)}</strong>
-          : part
-      )}
-    </>
-  );
-}
-
-function PlanContent({ text }: { text: string }) {
-  const lines = text.split('\n');
-  return (
-    <div>
-      {lines.map((line, i) => {
-        if (line.startsWith('# '))
-          return <div key={i} style={pc.h1}>{renderInline(line.slice(2))}</div>;
-        if (line.startsWith('## '))
-          return <div key={i} style={pc.h2}>{renderInline(line.slice(3))}</div>;
-        if (line.startsWith('### '))
-          return <div key={i} style={pc.h3}>{renderInline(line.slice(4))}</div>;
-        if (line.startsWith('- ') || line.startsWith('* '))
-          return <div key={i} style={pc.bullet}>• {renderInline(line.slice(2))}</div>;
-        if (/^\d+\. /.test(line)) {
-          const m = line.match(/^(\d+)\. (.*)/);
-          return m ? <div key={i} style={pc.numbered}>{m[1]}. {renderInline(m[2])}</div> : <div key={i} style={pc.body}>{renderInline(line)}</div>;
-        }
-        if (line.trim() === '') return <div key={i} style={{ height: '0.45rem' }} />;
-        return <div key={i} style={pc.body}>{renderInline(line)}</div>;
-      })}
-    </div>
-  );
-}
-
 function WelcomeBubble() {
   return (
     <div style={mc.bubbleWrap}>
@@ -148,6 +112,8 @@ export default function Mentor() {
   const [showPlan,       setShowPlan]       = useState(false);
   const [planText,       setPlanText]       = useState('');
   const [generatingPlan, setGeneratingPlan] = useState(false);
+  const [planSaved,      setPlanSaved]      = useState(false);
+  const [savingPlan,     setSavingPlan]     = useState(false);
 
   const bottomRef   = useRef<HTMLDivElement>(null);
   const planBottomRef = useRef<HTMLDivElement>(null);
@@ -195,6 +161,11 @@ export default function Mentor() {
           })));
         }
       })
+      .catch(() => {});
+
+    // Load saved plan if any
+    api.get<{ plan_text: string }>('/mentor/study-plan/saved', { headers: h })
+      .then(r => { setPlanText(r.data.plan_text); setPlanSaved(true); })
       .catch(() => {});
   }, [refreshSidebar, token]);
 
@@ -264,9 +235,20 @@ export default function Mentor() {
     }
   }
 
+  async function savePlan() {
+    if (!planText || savingPlan) return;
+    setSavingPlan(true);
+    try {
+      await api.post('/mentor/study-plan/save', { plan_text: planText });
+      setPlanSaved(true);
+    } catch { /* ignore */ }
+    finally { setSavingPlan(false); }
+  }
+
   async function generateStudyPlan() {
     if (generatingPlan) return;
     setPlanText('');
+    setPlanSaved(false);
     setShowPlan(true);
     setGeneratingPlan(true);
 
@@ -521,6 +503,19 @@ export default function Mentor() {
               >
                 {generatingPlan ? 'Generating…' : 'Regenerate Plan'}
               </button>
+              {planText && !generatingPlan && (
+                <button
+                  onClick={savePlan}
+                  disabled={savingPlan || planSaved}
+                  style={{
+                    ...mc.saveBtn,
+                    opacity: (savingPlan || planSaved) ? 0.7 : 1,
+                    cursor: (savingPlan || planSaved) ? 'default' : 'pointer',
+                  }}
+                >
+                  {savingPlan ? 'Saving…' : planSaved ? 'Saved ✓' : 'Save Plan'}
+                </button>
+              )}
               <button onClick={() => setShowPlan(false)} style={mc.modalCloseBtn}>Close</button>
             </div>
           </div>
@@ -690,6 +685,12 @@ const mc: Record<string, React.CSSProperties> = {
     padding: '0.45rem 1rem', background: 'var(--accent-bg)',
     border: '1px solid var(--accent-border)', borderRadius: '8px',
     color: 'var(--text-h)', fontSize: '0.82rem', fontWeight: 500, fontFamily: 'inherit',
+    cursor: 'pointer',
+  },
+  saveBtn: {
+    padding: '0.45rem 1rem', background: 'rgba(16,185,129,0.12)',
+    border: '1px solid rgba(16,185,129,0.35)', borderRadius: '8px',
+    color: '#10b981', fontSize: '0.82rem', fontWeight: 600, fontFamily: 'inherit',
   },
   modalCloseBtn: {
     padding: '0.45rem 1.25rem', background: 'var(--accent)',
@@ -698,15 +699,3 @@ const mc: Record<string, React.CSSProperties> = {
   },
 };
 
-const pc: Record<string, React.CSSProperties> = {
-  h1: { fontSize: '1.05rem', fontWeight: 700, color: 'var(--accent)', margin: '1rem 0 0.3rem' },
-  h2: {
-    fontSize: '0.95rem', fontWeight: 700, color: 'var(--accent)',
-    margin: '0.85rem 0 0.25rem', paddingBottom: '0.2rem',
-    borderBottom: '1px solid var(--border)',
-  },
-  h3:      { fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-h)', margin: '0.6rem 0 0.15rem' },
-  bullet:  { fontSize: '0.875rem', lineHeight: '1.55', color: 'var(--text-h)', paddingLeft: '1rem', marginBottom: '0.1rem' },
-  numbered:{ fontSize: '0.875rem', lineHeight: '1.55', color: 'var(--text-h)', paddingLeft: '0.5rem', marginBottom: '0.1rem' },
-  body:    { fontSize: '0.875rem', lineHeight: '1.55', color: 'var(--text-h)' },
-};
