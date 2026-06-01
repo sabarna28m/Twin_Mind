@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState, DragEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { DragEvent } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -39,6 +41,7 @@ function formatDate(iso: string | null) {
 
 export default function Materials() {
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const headers = { Authorization: `Bearer ${token}` };
   const wsConnected = useWebSocket(user?.id, token, () => {});
 
@@ -121,7 +124,7 @@ export default function Materials() {
       </header>
 
       <main style={s.main}>
-        <h1 style={s.pageTitle}>Materials</h1>
+        <h1 style={s.pageTitle}>{t('materials_title')}</h1>
 
         {/* Drop zone */}
         <div
@@ -140,7 +143,7 @@ export default function Materials() {
           />
           {uploading ? (
             <div style={s.progressWrap}>
-              <p style={s.dropLabel}>Uploading…</p>
+              <p style={s.dropLabel}>{t('materials_uploading')}</p>
               <div style={s.progressTrack}>
                 <div style={{ ...s.progressBar, width: `${progress}%` }} />
               </div>
@@ -149,8 +152,8 @@ export default function Materials() {
           ) : (
             <>
               <p style={s.dropIcon}>☁</p>
-              <p style={s.dropLabel}>{dragOver ? 'Drop to upload' : 'Drag & drop a file here'}</p>
-              <p style={s.dropHint}>or click to browse · PDF, images, docs up to 20 MB</p>
+              <p style={s.dropLabel}>{dragOver ? t('materials_drop') : t('materials_upload')}</p>
+              <p style={s.dropHint}>{t('materials_browse')} · {t('materials_supported')}</p>
             </>
           )}
         </div>
@@ -159,11 +162,11 @@ export default function Materials() {
 
         {/* File list */}
         {loading ? (
-          <p style={s.emptyText}>Loading…</p>
+          <p style={s.emptyText}>{t('loading')}</p>
         ) : materials.length === 0 ? (
           <div style={s.empty}>
             <p style={s.emptyIcon}>📂</p>
-            <p style={s.emptyTitle}>No materials yet</p>
+            <p style={s.emptyTitle}>{t('materials_empty')}</p>
             <p style={s.emptyHint}>Upload your first file above.</p>
           </div>
         ) : (

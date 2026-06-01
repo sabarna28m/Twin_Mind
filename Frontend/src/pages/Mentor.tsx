@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useRef, useState, KeyboardEvent } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -115,6 +117,7 @@ function WelcomeBubble() {
 
 export default function Mentor() {
   const { token, user } = useAuth();
+  const { t } = useLanguage();
 
   const [messages,       setMessages]       = useState<ChatMessage[]>([]);
   const [input,          setInput]          = useState('');
@@ -443,7 +446,7 @@ export default function Mentor() {
                 cursor: generatingPlan ? 'not-allowed' : 'pointer',
               }}
             >
-              {generatingPlan ? 'Generating…' : 'Generate 30-Day Plan'}
+              {generatingPlan ? t('mentor_generating') : t('mentor_gen_plan')}
             </button>
             {planText && !showPlan && (
               <button onClick={() => setShowPlan(true)} style={mc.viewPlanBtn}>
@@ -517,7 +520,7 @@ export default function Mentor() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask your mentor… (Enter to send, Shift+Enter for new line)"
+              placeholder={t('mentor_placeholder')}
               rows={2}
               disabled={streaming}
               style={mc.textarea}

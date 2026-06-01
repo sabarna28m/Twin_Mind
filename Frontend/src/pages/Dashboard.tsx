@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import ThemeToggle from '../components/ThemeToggle';
 import NotificationBell from '../components/NotificationBell';
 import PlanContent from '../components/PlanContent';
+import LanguageModal from '../components/LanguageModal';
 import api from '../services/api';
 
 const BACKEND = 'http://localhost:8000';
@@ -156,30 +158,31 @@ const ch: Record<string, React.CSSProperties> = {
 };
 
 // ── Data constants ─────────────────────────────────────────────────
-const navItems = [
-  { label: 'Sessions',     to: '/sessions'     },
-  { label: 'Notes',        to: '/notes'        },
-  { label: 'Materials',    to: '/materials'    },
-  { label: 'Progress',     to: '/progress'     },
-  { label: 'Check-in',     to: '/checkin'      },
-  { label: 'Achievements', to: '/achievements' },
-  { label: 'Quiz',         to: '/quiz'         },
-  { label: 'Simulate',     to: '/simulate'     },
-  { label: 'Mentor',       to: '/mentor'       },
-  { label: 'Twin',         to: '/twin'         },
+const NAV_KEYS = [
+  { key: 'nav_sessions', to: '/sessions' },
+  { key: 'nav_notes',    to: '/notes'    },
+  { key: 'nav_materials',to: '/materials'},
+  { key: 'nav_progress', to: '/progress' },
+  { key: 'nav_checkin',  to: '/checkin'  },
+  { key: 'nav_achievements', to: '/achievements' },
+  { key: 'nav_quiz',     to: '/quiz'     },
+  { key: 'nav_simulate', to: '/simulate' },
+  { key: 'nav_mentor',   to: '/mentor'   },
+  { key: 'nav_twin',     to: '/twin'     },
 ];
 
-const quickActions = [
-  { label: 'Sessions',     icon: '▶',  grad: 'linear-gradient(135deg,#6366f1,#8b5cf6)', to: '/sessions',     desc: 'Study' },
-  { label: 'Materials',    icon: '↑',  grad: 'linear-gradient(135deg,#3b82f6,#06b6d4)', to: '/materials',    desc: 'Upload' },
-  { label: 'Progress',     icon: '◎',  grad: 'linear-gradient(135deg,#10b981,#34d399)', to: '/progress',     desc: 'Analytics' },
-  { label: 'Quiz',         icon: '🧠', grad: 'linear-gradient(135deg,#06b6d4,#3b82f6)', to: '/quiz',         desc: 'AI Quiz' },
-  { label: 'Predict',      icon: '🎯', grad: 'linear-gradient(135deg,#8b5cf6,#d946ef)', to: '/predict',      desc: 'ML Score' },
-  { label: 'Achievements', icon: '🏆', grad: 'linear-gradient(135deg,#f59e0b,#fbbf24)', to: '/achievements', desc: 'Badges' },
-  { label: 'Simulate',     icon: '⚡', grad: 'linear-gradient(135deg,#f59e0b,#ef4444)', to: '/simulate',     desc: 'What-If' },
-  { label: 'Mentor',       icon: '💬', grad: 'linear-gradient(135deg,#ec4899,#8b5cf6)', to: '/mentor',       desc: 'AI Advice' },
-  { label: 'Twin',         icon: '◈',  grad: 'linear-gradient(135deg,#06b6d4,#6366f1)', to: '/twin',         desc: 'Digital Twin' },
-  { label: 'Check-in',     icon: '✓',  grad: 'linear-gradient(135deg,#34d399,#10b981)', to: '/checkin',      desc: 'Log Today' },
+const QA_DEFS = [
+  { labelKey: 'qa_sessions',     descKey: 'qa_desc_study',    icon: '▶',  grad: 'linear-gradient(135deg,#6366f1,#8b5cf6)', to: '/sessions'     },
+  { labelKey: 'qa_materials',    descKey: 'qa_desc_upload',   icon: '↑',  grad: 'linear-gradient(135deg,#3b82f6,#06b6d4)', to: '/materials'    },
+  { labelKey: 'qa_progress',     descKey: 'qa_desc_analytics',icon: '◎',  grad: 'linear-gradient(135deg,#10b981,#34d399)', to: '/progress'     },
+  { labelKey: 'qa_quiz',         descKey: 'qa_desc_quiz',     icon: '🧠', grad: 'linear-gradient(135deg,#06b6d4,#3b82f6)', to: '/quiz'         },
+  { labelKey: 'qa_predict',      descKey: 'qa_desc_ml',       icon: '🎯', grad: 'linear-gradient(135deg,#8b5cf6,#d946ef)', to: '/predict'      },
+  { labelKey: 'qa_achievements', descKey: 'qa_desc_badges',   icon: '🏆', grad: 'linear-gradient(135deg,#f59e0b,#fbbf24)', to: '/achievements' },
+  { labelKey: 'qa_simulate',     descKey: 'qa_desc_whatif',   icon: '⚡', grad: 'linear-gradient(135deg,#f59e0b,#ef4444)', to: '/simulate'     },
+  { labelKey: 'qa_mentor',       descKey: 'qa_desc_advice',   icon: '💬', grad: 'linear-gradient(135deg,#ec4899,#8b5cf6)', to: '/mentor'       },
+  { labelKey: 'qa_twin',         descKey: 'qa_desc_twin',     icon: '◈',  grad: 'linear-gradient(135deg,#06b6d4,#6366f1)', to: '/twin'         },
+  { labelKey: 'qa_checkin',      descKey: 'qa_desc_log',      icon: '✓',  grad: 'linear-gradient(135deg,#34d399,#10b981)', to: '/checkin'      },
+  { labelKey: 'qa_language',     descKey: 'qa_desc_language', icon: '🌐', grad: 'linear-gradient(135deg,#6366f1,#06b6d4)', to: null            },
 ];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }
@@ -187,11 +190,13 @@ interface SavedPlan { id: number; plan_text: string; created_at: string }
 // ── Main component ─────────────────────────────────────────────────
 export default function Dashboard() {
   const { user, token, logout } = useAuth();
+  const { t } = useLanguage();
   const hour = new Date().getHours();
-  const greeting = hour < 5 ? 'Burning midnight oil' : hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const greeting = hour < 5 ? t('greeting_midnight') : hour < 12 ? t('greeting_morning') : hour < 17 ? t('greeting_afternoon') : t('greeting_evening');
   const firstName = user?.full_name?.split(' ')[0] ?? '';
   const quote = getDailyQuote();
   const avatarSrc = user?.avatar_url ? BACKEND + user.avatar_url : null;
+  const [showLangModal, setShowLangModal] = useState(false);
 
   const [entries, setEntries]           = useState<LearningEntry[]>([]);
   const [sessionCount, setSessionCount] = useState(0);
@@ -288,7 +293,7 @@ export default function Dashboard() {
           )}
         </div>
         <nav style={s.navCenter}>
-          {navItems.map(n => <Link key={n.to} to={n.to} className="nav-link">{n.label}</Link>)}
+          {NAV_KEYS.map(n => <Link key={n.to} to={n.to} className="nav-link">{t(n.key)}</Link>)}
         </nav>
         <div style={s.navRight}>
           <ThemeToggle />
@@ -299,7 +304,7 @@ export default function Dashboard() {
               : <span style={s.navInitials}>{firstName[0]?.toUpperCase()}</span>}
             {user?.full_name}
           </Link>
-          <button className="sign-out-btn" onClick={logout}>Sign out</button>
+          <button className="sign-out-btn" onClick={logout}>{t('sign_out')}</button>
         </div>
       </header>
 
@@ -314,11 +319,12 @@ export default function Dashboard() {
             {/* Left */}
             <div style={s.heroLeft}>
               <p style={s.greetingLabel}>{greeting} ✦</p>
+
               <h1 style={s.heroName}>
                 {firstName}&nbsp;
                 <span style={{ display: 'inline-block', animation: 'float 3s ease-in-out infinite' }}>👋</span>
               </h1>
-              <p style={s.heroSub}>Ready to make today count?</p>
+              <p style={s.heroSub}>{t('hero_sub')}</p>
               <div style={s.quoteBox}>
                 <span style={s.quoteMark}>"</span>
                 <div>
@@ -361,12 +367,12 @@ export default function Dashboard() {
 
         {/* ── Stat cards ── */}
         <section style={s.statsGrid}>
-          <StatCard icon="▶"  grad="linear-gradient(135deg,#6366f1,#818cf8)" value={sessionCount} label="Sessions"      delay={0}   />
-          <StatCard icon="⏱"  grad="linear-gradient(135deg,#8b5cf6,#a78bfa)" value={totalHours}  unit="h" label="Hours Studied" delay={70}  />
-          <StatCard icon="🔥" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={streak}      label="Day Streak"    delay={140} />
-          <StatCard icon="📝" grad="linear-gradient(135deg,#10b981,#34d399)" value={noteCount}   label="Notes"         delay={210} />
+          <StatCard icon="▶"  grad="linear-gradient(135deg,#6366f1,#818cf8)" value={sessionCount} label={t('stat_sessions')}  delay={0}   />
+          <StatCard icon="⏱"  grad="linear-gradient(135deg,#8b5cf6,#a78bfa)" value={totalHours}  unit="h" label={t('stat_hours')} delay={70}  />
+          <StatCard icon="🔥" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={streak}      label={t('stat_streak')}   delay={140} />
+          <StatCard icon="📝" grad="linear-gradient(135deg,#10b981,#34d399)" value={noteCount}   label={t('stat_notes')}    delay={210} />
           <Link to="/achievements" style={{ textDecoration: 'none' }}>
-            <StatCard icon="🏆" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={badgeCount} label="Badges Earned" delay={280} />
+            <StatCard icon="🏆" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={badgeCount} label={t('stat_badges')} delay={280} />
           </Link>
         </section>
 
@@ -376,41 +382,49 @@ export default function Dashboard() {
           {/* 7-day chart */}
           <section style={s.panel}>
             <div style={s.panelHead}>
-              <h2 style={s.panelTitle}>Study Hours — Last 7 Days</h2>
-              <Link to="/checkin" style={s.panelCta}>+ Log today</Link>
+              <h2 style={s.panelTitle}>{t('chart_title')}</h2>
+              <Link to="/checkin" style={s.panelCta}>{t('chart_log_today')}</Link>
             </div>
             {last7.some(d => d.hours > 0) ? (
               <>
                 <StudyChart data={last7} />
                 <div style={s.chartFooter}>
-                  <span style={s.chartStat}>This week&nbsp;<strong style={s.chartStatVal}>{weekHours.toFixed(1)}h</strong></span>
-                  <span style={s.chartStat}>Daily avg&nbsp;<strong style={s.chartStatVal}>{(weekHours / 7).toFixed(1)}h</strong></span>
+                  <span style={s.chartStat}>{t('chart_this_week')}&nbsp;<strong style={s.chartStatVal}>{weekHours.toFixed(1)}h</strong></span>
+                  <span style={s.chartStat}>{t('chart_daily_avg')}&nbsp;<strong style={s.chartStatVal}>{(weekHours / 7).toFixed(1)}h</strong></span>
                 </div>
               </>
             ) : (
               <div style={s.emptyState}>
                 <p style={s.emptyIcon}>📊</p>
-                <p style={s.emptyText}>No study data yet</p>
-                <p style={s.emptySub}>Log your first check-in to see your chart.</p>
-                <Link to="/checkin" style={s.emptyBtn}>Log today →</Link>
+                <p style={s.emptyText}>{t('no_data_title')}</p>
+                <p style={s.emptySub}>{t('no_data_sub')}</p>
+                <Link to="/checkin" style={s.emptyBtn}>{t('no_data_btn')}</Link>
               </div>
             )}
           </section>
 
           {/* Quick actions icon grid */}
           <section style={s.panel}>
-            <h2 style={s.panelTitle}>Quick Actions</h2>
+            <h2 style={s.panelTitle}>{t('quick_actions')}</h2>
             <div style={s.actionGrid}>
-              {quickActions.map(a => (
-                <Link key={a.label} to={a.to} style={{ textDecoration: 'none' }}>
+              {QA_DEFS.map(a => a.to ? (
+                <Link key={a.labelKey} to={a.to} style={{ textDecoration: 'none' }}>
                   <div className="action-tile">
                     <div className="action-icon-big" style={{ ...s.actionIconBig, background: a.grad }}>
                       <span style={s.actionIconGlyph}>{a.icon}</span>
                     </div>
-                    <p style={s.actionTileLabel}>{a.label}</p>
-                    <p style={s.actionTileDesc}>{a.desc}</p>
+                    <p style={s.actionTileLabel}>{t(a.labelKey)}</p>
+                    <p style={s.actionTileDesc}>{t(a.descKey)}</p>
                   </div>
                 </Link>
+              ) : (
+                <div key={a.labelKey} className="action-tile" style={{ cursor: 'pointer' }} onClick={() => setShowLangModal(true)}>
+                  <div className="action-icon-big" style={{ ...s.actionIconBig, background: a.grad }}>
+                    <span style={s.actionIconGlyph}>{a.icon}</span>
+                  </div>
+                  <p style={s.actionTileLabel}>{t(a.labelKey)}</p>
+                  <p style={s.actionTileDesc}>{t(a.descKey)}</p>
+                </div>
               ))}
             </div>
           </section>
@@ -422,15 +436,15 @@ export default function Dashboard() {
           <div style={s.panelHead}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span style={{ fontSize: '1rem' }}>📋</span>
-              <h2 style={s.panelTitle}>My Study Plan</h2>
+              <h2 style={s.panelTitle}>{t('my_study_plan')}</h2>
             </div>
-            <Link to="/mentor" style={s.panelCta}>Generate new →</Link>
+            <Link to="/mentor" style={s.panelCta}>{t('generate_new')}</Link>
           </div>
 
           {savedPlan ? (
             <div>
               <p style={s.planDate}>
-                Saved {new Date(savedPlan.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}
+                {t('plan_saved')} {new Date(savedPlan.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
               </p>
               <div style={s.planPreview}>
                 {savedPlan.plan_text
@@ -444,15 +458,15 @@ export default function Dashboard() {
                 <p style={s.planFade}>…</p>
               </div>
               <button onClick={() => setShowPlanModal(true)} style={s.viewPlanBtn}>
-                View Full Plan
+                {t('view_full_plan')}
               </button>
             </div>
           ) : (
             <div style={s.emptyState}>
               <p style={s.emptyIcon}>📋</p>
-              <p style={s.emptyText}>No saved study plan yet</p>
-              <p style={s.emptySub}>Generate a personalized 30-day plan in the AI Mentor.</p>
-              <Link to="/mentor" style={s.emptyBtn}>Go to Mentor →</Link>
+              <p style={s.emptyText}>{t('no_plan_title')}</p>
+              <p style={s.emptySub}>{t('no_plan_sub')}</p>
+              <Link to="/mentor" style={s.emptyBtn}>{t('go_to_mentor')}</Link>
             </div>
           )}
         </section>
@@ -460,14 +474,16 @@ export default function Dashboard() {
       </main>
 
       {/* ── Full Plan Modal ── */}
+      {showLangModal && <LanguageModal onClose={() => setShowLangModal(false)} />}
+
       {showPlanModal && savedPlan && (
         <div style={s.modalOverlay} onClick={() => setShowPlanModal(false)}>
           <div style={s.modalBox} onClick={e => e.stopPropagation()}>
             <div style={s.modalHeader}>
               <div>
-                <p style={s.modalTitle}>30-Day Study Plan</p>
+                <p style={s.modalTitle}>{t('modal_plan_title')}</p>
                 <p style={s.modalSub}>
-                  Saved {new Date(savedPlan.created_at).toLocaleDateString('en', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  {t('plan_saved')} {new Date(savedPlan.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
               <button onClick={() => setShowPlanModal(false)} style={s.modalClose}>✕</button>
@@ -477,9 +493,9 @@ export default function Dashboard() {
             </div>
             <div style={s.modalFooter}>
               <Link to="/mentor" style={s.modalMentorLink} onClick={() => setShowPlanModal(false)}>
-                Regenerate in Mentor →
+                {t('modal_regenerate')}
               </Link>
-              <button onClick={() => setShowPlanModal(false)} style={s.modalCloseBtn}>Close</button>
+              <button onClick={() => setShowPlanModal(false)} style={s.modalCloseBtn}>{t('close')}</button>
             </div>
           </div>
         </div>

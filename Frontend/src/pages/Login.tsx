@@ -1,9 +1,12 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Login() {
   const { login } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +21,7 @@ export default function Login() {
       await login(email, password);
       navigate('/');
     } catch {
-      setError('Invalid email or password.');
+      setError(t('login_error'));
     } finally {
       setLoading(false);
     }
@@ -35,32 +38,32 @@ export default function Login() {
           <span style={s.logoIcon}>◈</span>
           <span className="grad-text" style={s.logoText}>TwinMind</span>
         </div>
-        <p style={s.tagline}>Your AI-powered academic twin</p>
-        <h2 style={s.title}>Welcome back</h2>
+        <p style={s.tagline}>{t('login_tagline')}</p>
+        <h2 style={s.title}>{t('login_title')}</h2>
 
         {error && <div style={s.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={s.form}>
           <label style={s.label}>
-            Email
+            {t('login_email')}
             <input className="dark-input" type="email" value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com" required autoFocus />
           </label>
           <label style={s.label}>
-            Password
+            {t('login_password')}
             <input className="dark-input" type="password" value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••" required />
-            <Link to="/forgot-password" style={s.forgotLink}>Forgot Password?</Link>
+            <Link to="/forgot-password" style={s.forgotLink}>{t('login_forgot')}</Link>
           </label>
           <button className="grad-btn" type="submit" disabled={loading} style={{ marginTop: '0.5rem' }}>
-            {loading ? 'Signing in…' : 'Sign in →'}
+            {loading ? t('login_btn_loading') : t('login_btn')}
           </button>
         </form>
 
         <p style={s.footer}>
-          No account? <Link to="/register" style={s.link}>Create one</Link>
+          {t('login_no_account')} <Link to="/register" style={s.link}>{t('login_create')}</Link>
         </p>
       </div>
     </div>

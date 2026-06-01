@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -64,6 +65,7 @@ function timeAgo(iso: string) {
 // ── Component ──────────────────────────────────────────────────────────
 export default function Quiz() {
   const { token } = useAuth();
+  const { t } = useLanguage();
 
   // ── Setup state ──
   const [subjects, setSubjects]       = useState<string[]>([]);
@@ -224,7 +226,7 @@ export default function Quiz() {
           <div style={p.genBox}>
             <div style={p.spinner} className="spin" />
             <p style={p.genTitle}>Generating your quiz…</p>
-            <p style={p.genSub}>Asking Gemini AI to craft {getQuestionCount(duration, difficulty)} {difficulty.toLowerCase()} questions on <strong>{subject}</strong></p>
+            <p style={p.genSub}>{t('quiz_generating')} {getQuestionCount(duration, difficulty)} {difficulty.toLowerCase()} — <strong>{subject}</strong></p>
           </div>
         </div>
       </div>
@@ -313,7 +315,7 @@ export default function Quiz() {
                 disabled={!answered}
                 style={{ ...p.nextBtn, opacity: answered ? 1 : 0.4, cursor: answered ? 'pointer' : 'default' }}
               >
-                {current + 1 === total ? 'Finish Quiz' : 'Next Question'} →
+                {current + 1 === total ? t('quiz_finish') : t('quiz_next')} →
               </button>
             </div>
           </div>
@@ -331,7 +333,7 @@ export default function Quiz() {
         <header style={p.nav}>
           <div style={p.navLeft}><BackButton /></div>
           <span style={p.navTitle}>Quiz Results</span>
-          <button onClick={reset} style={p.retakeBtn}>Take Another →</button>
+          <button onClick={reset} style={p.retakeBtn}>{t('quiz_take_another')}</button>
         </header>
 
         <main style={p.main}>
@@ -345,31 +347,31 @@ export default function Quiz() {
             <div style={p.statsRow}>
               <div style={p.statItem}>
                 <span style={{ ...p.statNum, color: '#10b981' }}>{score}</span>
-                <span style={p.statLbl}>Correct</span>
+                <span style={p.statLbl}>{t('quiz_correct')}</span>
               </div>
               <div style={p.statItem}>
                 <span style={{ ...p.statNum, color: '#ef4444' }}>{wrong}</span>
-                <span style={p.statLbl}>Wrong</span>
+                <span style={p.statLbl}>{t('quiz_wrong')}</span>
               </div>
               <div style={p.statItem}>
                 <span style={{ ...p.statNum, color: 'var(--text)' }}>{skipped}</span>
-                <span style={p.statLbl}>Skipped</span>
+                <span style={p.statLbl}>{t('quiz_skipped')}</span>
               </div>
               <div style={p.statItem}>
                 <span style={{ ...p.statNum, color: '#818cf8' }}>{formatTime(timeTaken)}</span>
-                <span style={p.statLbl}>Time</span>
+                <span style={p.statLbl}>{t('quiz_time')}</span>
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1.5rem' }}>
-              <button onClick={reset} style={p.nextBtn}>Take Another Quiz</button>
+              <button onClick={reset} style={p.nextBtn}>{t('quiz_take_another_btn')}</button>
               <Link to="/" style={{ ...p.nextBtn, background: 'var(--bg-surface)', color: 'var(--text-h)', border: '1px solid var(--border)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>← Dashboard</Link>
             </div>
           </div>
 
           {/* Answer review */}
           <div style={p.reviewSection}>
-            <h2 style={p.reviewTitle}>Answer Review</h2>
+            <h2 style={p.reviewTitle}>{t('quiz_review')}</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {questions.map((q, qi) => {
                 const ua = selected[qi];
@@ -429,7 +431,7 @@ export default function Quiz() {
     <div style={p.shell}>
       <header style={p.nav}>
         <div style={p.navLeft}><BackButton /></div>
-        <span style={p.navTitle}>AI Quiz</span>
+        <span style={p.navTitle}>{t('quiz_title')}</span>
         <div style={{ width: 100 }} />
       </header>
 
@@ -442,7 +444,7 @@ export default function Quiz() {
               <span style={p.cardIcon}>🧠</span>
               <div>
                 <h2 style={p.cardTitle}>Configure Your Quiz</h2>
-                <p style={p.cardSub}>Powered by Gemini AI</p>
+                <p style={p.cardSub}>{t('quiz_powered')}</p>
               </div>
             </div>
 
@@ -450,7 +452,7 @@ export default function Quiz() {
 
             {/* Subject */}
             <div style={p.fieldGroup}>
-              <label style={p.label}>Subject</label>
+              <label style={p.label}>{t('quiz_subject')}</label>
               {subjects.length > 0 ? (
                 <div style={p.chipRow}>
                   {subjects.map(s => (
@@ -470,14 +472,14 @@ export default function Quiz() {
                 </div>
               ) : (
                 <p style={p.noProfile}>
-                  No subjects in your profile. <Link to="/profile" style={{ color: '#818cf8' }}>Add subjects →</Link>
+                  {t('quiz_no_subjects')} <Link to="/profile" style={{ color: '#818cf8' }}>{t('quiz_add_subjects')}</Link>
                 </p>
               )}
             </div>
 
             {/* Duration */}
             <div style={p.fieldGroup}>
-              <label style={p.label}>Duration</label>
+              <label style={p.label}>{t('quiz_duration')}</label>
               <div style={p.chipRow}>
                 {DURATIONS.map(d => (
                   <button
@@ -502,7 +504,7 @@ export default function Quiz() {
 
             {/* Difficulty */}
             <div style={p.fieldGroup}>
-              <label style={p.label}>Difficulty</label>
+              <label style={p.label}>{t('quiz_difficulty')}</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {DIFFICULTIES.map(d => (
                   <button
@@ -529,17 +531,17 @@ export default function Quiz() {
               disabled={!subject || subjects.length === 0}
               style={{ ...p.generateBtn, opacity: subject ? 1 : 0.5, cursor: subject ? 'pointer' : 'not-allowed' }}
             >
-              Generate Quiz →
+              {t('quiz_generate')}
             </button>
           </div>
 
           {/* ── History card ── */}
           <div style={p.histCard}>
-            <h2 style={p.histTitle}>Past Quizzes</h2>
+            <h2 style={p.histTitle}>{t('quiz_history')}</h2>
             {histLoading ? (
               <p style={p.histEmpty}>Loading…</p>
             ) : history.length === 0 ? (
-              <p style={p.histEmpty}>No quizzes taken yet. Take your first quiz!</p>
+              <p style={p.histEmpty}>{t('quiz_no_history')}</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
                 {history.map(h => {

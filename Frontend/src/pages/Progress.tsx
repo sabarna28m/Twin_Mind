@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import {
   AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -274,6 +274,7 @@ async function downloadReport(
 
 export default function Progress() {
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const [summary, setSummary]   = useState<Summary | null>(null);
   const [legacy,  setLegacy]    = useState<LegacyAnalytics | null>(null);
   const [loading, setLoading]   = useState(true);
@@ -344,7 +345,7 @@ export default function Progress() {
 
       <main style={s.main}>
         <div style={{ marginBottom: '2rem' }}>
-          <h1 style={s.pageTitle}>Progress & Analytics</h1>
+          <h1 style={s.pageTitle}>{t('nav_progress')}</h1>
           <p style={{ color: '#475569', fontSize: '0.9rem', margin: 0 }}>Your academic journey, visualised.</p>
         </div>
 

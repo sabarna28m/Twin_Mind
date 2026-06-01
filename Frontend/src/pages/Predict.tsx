@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState, FormEvent } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -79,6 +81,7 @@ const g: Record<string, React.CSSProperties> = {
 
 export default function Predict() {
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const headers = { Authorization: `Bearer ${token}` };
 
   const [studyHours,  setStudyHours]  = useState('');
@@ -136,7 +139,6 @@ export default function Predict() {
     }
   }
 
-  const maxContrib = result ? Math.max(...Object.values(result.feature_contributions)) : 1;
   const sortedImportance = result
     ? Object.entries(result.feature_importance).sort(([, a], [, b]) => b - a)
     : [];
@@ -152,7 +154,7 @@ export default function Predict() {
       </header>
 
       <main style={s.main}>
-        <h1 style={s.pageTitle}>Predict Exam Score</h1>
+        <h1 style={s.pageTitle}>{t('predict_title')}</h1>
         <p style={s.subtitle}>Enter your learning stats and TwinMind will predict your likely exam result.</p>
 
         <div style={result ? s.layout2 : s.layout1}>
@@ -210,7 +212,7 @@ export default function Predict() {
               </div>
 
               <button type="submit" disabled={loading} style={s.submitBtn}>
-                {loading ? 'Predicting…' : 'Predict my score →'}
+                {loading ? t('predict_predicting') : t('predict_btn')}
               </button>
             </form>
           </section>

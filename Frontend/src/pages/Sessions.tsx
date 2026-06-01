@@ -1,5 +1,7 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
@@ -17,6 +19,7 @@ interface Session {
 
 export default function Sessions() {
   const { user, token, studentProfile } = useAuth();
+  const { t } = useLanguage();
   const profileSubjects = studentProfile?.subjects ?? [];
   const headers = { Authorization: `Bearer ${token}` };
   const wsConnected = useWebSocket(user?.id, token, () => {});
@@ -82,9 +85,9 @@ export default function Sessions() {
 
       <main style={s.main}>
         <div style={s.titleRow}>
-          <h1 style={s.pageTitle}>Sessions</h1>
+          <h1 style={s.pageTitle}>{t('sessions_title')}</h1>
           <button onClick={() => setShowForm(v => !v)} style={s.newBtn}>
-            {showForm ? 'Cancel' : '+ New session'}
+            {showForm ? t('sessions_form_cancel') : t('sessions_new')}
           </button>
         </div>
 
@@ -92,7 +95,7 @@ export default function Sessions() {
           <form onSubmit={handleCreate} style={s.form}>
             <input
               type="text"
-              placeholder="Session title"
+              placeholder={t('sessions_form_title')}
               value={title}
               onChange={e => setTitle(e.target.value)}
               style={s.input}
@@ -105,7 +108,7 @@ export default function Sessions() {
                 onChange={e => setSubject(e.target.value)}
                 style={{ ...s.input, cursor: 'pointer' }}
               >
-                <option value="">Subject (optional)</option>
+                <option value="">{t('sessions_form_subject_ph')}</option>
                 {profileSubjects.map(sub => (
                   <option key={sub} value={sub}>{sub}</option>
                 ))}
@@ -120,18 +123,18 @@ export default function Sessions() {
               />
             )}
             <button type="submit" disabled={creating} style={s.createBtn}>
-              {creating ? 'Creating…' : 'Create'}
+              {creating ? t('sessions_form_creating') : t('sessions_form_create')}
             </button>
           </form>
         )}
 
         {loading ? (
-          <p style={s.emptyText}>Loading…</p>
+          <p style={s.emptyText}>{t('loading')}</p>
         ) : sessions.length === 0 ? (
           <div style={s.empty}>
             <p style={s.emptyIcon}>📖</p>
-            <p style={s.emptyTitle}>No sessions yet</p>
-            <p style={s.emptyHint}>Create your first session to get started.</p>
+            <p style={s.emptyTitle}>{t('sessions_empty')}</p>
+            <p style={s.emptyHint}>{t('sessions_empty_sub')}</p>
           </div>
         ) : (
           <div style={s.list}>
@@ -143,7 +146,7 @@ export default function Sessions() {
                     style={session.status === 'completed' ? s.badgeDone : s.badgeActive}
                     title="Toggle status"
                   >
-                    {session.status === 'completed' ? 'Completed' : 'Active'}
+                    {session.status === 'completed' ? t('sessions_completed') : t('sessions_active')}
                   </button>
                   <div>
                     <p style={s.cardTitle}>{session.title}</p>

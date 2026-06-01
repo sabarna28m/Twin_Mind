@@ -1,4 +1,5 @@
-import { FormEvent, KeyboardEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import type { FormEvent, KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';

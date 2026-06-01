@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -115,6 +116,7 @@ function SliderRow({
 
 export default function Simulate() {
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const headers = { Authorization: `Bearer ${token}` };
   // No auto-refresh on checkin_update — would reset the user's slider state
   const wsConnected = useWebSocket(user?.id, token, () => {});
@@ -173,7 +175,7 @@ export default function Simulate() {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [current, hypothetical, runSim]);
 
-  function updateHypo(field: keyof SimParams, value: number) {
+  function updateHypo(field: keyof SimParams, value: number | null) {
     setHypo(prev => ({ ...prev, [field]: value }));
   }
 
@@ -193,7 +195,7 @@ export default function Simulate() {
       </header>
 
       <main style={sc.main}>
-        <h1 style={sc.pageTitle}>What-If Simulator</h1>
+        <h1 style={sc.pageTitle}>{t('simulate_title')}</h1>
         <p style={sc.subtitle}>
           {hasData
             ? 'Adjust the sliders to explore how habit changes would affect your predicted exam score.'
@@ -205,7 +207,7 @@ export default function Simulate() {
         <div style={sc.layout}>
           {/* ── Slider panel ─────────────────────────────────── */}
           <section style={sc.card}>
-            <h2 style={sc.cardTitle}>Hypothetical Scenario</h2>
+            <h2 style={sc.cardTitle}>{t('simulate_hypothetical')}</h2>
             <p style={sc.cardSub}>Drag sliders to explore "what if" changes</p>
 
             <SliderRow
@@ -245,7 +247,7 @@ export default function Simulate() {
               onClick={() => setHypo(current)}
               style={sc.resetBtn}
             >
-              Reset to current
+              {t('simulate_reset')}
             </button>
           </section>
 
@@ -258,7 +260,7 @@ export default function Simulate() {
               {result && (
                 <>
                   <div style={sc.scoreRow}>
-                    <ScoreBadge label="Current" detail={result.current} />
+                    <ScoreBadge label={t('simulate_current')} detail={result.current} />
                     <div style={sc.arrow}>→</div>
                     <ScoreBadge label="What-If" detail={result.hypothetical} />
                   </div>

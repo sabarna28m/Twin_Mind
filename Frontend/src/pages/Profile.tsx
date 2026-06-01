@@ -1,4 +1,6 @@
-import { FormEvent, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import type { FormEvent } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
@@ -8,6 +10,7 @@ const BACKEND = 'http://localhost:8000';
 
 export default function Profile() {
   const { user, token, refreshUser } = useAuth();
+  const { t } = useLanguage();
 
   const [fullName, setFullName] = useState(user?.full_name ?? '');
   const [nameMsg, setNameMsg]   = useState<{ ok: boolean; text: string } | null>(null);
@@ -99,12 +102,12 @@ export default function Profile() {
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <ThemeToggle />
           <Link to="/profile/setup" style={s.backLink}>Student Profile</Link>
-          <Link to="/" style={s.backLink}>← Dashboard</Link>
+          <Link to="/" style={s.backLink}>{t('back_dashboard')}</Link>
         </div>
       </header>
 
       <main style={s.main}>
-        <h1 style={s.pageTitle}>Profile</h1>
+        <h1 style={s.pageTitle}>{t('profile_title')}</h1>
 
         {/* Identity card */}
         <section style={s.card}>
@@ -145,7 +148,7 @@ export default function Profile() {
 
         {/* Edit name */}
         <section style={s.panel}>
-          <h2 style={s.panelTitle}>Display name</h2>
+          <h2 style={s.panelTitle}>{t('profile_name')}</h2>
           {nameMsg && <p style={nameMsg.ok ? s.msgOk : s.msgErr}>{nameMsg.text}</p>}
           <form onSubmit={saveName} style={s.form}>
             <input
@@ -156,18 +159,18 @@ export default function Profile() {
               required
             />
             <button type="submit" disabled={nameSaving} style={s.btn}>
-              {nameSaving ? 'Saving…' : 'Save'}
+              {nameSaving ? t('profile_saving') : t('profile_save_name')}
             </button>
           </form>
         </section>
 
         {/* Change password */}
         <section style={s.panel}>
-          <h2 style={s.panelTitle}>Change password</h2>
+          <h2 style={s.panelTitle}>{t('profile_change_pw')}</h2>
           {pwMsg && <p style={pwMsg.ok ? s.msgOk : s.msgErr}>{pwMsg.text}</p>}
           <form onSubmit={savePassword} style={s.form}>
             <label style={s.label}>
-              Current password
+              {t('profile_current_pw')}
               <input
                 type="password"
                 value={currentPw}
@@ -178,7 +181,7 @@ export default function Profile() {
               />
             </label>
             <label style={s.label}>
-              New password
+              {t('profile_new_pw')}
               <input
                 type="password"
                 value={newPw}
@@ -190,7 +193,7 @@ export default function Profile() {
               />
             </label>
             <button type="submit" disabled={pwSaving} style={s.btn}>
-              {pwSaving ? 'Saving…' : 'Change password'}
+              {pwSaving ? t('profile_saving') : t('profile_save_pw')}
             </button>
           </form>
         </section>

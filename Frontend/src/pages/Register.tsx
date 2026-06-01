@@ -1,9 +1,12 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Register() {
   const { register } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
   const [email, setEmail]       = useState('');
@@ -20,7 +23,7 @@ export default function Register() {
       navigate('/login');
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg ?? 'Registration failed. Please try again.');
+      setError(msg ?? t('register_error'));
     } finally {
       setLoading(false);
     }
@@ -37,37 +40,37 @@ export default function Register() {
           <span style={s.logoIcon}>◈</span>
           <span className="grad-text" style={s.logoText}>TwinMind</span>
         </div>
-        <p style={s.tagline}>Your AI-powered academic twin</p>
-        <h2 style={s.title}>Create your account</h2>
+        <p style={s.tagline}>{t('login_tagline')}</p>
+        <h2 style={s.title}>{t('register_title')}</h2>
 
         {error && <div style={s.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={s.form}>
           <label style={s.label}>
-            Full name
+            {t('register_fullname')}
             <input className="dark-input" type="text" value={fullName}
               onChange={e => setFullName(e.target.value)}
               placeholder="Jane Doe" required autoFocus />
           </label>
           <label style={s.label}>
-            Email
+            {t('register_email')}
             <input className="dark-input" type="email" value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com" required />
           </label>
           <label style={s.label}>
-            Password
+            {t('register_password')}
             <input className="dark-input" type="password" value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="Min. 8 characters" minLength={8} required />
           </label>
           <button className="grad-btn" type="submit" disabled={loading} style={{ marginTop: '0.5rem' }}>
-            {loading ? 'Creating account…' : 'Get started →'}
+            {loading ? t('register_btn_loading') : t('register_btn')}
           </button>
         </form>
 
         <p style={s.footer}>
-          Already have an account? <Link to="/login" style={s.link}>Sign in</Link>
+          {t('register_have_account')} <Link to="/login" style={s.link}>{t('register_signin')}</Link>
         </p>
       </div>
     </div>

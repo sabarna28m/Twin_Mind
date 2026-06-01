@@ -1,9 +1,12 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API = 'http://localhost:8000/api/v1';
 
 export default function ForgotPassword() {
+  const { t } = useLanguage();
   const [email, setEmail]     = useState('');
   const [status, setStatus]   = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -37,27 +40,22 @@ export default function ForgotPassword() {
           <span style={s.logoIcon}>◈</span>
           <span className="grad-text" style={s.logoText}>TwinMind</span>
         </div>
-        <p style={s.tagline}>Your AI-powered academic twin</p>
-        <h2 style={s.title}>Forgot Password</h2>
+        <p style={s.tagline}>{t('login_tagline')}</p>
+        <h2 style={s.title}>{t('forgot_title')}</h2>
 
         {status === 'sent' ? (
           <div style={s.success}>
             <div style={s.successIcon}>✉</div>
             <p style={s.successText}>{message}</p>
-            <p style={s.successSub}>Check your inbox and follow the link to reset your password.</p>
-            <Link to="/login" style={s.backLink}>← Back to Sign In</Link>
+            <Link to="/login" style={s.backLink}>{t('forgot_back')}</Link>
           </div>
         ) : (
           <>
-            <p style={s.description}>
-              Enter your registered email address and we'll send you a link to reset your password.
-            </p>
-
             {status === 'error' && <div style={s.error}>{message}</div>}
 
             <form onSubmit={handleSubmit} style={s.form}>
               <label style={s.label}>
-                Email
+                {t('forgot_email')}
                 <input
                   className="dark-input"
                   type="email"
@@ -74,12 +72,12 @@ export default function ForgotPassword() {
                 disabled={status === 'loading'}
                 style={{ marginTop: '0.5rem' }}
               >
-                {status === 'loading' ? 'Sending…' : 'Send Reset Link →'}
+                {status === 'loading' ? t('forgot_btn_loading') : t('forgot_btn')}
               </button>
             </form>
 
             <p style={s.footer}>
-              Remember it? <Link to="/login" style={s.link}>Sign in</Link>
+              <Link to="/login" style={s.link}>{t('forgot_back')}</Link>
             </p>
           </>
         )}

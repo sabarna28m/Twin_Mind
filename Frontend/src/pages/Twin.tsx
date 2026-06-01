@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -39,7 +40,6 @@ interface TwinState {
 const RISK_COLOR  = { low: '#10b981', medium: '#f59e0b', high: '#ef4444' };
 const RISK_BG     = { low: 'rgba(16,185,129,0.12)', medium: 'rgba(245,158,11,0.12)', high: 'rgba(239,68,68,0.12)' };
 const RISK_BORDER = { low: 'rgba(16,185,129,0.4)', medium: 'rgba(245,158,11,0.4)', high: 'rgba(239,68,68,0.4)' };
-const RISK_GLOW   = { low: '0 0 40px rgba(16,185,129,0.4)', medium: '0 0 40px rgba(245,158,11,0.4)', high: '0 0 40px rgba(239,68,68,0.4)' };
 
 const TREND_ICON  = { improving: '↑', declining: '↓', stable: '→' };
 const TREND_COLOR = { improving: '#10b981', declining: '#ef4444', stable: '#94a3b8' };
@@ -348,6 +348,7 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
 
 export default function Twin() {
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const [twin, setTwin]       = useState<TwinState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
@@ -394,7 +395,7 @@ export default function Twin() {
 
       <main style={s.main}>
         <div style={{ marginBottom: '2rem' }} className="animate-slide-up">
-          <h1 style={s.pageTitle}>Your Digital Twin</h1>
+          <h1 style={s.pageTitle}>{t('twin_title')}</h1>
           <p style={s.pageSub}>A living model of your academic self, built from your data.</p>
         </div>
 

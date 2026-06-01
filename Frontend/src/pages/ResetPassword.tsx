@@ -1,5 +1,7 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API = 'http://localhost:8000/api/v1';
 
@@ -8,6 +10,7 @@ export default function ResetPassword() {
   const token = searchParams.get('token') || '';
   const navigate = useNavigate();
 
+  const { t } = useLanguage();
   const [password, setPassword]   = useState('');
   const [confirm, setConfirm]     = useState('');
   const [status, setStatus]       = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
@@ -17,7 +20,7 @@ export default function ResetPassword() {
     e.preventDefault();
     if (password !== confirm) {
       setStatus('error');
-      setMessage('Passwords do not match.');
+      setMessage(t('reset_mismatch'));
       return;
     }
     if (password.length < 8) {
@@ -70,25 +73,22 @@ export default function ResetPassword() {
           <span style={s.logoIcon}>◈</span>
           <span className="grad-text" style={s.logoText}>TwinMind</span>
         </div>
-        <p style={s.tagline}>Your AI-powered academic twin</p>
-        <h2 style={s.title}>Set New Password</h2>
+        <p style={s.tagline}>{t('login_tagline')}</p>
+        <h2 style={s.title}>{t('reset_title')}</h2>
 
         {status === 'done' ? (
           <div style={s.success}>
             <div style={s.successIcon}>✓</div>
-            <p style={s.successText}>Password updated successfully!</p>
-            <p style={s.successSub}>Redirecting you to sign in…</p>
-            <Link to="/login" style={s.backLink}>Sign in now →</Link>
+            <p style={s.successText}>{message}</p>
+            <Link to="/login" style={s.backLink}>{t('login_btn')}</Link>
           </div>
         ) : (
           <>
-            <p style={s.description}>Choose a strong new password for your account.</p>
-
             {status === 'error' && <div style={s.error}>{message}</div>}
 
             <form onSubmit={handleSubmit} style={s.form}>
               <label style={s.label}>
-                New Password
+                {t('reset_new_pw')}
                 <input
                   className="dark-input"
                   type="password"
@@ -100,7 +100,7 @@ export default function ResetPassword() {
                 />
               </label>
               <label style={s.label}>
-                Confirm Password
+                {t('reset_confirm_pw')}
                 <input
                   className="dark-input"
                   type="password"
@@ -116,12 +116,12 @@ export default function ResetPassword() {
                 disabled={status === 'loading'}
                 style={{ marginTop: '0.5rem' }}
               >
-                {status === 'loading' ? 'Updating…' : 'Update Password →'}
+                {status === 'loading' ? t('reset_btn_loading') : t('reset_btn')}
               </button>
             </form>
 
             <p style={s.footer}>
-              <Link to="/login" style={s.link}>← Back to Sign In</Link>
+              <Link to="/login" style={s.link}>{t('forgot_back')}</Link>
             </p>
           </>
         )}

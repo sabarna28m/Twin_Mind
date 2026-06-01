@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -15,6 +16,7 @@ interface Note {
 
 export default function Notes() {
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const headers = { Authorization: `Bearer ${token}` };
   const wsConnected = useWebSocket(user?.id, token, () => {});
 
@@ -27,7 +29,7 @@ export default function Notes() {
   const [saved, setSaved] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const active = notes.find(n => n.id === activeId) ?? null;
+
 
   useEffect(() => {
     api.get<Note[]>('/notes', { headers })
@@ -124,14 +126,14 @@ export default function Notes() {
         {/* Sidebar */}
         <aside style={s.sidebar}>
           <div style={s.sidebarHead}>
-            <span style={s.sidebarTitle}>Notes</span>
-            <button onClick={createNote} style={s.newBtn} title="New note">+</button>
+            <span style={s.sidebarTitle}>{t('notes_title')}</span>
+            <button onClick={createNote} style={s.newBtn} title={t('notes_new')}>+</button>
           </div>
 
           {loading ? (
-            <p style={s.sidebarEmpty}>Loading…</p>
+            <p style={s.sidebarEmpty}>{t('loading')}</p>
           ) : notes.length === 0 ? (
-            <p style={s.sidebarEmpty}>No notes yet.</p>
+            <p style={s.sidebarEmpty}>{t('notes_empty')}</p>
           ) : (
             <ul style={s.noteList}>
               {notes.map(note => (
@@ -165,9 +167,9 @@ export default function Notes() {
           {activeId === null ? (
             <div style={s.editorEmpty}>
               <p style={s.editorEmptyIcon}>📝</p>
-              <p style={s.editorEmptyTitle}>No note selected</p>
-              <p style={s.editorEmptyHint}>Pick a note from the list or create a new one.</p>
-              <button onClick={createNote} style={s.editorNewBtn}>New note</button>
+              <p style={s.editorEmptyTitle}>{t('notes_empty')}</p>
+              <p style={s.editorEmptyHint}>{t('notes_empty_sub')}</p>
+              <button onClick={createNote} style={s.editorNewBtn}>{t('notes_new')}</button>
             </div>
           ) : (
             <>
@@ -176,17 +178,17 @@ export default function Notes() {
                   value={title}
                   onChange={e => handleTitleChange(e.target.value)}
                   style={s.titleInput}
-                  placeholder="Note title"
+                  placeholder={t('notes_untitled')}
                 />
                 <span style={s.saveStatus}>
-                  {saving ? 'Saving…' : saved ? 'Saved' : ''}
+                  {saving ? t('notes_saving') : saved ? t('notes_saved') : ''}
                 </span>
               </div>
               <textarea
                 value={content}
                 onChange={e => handleContentChange(e.target.value)}
                 style={s.contentArea}
-                placeholder="Start writing…"
+                placeholder={t('notes_placeholder')}
               />
             </>
           )}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -61,6 +62,7 @@ function BadgeCard({ badge }: { badge: AchievementItem }) {
 
 export default function Achievements() {
   const { token } = useAuth();
+  const { t } = useLanguage();
   const [badges, setBadges] = useState<AchievementItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -88,7 +90,7 @@ export default function Achievements() {
       <main style={s.main}>
         <div style={s.titleRow}>
           <div>
-            <h1 style={s.pageTitle}>Achievements</h1>
+            <h1 style={s.pageTitle}>{t('achievements_title')}</h1>
             <p style={s.pageSubtitle}>Earn badges by building great study habits</p>
           </div>
           {!loading && (
@@ -104,7 +106,7 @@ export default function Achievements() {
         </div>
 
         {loading ? (
-          <div style={s.loading}>Loading badges…</div>
+          <div style={s.loading}>{t('loading')}</div>
         ) : (
           <div style={s.grid}>
             {badges.map(badge => (
