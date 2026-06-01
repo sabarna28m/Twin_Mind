@@ -38,7 +38,8 @@ def _get_client() -> Groq:
         _client = Groq(api_key=settings.groq_api_key)
     return _client
 
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL        = "llama-3.3-70b-versatile"
+GROQ_VISION_MODEL = "llama-3.2-11b-vision-preview"
 
 
 def _build_system_prompt(
@@ -382,8 +383,18 @@ def mentor_chat(
     messages = [{"role": "system", "content": system_prompt}]
     for m in payload.history:
         messages.append({"role": m.role, "content": m.content})
-    messages.append({"role": "user", "content": payload.message})
 
+    # Build the final user message — include image if provided
+    if payload.image:
+        user_content = [
+            {"type": "text", "text": payload.message},
+            {"type": "image_url", "image_url": {"url": payload.image}},
+        ]
+    else:
+        user_content = payload.message
+    messages.append({"role": "user", "content": user_content})
+
+    model = GROQ_VISION_MODEL if payload.image else GROQ_MODEL
     user_id = current_user.id
 
     def event_stream():
@@ -391,7 +402,7 @@ def mentor_chat(
         try:
             client = _get_client()
             stream = client.chat.completions.create(
-                model=GROQ_MODEL,
+                model=model,
                 messages=messages,
                 max_tokens=2048,
                 temperature=0.7,

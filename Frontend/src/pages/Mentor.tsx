@@ -137,8 +137,16 @@ export default function Mentor() {
   const [planSaved,      setPlanSaved]      = useState(false);
   const [savingPlan,     setSavingPlan]     = useState(false);
 
-  const bottomRef   = useRef<HTMLDivElement>(null);
-  const planBottomRef = useRef<HTMLDivElement>(null);
+  // Multimedia input state
+  const [isRecording,   setIsRecording]   = useState(false);
+  const [attachedImage, setAttachedImage] = useState<{ base64: string; name: string } | null>(null);
+  const [attachedFile,  setAttachedFile]  = useState<{ name: string; content: string } | null>(null);
+
+  const bottomRef      = useRef<HTMLDivElement>(null);
+  const planBottomRef  = useRef<HTMLDivElement>(null);
+  const imageInputRef  = useRef<HTMLInputElement>(null);
+  const fileInputRef   = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const refreshSidebar = useCallback(() => {
     const h = { Authorization: `Bearer ${token}` };
@@ -226,23 +234,113 @@ export default function Mentor() {
     } catch { /* ignore */ }
   }
 
+  // ── Multimedia handlers ─────────────────────────────
+  function toggleVoice() {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+      return;
+    }
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      alert('Speech recognition is not supported in this browser. Try Chrome or Edge.');
+      return;
+    }
+    const rec = new SR();
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.lang = 'en-US';
+    rec.onresult = (e: any) => {
+      const transcript: string = e.results[0][0].transcript;
+      setInput(prev => prev ? `${prev} ${transcript}` : transcript);
+    };
+    rec.onend = () => setIsRecording(false);
+    rec.onerror = () => setIsRecording(false);
+    recognitionRef.current = rec;
+    rec.start();
+    setIsRecording(true);
+  }
+
+  function handleImageFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setAttachedImage({ base64: reader.result as string, name: file.name });
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+
+  function extractTextFromPdf(buf: ArrayBuffer): string {
+    const latin = new TextDecoder('latin1').decode(new Uint8Array(buf));
+    const parts: string[] = [];
+    const re = /\(([^)\\]*(?:\\.[^)\\]*)*)\)\s*Tj/g;
+    let m;
+    while ((m = re.exec(latin)) !== null) {
+      const t = m[1]
+        .replace(/\\n/g, '\n').replace(/\\\\/g, '\\')
+        .replace(/\\\(/g, '(').replace(/\\\)/g, ')');
+      if (t.trim()) parts.push(t);
+    }
+    return parts.length > 0
+      ? parts.join(' ')
+      : '[Could not extract PDF text — try converting to .txt first]';
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.name.toLowerCase().endsWith('.txt')) {
+      const reader = new FileReader();
+      reader.onload = () => setAttachedFile({ name: file.name, content: reader.result as string });
+      reader.readAsText(file);
+    } else if (file.name.toLowerCase().endsWith('.pdf')) {
+      const buf = await file.arrayBuffer();
+      setAttachedFile({ name: file.name, content: extractTextFromPdf(buf) });
+    }
+    e.target.value = '';
+  }
+
   async function sendMessage(text: string) {
-    if (!text.trim() || streaming) return;
+    const hasImage = Boolean(attachedImage);
+    const hasFile  = Boolean(attachedFile);
+    if (!text.trim() && !hasImage && !hasFile) return;
+    if (streaming) return;
+
+    // Build the API message (file content prepended as context)
+    let apiMessage = text.trim();
+    if (hasFile && attachedFile) {
+      const prefix = `[Attached file: ${attachedFile.name}]\n\n${attachedFile.content}\n\n---\n\n`;
+      apiMessage = prefix + (apiMessage || 'Please analyze this file and summarize the key points for me.');
+    }
+    if (!apiMessage.trim()) apiMessage = 'Please analyze this image and help me understand it.';
+
+    // Build display content shown in chat bubble
+    const displayParts: string[] = [];
+    if (hasFile  && attachedFile)  displayParts.push(`📎 ${attachedFile.name}`);
+    if (hasImage && attachedImage) displayParts.push(`🖼 ${attachedImage.name}`);
+    if (text.trim()) displayParts.push(text.trim());
 
     const history = messages.map(m => ({ role: m.role, content: m.content }));
-    const userMsg: ChatMessage = { id: uid(), role: 'user', content: text };
+    const userMsg: ChatMessage = { id: uid(), role: 'user', content: displayParts.join('\n') || apiMessage };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
+
+    const capturedImage = attachedImage;
+    setAttachedImage(null);
+    setAttachedFile(null);
 
     const assistantId = uid();
     setMessages(prev => [...prev, { id: assistantId, role: 'assistant', content: '', streaming: true }]);
     setStreaming(true);
 
     try {
+      const body: Record<string, unknown> = { message: apiMessage, history };
+      if (capturedImage) body.image = capturedImage.base64;
+
       const response = await fetch(`${API_BASE}/mentor/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ message: text, history }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
@@ -516,26 +614,118 @@ export default function Mentor() {
 
           {/* Input area */}
           <div style={mc.inputArea}>
-            <textarea
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={t('mentor_placeholder')}
-              rows={2}
-              disabled={streaming}
-              style={mc.textarea}
+            {/* Hidden file inputs */}
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/jpg"
+              onChange={handleImageFile}
+              style={{ display: 'none' }}
             />
-            <button
-              onClick={() => sendMessage(input)}
-              disabled={!input.trim() || streaming}
-              style={{
-                ...mc.sendBtn,
-                opacity: (!input.trim() || streaming) ? 0.5 : 1,
-                cursor: (!input.trim() || streaming) ? 'not-allowed' : 'pointer',
-              }}
-            >
-              {streaming ? '…' : '→'}
-            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.txt"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+
+            {/* Attachment preview chips */}
+            {(attachedImage || attachedFile) && (
+              <div style={mc.attachRow}>
+                {attachedImage && (
+                  <div style={mc.attachChip}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <span style={mc.chipName}>{attachedImage.name}</span>
+                    <button onClick={() => setAttachedImage(null)} style={mc.chipClose}>✕</button>
+                  </div>
+                )}
+                {attachedFile && (
+                  <div style={mc.attachChip}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                    </svg>
+                    <span style={mc.chipName}>{attachedFile.name}</span>
+                    <button onClick={() => setAttachedFile(null)} style={mc.chipClose}>✕</button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Input row */}
+            <div style={mc.inputRow}>
+              {/* Voice input */}
+              <button
+                onClick={toggleVoice}
+                disabled={streaming}
+                title={isRecording ? 'Stop recording' : 'Voice input'}
+                style={{ ...mc.mediaBtn, ...(isRecording ? mc.mediaBtnActive : {}) }}
+              >
+                {isRecording ? (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="#ef4444">
+                    <circle cx="12" cy="12" r="8"/>
+                  </svg>
+                ) : (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                )}
+              </button>
+
+              {/* Image upload */}
+              <button
+                onClick={() => imageInputRef.current?.click()}
+                disabled={streaming}
+                title="Upload image (JPG, PNG)"
+                style={mc.mediaBtn}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+              </button>
+
+              {/* File attachment */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={streaming}
+                title="Attach PDF or text file"
+                style={mc.mediaBtn}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                </svg>
+              </button>
+
+              <textarea
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={t('mentor_placeholder')}
+                rows={2}
+                disabled={streaming}
+                style={mc.textarea}
+              />
+              <button
+                onClick={() => sendMessage(input)}
+                disabled={(!input.trim() && !attachedImage && !attachedFile) || streaming}
+                style={{
+                  ...mc.sendBtn,
+                  opacity: ((!input.trim() && !attachedImage && !attachedFile) || streaming) ? 0.5 : 1,
+                  cursor: ((!input.trim() && !attachedImage && !attachedFile) || streaming) ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {streaming ? '…' : '→'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -770,9 +960,12 @@ const mc: Record<string, React.CSSProperties> = {
 
   // Input
   inputArea: {
-    display: 'flex', alignItems: 'flex-end', gap: '0.75rem',
+    display: 'flex', flexDirection: 'column' as const, gap: '0.45rem',
     padding: '0.875rem 1.5rem', borderTop: '1px solid var(--border)',
     background: 'var(--bg)',
+  },
+  inputRow: {
+    display: 'flex', alignItems: 'flex-end', gap: '0.5rem',
   },
   textarea: {
     flex: 1, resize: 'none' as const,
@@ -786,6 +979,36 @@ const mc: Record<string, React.CSSProperties> = {
     background: 'var(--accent)', color: '#fff', border: 'none',
     fontSize: '1.1rem', fontWeight: 700, flexShrink: 0,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
+  // Media buttons
+  mediaBtn: {
+    width: '36px', height: '36px', flexShrink: 0,
+    background: 'transparent', border: '1px solid var(--border)',
+    borderRadius: '8px', color: 'var(--text)',
+    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
+  mediaBtnActive: {
+    borderColor: '#ef4444', color: '#ef4444',
+    background: 'rgba(239,68,68,0.08)',
+  },
+  // Attachment chips
+  attachRow: {
+    display: 'flex', flexWrap: 'wrap' as const, gap: '0.35rem',
+  },
+  attachChip: {
+    display: 'flex', alignItems: 'center', gap: '0.3rem',
+    background: 'var(--accent-bg)', border: '1px solid var(--accent-border)',
+    borderRadius: '99px', padding: '0.2rem 0.5rem 0.2rem 0.45rem',
+    fontSize: '0.72rem', color: 'var(--text-h)', maxWidth: '220px',
+  },
+  chipName: {
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+    maxWidth: '160px',
+  },
+  chipClose: {
+    background: 'transparent', border: 'none', color: 'var(--text)',
+    cursor: 'pointer', padding: 0, lineHeight: 1, fontSize: '0.68rem',
+    display: 'flex', alignItems: 'center',
   },
 
   // Study Plan Modal

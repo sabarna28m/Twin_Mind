@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, field_validator
 
 
@@ -18,6 +18,7 @@ class MentorMessage(BaseModel):
 class MentorChatRequest(BaseModel):
     message: str
     history: List[MentorMessage] = []
+    image: Optional[str] = None  # base64 data URI, e.g. "data:image/jpeg;base64,..."
 
 
 class HistoryMessage(BaseModel):
