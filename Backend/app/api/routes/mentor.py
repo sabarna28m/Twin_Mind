@@ -2,8 +2,7 @@ import json
 import logging
 from typing import List, Optional
 
-from google import genai
-from google.genai import types
+from groq import Groq
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
@@ -30,14 +29,16 @@ from app.ml.predictor import predict
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/mentor", tags=["mentor"])
 
-_client: Optional[genai.Client] = None
+_client: Optional[Groq] = None
 
 
-def _get_client() -> genai.Client:
+def _get_client() -> Groq:
     global _client
     if _client is None:
-        _client = genai.Client(api_key=settings.gemini_api_key)
+        _client = Groq(api_key=settings.groq_api_key)
     return _client
+
+GROQ_MODEL = "llama3-70b-8192"
 
 
 def _build_system_prompt(
@@ -378,14 +379,10 @@ def mentor_chat(
     db.add(user_msg)
     db.commit()
 
-    contents: list[types.ContentDict] = [
-        {
-            "role": "model" if m.role == "assistant" else "user",
-            "parts": [{"text": m.content}],
-        }
-        for m in payload.history
-    ]
-    contents.append({"role": "user", "parts": [{"text": payload.message}]})
+    messages = [{"role": "system", "content": system_prompt}]
+    for m in payload.history:
+        messages.append({"role": m.role, "content": m.content})
+    messages.append({"role": "user", "content": payload.message})
 
     user_id = current_user.id
 
@@ -393,23 +390,18 @@ def mentor_chat(
         full_response: list[str] = []
         try:
             client = _get_client()
-            response = client.models.generate_content_stream(
-                model="gemini-2.5-flash",
-                contents=contents,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_prompt,
-                    max_output_tokens=2048,
-                    temperature=0.7,
-                ),
+            stream = client.chat.completions.create(
+                model=GROQ_MODEL,
+                messages=messages,
+                max_tokens=2048,
+                temperature=0.7,
+                stream=True,
             )
-            for chunk in response:
-                try:
-                    text = chunk.text
-                    if text:
-                        full_response.append(text)
-                        yield f"data: {json.dumps({'delta': text})}\n\n"
-                except Exception:
-                    pass
+            for chunk in stream:
+                delta = chunk.choices[0].delta.content
+                if delta:
+                    full_response.append(delta)
+                    yield f"data: {json.dumps({'delta': delta})}\n\n"
             yield "data: [DONE]\n\n"
         except Exception as exc:
             logger.error("Mentor stream error: %s", exc)
@@ -449,31 +441,29 @@ def generate_study_plan(
     def event_stream():
         try:
             client = _get_client()
-            response = client.models.generate_content_stream(
-                model="gemini-2.5-flash",
-                contents=[{"role": "user", "parts": [{"text": (
-                    "Generate a COMPLETE 30-day study plan for me. "
-                    "You MUST include all 30 days. "
-                    "Label each day exactly as: Day 1, Day 2, Day 3 ... all the way to Day 30. "
-                    "Do NOT stop before Day 30. "
-                    "Do NOT summarize groups of days. "
-                    "Do NOT write 'repeat the above' or 'similar to previous days'. "
-                    "Write specific, unique tasks for EVERY single day from Day 1 to Day 30. "
-                    "This response is incomplete if it does not contain Day 30."
-                )}]}],
-                config=types.GenerateContentConfig(
-                    system_instruction=system_prompt,
-                    max_output_tokens=8000,
-                    temperature=0.6,
-                ),
+            stream = client.chat.completions.create(
+                model=GROQ_MODEL,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": (
+                        "Generate a COMPLETE 30-day study plan for me. "
+                        "You MUST include all 30 days. "
+                        "Label each day exactly as: Day 1, Day 2, Day 3 ... all the way to Day 30. "
+                        "Do NOT stop before Day 30. "
+                        "Do NOT summarize groups of days. "
+                        "Do NOT write 'repeat the above' or 'similar to previous days'. "
+                        "Write specific, unique tasks for EVERY single day from Day 1 to Day 30. "
+                        "This response is incomplete if it does not contain Day 30."
+                    )},
+                ],
+                max_tokens=6000,
+                temperature=0.6,
+                stream=True,
             )
-            for chunk in response:
-                try:
-                    text = chunk.text
-                    if text:
-                        yield f"data: {json.dumps({'delta': text})}\n\n"
-                except Exception:
-                    pass
+            for chunk in stream:
+                delta = chunk.choices[0].delta.content
+                if delta:
+                    yield f"data: {json.dumps({'delta': delta})}\n\n"
             yield "data: [DONE]\n\n"
         except Exception as exc:
             logger.error("Study plan stream error: %s", exc)

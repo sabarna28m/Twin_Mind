@@ -5,8 +5,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from google import genai
-from google.genai import types
+from groq import Groq
 
 from app.core.config import settings
 from app.core.database import get_db
@@ -16,13 +15,15 @@ from app.models.user import User
 
 router = APIRouter(prefix="/quiz", tags=["quiz"])
 
-_client: Optional[genai.Client] = None
+_client: Optional[Groq] = None
+
+GROQ_MODEL = "llama3-70b-8192"
 
 
-def _get_client() -> genai.Client:
+def _get_client() -> Groq:
     global _client
     if _client is None:
-        _client = genai.Client(api_key=settings.gemini_api_key)
+        _client = Groq(api_key=settings.groq_api_key)
     return _client
 
 
@@ -99,16 +100,14 @@ Rules:
     client = _get_client()
 
     try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=[{"role": "user", "parts": [{"text": prompt}]}],
-            config=types.GenerateContentConfig(
-                max_output_tokens=6000,
-                temperature=0.35,
-            ),
+        response = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=6000,
+            temperature=0.35,
         )
 
-        raw = response.text.strip()
+        raw = response.choices[0].message.content.strip()
         # Strip accidental markdown code fences
         raw = re.sub(r"^```(?:json)?\s*", "", raw)
         raw = re.sub(r"\s*```$", "", raw.strip())

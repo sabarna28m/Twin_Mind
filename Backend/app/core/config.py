@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 1440  # 24 hours
 
-    gemini_api_key: str = ""
+    groq_api_key: str = ""
 
     mail_username: str = ""
     mail_password: str = ""
