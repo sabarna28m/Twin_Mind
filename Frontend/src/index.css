@@ -211,6 +211,7 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
   50%       { box-shadow: 0 0 8px #10b981, 0 0 16px rgba(16,185,129,0.7); opacity: 0.7; }
 }
 .live-dot { animation: live-pulse 2s ease-in-out infinite; }
+.spin      { animation: ring-spin 0.9s linear infinite; }
 
 @keyframes particle-float {
   0%, 100% { opacity: 0.15; transform: scale(0.7) translateY(0px); }

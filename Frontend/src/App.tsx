@@ -17,6 +17,7 @@ import Simulate from './pages/Simulate';
 import Mentor from './pages/Mentor';
 import Twin from './pages/Twin';
 import Achievements from './pages/Achievements';
+import Quiz from './pages/Quiz';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
@@ -131,6 +132,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Achievements />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quiz"
+            element={
+              <ProtectedRoute>
+                <Quiz />
               </ProtectedRoute>
             }
           />
