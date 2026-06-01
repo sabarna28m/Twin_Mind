@@ -15,7 +15,8 @@ from app.models import learning_data  # noqa: F401
 from app.models import password_reset  # noqa: F401
 from app.models import mentor_conversation  # noqa: F401
 from app.models import achievement  # noqa: F401
-from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes
+from app.models import notification  # noqa: F401
+from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes, notifications as notif_routes
 from app.api.routes import websocket as ws_routes
 from app.ml.predictor import get_model  # warm up model at startup
 
@@ -26,6 +27,17 @@ with engine.connect() as _conn:
     for _sql in [
         "ALTER TABLE users ADD COLUMN avatar_url TEXT",
         "ALTER TABLE student_profiles ADD COLUMN subjects TEXT DEFAULT ''",
+        (
+            "CREATE TABLE IF NOT EXISTS notifications ("
+            "id INTEGER PRIMARY KEY, "
+            "user_id INTEGER NOT NULL REFERENCES users(id), "
+            "notification_type VARCHAR(50) NOT NULL, "
+            "message VARCHAR(500) NOT NULL, "
+            "is_read BOOLEAN NOT NULL DEFAULT 0, "
+            "reference_key VARCHAR(100), "
+            "created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
+        ),
+        "CREATE INDEX IF NOT EXISTS ix_notifications_user_id ON notifications(user_id)",
     ]:
         try:
             _conn.execute(text(_sql))
@@ -59,6 +71,7 @@ app.include_router(sim_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(mentor_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(twin_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(ach_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(notif_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(ws_routes.router)
 
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"

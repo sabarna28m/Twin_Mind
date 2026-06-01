@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
+import NotificationBell from '../components/NotificationBell';
 import api from '../services/api';
 
 const BACKEND = 'http://localhost:8000';
@@ -277,6 +278,7 @@ export default function Dashboard() {
         </nav>
         <div style={s.navRight}>
           <ThemeToggle />
+          <NotificationBell />
           <Link to="/profile" style={s.navUser}>
             {avatarSrc
               ? <img src={avatarSrc} alt="" style={s.navAvatar} />

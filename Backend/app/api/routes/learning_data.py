@@ -11,6 +11,7 @@ from app.models.user import User
 from app.api.routes.auth import get_current_user
 from app.api.schemas.learning_data import LearningDataCreate, LearningDataUpdate, LearningDataResponse
 from app.api.routes.websocket import manager
+from app.services.notifications import maybe_notify_streak
 
 router = APIRouter(prefix="/learning-data", tags=["learning-data"])
 
@@ -63,6 +64,8 @@ def create_learning_data(
             detail="An entry for this date already exists — use PUT to update it",
         )
     db.refresh(entry)
+    all_entries = db.query(LearningData).filter(LearningData.user_id == current_user.id).all()
+    maybe_notify_streak(db, current_user.id, all_entries)
     background_tasks.add_task(
         manager.broadcast,
         current_user.id,
@@ -89,6 +92,8 @@ def update_learning_data(
         setattr(entry, field, value)
     db.commit()
     db.refresh(entry)
+    all_entries = db.query(LearningData).filter(LearningData.user_id == current_user.id).all()
+    maybe_notify_streak(db, current_user.id, all_entries)
     background_tasks.add_task(
         manager.broadcast,
         current_user.id,

@@ -10,6 +10,7 @@ from app.models.user import User
 from app.models.learning_data import LearningData
 from app.models.achievement import UserAchievement
 from app.api.routes.auth import get_current_user
+from app.services.notifications import create_badge_notification
 
 router = APIRouter(prefix="/achievements", tags=["achievements"])
 
@@ -208,4 +209,6 @@ def check_and_award(
             db.rollback()
 
     new_badges = [b for b in BADGES if b["id"] in new_ids]
+    for badge in new_badges:
+        create_badge_notification(db, current_user.id, badge)
     return {"new_badges": new_badges}
