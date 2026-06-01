@@ -277,6 +277,17 @@ def get_history(
     return [HistoryMessage(role=r.role, content=r.content) for r in rows]
 
 
+@router.delete("/history", status_code=204)
+def clear_history(
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    db.query(MentorConversation).filter(
+        MentorConversation.user_id == current_user.id
+    ).delete()
+    db.commit()
+
+
 @router.post("/chat")
 def mentor_chat(
     payload: MentorChatRequest,
@@ -368,7 +379,16 @@ def generate_study_plan(
             client = _get_client()
             response = client.models.generate_content_stream(
                 model="gemini-2.5-flash",
-                contents=[{"role": "user", "parts": [{"text": "Generate my personalized 30-day study plan."}]}],
+                contents=[{"role": "user", "parts": [{"text": (
+                    "Generate a COMPLETE 30-day study plan for me. "
+                    "You MUST include all 30 days. "
+                    "Label each day exactly as: Day 1, Day 2, Day 3 ... all the way to Day 30. "
+                    "Do NOT stop before Day 30. "
+                    "Do NOT summarize groups of days. "
+                    "Do NOT write 'repeat the above' or 'similar to previous days'. "
+                    "Write specific, unique tasks for EVERY single day from Day 1 to Day 30. "
+                    "This response is incomplete if it does not contain Day 30."
+                )}]}],
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
                     max_output_tokens=8000,

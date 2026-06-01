@@ -108,6 +108,8 @@ export default function Mentor() {
   const [entry,          setEntry]          = useState<LatestEntry | null>(null);
   const [prediction,     setPrediction]     = useState<{score: number; risk: string} | null>(null);
 
+  const [showNewChatConfirm, setShowNewChatConfirm] = useState(false);
+
   // Study plan state
   const [showPlan,       setShowPlan]       = useState(false);
   const [planText,       setPlanText]       = useState('');
@@ -176,6 +178,14 @@ export default function Mentor() {
   useEffect(() => {
     if (showPlan) planBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [planText, showPlan]);
+
+  async function handleNewChat() {
+    try {
+      await api.delete('/mentor/history');
+    } catch { /* ignore — clear frontend regardless */ }
+    setMessages([]);
+    setShowNewChatConfirm(false);
+  }
 
   async function sendMessage(text: string) {
     if (!text.trim() || streaming) return;
@@ -310,6 +320,13 @@ export default function Mentor() {
           {wsConnected && <LiveBadge />}
         </div>
         <nav style={mc.navRight}>
+          <button
+            onClick={() => setShowNewChatConfirm(true)}
+            disabled={streaming}
+            style={{ ...mc.newChatBtn, opacity: streaming ? 0.5 : 1, cursor: streaming ? 'not-allowed' : 'pointer' }}
+          >
+            + New Chat
+          </button>
           <Link to="/predict" style={mc.navLink}>Predict</Link>
           <Link to="/simulate" style={mc.navLink}>Simulate</Link>
           <Link to="/" style={mc.backLink}>← Dashboard</Link>
@@ -466,6 +483,24 @@ export default function Mentor() {
         </div>
       </div>
 
+      {/* ── New Chat Confirmation ────────────────────────── */}
+      {showNewChatConfirm && (
+        <div style={mc.modalOverlay} onClick={() => setShowNewChatConfirm(false)}>
+          <div style={mc.confirmBox} onClick={e => e.stopPropagation()}>
+            <p style={mc.confirmTitle}>Start a new conversation?</p>
+            <p style={mc.confirmSub}>Current chat will be cleared.</p>
+            <div style={mc.confirmActions}>
+              <button onClick={() => setShowNewChatConfirm(false)} style={mc.confirmCancel}>
+                Cancel
+              </button>
+              <button onClick={handleNewChat} style={mc.confirmOk}>
+                Clear &amp; Start Fresh
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Study Plan Modal ──────────────────────────────── */}
       {showPlan && (
         <div style={mc.modalOverlay} onClick={() => setShowPlan(false)}>
@@ -537,6 +572,12 @@ const mc: Record<string, React.CSSProperties> = {
   navRight: { display: 'flex', alignItems: 'center', gap: '1.25rem' },
   navLink:  { fontSize: '0.875rem', color: 'var(--text)', textDecoration: 'none', fontWeight: 500 },
   backLink: { fontSize: '0.875rem', color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 },
+  newChatBtn: {
+    padding: '0.35rem 0.85rem', background: 'var(--accent-bg)',
+    border: '1px solid var(--accent-border)', borderRadius: '8px',
+    color: 'var(--accent)', fontSize: '0.8rem', fontWeight: 600,
+    fontFamily: 'inherit',
+  },
 
   body: {
     flex: 1, display: 'grid',
@@ -696,6 +737,30 @@ const mc: Record<string, React.CSSProperties> = {
     padding: '0.45rem 1.25rem', background: 'var(--accent)',
     border: 'none', borderRadius: '8px',
     color: '#fff', fontSize: '0.82rem', fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
+  },
+
+  // New chat confirmation
+  confirmBox: {
+    background: 'var(--bg-surface)', border: '1px solid var(--border)',
+    borderRadius: '14px', padding: '1.75rem 1.5rem',
+    width: '100%', maxWidth: '360px',
+    boxShadow: '0 16px 48px rgba(0,0,0,0.4)',
+    textAlign: 'center' as const,
+  },
+  confirmTitle: { margin: '0 0 0.4rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-h)' },
+  confirmSub:   { margin: '0 0 1.25rem', fontSize: '0.85rem', color: 'var(--text)' },
+  confirmActions: { display: 'flex', gap: '0.75rem', justifyContent: 'center' },
+  confirmCancel: {
+    padding: '0.5rem 1.1rem', background: 'var(--bg)',
+    border: '1px solid var(--border)', borderRadius: '8px',
+    color: 'var(--text-h)', fontSize: '0.85rem', fontWeight: 500,
+    fontFamily: 'inherit', cursor: 'pointer',
+  },
+  confirmOk: {
+    padding: '0.5rem 1.1rem', background: '#ef4444',
+    border: 'none', borderRadius: '8px',
+    color: '#fff', fontSize: '0.85rem', fontWeight: 600,
+    fontFamily: 'inherit', cursor: 'pointer',
   },
 };
 
