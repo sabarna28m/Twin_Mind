@@ -6,6 +6,7 @@ import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import PlanContent from '../components/PlanContent';
 import BackButton from '../components/BackButton';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000/api/v1';
 
@@ -115,6 +116,7 @@ function WelcomeBubble() {
 
 export default function Mentor() {
   const { token, user } = useAuth();
+  const { t } = useLanguage();
 
   const [messages,       setMessages]       = useState<ChatMessage[]>([]);
   const [input,          setInput]          = useState('');
@@ -362,10 +364,10 @@ export default function Mentor() {
             disabled={streaming}
             style={{ ...mc.newChatBtn, opacity: streaming ? 0.5 : 1, cursor: streaming ? 'not-allowed' : 'pointer' }}
           >
-            + New Chat
+            {t('mentor.newChat')}
           </button>
-          <Link to="/predict" style={mc.navLink}>Predict</Link>
-          <Link to="/simulate" style={mc.navLink}>Simulate</Link>
+          <Link to="/predict" style={mc.navLink}>{t('qa.predict')}</Link>
+          <Link to="/simulate" style={mc.navLink}>{t('qa.simulate')}</Link>
         </nav>
       </header>
 
@@ -373,7 +375,7 @@ export default function Mentor() {
         {/* ── Sidebar ──────────────────────────────────────── */}
         <aside style={mc.sidebar}>
           <div style={mc.sideSection}>
-            <p style={mc.sideTitle}>Your Context</p>
+            <p style={mc.sideTitle}>{t('mentor.context')}</p>
             <p style={mc.sideName}>{user?.full_name}</p>
             {profile && (
               <>
@@ -396,7 +398,7 @@ export default function Mentor() {
 
           {entry && (
             <div style={mc.sideSection}>
-              <p style={mc.sideTitle}>Latest Check-in</p>
+              <p style={mc.sideTitle}>{t('mentor.latestCheckin')}</p>
               <p style={mc.sideSub}>{entry.date}</p>
               {([
                 ['Study', `${entry.study_hours}h`],
@@ -415,7 +417,7 @@ export default function Mentor() {
 
           {prediction && riskLevel && (
             <div style={mc.sideSection}>
-              <p style={mc.sideTitle}>Predicted Score</p>
+              <p style={mc.sideTitle}>{t('mentor.predictedScore')}</p>
               <p style={{ ...mc.predScore, color: RISK_COLOR[riskLevel] }}>{prediction.score}</p>
               <div style={{ ...mc.riskBadge, background: RISK_BG[riskLevel], color: RISK_COLOR[riskLevel] }}>
                 {riskLevel.toUpperCase()} RISK
@@ -433,7 +435,7 @@ export default function Mentor() {
 
           {/* Study Plan button */}
           <div style={mc.sideSection}>
-            <p style={mc.sideTitle}>Study Plan</p>
+            <p style={mc.sideTitle}>{t('mentor.studyPlan')}</p>
             <button
               onClick={generateStudyPlan}
               disabled={generatingPlan}
@@ -443,11 +445,11 @@ export default function Mentor() {
                 cursor: generatingPlan ? 'not-allowed' : 'pointer',
               }}
             >
-              {generatingPlan ? 'Generating…' : 'Generate 30-Day Plan'}
+              {generatingPlan ? 'Generating…' : t('mentor.generate')}
             </button>
             {planText && !showPlan && (
               <button onClick={() => setShowPlan(true)} style={mc.viewPlanBtn}>
-                View Plan
+                {t('mentor.viewPlan')}
               </button>
             )}
           </div>
@@ -455,7 +457,7 @@ export default function Mentor() {
           {/* Chat History */}
           {chatSessions.length > 0 && (
             <div style={mc.sideSection}>
-              <p style={mc.sideTitle}>Chat History</p>
+              <p style={mc.sideTitle}>{t('mentor.history')}</p>
               <div style={mc.sessionList}>
                 {chatSessions.map(s => (
                   <button key={s.id} onClick={() => openSession(s.id)} style={mc.sessionBtn}>
@@ -472,7 +474,7 @@ export default function Mentor() {
 
           {/* Smart contextual starters */}
           <div style={mc.sideSection}>
-            <p style={mc.sideTitle}>Try asking…</p>
+            <p style={mc.sideTitle}>{t('mentor.tryAsking')}</p>
             <div style={mc.starterList}>
               {starters.map(s => (
                 <button
@@ -517,7 +519,7 @@ export default function Mentor() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask your mentor… (Enter to send, Shift+Enter for new line)"
+              placeholder={t('mentor.placeholder')}
               rows={2}
               disabled={streaming}
               style={mc.textarea}
@@ -564,7 +566,7 @@ export default function Mentor() {
               ))}
             </div>
             <div style={mc.modalFooter}>
-              <button onClick={() => setViewingSession(null)} style={mc.modalCloseBtn}>Close</button>
+              <button onClick={() => setViewingSession(null)} style={mc.modalCloseBtn}>{t('btn.close')}</button>
             </div>
           </div>
         </div>
@@ -574,14 +576,14 @@ export default function Mentor() {
       {showNewChatConfirm && (
         <div style={mc.modalOverlay} onClick={() => setShowNewChatConfirm(false)}>
           <div style={mc.confirmBox} onClick={e => e.stopPropagation()}>
-            <p style={mc.confirmTitle}>Start a new conversation?</p>
-            <p style={mc.confirmSub}>Current chat will be cleared.</p>
+            <p style={mc.confirmTitle}>{t('mentor.newChatConfirm')}</p>
+            <p style={mc.confirmSub}>{t('mentor.newChatSub')}</p>
             <div style={mc.confirmActions}>
               <button onClick={() => setShowNewChatConfirm(false)} style={mc.confirmCancel}>
-                Cancel
+                {t('mentor.cancel')}
               </button>
               <button onClick={handleNewChat} style={mc.confirmOk}>
-                Clear &amp; Start Fresh
+                {t('mentor.clearFresh')}
               </button>
             </div>
           </div>
@@ -594,7 +596,7 @@ export default function Mentor() {
           <div style={mc.modalBox} onClick={e => e.stopPropagation()}>
             <div style={mc.modalHeader}>
               <div>
-                <p style={mc.modalTitle}>30-Day Study Plan</p>
+                <p style={mc.modalTitle}>{t('mentor.studyPlan')}</p>
                 <p style={mc.modalSub}>Personalized for {user?.full_name}</p>
               </div>
               <button onClick={() => setShowPlan(false)} style={mc.closeBtn}>✕</button>
@@ -623,7 +625,7 @@ export default function Mentor() {
                 disabled={generatingPlan}
                 style={{ ...mc.regenBtn, opacity: generatingPlan ? 0.5 : 1, cursor: generatingPlan ? 'not-allowed' : 'pointer' }}
               >
-                {generatingPlan ? 'Generating…' : 'Regenerate Plan'}
+                {generatingPlan ? 'Generating…' : t('mentor.regenPlan')}
               </button>
               {planText && !generatingPlan && (
                 <button
@@ -635,10 +637,10 @@ export default function Mentor() {
                     cursor: (savingPlan || planSaved) ? 'default' : 'pointer',
                   }}
                 >
-                  {savingPlan ? 'Saving…' : planSaved ? 'Saved ✓' : 'Save Plan'}
+                  {savingPlan ? t('mentor.saving') : planSaved ? t('mentor.saved') : t('mentor.savePlan')}
                 </button>
               )}
-              <button onClick={() => setShowPlan(false)} style={mc.modalCloseBtn}>Close</button>
+              <button onClick={() => setShowPlan(false)} style={mc.modalCloseBtn}>{t('btn.close')}</button>
             </div>
           </div>
         </div>

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function BackButton() {
+  const { t } = useLanguage();
   return (
     <Link to="/" style={{
       display: 'inline-flex',
@@ -17,7 +19,7 @@ export default function BackButton() {
       whiteSpace: 'nowrap' as const,
       letterSpacing: '0.01em',
     }}>
-      ← Dashboard
+      {t('btn.dashboard')}
     </Link>
   );
 }

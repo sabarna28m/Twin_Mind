@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import BadgeNotification, { type Badge } from '../components/BadgeNotification';
 import BackButton from '../components/BackButton';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface LearningEntry {
   id: number;
@@ -36,6 +37,7 @@ function stressLabel(level: number) {
 
 export default function CheckIn() {
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const headers = { Authorization: `Bearer ${token}` };
 
   const [entries, setEntries] = useState<LearningEntry[]>([]);
@@ -202,77 +204,72 @@ export default function CheckIn() {
       </header>
 
       <main style={s.main}>
-        <h1 style={s.pageTitle}>Daily Check-in</h1>
+        <h1 style={s.pageTitle}>{t('checkin.title')}</h1>
 
         {/* ── Form ─────────────────────────────────────────────────── */}
         <section style={s.formCard}>
           <div style={s.formHeader}>
             <h2 style={s.formTitle}>
-              {isEditing ? `Editing entry for ${date}` : "Log today's learning"}
+              {isEditing ? t('checkin.editEntry', { date }) : t('checkin.logToday')}
             </h2>
             {isEditing && (
-              <span style={s.editBadge}>Editing existing entry</span>
+              <span style={s.editBadge}>{t('checkin.editBadge')}</span>
             )}
           </div>
 
           {msg && <p style={msg.ok ? s.msgOk : s.msgErr}>{msg.text}</p>}
 
           <form onSubmit={handleSubmit} style={s.form}>
-            {/* Date */}
             <div style={s.row}>
               <label style={s.label}>
-                Date
+                {t('checkin.date')}
                 <input type="date" value={date} onChange={e => setDate(e.target.value)}
                   style={s.input} max={today()} required />
               </label>
             </div>
 
-            {/* Row 1: Study hours + Sleep */}
             <div style={s.row2}>
               <label style={s.label}>
-                Study Hours
+                {t('checkin.studyHours')}
                 <input type="number" value={studyHours} onChange={e => setStudyHours(e.target.value)}
                   style={s.input} min={0} max={24} step={0.5} placeholder="e.g. 3.5" required />
               </label>
               <label style={s.label}>
-                Sleep Duration (hrs)
+                {t('checkin.sleep')}
                 <input type="number" value={sleep} onChange={e => setSleep(e.target.value)}
                   style={s.input} min={0} max={24} step={0.5} placeholder="e.g. 7" required />
               </label>
             </div>
 
-            {/* Row 2: Attendance + Assignment completion */}
             <div style={s.row2}>
               <label style={s.label}>
-                Attendance (%)
+                {t('checkin.attendance')}
                 <input type="number" value={attendance} onChange={e => setAttendance(e.target.value)}
                   style={s.input} min={0} max={100} step={1} placeholder="e.g. 85" required />
               </label>
               <label style={s.label}>
-                Assignment Completion (%)
+                {t('checkin.completion')}
                 <input type="number" value={completion} onChange={e => setCompletion(e.target.value)}
                   style={s.input} min={0} max={100} step={1} placeholder="e.g. 90" required />
               </label>
             </div>
 
-            {/* Row 3: Quiz + Exam (optional) */}
             <div style={s.row2}>
               <label style={s.label}>
-                Quiz Score (%) <span style={s.optional}>optional</span>
+                {t('checkin.quiz')} <span style={s.optional}>{t('checkin.optional')}</span>
                 <input type="number" value={quizScore} onChange={e => setQuizScore(e.target.value)}
                   style={s.input} min={0} max={100} step={0.5} placeholder="—" />
               </label>
               <label style={s.label}>
-                Exam Score (%) <span style={s.optional}>optional</span>
+                {t('checkin.exam')} <span style={s.optional}>{t('checkin.optional')}</span>
                 <input type="number" value={examScore} onChange={e => setExamScore(e.target.value)}
                   style={s.input} min={0} max={100} step={0.5} placeholder="—" />
               </label>
             </div>
 
-            {/* Stress level */}
             <div>
               <p style={s.stressLabel}>
-                Stress Level
+                {t('checkin.stress')}
                 {stress > 0 && (
                   <span style={{ ...s.stressBadge, color: stressColor(stress) }}>
                     {stress}/10 — {stressLabel(stress)}
@@ -296,16 +293,15 @@ export default function CheckIn() {
               </div>
             </div>
 
-            {/* Notes */}
             <label style={s.label}>
-              Notes <span style={s.optional}>optional</span>
+              {t('checkin.notes')} <span style={s.optional}>{t('checkin.optional')}</span>
               <textarea value={notes} onChange={e => setNotes(e.target.value)}
                 style={s.textarea} rows={2}
                 placeholder="Anything notable about today's session…" />
             </label>
 
             <button type="submit" disabled={saving} style={s.submitBtn}>
-              {saving ? 'Saving…' : isEditing ? 'Update entry' : 'Log entry'}
+              {saving ? t('checkin.saving') : isEditing ? t('checkin.updateEntry') : t('checkin.logEntry')}
             </button>
           </form>
         </section>

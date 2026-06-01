@@ -9,6 +9,7 @@ import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -274,6 +275,7 @@ async function downloadReport(
 
 export default function Progress() {
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const [summary, setSummary]   = useState<Summary | null>(null);
   const [legacy,  setLegacy]    = useState<LegacyAnalytics | null>(null);
   const [loading, setLoading]   = useState(true);
@@ -344,7 +346,7 @@ export default function Progress() {
 
       <main style={s.main}>
         <div style={{ marginBottom: '2rem' }}>
-          <h1 style={s.pageTitle}>Progress & Analytics</h1>
+          <h1 style={s.pageTitle}>{t('progress.title')}</h1>
           <p style={{ color: '#475569', fontSize: '0.9rem', margin: 0 }}>Your academic journey, visualised.</p>
         </div>
 

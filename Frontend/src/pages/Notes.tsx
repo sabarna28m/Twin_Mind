@@ -5,6 +5,7 @@ import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Note {
   id: number;
@@ -15,6 +16,7 @@ interface Note {
 
 export default function Notes() {
   const { user, token } = useAuth();
+  const { t } = useLanguage();
   const headers = { Authorization: `Bearer ${token}` };
   const wsConnected = useWebSocket(user?.id, token, () => {});
 
@@ -124,7 +126,7 @@ export default function Notes() {
         {/* Sidebar */}
         <aside style={s.sidebar}>
           <div style={s.sidebarHead}>
-            <span style={s.sidebarTitle}>Notes</span>
+            <span style={s.sidebarTitle}>{t('notes.title')}</span>
             <button onClick={createNote} style={s.newBtn} title="New note">+</button>
           </div>
 
