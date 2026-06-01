@@ -9,6 +9,13 @@ interface Question {
   question: string;
   options: string[];
   correct: number;
+  explanation?: string;
+}
+
+// ── Question count: harder = more time per question ────────────────────
+const MULTIPLIERS: Record<string, number> = { Easy: 1.0, Medium: 0.75, Hard: 0.5 };
+function getQuestionCount(mins: number, diff: string) {
+  return Math.max(1, Math.round(mins * (MULTIPLIERS[diff] ?? 1.0)));
 }
 
 interface HistoryItem {
@@ -27,10 +34,10 @@ type Phase = 'setup' | 'generating' | 'quiz' | 'results';
 type Difficulty = 'Easy' | 'Medium' | 'Hard';
 
 const DURATIONS = [
-  { value: 10, label: '10 min', sub: '10 questions' },
-  { value: 20, label: '20 min', sub: '20 questions' },
-  { value: 30, label: '30 min', sub: '30 questions' },
-  { value: 60, label: '1 hour', sub: '60 questions' },
+  { value: 10, label: '10 min' },
+  { value: 20, label: '20 min' },
+  { value: 30, label: '30 min' },
+  { value: 60, label: '1 hour' },
 ];
 
 const DIFFICULTIES: { value: Difficulty; color: string; desc: string }[] = [
@@ -217,7 +224,7 @@ export default function Quiz() {
           <div style={p.genBox}>
             <div style={p.spinner} className="spin" />
             <p style={p.genTitle}>Generating your quiz…</p>
-            <p style={p.genSub}>Asking Gemini AI to craft {DURATION_TO_QUESTIONS[duration]} {difficulty.toLowerCase()} questions on <strong>{subject}</strong></p>
+            <p style={p.genSub}>Asking Gemini AI to craft {getQuestionCount(duration, difficulty)} {difficulty.toLowerCase()} questions on <strong>{subject}</strong></p>
           </div>
         </div>
       </div>
@@ -333,7 +340,7 @@ export default function Quiz() {
           <div style={{ ...p.quizCard, textAlign: 'center' as const }}>
             <div style={{ ...p.scoreBig, color: gradeColor }}>{pct}%</div>
             <p style={{ ...p.gradeLabel, color: gradeColor }}>{grade}</p>
-            <p style={p.scoreSub}>{subject} · {difficulty} · {DURATION_TO_QUESTIONS[duration]} questions</p>
+            <p style={p.scoreSub}>{subject} · {difficulty} · {total} questions</p>
 
             <div style={p.statsRow}>
               <div style={p.statItem}>
@@ -399,6 +406,13 @@ export default function Quiz() {
                         );
                       })}
                     </div>
+                    {/* Explanation — only for wrong or skipped answers */}
+                    {!isCorrect && q.explanation && (
+                      <div style={p.explanationBox}>
+                        <span style={p.explanationIcon}>💡</span>
+                        <p style={p.explanationText}>{q.explanation}</p>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -480,7 +494,7 @@ export default function Quiz() {
                     }}
                   >
                     <span style={{ fontWeight: 700 }}>{d.label}</span>
-                    <span style={{ fontSize: '0.68rem', opacity: 0.7 }}>{d.sub}</span>
+                    <span style={{ fontSize: '0.68rem', opacity: 0.7 }}>{getQuestionCount(d.value, difficulty)} questions</span>
                   </button>
                 ))}
               </div>
@@ -558,9 +572,6 @@ export default function Quiz() {
   );
 }
 
-// ── Helper: map duration → count (used in UI copy) ─────────────────────
-const DURATION_TO_QUESTIONS: Record<number, number> = { 10: 10, 20: 20, 30: 30, 60: 60 };
-
 // ── Styles ────────────────────────────────────────────────────────────
 const p: Record<string, React.CSSProperties> = {
   shell:    { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' },
@@ -637,5 +648,8 @@ const p: Record<string, React.CSSProperties> = {
   reviewNum:    { padding: '0.2rem 0.55rem', borderRadius: '99px', fontSize: '0.72rem', fontWeight: 700, flexShrink: 0, marginTop: '2px' },
   reviewQ:      { margin: 0, fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-h)', lineHeight: 1.5 },
   reviewOpt:    { display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.5rem 0.75rem', borderRadius: '8px', fontSize: '0.82rem' },
-  reviewLetter: { width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 700, flexShrink: 0 },
+  reviewLetter:   { width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 700, flexShrink: 0 },
+  explanationBox: { display: 'flex', alignItems: 'flex-start', gap: '0.55rem', marginTop: '0.65rem', padding: '0.65rem 0.85rem', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '8px' },
+  explanationIcon:{ fontSize: '0.9rem', flexShrink: 0, marginTop: '1px' },
+  explanationText:{ margin: 0, fontSize: '0.8rem', color: 'var(--text-h)', lineHeight: 1.55 },
 };

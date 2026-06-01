@@ -26,7 +26,12 @@ def _get_client() -> genai.Client:
     return _client
 
 
-DURATION_TO_QUESTIONS = {10: 10, 20: 20, 30: 30, 60: 60}
+MULTIPLIERS = {"Easy": 1.0, "Medium": 0.75, "Hard": 0.5}
+
+
+def get_question_count(duration_minutes: int, difficulty: str) -> int:
+    m = MULTIPLIERS.get(difficulty, 1.0)
+    return max(1, round(duration_minutes * m))
 
 
 # ── Schemas ──────────────────────────────────────────────────────────
@@ -60,24 +65,34 @@ def generate_quiz(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    num_q = DURATION_TO_QUESTIONS.get(req.duration_minutes, 10)
     difficulty = req.difficulty if req.difficulty in ("Easy", "Medium", "Hard") else "Medium"
+    num_q = get_question_count(req.duration_minutes, difficulty)
+
+    depth_hint = (
+        "Questions should test basic recall and straightforward concepts."
+        if difficulty == "Easy" else
+        "Questions should test applied understanding and moderate reasoning."
+        if difficulty == "Medium" else
+        "Questions should test deep understanding, edge cases, and multi-step reasoning."
+    )
 
     prompt = f"""Generate exactly {num_q} multiple-choice quiz questions on the subject "{req.subject}" at {difficulty} difficulty.
 
-Return ONLY a raw JSON array — no markdown, no code fences, no explanation — in this exact format:
+Return ONLY a raw JSON array — no markdown, no code fences, no extra text — in this exact format:
 [
   {{
     "question": "Question text here?",
     "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correct": 0
+    "correct": 0,
+    "explanation": "One or two sentences explaining why the correct answer is right."
   }}
 ]
 
 Rules:
 - "correct" is the 0-based index of the correct option (0, 1, 2, or 3)
 - All 4 options must be distinct and plausible
-- {"Questions should test basic recall and straightforward concepts." if difficulty == "Easy" else "Questions should test applied understanding and moderate reasoning." if difficulty == "Medium" else "Questions should test deep understanding, edge cases, and multi-step reasoning."}
+- {depth_hint}
+- "explanation" must be 1-2 concise sentences that clearly justify the correct answer; do not start with "The correct answer is…"
 - Return exactly {num_q} questions, no more, no less
 - Output only the JSON array, nothing else"""
 
@@ -117,6 +132,7 @@ Rules:
                 "question": str(q["question"]),
                 "options": [str(o) for o in q["options"]],
                 "correct": int(q["correct"]),
+                "explanation": str(q.get("explanation", "")).strip(),
             })
 
         return {"questions": validated, "total": len(validated)}
