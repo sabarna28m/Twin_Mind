@@ -15,9 +15,16 @@ from app.models.user import User
 from app.models.student_profile import StudentProfile
 from app.models.learning_data import LearningData
 from app.models.mentor_conversation import MentorConversation
+from fastapi import HTTPException, status as http_status
+
 from app.api.routes.auth import get_current_user
-from app.api.schemas.mentor import MentorChatRequest, HistoryMessage, StudyPlanSaveRequest, StudyPlanResponse
+from app.api.schemas.mentor import (
+    MentorChatRequest, HistoryMessage,
+    StudyPlanSaveRequest, StudyPlanResponse,
+    ChatSessionSummary,
+)
 from app.models.study_plan import StudyPlan
+from app.models.chat_session import ChatSession
 from app.ml.predictor import predict
 
 logger = logging.getLogger(__name__)
@@ -277,15 +284,80 @@ def get_history(
     return [HistoryMessage(role=r.role, content=r.content) for r in rows]
 
 
-@router.delete("/history", status_code=204)
-def clear_history(
+@router.post("/sessions", response_model=ChatSessionSummary, status_code=201)
+def archive_chat(
     current_user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
 ):
+    """Archive the live conversation as a saved session and clear live history."""
+    rows = (
+        db.query(MentorConversation)
+        .filter(MentorConversation.user_id == current_user.id)
+        .order_by(MentorConversation.created_at.asc())
+        .all()
+    )
+    if not rows:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail="No messages to archive",
+        )
+
+    first_user_msg = next((r for r in rows if r.role == "user"), rows[0])
+    raw_title = first_user_msg.content.strip().replace("\n", " ")
+    title = raw_title[:60] + ("…" if len(raw_title) > 60 else "")
+
+    messages = [{"role": r.role, "content": r.content} for r in rows]
+    session = ChatSession(
+        user_id=current_user.id,
+        title=title,
+        messages_json=json.dumps(messages),
+        message_count=len(messages),
+    )
+    db.add(session)
     db.query(MentorConversation).filter(
         MentorConversation.user_id == current_user.id
     ).delete()
     db.commit()
+    db.refresh(session)
+    return session
+
+
+@router.get("/sessions", response_model=List[ChatSessionSummary])
+def get_sessions(
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    return (
+        db.query(ChatSession)
+        .filter(ChatSession.user_id == current_user.id)
+        .order_by(ChatSession.created_at.desc())
+        .limit(20)
+        .all()
+    )
+
+
+@router.get("/sessions/{session_id}")
+def get_session(
+    session_id: int,
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    session = db.query(ChatSession).filter(
+        ChatSession.id == session_id,
+        ChatSession.user_id == current_user.id,
+    ).first()
+    if not session:
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND,
+            detail="Session not found",
+        )
+    return {
+        "id": session.id,
+        "title": session.title,
+        "created_at": session.created_at,
+        "message_count": session.message_count,
+        "messages": json.loads(session.messages_json),
+    }
 
 
 @router.post("/chat")

@@ -31,6 +31,20 @@ interface Profile {
   institution: string;
 }
 
+interface ChatSessionSummary {
+  id: number;
+  title: string;
+  message_count: number;
+  created_at: string;
+}
+
+interface ChatSessionDetail {
+  id: number;
+  title: string;
+  created_at: string;
+  messages: { role: string; content: string }[];
+}
+
 const RISK_COLOR = { low: '#16a34a', medium: '#d97706', high: '#dc2626' };
 const RISK_BG    = { low: 'rgba(34,197,94,0.1)', medium: 'rgba(217,119,6,0.1)', high: 'rgba(239,68,68,0.1)' };
 
@@ -109,6 +123,8 @@ export default function Mentor() {
   const [prediction,     setPrediction]     = useState<{score: number; risk: string} | null>(null);
 
   const [showNewChatConfirm, setShowNewChatConfirm] = useState(false);
+  const [chatSessions,       setChatSessions]       = useState<ChatSessionSummary[]>([]);
+  const [viewingSession,     setViewingSession]     = useState<ChatSessionDetail | null>(null);
 
   // Study plan state
   const [showPlan,       setShowPlan]       = useState(false);
@@ -144,6 +160,13 @@ export default function Mentor() {
 
   const wsConnected = useWebSocket(user?.id, token, refreshSidebar);
 
+  const loadChatSessions = useCallback(async () => {
+    try {
+      const { data } = await api.get<ChatSessionSummary[]>('/mentor/sessions');
+      setChatSessions(data);
+    } catch { /* ignore */ }
+  }, []);
+
   // Load sidebar data + conversation history on mount
   useEffect(() => {
     const h = { Authorization: `Bearer ${token}` };
@@ -169,7 +192,9 @@ export default function Mentor() {
     api.get<{ plan_text: string }>('/mentor/study-plan/saved', { headers: h })
       .then(r => { setPlanText(r.data.plan_text); setPlanSaved(true); })
       .catch(() => {});
-  }, [refreshSidebar, token]);
+
+    loadChatSessions();
+  }, [refreshSidebar, token, loadChatSessions]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -180,11 +205,21 @@ export default function Mentor() {
   }, [planText, showPlan]);
 
   async function handleNewChat() {
-    try {
-      await api.delete('/mentor/history');
-    } catch { /* ignore — clear frontend regardless */ }
+    if (messages.length > 0) {
+      try {
+        await api.post('/mentor/sessions');
+      } catch { /* ignore — clear frontend regardless */ }
+    }
     setMessages([]);
     setShowNewChatConfirm(false);
+    loadChatSessions();
+  }
+
+  async function openSession(id: number) {
+    try {
+      const { data } = await api.get<ChatSessionDetail>(`/mentor/sessions/${id}`);
+      setViewingSession(data);
+    } catch { /* ignore */ }
   }
 
   async function sendMessage(text: string) {
@@ -416,6 +451,24 @@ export default function Mentor() {
             )}
           </div>
 
+          {/* Chat History */}
+          {chatSessions.length > 0 && (
+            <div style={mc.sideSection}>
+              <p style={mc.sideTitle}>Chat History</p>
+              <div style={mc.sessionList}>
+                {chatSessions.map(s => (
+                  <button key={s.id} onClick={() => openSession(s.id)} style={mc.sessionBtn}>
+                    <p style={mc.sessionTitle}>{s.title}</p>
+                    <p style={mc.sessionMeta}>
+                      {new Date(s.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {' · '}{s.message_count} msg{s.message_count !== 1 ? 's' : ''}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Smart contextual starters */}
           <div style={mc.sideSection}>
             <p style={mc.sideTitle}>Try asking…</p>
@@ -482,6 +535,39 @@ export default function Mentor() {
           </div>
         </div>
       </div>
+
+      {/* ── Past Session Viewer ──────────────────────────── */}
+      {viewingSession && (
+        <div style={mc.modalOverlay} onClick={() => setViewingSession(null)}>
+          <div style={mc.modalBox} onClick={e => e.stopPropagation()}>
+            <div style={mc.modalHeader}>
+              <div>
+                <p style={mc.modalTitle}>{viewingSession.title}</p>
+                <p style={mc.modalSub}>
+                  {new Date(viewingSession.created_at).toLocaleDateString('en', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  {' · '}{viewingSession.messages.length} messages · read-only
+                </p>
+              </div>
+              <button onClick={() => setViewingSession(null)} style={mc.closeBtn}>✕</button>
+            </div>
+            <div style={{ ...mc.modalBody, display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              {viewingSession.messages.map((m, i) => (
+                <div key={i} style={m.role === 'user' ? mc.bubbleWrapUser : mc.bubbleWrap}>
+                  {m.role === 'assistant' && <div style={mc.avatar}>TM</div>}
+                  <div style={{ ...mc.bubble, ...(m.role === 'user' ? mc.bubbleUser : mc.bubbleAssistant) }}>
+                    {m.content.split('\n').map((line, j) => (
+                      <span key={j}>{line}{j < m.content.split('\n').length - 1 ? <br /> : null}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={mc.modalFooter}>
+              <button onClick={() => setViewingSession(null)} style={mc.modalCloseBtn}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── New Chat Confirmation ────────────────────────── */}
       {showNewChatConfirm && (
@@ -630,6 +716,22 @@ const mc: Record<string, React.CSSProperties> = {
     padding: '0.35rem 0.6rem', fontSize: '0.72rem', color: 'var(--text-h)',
     cursor: 'pointer', fontFamily: 'inherit', lineHeight: '1.4',
   },
+
+  // Chat history
+  sessionList: { display: 'flex', flexDirection: 'column', gap: '0.3rem' },
+  sessionBtn: {
+    width: '100%', textAlign: 'left' as const,
+    background: 'var(--bg)', border: '1px solid var(--border)',
+    borderRadius: '8px', padding: '0.5rem 0.65rem',
+    cursor: 'pointer', fontFamily: 'inherit',
+    transition: 'border-color 0.15s',
+  },
+  sessionTitle: {
+    margin: '0 0 0.15rem', fontSize: '0.75rem', fontWeight: 600,
+    color: 'var(--text-h)', lineHeight: 1.35,
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+  },
+  sessionMeta: { margin: 0, fontSize: '0.65rem', color: 'var(--text)' },
 
   // Chat
   chatPanel:   { display: 'flex', flexDirection: 'column', overflow: 'hidden' },

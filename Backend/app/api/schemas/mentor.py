@@ -25,6 +25,16 @@ class HistoryMessage(BaseModel):
     content: str
 
 
+class ChatSessionSummary(BaseModel):
+    id: int
+    title: str
+    message_count: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 class StudyPlanSaveRequest(BaseModel):
     plan_text: str
 
