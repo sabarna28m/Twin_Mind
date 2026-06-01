@@ -17,7 +17,7 @@ router = APIRouter(prefix="/quiz", tags=["quiz"])
 
 _client: Optional[Groq] = None
 
-GROQ_MODEL = "llama3-70b-8192"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 
 
 def _get_client() -> Groq:
@@ -137,7 +137,7 @@ Rules:
         return {"questions": validated, "total": len(validated)}
 
     except json.JSONDecodeError as e:
-        raise HTTPException(status_code=500, detail=f"Gemini returned invalid JSON: {e}")
+        raise HTTPException(status_code=500, detail=f"Groq returned invalid JSON: {e}")
     except ValueError as e:
         raise HTTPException(status_code=500, detail=f"Invalid question format: {e}")
     except Exception as e:

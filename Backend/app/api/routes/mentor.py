@@ -38,7 +38,7 @@ def _get_client() -> Groq:
         _client = Groq(api_key=settings.groq_api_key)
     return _client
 
-GROQ_MODEL = "llama3-70b-8192"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 
 
 def _build_system_prompt(
