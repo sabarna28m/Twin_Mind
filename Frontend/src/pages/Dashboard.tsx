@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import ThemeToggle from '../components/ThemeToggle';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import NotificationBell from '../components/NotificationBell';
 import PlanContent from '../components/PlanContent';
-import LanguageModal from '../components/LanguageModal';
 import api from '../services/api';
 
 const BACKEND = 'http://localhost:8000';
@@ -182,7 +182,6 @@ const QA_DEFS = [
   { labelKey: 'qa_mentor',       descKey: 'qa_desc_advice',   icon: '💬', grad: 'linear-gradient(135deg,#ec4899,#8b5cf6)', to: '/mentor'       },
   { labelKey: 'qa_twin',         descKey: 'qa_desc_twin',     icon: '◈',  grad: 'linear-gradient(135deg,#06b6d4,#6366f1)', to: '/twin'         },
   { labelKey: 'qa_checkin',      descKey: 'qa_desc_log',      icon: '✓',  grad: 'linear-gradient(135deg,#34d399,#10b981)', to: '/checkin'      },
-  { labelKey: 'qa_language',     descKey: 'qa_desc_language', icon: '🌐', grad: 'linear-gradient(135deg,#6366f1,#06b6d4)', to: null            },
 ];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }
@@ -196,8 +195,6 @@ export default function Dashboard() {
   const firstName = user?.full_name?.split(' ')[0] ?? '';
   const quote = getDailyQuote();
   const avatarSrc = user?.avatar_url ? BACKEND + user.avatar_url : null;
-  const [showLangModal, setShowLangModal] = useState(false);
-
   const [entries, setEntries]           = useState<LearningEntry[]>([]);
   const [sessionCount, setSessionCount] = useState(0);
   const [noteCount, setNoteCount]       = useState(0);
@@ -296,6 +293,7 @@ export default function Dashboard() {
           {NAV_KEYS.map(n => <Link key={n.to} to={n.to} className="nav-link">{t(n.key)}</Link>)}
         </nav>
         <div style={s.navRight}>
+          <LanguageSwitcher />
           <ThemeToggle />
           <NotificationBell />
           <Link to="/profile" style={s.navUser}>
@@ -407,7 +405,7 @@ export default function Dashboard() {
           <section style={s.panel}>
             <h2 style={s.panelTitle}>{t('quick_actions')}</h2>
             <div style={s.actionGrid}>
-              {QA_DEFS.map(a => a.to ? (
+              {QA_DEFS.map(a => (
                 <Link key={a.labelKey} to={a.to} style={{ textDecoration: 'none' }}>
                   <div className="action-tile">
                     <div className="action-icon-big" style={{ ...s.actionIconBig, background: a.grad }}>
@@ -417,14 +415,6 @@ export default function Dashboard() {
                     <p style={s.actionTileDesc}>{t(a.descKey)}</p>
                   </div>
                 </Link>
-              ) : (
-                <div key={a.labelKey} className="action-tile" style={{ cursor: 'pointer' }} onClick={() => setShowLangModal(true)}>
-                  <div className="action-icon-big" style={{ ...s.actionIconBig, background: a.grad }}>
-                    <span style={s.actionIconGlyph}>{a.icon}</span>
-                  </div>
-                  <p style={s.actionTileLabel}>{t(a.labelKey)}</p>
-                  <p style={s.actionTileDesc}>{t(a.descKey)}</p>
-                </div>
               ))}
             </div>
           </section>
@@ -474,8 +464,6 @@ export default function Dashboard() {
       </main>
 
       {/* ── Full Plan Modal ── */}
-      {showLangModal && <LanguageModal onClose={() => setShowLangModal(false)} />}
-
       {showPlanModal && savedPlan && (
         <div style={s.modalOverlay} onClick={() => setShowPlanModal(false)}>
           <div style={s.modalBox} onClick={e => e.stopPropagation()}>

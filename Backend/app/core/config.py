@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 1440  # 24 hours
 
     groq_api_key: str = ""
+    gemini_api_key: str = ""
 
     mail_username: str = ""
     mail_password: str = ""

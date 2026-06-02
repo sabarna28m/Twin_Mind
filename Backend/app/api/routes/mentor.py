@@ -4,7 +4,9 @@ from typing import List, Optional
 
 from groq import Groq
 
-from fastapi import APIRouter, Depends
+from io import BytesIO
+
+from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session as DBSession
 
@@ -38,8 +40,32 @@ def _get_client() -> Groq:
         _client = Groq(api_key=settings.groq_api_key)
     return _client
 
-GROQ_MODEL        = "llama-3.3-70b-versatile"
-GROQ_VISION_MODEL = "llama-3.2-11b-vision-preview"
+GROQ_MODEL       = "llama-3.3-70b-versatile"
+GROQ_VISION_MODEL = "llava-v1.5-7b-4096-preview"
+
+
+def _analyze_image_with_groq(image_b64: str, user_message: str) -> str:
+    client = _get_client()
+    prompt = (
+        f'The student asks: "{user_message}"'
+        if user_message.strip()
+        else "Describe this image in detail, noting all text, diagrams, equations, and charts visible."
+    )
+    response = client.chat.completions.create(
+        model=GROQ_VISION_MODEL,
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image_url", "image_url": {"url": image_b64}},
+                    {"type": "text", "text": prompt},
+                ],
+            }
+        ],
+        max_tokens=1024,
+        temperature=0.4,
+    )
+    return response.choices[0].message.content
 
 
 def _build_system_prompt(
@@ -286,6 +312,37 @@ def get_history(
     return [HistoryMessage(role=r.role, content=r.content) for r in rows]
 
 
+@router.post("/upload-file")
+async def upload_file(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    filename = file.filename or ""
+    ext = filename.lower().rsplit(".", 1)[-1] if "." in filename else ""
+    if ext not in ("pdf", "txt"):
+        raise HTTPException(status_code=400, detail="Only .pdf and .txt files are supported")
+
+    content = await file.read()
+
+    if ext == "txt":
+        try:
+            text = content.decode("utf-8")
+        except UnicodeDecodeError:
+            text = content.decode("latin-1")
+    else:
+        try:
+            import pypdf
+            reader = pypdf.PdfReader(BytesIO(content))
+            pages_text = [page.extract_text() or "" for page in reader.pages]
+            text = "\n".join(pages_text).strip()
+            if not text:
+                text = "[Could not extract text from this PDF — it may be image-based or scanned. Try converting to .txt first.]"
+        except Exception as exc:
+            raise HTTPException(status_code=422, detail=f"Failed to read PDF: {exc}")
+
+    return {"filename": filename, "text": text}
+
+
 @router.post("/sessions", response_model=ChatSessionSummary, status_code=201)
 def archive_chat(
     current_user: User = Depends(get_current_user),
@@ -384,17 +441,24 @@ def mentor_chat(
     for m in payload.history:
         messages.append({"role": m.role, "content": m.content})
 
-    # Build the final user message — include image if provided
+    # If image attached: analyse with Groq llava vision, then pass description to Groq text model
     if payload.image:
-        user_content = [
-            {"type": "text", "text": payload.message},
-            {"type": "image_url", "image_url": {"url": payload.image}},
-        ]
+        try:
+            image_description = _analyze_image_with_groq(payload.image, payload.message)
+            user_content = (
+                f"[Image analysed by vision model]\n{image_description}\n\n"
+                f"---\n"
+                f"{payload.message or 'Please help me with this image.'}"
+            )
+        except Exception as exc:
+            logger.error("Image analysis failed: %s", exc, exc_info=True)
+            user_content = (
+                f"[Image analysis failed — {type(exc).__name__}: {exc}]\n\n"
+                f"{payload.message or 'I uploaded an image but analysis failed.'}"
+            )
     else:
         user_content = payload.message
     messages.append({"role": "user", "content": user_content})
-
-    model = GROQ_VISION_MODEL if payload.image else GROQ_MODEL
     user_id = current_user.id
 
     def event_stream():
@@ -402,7 +466,7 @@ def mentor_chat(
         try:
             client = _get_client()
             stream = client.chat.completions.create(
-                model=model,
+                model=GROQ_MODEL,
                 messages=messages,
                 max_tokens=2048,
                 temperature=0.7,

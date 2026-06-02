@@ -138,9 +138,11 @@ export default function Mentor() {
   const [savingPlan,     setSavingPlan]     = useState(false);
 
   // Multimedia input state
-  const [isRecording,   setIsRecording]   = useState(false);
-  const [attachedImage, setAttachedImage] = useState<{ base64: string; name: string } | null>(null);
-  const [attachedFile,  setAttachedFile]  = useState<{ name: string; content: string } | null>(null);
+  const [isRecording,    setIsRecording]    = useState(false);
+  const [attachedImage,  setAttachedImage]  = useState<{ base64: string; name: string } | null>(null);
+  const [attachedFile,   setAttachedFile]   = useState<{ name: string; content: string } | null>(null);
+  const [isReadingFile,  setIsReadingFile]  = useState(false);
+  const [readingFileName, setReadingFileName] = useState<string | null>(null);
 
   const bottomRef      = useRef<HTMLDivElement>(null);
   const planBottomRef  = useRef<HTMLDivElement>(null);
@@ -270,34 +272,34 @@ export default function Mentor() {
     e.target.value = '';
   }
 
-  function extractTextFromPdf(buf: ArrayBuffer): string {
-    const latin = new TextDecoder('latin1').decode(new Uint8Array(buf));
-    const parts: string[] = [];
-    const re = /\(([^)\\]*(?:\\.[^)\\]*)*)\)\s*Tj/g;
-    let m;
-    while ((m = re.exec(latin)) !== null) {
-      const t = m[1]
-        .replace(/\\n/g, '\n').replace(/\\\\/g, '\\')
-        .replace(/\\\(/g, '(').replace(/\\\)/g, ')');
-      if (t.trim()) parts.push(t);
-    }
-    return parts.length > 0
-      ? parts.join(' ')
-      : '[Could not extract PDF text — try converting to .txt first]';
-  }
-
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.name.toLowerCase().endsWith('.txt')) {
-      const reader = new FileReader();
-      reader.onload = () => setAttachedFile({ name: file.name, content: reader.result as string });
-      reader.readAsText(file);
-    } else if (file.name.toLowerCase().endsWith('.pdf')) {
-      const buf = await file.arrayBuffer();
-      setAttachedFile({ name: file.name, content: extractTextFromPdf(buf) });
-    }
     e.target.value = '';
+
+    setIsReadingFile(true);
+    setReadingFileName(file.name);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch(`${API_BASE}/mentor/upload-file`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        alert(`Could not read file: ${err.detail ?? response.status}`);
+        return;
+      }
+      const { filename, text } = await response.json();
+      setAttachedFile({ name: filename, content: text });
+    } catch {
+      alert('Failed to read file. Please try again.');
+    } finally {
+      setIsReadingFile(false);
+      setReadingFileName(null);
+    }
   }
 
   async function sendMessage(text: string) {
@@ -631,8 +633,16 @@ export default function Mentor() {
             />
 
             {/* Attachment preview chips */}
-            {(attachedImage || attachedFile) && (
+            {(attachedImage || attachedFile || isReadingFile) && (
               <div style={mc.attachRow}>
+                {isReadingFile && readingFileName && (
+                  <div style={{ ...mc.attachChip, opacity: 0.75 }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                    </svg>
+                    <span style={mc.chipName}>Reading {readingFileName}…</span>
+                  </div>
+                )}
                 {attachedImage && (
                   <div style={mc.attachChip}>
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -696,9 +706,9 @@ export default function Mentor() {
               {/* File attachment */}
               <button
                 onClick={() => fileInputRef.current?.click()}
-                disabled={streaming}
+                disabled={streaming || isReadingFile}
                 title="Attach PDF or text file"
-                style={mc.mediaBtn}
+                style={{ ...mc.mediaBtn, opacity: (streaming || isReadingFile) ? 0.5 : 1 }}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
