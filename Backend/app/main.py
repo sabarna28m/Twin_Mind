@@ -19,7 +19,10 @@ from app.models import notification  # noqa: F401
 from app.models import study_plan  # noqa: F401
 from app.models import chat_session  # noqa: F401
 from app.models import quiz  # noqa: F401
-from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes, notifications as notif_routes, quiz as quiz_routes
+from app.models import weekly_challenge  # noqa: F401
+from app.models import battle  # noqa: F401
+from app.models import google_token  # noqa: F401
+from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes, notifications as notif_routes, quiz as quiz_routes, gamification as gamif_routes, battles as battle_routes, calendar as calendar_routes
 from app.api.routes import websocket as ws_routes
 from app.ml.predictor import get_model  # warm up model at startup
 
@@ -74,6 +77,49 @@ with engine.connect() as _conn:
             "created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
         ),
         "CREATE INDEX IF NOT EXISTS ix_quiz_sessions_user_id ON quiz_sessions(user_id)",
+        (
+            "CREATE TABLE IF NOT EXISTS weekly_challenges ("
+            "id INTEGER PRIMARY KEY, "
+            "user_id INTEGER NOT NULL REFERENCES users(id), "
+            "week_start DATE NOT NULL, "
+            "target_study_hours REAL, "
+            "target_quiz_count INTEGER, "
+            "target_checkin_days INTEGER, "
+            "created_at DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
+        ),
+        "CREATE INDEX IF NOT EXISTS ix_weekly_challenges_user_id ON weekly_challenges(user_id)",
+        (
+            "CREATE TABLE IF NOT EXISTS battles ("
+            "id INTEGER PRIMARY KEY, "
+            "challenger_id INTEGER NOT NULL REFERENCES users(id), "
+            "opponent_id INTEGER REFERENCES users(id), "
+            "battle_type VARCHAR(20) NOT NULL, "
+            "target_value REAL NOT NULL, "
+            "duration VARCHAR(10) NOT NULL, "
+            "status VARCHAR(20) NOT NULL DEFAULT 'pending', "
+            "winner_id INTEGER REFERENCES users(id), "
+            "invite_code VARCHAR(20) UNIQUE NOT NULL, "
+            "is_random BOOLEAN NOT NULL DEFAULT 0, "
+            "created_at DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "expires_at DATETIME, "
+            "started_at DATETIME, "
+            "completed_at DATETIME)"
+        ),
+        "CREATE INDEX IF NOT EXISTS ix_battles_challenger_id ON battles(challenger_id)",
+        "CREATE INDEX IF NOT EXISTS ix_battles_opponent_id ON battles(opponent_id)",
+        "CREATE UNIQUE INDEX IF NOT EXISTS ix_battles_invite_code ON battles(invite_code)",
+        (
+            "CREATE TABLE IF NOT EXISTS google_tokens ("
+            "id INTEGER PRIMARY KEY, "
+            "user_id INTEGER NOT NULL REFERENCES users(id) UNIQUE, "
+            "access_token TEXT NOT NULL, "
+            "refresh_token TEXT, "
+            "token_expiry TEXT, "
+            "created_at DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
+        ),
+        "CREATE INDEX IF NOT EXISTS ix_google_tokens_user_id ON google_tokens(user_id)",
     ]:
         try:
             _conn.execute(text(_sql))
@@ -109,6 +155,9 @@ app.include_router(twin_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(ach_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(notif_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(quiz_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(gamif_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(battle_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(calendar_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(ws_routes.router)
 
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"

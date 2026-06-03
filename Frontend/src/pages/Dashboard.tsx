@@ -6,7 +6,9 @@ import ThemeToggle from '../components/ThemeToggle';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import NotificationBell from '../components/NotificationBell';
 import PlanContent from '../components/PlanContent';
+import TutorialOverlay from '../components/TutorialOverlay';
 import api from '../services/api';
+import { getLevelColor, getLevelGradient, LEVEL_NAMES, type GamificationProgress, type WeeklyChallengeData } from '../utils/gamification';
 
 const BACKEND = 'http://localhost:8000';
 
@@ -171,6 +173,14 @@ const NAV_KEYS = [
   { key: 'nav_twin',     to: '/twin'     },
 ];
 
+const NAV_TOUR: Record<string, string> = {
+  '/checkin':  'checkin',
+  '/twin':     'twin',
+  '/mentor':   'mentor',
+  '/simulate': 'simulate',
+  '/quiz':     'quiz',
+};
+
 const QA_DEFS = [
   { labelKey: 'qa_sessions',     descKey: 'qa_desc_study',    icon: '▶',  grad: 'linear-gradient(135deg,#6366f1,#8b5cf6)', to: '/sessions'     },
   { labelKey: 'qa_materials',    descKey: 'qa_desc_upload',   icon: '↑',  grad: 'linear-gradient(135deg,#3b82f6,#06b6d4)', to: '/materials'    },
@@ -182,9 +192,11 @@ const QA_DEFS = [
   { labelKey: 'qa_mentor',       descKey: 'qa_desc_advice',   icon: '💬', grad: 'linear-gradient(135deg,#ec4899,#8b5cf6)', to: '/mentor'       },
   { labelKey: 'qa_twin',         descKey: 'qa_desc_twin',     icon: '◈',  grad: 'linear-gradient(135deg,#06b6d4,#6366f1)', to: '/twin'         },
   { labelKey: 'qa_checkin',      descKey: 'qa_desc_log',      icon: '✓',  grad: 'linear-gradient(135deg,#34d399,#10b981)', to: '/checkin'      },
+  { labelKey: 'qa_battles',      descKey: 'qa_desc_battles',  icon: '⚔️', grad: 'linear-gradient(135deg,#ef4444,#f97316)', to: '/battles'      },
 ];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }
+interface CalEvent  { id: string; title: string; start: string; link: string }
 
 // ── Main component ─────────────────────────────────────────────────
 export default function Dashboard() {
@@ -202,8 +214,16 @@ export default function Dashboard() {
   const [wsConnected, setWsConnected]   = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
 
-  const [savedPlan,      setSavedPlan]      = useState<SavedPlan | null>(null);
-  const [showPlanModal,  setShowPlanModal]  = useState(false);
+  const [savedPlan,        setSavedPlan]        = useState<SavedPlan | null>(null);
+  const [showPlanModal,    setShowPlanModal]    = useState(false);
+  const [calEvents,        setCalEvents]        = useState<CalEvent[]>([]);
+  const [gamProgress,      setGamProgress]      = useState<GamificationProgress | null>(null);
+  const [weeklyChallenge,  setWeeklyChallenge]  = useState<WeeklyChallengeData | null>(null);
+  const [showChallengeForm, setShowChallengeForm] = useState(false);
+  const [chStudy,          setChStudy]          = useState('');
+  const [chQuiz,           setChQuiz]           = useState('');
+  const [chCheckin,        setChCheckin]         = useState('');
+  const [savingChallenge,  setSavingChallenge]  = useState(false);
 
   const refreshData = useCallback(() => {
     Promise.all([
@@ -225,6 +245,15 @@ export default function Dashboard() {
     api.get<SavedPlan>('/mentor/study-plan/saved')
       .then(r => setSavedPlan(r.data))
       .catch(() => setSavedPlan(null));
+    api.get<{ events: CalEvent[] }>('/calendar/upcoming')
+      .then(r => setCalEvents(r.data.events))
+      .catch(() => {});
+    api.get<GamificationProgress>('/gamification/progress')
+      .then(r => setGamProgress(r.data))
+      .catch(() => {});
+    api.get<WeeklyChallengeData>('/gamification/weekly-challenge')
+      .then(r => setWeeklyChallenge(r.data))
+      .catch(() => {});
   }, []);
 
   // WebSocket — connect on mount, auto-reconnect on drop
@@ -268,6 +297,21 @@ export default function Dashboard() {
     };
   }, [user?.id, token, refreshData]);
 
+  async function saveChallenge() {
+    setSavingChallenge(true);
+    try {
+      await api.post('/gamification/weekly-challenge', {
+        target_study_hours:  chStudy  ? parseFloat(chStudy)  : null,
+        target_quiz_count:   chQuiz   ? parseInt(chQuiz)     : null,
+        target_checkin_days: chCheckin ? parseInt(chCheckin) : null,
+      });
+      const { data } = await api.get<WeeklyChallengeData>('/gamification/weekly-challenge');
+      setWeeklyChallenge(data);
+      setShowChallengeForm(false);
+    } catch { /* ignore */ }
+    finally { setSavingChallenge(false); }
+  }
+
   const streak     = computeStreak(entries);
   const totalHours = Math.round(entries.reduce((s, e) => s + e.study_hours, 0));
   const last7      = getLast7Days(entries);
@@ -290,13 +334,17 @@ export default function Dashboard() {
           )}
         </div>
         <nav style={s.navCenter}>
-          {NAV_KEYS.map(n => <Link key={n.to} to={n.to} className="nav-link">{t(n.key)}</Link>)}
+          {NAV_KEYS.map(n => (
+            <Link key={n.to} to={n.to} className="nav-link" {...(NAV_TOUR[n.to] ? { 'data-tour': NAV_TOUR[n.to] } : {})}>
+              {t(n.key)}
+            </Link>
+          ))}
         </nav>
         <div style={s.navRight}>
           <LanguageSwitcher />
           <ThemeToggle />
           <NotificationBell />
-          <Link to="/profile" style={s.navUser}>
+          <Link to="/profile" style={s.navUser} data-tour="profile">
             {avatarSrc
               ? <img src={avatarSrc} alt="" style={s.navAvatar} />
               : <span style={s.navInitials}>{firstName[0]?.toUpperCase()}</span>}
@@ -309,7 +357,7 @@ export default function Dashboard() {
       <main style={s.main}>
 
         {/* ── Hero ── */}
-        <section style={s.heroCard} className="animate-slide-up">
+        <section style={s.heroCard} className="animate-slide-up" data-tour="dashboard">
           <div style={s.heroOrb1} />
           <div style={s.heroOrb2} />
           <div style={s.heroContent}>
@@ -358,6 +406,34 @@ export default function Dashboard() {
                   ? 'Log a check-in to activate'
                   : `Based on last ${Math.min(entries.length, 7)} day${entries.length > 1 ? 's' : ''}`}
               </p>
+
+              {/* XP / Level mini display */}
+              {gamProgress && (
+                <div style={{ marginTop: '0.85rem', width: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', marginBottom: '0.35rem' }}>
+                    <div style={{
+                      width: '22px', height: '22px', borderRadius: '50%',
+                      background: getLevelGradient(gamProgress.level),
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '0.65rem', fontWeight: 800, color: '#fff',
+                      boxShadow: `0 0 8px ${getLevelColor(gamProgress.level)}60`,
+                    }}>{gamProgress.level}</div>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: getLevelColor(gamProgress.level) }}>
+                      {gamProgress.level_name}
+                    </span>
+                  </div>
+                  <div style={{ height: '4px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', width: `${gamProgress.progress_pct}%`,
+                      background: getLevelGradient(gamProgress.level),
+                      borderRadius: '99px', transition: 'width 0.8s ease',
+                    }} />
+                  </div>
+                  <p style={{ margin: '0.25rem 0 0', fontSize: '0.62rem', color: 'var(--text)', textAlign: 'center' as const }}>
+                    {gamProgress.xp.toLocaleString()} XP · {gamProgress.xp_to_next > 0 ? `${gamProgress.xp_to_next} to next` : 'Max level!'}
+                  </p>
+                </div>
+              )}
             </div>
 
           </div>
@@ -373,6 +449,75 @@ export default function Dashboard() {
             <StatCard icon="🏆" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={badgeCount} label={t('stat_badges')} delay={280} />
           </Link>
         </section>
+
+        {/* ── Weekly Challenge ── */}
+        {weeklyChallenge && (
+          <section style={s.panel}>
+            <div style={s.panelHead}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '1rem' }}>⚔️</span>
+                <h2 style={s.panelTitle}>Weekly Challenge</h2>
+                {weeklyChallenge.has_challenge && (
+                  <span style={{ fontSize: '0.7rem', fontWeight: 700, color: weeklyChallenge.completion_pct >= 100 ? '#10b981' : 'var(--accent)', padding: '0.15rem 0.5rem', background: weeklyChallenge.completion_pct >= 100 ? 'rgba(16,185,129,0.1)' : 'var(--accent-bg)', border: `1px solid ${weeklyChallenge.completion_pct >= 100 ? 'rgba(16,185,129,0.3)' : 'var(--accent-border)'}`, borderRadius: '99px' }}>
+                    {weeklyChallenge.completion_pct}% done
+                  </span>
+                )}
+              </div>
+              <button onClick={() => { setShowChallengeForm(f => !f); setChStudy(''); setChQuiz(''); setChCheckin(''); }} style={{ fontSize: '0.75rem', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>
+                {weeklyChallenge.has_challenge ? 'Update' : 'Set Challenge'}
+              </button>
+            </div>
+
+            {/* Set-challenge form */}
+            {showChallengeForm && (
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', flexWrap: 'wrap' as const, marginBottom: '0.85rem', padding: '0.85rem', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)', borderRadius: '10px' }}>
+                {[
+                  { label: 'Study hours goal', val: chStudy, set: setChStudy, ph: 'e.g. 30' },
+                  { label: 'Quizzes goal', val: chQuiz, set: setChQuiz, ph: 'e.g. 5' },
+                  { label: 'Check-in days goal', val: chCheckin, set: setChCheckin, ph: 'e.g. 7' },
+                ].map(f => (
+                  <label key={f.label} style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.2rem', fontSize: '0.75rem', color: 'var(--text)', fontWeight: 500 }}>
+                    {f.label}
+                    <input type="number" value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph} min={0} style={{ width: '100px', padding: '0.35rem 0.5rem', border: '1px solid var(--border)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--text-h)', fontSize: '0.875rem', outline: 'none' }} />
+                  </label>
+                ))}
+                <button onClick={saveChallenge} disabled={savingChallenge || (!chStudy && !chQuiz && !chCheckin)} style={{ padding: '0.4rem 1rem', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', opacity: (!chStudy && !chQuiz && !chCheckin) ? 0.5 : 1 }}>
+                  {savingChallenge ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+            )}
+
+            {weeklyChallenge.has_challenge && weeklyChallenge.targets ? (
+              <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.55rem' }}>
+                {[
+                  { label: 'Study Hours', cur: weeklyChallenge.progress.study_hours, target: weeklyChallenge.targets.study_hours, unit: 'h' },
+                  { label: 'Quizzes',     cur: weeklyChallenge.progress.quiz_count,   target: weeklyChallenge.targets.quiz_count,   unit: '' },
+                  { label: 'Check-in Days', cur: weeklyChallenge.progress.checkin_days, target: weeklyChallenge.targets.checkin_days, unit: ' days' },
+                ].filter(m => m.target).map(m => {
+                  const pct = Math.min(100, Math.round((m.cur / m.target!) * 100));
+                  const done = pct >= 100;
+                  return (
+                    <div key={m.label}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--text)', fontWeight: 500 }}>{m.label}</span>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: done ? '#10b981' : 'var(--text-h)' }}>
+                          {m.cur}{m.unit} / {m.target}{m.unit} {done ? '✓' : ''}
+                        </span>
+                      </div>
+                      <div style={{ height: '6px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${pct}%`, background: done ? 'linear-gradient(90deg,#10b981,#34d399)' : 'linear-gradient(90deg,var(--accent),#8b5cf6)', borderRadius: '99px', transition: 'width 0.6s ease' }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : !showChallengeForm && (
+              <p style={{ fontSize: '0.85rem', color: 'var(--text)', margin: 0 }}>
+                Set weekly study targets to track your progress and stay accountable.
+              </p>
+            )}
+          </section>
+        )}
 
         {/* ── Chart + Actions ── */}
         <div style={s.midRow}>
@@ -407,7 +552,7 @@ export default function Dashboard() {
             <div style={s.actionGrid}>
               {QA_DEFS.map(a => (
                 <Link key={a.labelKey} to={a.to} style={{ textDecoration: 'none' }}>
-                  <div className="action-tile">
+                  <div className="action-tile" {...(a.to === '/predict' ? { 'data-tour': 'predict' } : {})}>
                     <div className="action-icon-big" style={{ ...s.actionIconBig, background: a.grad }}>
                       <span style={s.actionIconGlyph}>{a.icon}</span>
                     </div>
@@ -420,6 +565,59 @@ export default function Dashboard() {
           </section>
 
         </div>
+
+        {/* ── Upcoming Calendar Events ── */}
+        {calEvents.length > 0 && (
+          <section style={s.panel}>
+            <div style={s.panelHead}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '1rem' }}>📅</span>
+                <h2 style={s.panelTitle}>Upcoming Study Events</h2>
+              </div>
+              <Link to="/profile" style={s.panelCta}>Manage Calendar</Link>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.55rem' }}>
+              {calEvents.map(ev => {
+                const d = new Date(ev.start);
+                const isDateOnly = ev.start.length === 10;
+                const label = isDateOnly
+                  ? d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
+                  : d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) +
+                    ' · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                return (
+                  <a
+                    key={ev.id}
+                    href={ev.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '0.75rem',
+                      padding: '0.6rem 0.75rem',
+                      background: 'rgba(99,102,241,0.06)',
+                      border: '1px solid rgba(99,102,241,0.15)',
+                      borderRadius: '10px',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <div style={{
+                      width: '32px', height: '32px', borderRadius: '8px', flexShrink: 0,
+                      background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '0.85rem',
+                    }}>📅</div>
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-h)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                        {ev.title}
+                      </p>
+                      <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--text)' }}>{label}</p>
+                    </div>
+                    <span style={{ marginLeft: 'auto', fontSize: '0.7rem', color: '#818cf8', flexShrink: 0 }}>↗</span>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* ── My Study Plan card ── */}
         <section style={s.panel}>
@@ -462,6 +660,9 @@ export default function Dashboard() {
         </section>
 
       </main>
+
+      {/* ── Onboarding Tour ── */}
+      <TutorialOverlay />
 
       {/* ── Full Plan Modal ── */}
       {showPlanModal && savedPlan && (

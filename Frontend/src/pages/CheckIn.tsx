@@ -6,6 +6,8 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import BadgeNotification, { type Badge } from '../components/BadgeNotification';
 import BackButton from '../components/BackButton';
+import LevelUpCelebration from '../components/LevelUpCelebration';
+import { levelStorageKey, STREAK_MILESTONES, type GamificationProgress } from '../utils/gamification';
 
 interface LearningEntry {
   id: number;
@@ -87,9 +89,11 @@ export default function CheckIn() {
   const [stress,     setStress]     = useState(0);
   const [notes,      setNotes]      = useState('');
 
-  const [saving,    setSaving]    = useState(false);
-  const [msg,       setMsg]       = useState<{ ok: boolean; text: string } | null>(null);
-  const [newBadges, setNewBadges] = useState<Badge[]>([]);
+  const [saving,        setSaving]        = useState(false);
+  const [msg,           setMsg]           = useState<{ ok: boolean; text: string } | null>(null);
+  const [newBadges,     setNewBadges]     = useState<Badge[]>([]);
+  const [levelUpData,   setLevelUpData]   = useState<GamificationProgress | null>(null);
+  const [streakMilestone, setStreakMilestone] = useState<number | null>(null);
 
   // Survey state
   const [showSurvey,    setShowSurvey]    = useState(false);
@@ -209,6 +213,18 @@ export default function CheckIn() {
         const { data } = await api.post<{ new_badges: Badge[] }>('/achievements/check', {}, { headers });
         if (data.new_badges?.length > 0) setNewBadges(data.new_badges);
       } catch { /* non-critical */ }
+      // Check for level-up or streak milestone
+      try {
+        const storKey = levelStorageKey(user?.id ?? '');
+        const prevLv = Number(localStorage.getItem(storKey) || '1');
+        const { data: prog } = await api.get<GamificationProgress>('/gamification/progress');
+        localStorage.setItem(storKey, String(prog.level));
+        if (prog.level > prevLv) {
+          setLevelUpData(prog);
+        } else if (STREAK_MILESTONES.includes(prog.streak_days)) {
+          setStreakMilestone(prog.streak_days);
+        }
+      } catch { /* non-critical */ }
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setMsg({ ok: false, text: detail ?? 'Failed to save.' });
@@ -232,6 +248,8 @@ export default function CheckIn() {
   return (
     <div style={s.shell}>
       {newBadges.length > 0 && <BadgeNotification badges={newBadges} onDone={() => setNewBadges([])} />}
+      {levelUpData && <LevelUpCelebration type="level_up" level={levelUpData.level} levelName={levelUpData.level_name} xp={levelUpData.xp} onClose={() => setLevelUpData(null)} />}
+      {streakMilestone && <LevelUpCelebration type="streak" streak={streakMilestone} onClose={() => setStreakMilestone(null)} />}
 
       <header style={s.nav}>
         <div style={s.navLeft}>

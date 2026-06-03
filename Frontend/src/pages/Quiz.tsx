@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import BackButton from '../components/BackButton';
+import LevelUpCelebration from '../components/LevelUpCelebration';
+import { levelStorageKey, type GamificationProgress } from '../utils/gamification';
 
 // ── Types ─────────────────────────────────────────────────────────────
 interface Question {
@@ -64,7 +66,7 @@ function timeAgo(iso: string) {
 
 // ── Component ──────────────────────────────────────────────────────────
 export default function Quiz() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const { t } = useLanguage();
 
   // ── Setup state ──
@@ -73,7 +75,8 @@ export default function Quiz() {
   const [duration, setDuration]       = useState<number>(10);
   const [difficulty, setDifficulty]   = useState<Difficulty>('Medium');
   const [history, setHistory]         = useState<HistoryItem[]>([]);
-  const [histLoading, setHistLoading] = useState(true);
+  const [histLoading,  setHistLoading]  = useState(true);
+  const [levelUpData,  setLevelUpData]  = useState<GamificationProgress | null>(null);
 
   // ── Quiz state ──
   const [phase, setPhase]             = useState<Phase>('setup');

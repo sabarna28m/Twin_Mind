@@ -1,16 +1,19 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
 import api from '../services/api';
 
 const BACKEND = 'http://localhost:8000';
 
+interface CalStatus { configured: boolean; connected: boolean }
+
 export default function Profile() {
   const { user, token, refreshUser } = useAuth();
   const { t } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [fullName, setFullName] = useState(user?.full_name ?? '');
   const [nameMsg, setNameMsg]   = useState<{ ok: boolean; text: string } | null>(null);
@@ -24,6 +27,80 @@ export default function Profile() {
   const [avatarMsg, setAvatarMsg]       = useState<{ ok: boolean; text: string } | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Google Calendar state
+  const [calStatus,     setCalStatus]     = useState<CalStatus | null>(null);
+  const [calMsg,        setCalMsg]        = useState<{ ok: boolean; text: string } | null>(null);
+  const [syncing,       setSyncing]       = useState(false);
+  const [syncMsg,       setSyncMsg]       = useState<{ ok: boolean; text: string } | null>(null);
+  const [remTitle,      setRemTitle]      = useState('');
+  const [remDate,       setRemDate]       = useState('');
+  const [remTime,       setRemTime]       = useState('');
+  const [remDesc,       setRemDesc]       = useState('');
+  const [addingRem,     setAddingRem]     = useState(false);
+  const [remMsg,        setRemMsg]        = useState<{ ok: boolean; text: string } | null>(null);
+
+  useEffect(() => {
+    api.get<CalStatus>('/calendar/status').then(r => setCalStatus(r.data)).catch(() => {});
+    const cal = searchParams.get('calendar');
+    if (cal === 'connected') {
+      setCalMsg({ ok: true, text: 'Google Calendar connected successfully!' });
+      setSearchParams({}, { replace: true });
+    } else if (cal === 'error') {
+      setCalMsg({ ok: false, text: 'Failed to connect Google Calendar. Please try again.' });
+      setSearchParams({}, { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function connectCalendar() {
+    try {
+      const { data } = await api.get<{ auth_url: string }>('/calendar/auth-url');
+      window.location.href = data.auth_url;
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setCalMsg({ ok: false, text: detail ?? 'Failed to get auth URL.' });
+    }
+  }
+
+  async function disconnectCalendar() {
+    try {
+      await api.post('/calendar/disconnect');
+      setCalStatus(s => s ? { ...s, connected: false } : s);
+      setCalMsg({ ok: true, text: 'Disconnected from Google Calendar.' });
+    } catch {
+      setCalMsg({ ok: false, text: 'Failed to disconnect.' });
+    }
+  }
+
+  async function syncPlan() {
+    setSyncing(true);
+    setSyncMsg(null);
+    try {
+      const { data } = await api.post<{ ok: boolean; events_created: number }>('/calendar/sync-study-plan');
+      setSyncMsg({ ok: true, text: `${data.events_created} calendar events created!` });
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setSyncMsg({ ok: false, text: detail ?? 'Sync failed.' });
+    } finally {
+      setSyncing(false);
+    }
+  }
+
+  async function addReminder(e: FormEvent) {
+    e.preventDefault();
+    setAddingRem(true);
+    setRemMsg(null);
+    try {
+      await api.post('/calendar/add-reminder', { title: remTitle, date: remDate, time: remTime, description: remDesc });
+      setRemMsg({ ok: true, text: 'Reminder added to Google Calendar!' });
+      setRemTitle(''); setRemDate(''); setRemTime(''); setRemDesc('');
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setRemMsg({ ok: false, text: detail ?? 'Failed to add reminder.' });
+    } finally {
+      setAddingRem(false);
+    }
+  }
 
   async function saveName(e: FormEvent) {
     e.preventDefault();
@@ -196,6 +273,95 @@ export default function Profile() {
               {pwSaving ? t('profile_saving') : t('profile_save_pw')}
             </button>
           </form>
+        </section>
+
+        {/* Google Calendar */}
+        <section style={s.panel}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '1.1rem' }}>📅</span>
+            <h2 style={s.panelTitle}>Google Calendar</h2>
+          </div>
+          {calMsg && <p style={calMsg.ok ? s.msgOk : s.msgErr}>{calMsg.text}</p>}
+
+          {calStatus === null ? (
+            <p style={{ fontSize: '0.85rem', color: 'var(--text)', margin: 0 }}>Loading…</p>
+          ) : !calStatus.configured ? (
+            <div>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text)', margin: '0 0 0.5rem' }}>
+                Google Calendar integration requires Google OAuth credentials.
+              </p>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text)', margin: 0, fontFamily: 'monospace', background: 'var(--bg)', padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to Backend/.env
+              </p>
+            </div>
+          ) : calStatus.connected ? (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                <span style={s.connectedBadge}>Connected</span>
+                <button onClick={disconnectCalendar} style={s.linkBtn}>Disconnect</button>
+              </div>
+
+              <div style={{ marginBottom: '1.25rem' }}>
+                <p style={{ fontSize: '0.82rem', color: 'var(--text)', margin: '0 0 0.6rem' }}>
+                  Add all 30 days of your study plan as calendar events.
+                </p>
+                <button onClick={syncPlan} disabled={syncing} style={s.btn}>
+                  {syncing ? 'Syncing…' : 'Sync Study Plan to Calendar'}
+                </button>
+                {syncMsg && <p style={{ ...(syncMsg.ok ? s.msgOk : s.msgErr), marginTop: '0.4rem' }}>{syncMsg.text}</p>}
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
+                <h3 style={{ margin: '0 0 0.75rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-h)' }}>Add Study Reminder</h3>
+                <form onSubmit={addReminder} style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                  <input
+                    type="text"
+                    placeholder="Title (e.g. Study Mathematics)"
+                    value={remTitle}
+                    onChange={e => setRemTitle(e.target.value)}
+                    style={s.input}
+                    required
+                  />
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      type="date"
+                      value={remDate}
+                      onChange={e => setRemDate(e.target.value)}
+                      style={{ ...s.input, flex: 1 }}
+                      required
+                    />
+                    <input
+                      type="time"
+                      value={remTime}
+                      onChange={e => setRemTime(e.target.value)}
+                      style={{ ...s.input, flex: 1 }}
+                      required
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Description (optional)"
+                    value={remDesc}
+                    onChange={e => setRemDesc(e.target.value)}
+                    style={s.input}
+                  />
+                  <button type="submit" disabled={addingRem} style={s.btn}>
+                    {addingRem ? 'Adding…' : 'Add Reminder'}
+                  </button>
+                  {remMsg && <p style={remMsg.ok ? s.msgOk : s.msgErr}>{remMsg.text}</p>}
+                </form>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text)', margin: '0 0 1rem' }}>
+                Connect your Google Calendar to sync your 30-day study plan and set study reminders.
+              </p>
+              <button onClick={connectCalendar} style={s.btn}>
+                Connect Google Calendar
+              </button>
+            </div>
+          )}
         </section>
       </main>
     </div>
@@ -394,5 +560,28 @@ const s: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     color: '#dc2626',
     fontSize: '0.875rem',
+  },
+  connectedBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.3rem',
+    padding: '0.25rem 0.65rem',
+    background: 'rgba(16,185,129,0.12)',
+    border: '1px solid rgba(16,185,129,0.35)',
+    borderRadius: '99px',
+    color: '#10b981',
+    fontSize: '0.78rem',
+    fontWeight: 700,
+  },
+  linkBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--accent)',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    fontSize: '0.82rem',
+    fontWeight: 600,
+    padding: 0,
+    textDecoration: 'underline',
   },
 };

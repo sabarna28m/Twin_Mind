@@ -6,6 +6,7 @@ import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
+import { getLevelColor, getLevelGradient, LEVEL_NAMES, LEVEL_COLORS, type GamificationProgress } from '../utils/gamification';
 
 interface HistoryPoint { date: string; overall_score: number; }
 
@@ -349,9 +350,10 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
 export default function Twin() {
   const { user, token } = useAuth();
   const { t } = useLanguage();
-  const [twin, setTwin]       = useState<TwinState | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState('');
+  const [twin,     setTwin]     = useState<TwinState | null>(null);
+  const [loading,  setLoading]  = useState(true);
+  const [error,    setError]    = useState('');
+  const [progress, setProgress] = useState<GamificationProgress | null>(null);
 
   const ageCount  = useCounter(twin?.twin_age ?? 0, 900);
   const dataCount = useCounter(twin?.data_points ?? 0, 800);
@@ -367,6 +369,9 @@ export default function Twin() {
       .then(r => setTwin(r.data))
       .catch(() => setError('Failed to load twin data.'))
       .finally(() => setLoading(false));
+    api.get<GamificationProgress>('/gamification/progress')
+      .then(r => setProgress(r.data))
+      .catch(() => {});
   }, [token]);
 
   const wsConnected = useWebSocket(user?.id, token, refreshTwin);
@@ -374,6 +379,8 @@ export default function Twin() {
   const initials = user?.full_name
     ? user.full_name.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
     : '?';
+
+  const avatarColor = progress ? getLevelColor(progress.level) : (twin ? RISK_COLOR[twin.risk_level] : '#6366f1');
 
   return (
     <div style={s.shell}>
@@ -409,49 +416,146 @@ export default function Twin() {
 
         {twin && (
           <div style={s.grid}>
+
+            {/* ── Level & XP card ── */}
+            {progress && (
+              <div style={{ ...s.card, ...s.fullWidth, marginBottom: 0 }} className="animate-slide-up">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' as const }}>
+                  {/* Level badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
+                    <div style={{
+                      width: '56px', height: '56px', borderRadius: '50%',
+                      background: getLevelGradient(progress.level),
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '1.4rem', fontWeight: 800, color: '#fff',
+                      boxShadow: `0 0 0 4px ${getLevelColor(progress.level)}30, 0 0 24px ${getLevelColor(progress.level)}40`,
+                    }}>
+                      {progress.level}
+                    </div>
+                    <div>
+                      <p style={{ margin: '0 0 0.1rem', fontSize: '0.65rem', fontWeight: 700, color: getLevelColor(progress.level), textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>
+                        Level {progress.level}
+                      </p>
+                      <p style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.3px' }}>
+                        {progress.level_name}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* XP progress */}
+                  <div style={{ flex: 1, minWidth: '200px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                      <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>
+                        {progress.xp.toLocaleString()} XP
+                      </span>
+                      {progress.level < 10 && (
+                        <span style={{ fontSize: '0.72rem', color: '#475569' }}>
+                          {progress.xp_to_next} XP to {LEVEL_NAMES[progress.level + 1]}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ height: '8px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%', width: `${progress.progress_pct}%`,
+                        background: getLevelGradient(progress.level),
+                        borderRadius: '99px', transition: 'width 1s ease',
+                        boxShadow: `0 0 8px ${getLevelColor(progress.level)}60`,
+                      }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' as const }}>
+                      {[
+                        { label: 'Check-ins', xp: progress.breakdown.checkins },
+                        { label: 'Quizzes',   xp: progress.breakdown.quizzes + progress.breakdown.high_scores },
+                        { label: 'Streak',    xp: progress.breakdown.streak },
+                        { label: 'Badges',    xp: progress.breakdown.achievements },
+                      ].map(b => b.xp > 0 && (
+                        <span key={b.label} style={{
+                          padding: '0.15rem 0.5rem', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 600,
+                          background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+                          color: '#64748b',
+                        }}>
+                          {b.label} +{b.xp}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Level progression strip */}
+                  <div style={{ display: 'flex', gap: '3px', flexShrink: 0 }}>
+                    {LEVEL_COLORS.slice(1).map((c, i) => {
+                      const lv = i + 1;
+                      return (
+                        <div key={lv} title={`Level ${lv}`} style={{
+                          width: '18px', height: '18px', borderRadius: '4px',
+                          background: lv <= progress.level ? c : 'rgba(255,255,255,0.06)',
+                          border: lv === progress.level ? `2px solid ${c}` : '1px solid rgba(255,255,255,0.05)',
+                          transition: 'all 0.2s',
+                          boxShadow: lv === progress.level ? `0 0 8px ${c}80` : 'none',
+                        }} />
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Avatar card */}
             <div style={s.avatarCard} className="animate-slide-up">
               {/* Avatar with rings + particles */}
               <div style={{ position: 'relative', width: '130px', height: '130px', marginBottom: '1rem' }}>
-                {/* Floating particles */}
                 <Particles riskLevel={twin.risk_level} />
 
-                {/* Outer spinning ring */}
+                {/* Outer spinning ring — level color */}
                 <div style={{
                   position: 'absolute', inset: '-8px', borderRadius: '50%',
                   border: '2px solid transparent',
-                  borderTopColor: RISK_COLOR[twin.risk_level],
-                  borderRightColor: RISK_COLOR[twin.risk_level],
+                  borderTopColor: avatarColor,
+                  borderRightColor: avatarColor,
                   animation: 'ring-spin 3s linear infinite',
-                  opacity: 0.55,
+                  opacity: 0.65,
                 }} />
-                {/* Middle glow ring — risk-specific pulse */}
+                {/* Middle glow ring */}
                 <div style={{
                   position: 'absolute', inset: 0, borderRadius: '50%',
-                  border: `2px solid ${RISK_COLOR[twin.risk_level]}`,
+                  border: `2px solid ${avatarColor}`,
+                  boxShadow: `0 0 16px ${avatarColor}60`,
                   animation: GLOW_ANIM[twin.risk_level],
                 }} />
                 {/* Inner ring counter-spin */}
                 <div style={{
                   position: 'absolute', inset: '8px', borderRadius: '50%',
                   border: '1px solid rgba(255,255,255,0.07)',
-                  borderBottomColor: `${RISK_COLOR[twin.risk_level]}60`,
+                  borderBottomColor: `${avatarColor}60`,
                   animation: 'ring-spin-rev 6s linear infinite',
                 }} />
-                {/* Avatar circle — breathing animation */}
+                {/* Avatar circle */}
                 <div style={{
                   position: 'absolute', inset: '4px', borderRadius: '50%',
-                  background: `radial-gradient(circle at 35% 35%, ${RISK_COLOR[twin.risk_level]}30 0%, rgba(15,23,42,0.95) 70%)`,
+                  background: `radial-gradient(circle at 35% 35%, ${avatarColor}35 0%, rgba(15,23,42,0.95) 70%)`,
                   border: '1px solid rgba(255,255,255,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '2rem', fontWeight: 800, color: RISK_COLOR[twin.risk_level],
+                  fontSize: '2rem', fontWeight: 800, color: avatarColor,
                   letterSpacing: '-1px',
-                  textShadow: `0 0 20px ${RISK_COLOR[twin.risk_level]}80`,
+                  textShadow: `0 0 20px ${avatarColor}90`,
                   animation: 'breathe 4s ease-in-out infinite',
                 }}>
                   {initials}
                 </div>
               </div>
+
+              {/* Level badge under avatar */}
+              {progress && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '0.35rem',
+                  padding: '0.25rem 0.75rem', borderRadius: '99px',
+                  background: `${avatarColor}18`,
+                  border: `1px solid ${avatarColor}40`,
+                  marginBottom: '0.5rem',
+                }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 800, color: avatarColor }}>Lv.{progress.level}</span>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 600, color: avatarColor }}>{progress.level_name}</span>
+                </div>
+              )}
 
               <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.6rem' }}>
                 {user?.full_name?.split(' ')[0]}'s Twin
