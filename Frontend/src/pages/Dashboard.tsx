@@ -197,6 +197,14 @@ const QA_DEFS = [
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }
 interface CalEvent  { id: string; title: string; start: string; link: string }
+interface DayPlan   { day: string; tasks: string[] }
+interface SmartPlan {
+  current_score: number
+  target_score: number
+  daily_hours: number
+  forecast: string
+  days: DayPlan[]
+}
 
 // ── Main component ─────────────────────────────────────────────────
 export default function Dashboard() {
@@ -217,6 +225,9 @@ export default function Dashboard() {
   const [savedPlan,        setSavedPlan]        = useState<SavedPlan | null>(null);
   const [showPlanModal,    setShowPlanModal]    = useState(false);
   const [calEvents,        setCalEvents]        = useState<CalEvent[]>([]);
+  const [smartPlan,        setSmartPlan]        = useState<SmartPlan | null>(null);
+  const [planLoading,      setPlanLoading]      = useState(false);
+  const [planError,        setPlanError]        = useState<string | null>(null);
   const [gamProgress,      setGamProgress]      = useState<GamificationProgress | null>(null);
   const [weeklyChallenge,  setWeeklyChallenge]  = useState<WeeklyChallengeData | null>(null);
   const [showChallengeForm, setShowChallengeForm] = useState(false);
@@ -296,6 +307,61 @@ export default function Dashboard() {
       wsRef.current = null;
     };
   }, [user?.id, token, refreshData]);
+
+  async function generatePlan() {
+    setPlanLoading(true);
+    setPlanError(null);
+    try {
+      const { data } = await api.post<SmartPlan>('/smart-plan/generate');
+      setSmartPlan(data);
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setPlanError(detail ?? 'Failed to generate plan. Please try again.');
+    } finally {
+      setPlanLoading(false);
+    }
+  }
+
+  function downloadPDF(plan: SmartPlan) {
+    const rows = plan.days.map(d => `
+      <div class="day-col">
+        <div class="day-name">${d.day.slice(0, 3)}</div>
+        ${d.tasks.map(t => `<div class="task">${t}</div>`).join('')}
+      </div>`).join('');
+
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>
+<title>TwinMind Smart Plan</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:2rem;color:#0f172a;background:#fff}
+  h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}
+  .sub{font-size:0.9rem;color:#475569;margin:0 0 1.5rem}
+  .badge{display:inline-block;background:#eef2ff;color:#4338ca;border-radius:99px;padding:0.25rem 0.85rem;font-size:0.82rem;font-weight:700;margin-bottom:1.5rem}
+  .grid{display:flex;gap:0.75rem;margin-bottom:1.5rem}
+  .day-col{flex:1;background:#f8fafc;border-radius:10px;padding:0.75rem;border:1px solid #e2e8f0}
+  .day-name{font-size:0.75rem;font-weight:800;color:#4338ca;text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.5rem}
+  .task{font-size:0.72rem;color:#334155;padding:0.35rem 0;border-bottom:1px solid #e2e8f0;line-height:1.4}
+  .task:last-child{border-bottom:none}
+  .report{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1rem;margin-top:0.5rem}
+  .report-title{font-size:0.8rem;font-weight:700;color:#4338ca;margin:0 0 0.4rem}
+  .forecast{font-size:0.82rem;color:#475569;line-height:1.5;margin:0}
+  @media print{body{padding:1rem}}
+</style></head><body>
+<h1>TwinMind Smart Plan</h1>
+<p class="sub">Raise expected performance from <strong>${plan.current_score}%</strong> to <strong>${plan.target_score}%</strong> over the next 3 weeks</p>
+<div class="badge">${plan.daily_hours}h/day recommended</div>
+<div class="grid">${rows}</div>
+<div class="report">
+  <p class="report-title">Twin Report</p>
+  <p class="forecast">${plan.forecast}</p>
+</div>
+</body></html>`;
+
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
+    win.onload = () => { win.focus(); win.print(); };
+  }
 
   async function saveChallenge() {
     setSavingChallenge(true);
@@ -659,6 +725,91 @@ export default function Dashboard() {
           )}
         </section>
 
+        {/* ── Smart Plan ── */}
+        <section style={sp.card}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <span style={{ fontSize: '1.15rem' }}>◈</span>
+              <h2 style={sp.title}>Smart Plan</h2>
+            </div>
+            <button
+              onClick={generatePlan}
+              disabled={planLoading}
+              style={sp.regenBtn}
+            >
+              {planLoading ? '⟳ Generating…' : smartPlan ? '⟳ Regenerate' : '✦ Generate Plan'}
+            </button>
+          </div>
+
+          {planError && (
+            <div style={sp.errorBox}>{planError}</div>
+          )}
+
+          {!smartPlan && !planLoading && !planError && (
+            <div style={sp.emptyWrap}>
+              <p style={sp.emptyIcon}>🧠</p>
+              <p style={sp.emptyTitle}>AI-Powered Weekly Schedule</p>
+              <p style={sp.emptySub}>
+                Generate a personalized 7-day study plan based on your performance data, weak areas, and academic goals.
+              </p>
+              <button onClick={generatePlan} style={sp.generateBigBtn}>Generate My Smart Plan</button>
+            </div>
+          )}
+
+          {planLoading && (
+            <div style={sp.loadingWrap}>
+              <div style={sp.spinner} className="spin" />
+              <p style={sp.loadingText}>Analyzing your performance data…</p>
+            </div>
+          )}
+
+          {smartPlan && !planLoading && (
+            <>
+              {/* Headline */}
+              <div style={sp.headline}>
+                <p style={sp.headlineText}>
+                  Raise expected performance from&nbsp;
+                  <span style={sp.scoreFrom}>{smartPlan.current_score}%</span>
+                  &nbsp;to&nbsp;
+                  <span style={sp.scoreTo}>{smartPlan.target_score}%</span>
+                  &nbsp;over the next 3 weeks
+                </p>
+                <span style={sp.hoursBadge}>{smartPlan.daily_hours}h/day recommended</span>
+              </div>
+
+              {/* 7-day grid */}
+              <div style={sp.dayGrid}>
+                {smartPlan.days.map((d, i) => (
+                  <div key={i} style={sp.dayCol}>
+                    <p style={sp.dayName}>{d.day.slice(0, 3).toUpperCase()}</p>
+                    {d.tasks.map((task, j) => (
+                      <div key={j} style={sp.taskCard}>
+                        <span style={sp.taskDot} />
+                        <span style={sp.taskText}>{task}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              {/* Twin Report */}
+              <div style={sp.reportBox}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.85rem' }}>◈</span>
+                    <span style={sp.reportTitle}>Twin Report</span>
+                  </div>
+                  <button onClick={() => downloadPDF(smartPlan)} style={sp.downloadBtn}>
+                    ↓ Download PDF
+                  </button>
+                </div>
+                <p style={sp.forecastText}>{smartPlan.forecast}</p>
+              </div>
+            </>
+          )}
+        </section>
+
       </main>
 
       {/* ── Onboarding Tour ── */}
@@ -839,5 +990,117 @@ const s: Record<string, React.CSSProperties> = {
     padding: '0.45rem 1.25rem', background: 'var(--accent)', border: 'none',
     borderRadius: '8px', color: '#fff', fontSize: '0.82rem', fontWeight: 600,
     fontFamily: 'inherit', cursor: 'pointer',
+  },
+};
+
+// ── Smart Plan styles ──────────────────────────────────────────────
+const sp: Record<string, React.CSSProperties> = {
+  card: {
+    position: 'relative',
+    background: 'linear-gradient(135deg, #0f172a 0%, #1a1040 50%, #0c1a38 100%)',
+    border: '1px solid rgba(99,102,241,0.35)',
+    borderRadius: '20px',
+    padding: '1.75rem',
+    overflow: 'hidden',
+    boxShadow: '0 8px 40px rgba(0,0,0,0.35)',
+  },
+  title: {
+    margin: 0,
+    fontSize: '1rem',
+    fontWeight: 800,
+    color: '#e2e8f0',
+    letterSpacing: '-0.2px',
+  },
+  regenBtn: {
+    padding: '0.4rem 1rem',
+    background: 'rgba(99,102,241,0.18)',
+    border: '1px solid rgba(99,102,241,0.45)',
+    borderRadius: '99px',
+    color: '#a5b4fc',
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    letterSpacing: '0.01em',
+    transition: 'background 0.2s',
+  },
+
+  // Empty / loading states
+  emptyWrap: { textAlign: 'center' as const, padding: '2rem 1rem' },
+  emptyIcon: { fontSize: '2.5rem', margin: '0 0 0.75rem' },
+  emptyTitle: { margin: '0 0 0.4rem', fontSize: '1rem', fontWeight: 700, color: '#e2e8f0' },
+  emptySub: { margin: '0 0 1.5rem', fontSize: '0.83rem', color: 'rgba(226,232,240,0.6)', lineHeight: 1.5, maxWidth: '380px', marginLeft: 'auto', marginRight: 'auto' },
+  generateBigBtn: {
+    padding: '0.65rem 1.75rem',
+    background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+    border: 'none',
+    borderRadius: '12px',
+    color: '#fff',
+    fontSize: '0.88rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    boxShadow: '0 4px 18px rgba(99,102,241,0.4)',
+  },
+  loadingWrap: { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '0.85rem', padding: '2.5rem 1rem' },
+  spinner: { width: '32px', height: '32px', border: '3px solid rgba(99,102,241,0.25)', borderTop: '3px solid #818cf8', borderRadius: '50%' },
+  loadingText: { fontSize: '0.85rem', color: 'rgba(226,232,240,0.7)', margin: 0 },
+  errorBox: { background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)', borderRadius: '10px', padding: '0.75rem 1rem', fontSize: '0.82rem', color: '#fca5a5', marginBottom: '1rem' },
+
+  // Headline
+  headline: { marginBottom: '1.5rem' },
+  headlineText: { margin: '0 0 0.75rem', fontSize: '1.05rem', fontWeight: 700, color: '#e2e8f0', lineHeight: 1.4 },
+  scoreFrom: { color: '#fbbf24', fontWeight: 800 },
+  scoreTo:   { color: '#34d399', fontWeight: 800 },
+  hoursBadge: {
+    display: 'inline-block',
+    padding: '0.3rem 0.9rem',
+    background: 'rgba(99,102,241,0.2)',
+    border: '1px solid rgba(99,102,241,0.4)',
+    borderRadius: '99px',
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    color: '#a5b4fc',
+  },
+
+  // 7-day grid
+  dayGrid: { display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '0.55rem', marginBottom: '1.5rem' },
+  dayCol: {
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '12px',
+    padding: '0.7rem 0.55rem',
+  },
+  dayName: {
+    margin: '0 0 0.55rem',
+    fontSize: '0.65rem',
+    fontWeight: 800,
+    color: '#818cf8',
+    letterSpacing: '0.08em',
+    textAlign: 'center' as const,
+  },
+  taskCard: { display: 'flex', gap: '0.35rem', alignItems: 'flex-start', marginBottom: '0.45rem' },
+  taskDot: { width: '5px', height: '5px', borderRadius: '50%', background: '#6366f1', flexShrink: 0, marginTop: '5px' },
+  taskText: { fontSize: '0.67rem', color: 'rgba(226,232,240,0.82)', lineHeight: 1.45 },
+
+  // Twin Report
+  reportBox: {
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(99,102,241,0.25)',
+    borderRadius: '12px',
+    padding: '1rem 1.1rem',
+  },
+  reportTitle: { fontSize: '0.8rem', fontWeight: 700, color: '#a5b4fc', letterSpacing: '0.02em' },
+  forecastText: { margin: 0, fontSize: '0.82rem', color: 'rgba(226,232,240,0.75)', lineHeight: 1.6, fontStyle: 'italic' },
+  downloadBtn: {
+    padding: '0.3rem 0.8rem',
+    background: 'rgba(16,185,129,0.15)',
+    border: '1px solid rgba(16,185,129,0.35)',
+    borderRadius: '8px',
+    color: '#34d399',
+    fontSize: '0.74rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    fontFamily: 'inherit',
   },
 };
