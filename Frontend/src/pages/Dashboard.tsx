@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { BookOpen, FileText, Upload, BarChart2, CheckSquare, Trophy, Brain, Zap, MessageCircle, Layers } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import ThemeToggle from '../components/ThemeToggle';
@@ -102,7 +103,7 @@ function StatCard({ icon, grad, value, unit = '', label, delay }: {
 }) {
   const count = useCounter(value);
   return (
-    <div style={{ ...s.statCard, animationDelay: `${delay}ms` }} className="animate-slide-up">
+    <div style={{ ...s.statCard, animationDelay: `${delay}ms` }} className="animate-slide-up stat-card-premium">
       <div style={{ ...s.statIconWrap, background: grad }}>
         <span style={s.statIcon}>{icon}</span>
       </div>
@@ -161,16 +162,16 @@ const ch: Record<string, React.CSSProperties> = {
 
 // ── Data constants ─────────────────────────────────────────────────
 const NAV_KEYS = [
-  { key: 'nav_sessions', to: '/sessions' },
-  { key: 'nav_notes',    to: '/notes'    },
-  { key: 'nav_materials',to: '/materials'},
-  { key: 'nav_progress', to: '/progress' },
-  { key: 'nav_checkin',  to: '/checkin'  },
-  { key: 'nav_achievements', to: '/achievements' },
-  { key: 'nav_quiz',     to: '/quiz'     },
-  { key: 'nav_simulate', to: '/simulate' },
-  { key: 'nav_mentor',   to: '/mentor'   },
-  { key: 'nav_twin',     to: '/twin'     },
+  { key: 'nav_sessions',     to: '/sessions',     Icon: BookOpen      },
+  { key: 'nav_notes',        to: '/notes',         Icon: FileText      },
+  { key: 'nav_materials',    to: '/materials',     Icon: Upload        },
+  { key: 'nav_progress',     to: '/progress',      Icon: BarChart2     },
+  { key: 'nav_checkin',      to: '/checkin',       Icon: CheckSquare   },
+  { key: 'nav_achievements', to: '/achievements',  Icon: Trophy        },
+  { key: 'nav_quiz',         to: '/quiz',          Icon: Brain         },
+  { key: 'nav_simulate',     to: '/simulate',      Icon: Zap           },
+  { key: 'nav_mentor',       to: '/mentor',        Icon: MessageCircle },
+  { key: 'nav_twin',         to: '/twin',          Icon: Layers        },
 ];
 
 const NAV_TOUR: Record<string, string> = {
@@ -388,7 +389,7 @@ export default function Dashboard() {
     <div style={s.shell}>
 
       {/* ── Navbar ── */}
-      <header style={s.nav}>
+      <header style={s.nav} className="nav-premium">
         <div style={s.navLeft}>
           <span style={s.logoIcon}>◈</span>
           <span style={s.navLogo}>TwinMind</span>
@@ -400,9 +401,10 @@ export default function Dashboard() {
           )}
         </div>
         <nav style={s.navCenter}>
-          {NAV_KEYS.map(n => (
-            <Link key={n.to} to={n.to} className="nav-link" {...(NAV_TOUR[n.to] ? { 'data-tour': NAV_TOUR[n.to] } : {})}>
-              {t(n.key)}
+          {NAV_KEYS.map(({ key, to, Icon: NavIcon }) => (
+            <Link key={to} to={to} className="nav-link" {...(NAV_TOUR[to] ? { 'data-tour': NAV_TOUR[to] } : {})}>
+              <NavIcon size={13} strokeWidth={2.5} />
+              {t(key)}
             </Link>
           ))}
         </nav>
@@ -423,7 +425,7 @@ export default function Dashboard() {
       <main style={s.main}>
 
         {/* ── Hero ── */}
-        <section style={s.heroCard} className="animate-slide-up" data-tour="dashboard">
+        <section style={s.heroCard} className="animate-slide-up hero-animated" data-tour="dashboard">
           <div style={s.heroOrb1} />
           <div style={s.heroOrb2} />
           <div style={s.heroContent}>
@@ -518,7 +520,7 @@ export default function Dashboard() {
 
         {/* ── Weekly Challenge ── */}
         {weeklyChallenge && (
-          <section style={s.panel}>
+          <section style={s.panel} className="glass-panel">
             <div style={s.panelHead}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span style={{ fontSize: '1rem' }}>⚔️</span>
@@ -589,7 +591,7 @@ export default function Dashboard() {
         <div style={s.midRow}>
 
           {/* 7-day chart */}
-          <section style={s.panel}>
+          <section style={s.panel} className="glass-panel">
             <div style={s.panelHead}>
               <h2 style={s.panelTitle}>{t('chart_title')}</h2>
               <Link to="/checkin" style={s.panelCta}>{t('chart_log_today')}</Link>
@@ -613,7 +615,7 @@ export default function Dashboard() {
           </section>
 
           {/* Quick actions icon grid */}
-          <section style={s.panel}>
+          <section style={s.panel} className="glass-panel">
             <h2 style={s.panelTitle}>{t('quick_actions')}</h2>
             <div style={s.actionGrid}>
               {QA_DEFS.map(a => (
@@ -634,7 +636,7 @@ export default function Dashboard() {
 
         {/* ── Upcoming Calendar Events ── */}
         {calEvents.length > 0 && (
-          <section style={s.panel}>
+          <section style={s.panel} className="glass-panel">
             <div style={s.panelHead}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span style={{ fontSize: '1rem' }}>📅</span>
@@ -686,7 +688,7 @@ export default function Dashboard() {
         )}
 
         {/* ── My Study Plan card ── */}
-        <section style={s.panel}>
+        <section style={s.panel} className="glass-panel">
           <div style={s.panelHead}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span style={{ fontSize: '1rem' }}>📋</span>
@@ -844,152 +846,196 @@ export default function Dashboard() {
   );
 }
 
-// ── Styles ─────────────────────────────────────────────────────────
+// ── Premium Styles ──────────────────────────────────────────────────
 const s: Record<string, React.CSSProperties> = {
   shell: { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' },
 
   /* Navbar */
   nav: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '0 1.75rem', height: '60px',
-    borderBottom: '1px solid var(--border)',
-    background: 'var(--bg)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    padding: '0 1.75rem', height: '64px',
+    background: 'rgba(6, 11, 24, 0.88)',
+    backdropFilter: 'blur(28px) saturate(200%)',
+    WebkitBackdropFilter: 'blur(28px) saturate(200%)',
+    borderBottom: '1px solid rgba(0,212,255,0.12)',
+    boxShadow: '0 1px 0 rgba(0,212,255,0.06), 0 8px 32px rgba(0,0,0,0.4)',
     position: 'sticky', top: 0, zIndex: 50,
   },
-  navLeft:    { display: 'flex', alignItems: 'center', gap: '0.45rem' },
-  logoIcon:   { fontSize: '1.1rem', color: '#6366f1' },
-  navLogo:    { fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.3px' },
-  navCenter:  { display: 'flex', alignItems: 'center', gap: '0.15rem' },
+  navLeft:    { display: 'flex', alignItems: 'center', gap: '0.55rem' },
+  logoIcon:   { fontSize: '1.25rem', color: '#00D4FF', filter: 'drop-shadow(0 0 8px rgba(0,212,255,0.7))' },
+  navLogo:    {
+    fontSize: '1.1rem', fontWeight: 900, letterSpacing: '-0.5px',
+    background: 'linear-gradient(135deg, #00D4FF 0%, #a78bfa 100%)',
+    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+  },
+  navCenter:  { display: 'flex', alignItems: 'center', gap: '0.1rem' },
   navRight:   { display: 'flex', alignItems: 'center', gap: '0.75rem' },
-  liveBadge:  { display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.2rem 0.6rem', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 700, color: '#10b981', letterSpacing: '0.04em' },
-  liveDot:    { width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981', flexShrink: 0 },
-  navUser:    { display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', color: 'var(--text)', textDecoration: 'none', fontWeight: 500 },
-  navAvatar:  { width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' as const, border: '1.5px solid var(--accent-border)' },
-  navInitials:{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--accent-bg)', border: '1.5px solid var(--accent-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 700, color: 'var(--accent)', flexShrink: 0 },
+  liveBadge:  { display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.22rem 0.7rem', background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.28)', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 800, color: '#00D4FF', letterSpacing: '0.06em' },
+  liveDot:    { width: '6px', height: '6px', borderRadius: '50%', background: '#00D4FF', boxShadow: '0 0 8px rgba(0,212,255,0.9)', flexShrink: 0 },
+  navUser:    { display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', color: 'var(--text-m)', textDecoration: 'none', fontWeight: 600 },
+  navAvatar:  { width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' as const, border: '2px solid rgba(0,212,255,0.4)', boxShadow: '0 0 12px rgba(0,212,255,0.2)' },
+  navInitials:{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,212,255,0.12)', border: '2px solid rgba(0,212,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 800, color: '#00D4FF', flexShrink: 0 },
 
   /* Main */
-  main: { flex: 1, padding: '2rem 2rem 3rem', maxWidth: '1040px', width: '100%', margin: '0 auto', boxSizing: 'border-box' as const, display: 'flex', flexDirection: 'column', gap: '1.5rem' },
+  main: { flex: 1, padding: '2.25rem 2rem 4rem', maxWidth: '1080px', width: '100%', margin: '0 auto', boxSizing: 'border-box' as const, display: 'flex', flexDirection: 'column', gap: '1.75rem' },
 
   /* Hero */
   heroCard: {
     position: 'relative', overflow: 'hidden',
-    background: 'var(--bg-surface)',
-    border: '1px solid var(--border)',
-    borderRadius: '20px',
-    padding: '2rem 2rem',
-    boxShadow: '0 4px 30px rgba(0,0,0,0.2)',
+    border: '1px solid rgba(0,212,255,0.14)',
+    borderRadius: '24px',
+    padding: '2.5rem 2.25rem',
+    boxShadow: '0 4px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.06)',
   },
   heroOrb1: {
-    position: 'absolute', width: '400px', height: '400px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 65%)',
-    top: '-150px', right: '-80px', pointerEvents: 'none',
+    position: 'absolute', width: '520px', height: '520px', borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 65%)',
+    top: '-220px', right: '-120px', pointerEvents: 'none',
+    animation: 'orb-drift-1 18s ease-in-out infinite',
   },
   heroOrb2: {
-    position: 'absolute', width: '300px', height: '300px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 65%)',
-    bottom: '-100px', left: '30%', pointerEvents: 'none',
+    position: 'absolute', width: '420px', height: '420px', borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 65%)',
+    bottom: '-160px', left: '22%', pointerEvents: 'none',
+    animation: 'orb-drift-2 14s ease-in-out infinite',
   },
   heroContent: { position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '2rem' },
   heroLeft:    { flex: 1 },
-  greetingLabel: { fontSize: '0.75rem', color: '#6366f1', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const, marginBottom: '0.4rem' },
-  heroName:    { fontSize: '2.1rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.5px', marginBottom: '0.25rem', lineHeight: 1.1 },
-  heroSub:     { fontSize: '0.9rem', color: 'var(--text)', marginBottom: '1.25rem' },
-  quoteBox:    { display: 'flex', gap: '0.6rem', alignItems: 'flex-start', padding: '0.9rem 1rem', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)', borderRadius: '12px', maxWidth: '480px' },
-  quoteMark:   { fontSize: '1.5rem', color: '#6366f1', lineHeight: 1, flexShrink: 0, marginTop: '-2px' },
-  quoteText:   { fontSize: '0.83rem', color: 'var(--text-m)', lineHeight: 1.55, marginBottom: '0.2rem', fontStyle: 'italic' },
-  quoteAuthor: { fontSize: '0.72rem', color: 'var(--text)', fontWeight: 600 },
+  greetingLabel: {
+    fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.15em',
+    textTransform: 'uppercase' as const, marginBottom: '0.5rem',
+    background: 'linear-gradient(90deg, #00D4FF, #7C3AED)',
+    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+  },
+  heroName: {
+    fontSize: '2.8rem', fontWeight: 900, letterSpacing: '-1.2px',
+    marginBottom: '0.3rem', lineHeight: 1.05,
+    background: 'linear-gradient(135deg, #f8fafc 0%, #c7d2fe 45%, #00D4FF 100%)',
+    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+  },
+  heroSub:     { fontSize: '0.95rem', color: 'rgba(148,163,184,0.85)', marginBottom: '1.5rem', lineHeight: 1.55 },
+  quoteBox:    { display: 'flex', gap: '0.75rem', alignItems: 'flex-start', padding: '1rem 1.15rem', background: 'rgba(0,212,255,0.05)', border: '1px solid rgba(0,212,255,0.14)', borderRadius: '14px', maxWidth: '500px', backdropFilter: 'blur(10px)' },
+  quoteMark:   { fontSize: '1.6rem', color: '#00D4FF', lineHeight: 1, flexShrink: 0, marginTop: '-4px', opacity: 0.75 },
+  quoteText:   { fontSize: '0.85rem', color: 'rgba(203,213,225,0.82)', lineHeight: 1.6, marginBottom: '0.22rem', fontStyle: 'italic' },
+  quoteAuthor: { fontSize: '0.72rem', color: '#00D4FF', fontWeight: 700, opacity: 0.75 },
 
   /* Hero right — twin health */
-  heroRight: { width: '200px', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' },
-  healthChip: { display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.85rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '99px' },
+  heroRight: { width: '215px', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.55rem' },
+  healthChip: { display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.42rem 0.9rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '99px', backdropFilter: 'blur(10px)' },
   healthDot:  { width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0 },
-  healthStatus: { fontSize: '0.8rem', fontWeight: 700 },
-  healthSectionLabel: { fontSize: '0.7rem', color: 'var(--text)', fontWeight: 500, textTransform: 'uppercase' as const, letterSpacing: '0.06em', margin: '0.25rem 0 0' },
-  healthPctText: { fontSize: '2.5rem', fontWeight: 800, lineHeight: 1, margin: '0' },
-  healthPctSuffix: { fontSize: '1.1rem', fontWeight: 600 },
-  healthBarTrack: { width: '100%', height: '6px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' },
-  healthBarFill:  { height: '100%', borderRadius: '99px', transition: 'width 0.8s ease' },
-  healthHint: { fontSize: '0.68rem', color: 'var(--text)', margin: '0.1rem 0 0', textAlign: 'center' as const },
+  healthStatus: { fontSize: '0.8rem', fontWeight: 800 },
+  healthSectionLabel: { fontSize: '0.68rem', color: 'rgba(148,163,184,0.65)', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0.25rem 0 0' },
+  healthPctText: { fontSize: '2.9rem', fontWeight: 900, lineHeight: 1, margin: '0' },
+  healthPctSuffix: { fontSize: '1.25rem', fontWeight: 700 },
+  healthBarTrack: { width: '100%', height: '7px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden' },
+  healthBarFill:  { height: '100%', borderRadius: '99px', transition: 'width 0.9s cubic-bezier(0.16,1,0.3,1)' },
+  healthHint: { fontSize: '0.68rem', color: 'rgba(148,163,184,0.55)', margin: '0.1rem 0 0', textAlign: 'center' as const },
 
   /* Stat cards */
-  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1rem' },
+  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1.1rem' },
   statCard: {
-    display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem',
-    background: 'var(--bg-surface)', border: '1px solid var(--border)',
-    borderRadius: '16px', boxShadow: '0 2px 16px rgba(0,0,0,0.15)',
+    display: 'flex', alignItems: 'center', gap: '1.1rem', padding: '1.4rem',
+    background: 'rgba(10, 16, 32, 0.8)',
+    border: '1px solid rgba(255,255,255,0.07)',
+    borderRadius: '18px',
+    boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+    backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
   },
-  statIconWrap: { width: '46px', height: '46px', borderRadius: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(0,0,0,0.3)' },
-  statIcon:  { fontSize: '1.15rem' },
-  statValue: { fontSize: '1.7rem', fontWeight: 800, color: 'var(--text-h)', lineHeight: 1.1, marginBottom: '0.15rem' },
-  statLabel: { fontSize: '0.68rem', color: 'var(--text)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' as const },
+  statIconWrap: { width: '50px', height: '50px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 6px 20px rgba(0,0,0,0.45)' },
+  statIcon:  { fontSize: '1.3rem' },
+  statValue: {
+    fontSize: '1.95rem', fontWeight: 900, lineHeight: 1.05, marginBottom: '0.18rem',
+    background: 'linear-gradient(135deg, #00D4FF 0%, #7C3AED 100%)',
+    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+  },
+  statLabel: { fontSize: '0.68rem', color: 'rgba(148,163,184,0.65)', fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase' as const },
 
   /* Mid row */
-  midRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', alignItems: 'start' },
+  midRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.75rem', alignItems: 'start' },
 
   /* Panels */
-  panel: { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '1.5rem' },
-  panelHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' },
-  panelTitle: { fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-h)', margin: 0, letterSpacing: '-0.1px' },
-  panelCta: { fontSize: '0.75rem', color: '#818cf8', textDecoration: 'none', fontWeight: 600 },
+  panel: {
+    background: 'rgba(10, 16, 32, 0.75)',
+    border: '1px solid rgba(255,255,255,0.07)',
+    borderRadius: '18px',
+    padding: '1.6rem',
+    backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 4px 32px rgba(0,0,0,0.25)',
+  },
+  panelHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.9rem' },
+  panelTitle: { fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-h)', margin: 0, letterSpacing: '-0.2px' },
+  panelCta: { fontSize: '0.75rem', color: '#00D4FF', textDecoration: 'none', fontWeight: 700, opacity: 0.85, transition: 'opacity 0.2s' },
 
   /* Chart footer */
-  chartFooter: { display: 'flex', gap: '1rem', marginTop: '0.75rem', paddingTop: '0.65rem', borderTop: '1px solid var(--border)' },
+  chartFooter: { display: 'flex', gap: '1rem', marginTop: '0.85rem', paddingTop: '0.7rem', borderTop: '1px solid rgba(255,255,255,0.06)' },
   chartStat: { fontSize: '0.75rem', color: 'var(--text)' },
   chartStatVal: { color: 'var(--text-h)', fontWeight: 700 },
 
   /* Empty state */
-  emptyState: { textAlign: 'center', padding: '1.5rem 0' },
-  emptyIcon: { fontSize: '2rem', marginBottom: '0.5rem' },
-  emptyText: { fontSize: '0.9rem', fontWeight: 600, color: 'var(--text)', marginBottom: '0.3rem' },
-  emptySub:  { fontSize: '0.78rem', color: 'var(--text)', marginBottom: '1rem' },
-  emptyBtn:  { display: 'inline-block', padding: '0.45rem 1rem', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '8px', color: '#818cf8', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none' },
+  emptyState: { textAlign: 'center' as const, padding: '2rem 0' },
+  emptyIcon: { fontSize: '2.25rem', marginBottom: '0.6rem' },
+  emptyText: { fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-h)', marginBottom: '0.35rem' },
+  emptySub:  { fontSize: '0.8rem', color: 'var(--text)', marginBottom: '1.25rem', lineHeight: 1.55 },
+  emptyBtn:  {
+    display: 'inline-block', padding: '0.52rem 1.3rem',
+    background: 'linear-gradient(135deg, rgba(0,212,255,0.14), rgba(124,58,237,0.14))',
+    border: '1px solid rgba(0,212,255,0.3)',
+    borderRadius: '10px', color: '#00D4FF', fontSize: '0.8rem', fontWeight: 700, textDecoration: 'none',
+  },
 
   /* Quick actions grid */
-  actionGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.25rem', marginTop: '0.25rem' },
-  actionIconBig: { width: '48px', height: '48px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.3)', marginBottom: '0.1rem' },
-  actionIconGlyph: { fontSize: '1.2rem' },
-  actionTileLabel: { fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-h)', margin: 0, lineHeight: 1.2 },
-  actionTileDesc:  { fontSize: '0.62rem', color: 'var(--text)', margin: 0, lineHeight: 1.2 },
+  actionGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.3rem', marginTop: '0.35rem' },
+  actionIconBig: { width: '50px', height: '50px', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 20px rgba(0,0,0,0.45)', marginBottom: '0.15rem' },
+  actionIconGlyph: { fontSize: '1.25rem' },
+  actionTileLabel: { fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-h)', margin: 0, lineHeight: 1.2 },
+  actionTileDesc:  { fontSize: '0.62rem', color: 'var(--text)', margin: 0, lineHeight: 1.25 },
 
   /* Study plan card */
-  planDate:        { fontSize: '0.7rem', color: 'var(--text)', marginBottom: '0.75rem', fontWeight: 500 },
-  planPreview:     { background: 'var(--bg-elevated, var(--bg))', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.9rem 1rem', marginBottom: '0.85rem' },
-  planPreviewHead: { fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-h)', margin: '0 0 0.3rem', lineHeight: 1.35 },
-  planPreviewLine: { fontSize: '0.78rem', color: 'var(--text)', margin: '0 0 0.15rem', lineHeight: 1.4 },
-  planFade:        { fontSize: '0.78rem', color: 'var(--text)', margin: '0.2rem 0 0', opacity: 0.5 },
+  planDate:        { fontSize: '0.72rem', color: 'rgba(148,163,184,0.55)', marginBottom: '0.85rem', fontWeight: 600, letterSpacing: '0.02em' },
+  planPreview:     { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '1rem 1.1rem', marginBottom: '1rem' },
+  planPreviewHead: { fontSize: '0.83rem', fontWeight: 700, color: 'var(--text-h)', margin: '0 0 0.3rem', lineHeight: 1.35 },
+  planPreviewLine: { fontSize: '0.78rem', color: 'var(--text)', margin: '0 0 0.15rem', lineHeight: 1.45 },
+  planFade:        { fontSize: '0.78rem', color: 'var(--text)', margin: '0.2rem 0 0', opacity: 0.4 },
   viewPlanBtn:     {
-    padding: '0.45rem 1.1rem', background: 'var(--accent)', color: '#fff',
-    border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600,
+    padding: '0.52rem 1.3rem',
+    background: 'linear-gradient(135deg, #00D4FF, #7C3AED)',
+    color: '#fff', border: 'none', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700,
     cursor: 'pointer', fontFamily: 'inherit',
+    boxShadow: '0 4px 20px rgba(0,212,255,0.32)',
+    transition: 'box-shadow 0.2s, transform 0.18s',
   },
 
   /* Full-plan modal */
   modalOverlay: {
     position: 'fixed' as const, inset: 0,
-    background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)',
+    background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(10px)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     zIndex: 100, padding: '1rem',
   },
   modalBox: {
-    background: 'var(--bg)', border: '1px solid var(--border)',
-    borderRadius: '16px', width: '100%', maxWidth: '760px',
+    background: 'rgba(10, 16, 32, 0.97)',
+    border: '1px solid rgba(0,212,255,0.18)',
+    borderRadius: '20px', width: '100%', maxWidth: '780px',
     maxHeight: '85vh', display: 'flex', flexDirection: 'column',
-    boxShadow: '0 24px 64px rgba(0,0,0,0.4)',
+    boxShadow: '0 24px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(0,212,255,0.06)',
+    backdropFilter: 'blur(20px)',
   },
   modalHeader: {
     display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-    padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', flexShrink: 0,
+    padding: '1.4rem 1.6rem', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0,
   },
-  modalTitle:  { margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--text-h)' },
-  modalSub:    { margin: '0.2rem 0 0', fontSize: '0.78rem', color: 'var(--text)' },
-  modalClose:  { background: 'transparent', border: 'none', color: 'var(--text)', fontSize: '1.1rem', cursor: 'pointer', padding: '0.2rem 0.4rem', borderRadius: '6px', lineHeight: 1 },
-  modalBody:   { flex: 1, overflowY: 'auto' as const, padding: '1.25rem 1.5rem' },
-  modalFooter: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem', padding: '1rem 1.5rem', borderTop: '1px solid var(--border)', flexShrink: 0 },
-  modalMentorLink: { fontSize: '0.82rem', color: '#818cf8', textDecoration: 'none', fontWeight: 500 },
+  modalTitle:  { margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-h)' },
+  modalSub:    { margin: '0.25rem 0 0', fontSize: '0.78rem', color: 'var(--text)' },
+  modalClose:  { background: 'transparent', border: 'none', color: 'var(--text)', fontSize: '1.15rem', cursor: 'pointer', padding: '0.25rem 0.5rem', borderRadius: '8px', lineHeight: 1 },
+  modalBody:   { flex: 1, overflowY: 'auto' as const, padding: '1.4rem 1.6rem' },
+  modalFooter: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem', padding: '1.1rem 1.6rem', borderTop: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 },
+  modalMentorLink: { fontSize: '0.82rem', color: '#00D4FF', textDecoration: 'none', fontWeight: 700 },
   modalCloseBtn: {
-    padding: '0.45rem 1.25rem', background: 'var(--accent)', border: 'none',
-    borderRadius: '8px', color: '#fff', fontSize: '0.82rem', fontWeight: 600,
+    padding: '0.52rem 1.4rem',
+    background: 'linear-gradient(135deg, #00D4FF, #7C3AED)',
+    border: 'none', borderRadius: '10px', color: '#fff', fontSize: '0.82rem', fontWeight: 700,
     fontFamily: 'inherit', cursor: 'pointer',
+    boxShadow: '0 4px 20px rgba(0,212,255,0.32)',
   },
 };
 
