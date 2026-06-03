@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import RecaptchaWidget from '../components/RecaptchaWidget';
 
-const RECAPTCHA_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MuLNMNjA';
+const RECAPTCHA_SITE_KEY = '6Lc66AotAAAAAEdE1ZBNHH6ahgCWLFQ9f-dfueL3';
 
 export default function Register() {
   const { register } = useAuth();
