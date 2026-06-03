@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-import httpx
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
@@ -24,27 +23,6 @@ from app.api.schemas.auth import (
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
-_RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify"
-
-
-def _verify_captcha(token: str) -> None:
-    try:
-        resp = httpx.post(
-            _RECAPTCHA_VERIFY_URL,
-            data={"secret": settings.recaptcha_secret_key, "response": token},
-            timeout=5.0,
-        )
-        if not resp.json().get("success"):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="CAPTCHA verification failed. Please complete the CAPTCHA and try again.",
-            )
-    except httpx.HTTPError:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="CAPTCHA service unavailable. Please try again.",
-        )
 bearer = HTTPBearer()
 
 _mail_conf = ConnectionConfig(
@@ -75,7 +53,6 @@ def get_current_user(
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register(payload: RegisterRequest, db: Session = Depends(get_db)):
-    _verify_captcha(payload.captcha_token)
     if db.query(User).filter(User.email == payload.email).first():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
     user = User(
@@ -91,7 +68,6 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
-    _verify_captcha(payload.captcha_token)
     user = db.query(User).filter(User.email == payload.email).first()
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")

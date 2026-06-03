@@ -3,36 +3,32 @@ import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import RecaptchaWidget from '../components/RecaptchaWidget';
-
-const RECAPTCHA_SITE_KEY = '6Lc66AotAAAAAEdE1ZBNHH6ahgCWLFQ9f-dfueL3';
+import CustomCaptcha from '../components/CustomCaptcha';
 
 export default function Login() {
   const { login } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const [email, setEmail]               = useState('');
-  const [password, setPassword]         = useState('');
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaKey, setCaptchaKey]     = useState(0);
-  const [error, setError]               = useState('');
-  const [loading, setLoading]           = useState(false);
+  const [email, setEmail]           = useState('');
+  const [password, setPassword]     = useState('');
+  const [captchaValid, setCaptchaValid] = useState(false);
+  const [captchaReset, setCaptchaReset] = useState(0);
+  const [error, setError]           = useState('');
+  const [loading, setLoading]       = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!captchaToken) return;
+    if (!captchaValid) return;
     setError('');
     setLoading(true);
     try {
-      await login(email, password, captchaToken);
+      await login(email, password);
       navigate('/');
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(detail ?? t('login_error'));
-      // reset captcha on failure by remounting the widget
-      setCaptchaKey(k => k + 1);
-      setCaptchaToken(null);
+      setCaptchaReset(r => r + 1);
     } finally {
       setLoading(false);
     }
@@ -69,18 +65,15 @@ export default function Login() {
             <Link to="/forgot-password" style={s.forgotLink}>{t('login_forgot')}</Link>
           </label>
 
-          <div style={s.captchaWrap}>
-            <RecaptchaWidget
-              key={captchaKey}
-              sitekey={RECAPTCHA_SITE_KEY}
-              onChange={setCaptchaToken}
-            />
-          </div>
+          <CustomCaptcha
+            onValid={setCaptchaValid}
+            resetKey={captchaReset}
+          />
 
           <button
             className="grad-btn"
             type="submit"
-            disabled={loading || !captchaToken}
+            disabled={loading || !captchaValid}
             style={{ marginTop: '0.25rem' }}
           >
             {loading ? t('login_btn_loading') : t('login_btn')}
@@ -97,14 +90,10 @@ export default function Login() {
 
 const s: Record<string, React.CSSProperties> = {
   page: {
-    minHeight: '100svh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    minHeight: '100svh', display: 'flex', alignItems: 'center', justifyContent: 'center',
     padding: '1.5rem',
     background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,212,255,0.12) 0%, transparent 70%), #060b18',
-    position: 'relative',
-    overflow: 'hidden',
+    position: 'relative', overflow: 'hidden',
   },
   orb1: {
     position: 'absolute', width: '600px', height: '600px', borderRadius: '50%',
@@ -126,9 +115,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: '2.75rem 2.25rem', borderRadius: '20px',
     boxShadow: '0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,212,255,0.1)',
   },
-  logoWrap: {
-    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.4rem',
-  },
+  logoWrap: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.4rem' },
   logoIcon: { fontSize: '1.6rem', color: '#00D4FF', lineHeight: 1, filter: 'drop-shadow(0 0 8px rgba(0,212,255,0.6))' },
   logoText: { fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' },
   tagline: { textAlign: 'center', fontSize: '0.8rem', color: '#475569', marginBottom: '1.75rem' },
@@ -143,11 +130,6 @@ const s: Record<string, React.CSSProperties> = {
     marginBottom: '1rem', padding: '0.65rem 1rem',
     background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
     borderRadius: '10px', color: '#f87171', fontSize: '0.875rem',
-  },
-  captchaWrap: {
-    padding: '0.25rem 0',
-    borderRadius: '12px',
-    overflow: 'hidden',
   },
   footer: { marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#475569' },
   link: { color: '#00D4FF', textDecoration: 'none', fontWeight: 600 },

@@ -7,13 +7,11 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     full_name: str
     password: str
-    captcha_token: str
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
-    captcha_token: str
 
 
 class TokenResponse(BaseModel):

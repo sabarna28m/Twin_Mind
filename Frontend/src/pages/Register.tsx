@@ -3,9 +3,7 @@ import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import RecaptchaWidget from '../components/RecaptchaWidget';
-
-const RECAPTCHA_SITE_KEY = '6Lc66AotAAAAAEdE1ZBNHH6ahgCWLFQ9f-dfueL3';
+import CustomCaptcha from '../components/CustomCaptcha';
 
 export default function Register() {
   const { register } = useAuth();
@@ -15,24 +13,23 @@ export default function Register() {
   const [fullName, setFullName]         = useState('');
   const [email, setEmail]               = useState('');
   const [password, setPassword]         = useState('');
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaKey, setCaptchaKey]     = useState(0);
+  const [captchaValid, setCaptchaValid] = useState(false);
+  const [captchaReset, setCaptchaReset] = useState(0);
   const [error, setError]               = useState('');
   const [loading, setLoading]           = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!captchaToken) return;
+    if (!captchaValid) return;
     setError('');
     setLoading(true);
     try {
-      await register(email, fullName, password, captchaToken);
+      await register(email, fullName, password);
       navigate('/login');
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(detail ?? t('register_error'));
-      setCaptchaKey(k => k + 1);
-      setCaptchaToken(null);
+      setCaptchaReset(r => r + 1);
     } finally {
       setLoading(false);
     }
@@ -74,18 +71,15 @@ export default function Register() {
               placeholder="Min. 8 characters" minLength={8} required />
           </label>
 
-          <div style={s.captchaWrap}>
-            <RecaptchaWidget
-              key={captchaKey}
-              sitekey={RECAPTCHA_SITE_KEY}
-              onChange={setCaptchaToken}
-            />
-          </div>
+          <CustomCaptcha
+            onValid={setCaptchaValid}
+            resetKey={captchaReset}
+          />
 
           <button
             className="grad-btn"
             type="submit"
-            disabled={loading || !captchaToken}
+            disabled={loading || !captchaValid}
             style={{ marginTop: '0.25rem' }}
           >
             {loading ? t('register_btn_loading') : t('register_btn')}
@@ -142,11 +136,6 @@ const s: Record<string, React.CSSProperties> = {
     marginBottom: '1rem', padding: '0.65rem 1rem',
     background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
     borderRadius: '10px', color: '#f87171', fontSize: '0.875rem',
-  },
-  captchaWrap: {
-    padding: '0.25rem 0',
-    borderRadius: '12px',
-    overflow: 'hidden',
   },
   footer: { marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#475569' },
   link: { color: '#00D4FF', textDecoration: 'none', fontWeight: 600 },

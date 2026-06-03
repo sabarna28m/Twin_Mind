@@ -26,8 +26,8 @@ interface AuthContextValue {
   token: string | null;
   studentProfile: StudentProfile | null;
   profileLoaded: boolean;
-  login: (email: string, password: string, captchaToken: string) => Promise<void>;
-  register: (email: string, fullName: string, password: string, captchaToken: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, fullName: string, password: string) => Promise<void>;
   logout: () => void;
   refreshStudentProfile: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -92,17 +92,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function login(email: string, password: string, captchaToken: string) {
-    const { data } = await api.post<{ access_token: string }>('/auth/login', {
-      email, password, captcha_token: captchaToken,
-    });
+  async function login(email: string, password: string) {
+    const { data } = await api.post<{ access_token: string }>('/auth/login', { email, password });
     localStorage.setItem('token', data.access_token);
     setProfileLoaded(false);
     setToken(data.access_token);
   }
 
-  async function register(email: string, fullName: string, password: string, captchaToken: string) {
-    await api.post('/auth/register', { email, full_name: fullName, password, captcha_token: captchaToken });
+  async function register(email: string, fullName: string, password: string) {
+    await api.post('/auth/register', { email, full_name: fullName, password });
   }
 
   function logout() {
