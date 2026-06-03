@@ -14,3 +14,9 @@ dist/
 # IDE
 .vscode/
 .idea/
+
+# Runtime artifacts
+*.db
+*.log
+*.log.err
+Backend/uploads/
