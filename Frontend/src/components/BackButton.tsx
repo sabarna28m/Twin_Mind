@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export default function BackButton() {
   return (
-    <Link to="/" style={{
+    <Link to="/" className="back-btn-link" style={{
       display: 'inline-flex',
       alignItems: 'center',
       fontSize: '0.78rem',
@@ -16,6 +16,7 @@ export default function BackButton() {
       flexShrink: 0,
       whiteSpace: 'nowrap' as const,
       letterSpacing: '0.01em',
+      minHeight: '36px',
     }}>
       ← Dashboard
     </Link>

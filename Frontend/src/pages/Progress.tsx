@@ -359,7 +359,7 @@ export default function Progress() {
         {!loading && summary && legacy && (
           <>
             {/* ── Overview stat cards ── */}
-            <div style={s.statsRow}>
+            <div style={s.statsRow} className="mob-stats-row-4">
               {[
                 { label: 'Total Check-ins',  value: summary.total_checkins,                 sub: 'all time',           grad: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
                 { label: 'Current Streak',   value: `${summary.current_streak}d`,           sub: `Best: ${summary.longest_streak}d`, grad: 'linear-gradient(135deg,#10b981,#06b6d4)' },
@@ -388,7 +388,7 @@ export default function Progress() {
             </div>
 
             {/* ── Charts row ── */}
-            <div style={s.twoCol}>
+            <div style={s.twoCol} className="mob-two-col">
               {/* Weekly trend */}
               <div style={s.card}>
                 <h2 style={s.cardTitle}>Weekly Score Trend</h2>
@@ -451,7 +451,7 @@ export default function Progress() {
             </div>
 
             {/* ── Bottom row: subjects + best/worst ── */}
-            <div style={s.twoCol}>
+            <div style={s.twoCol} className="mob-two-col">
               {/* Subject performance */}
               <div style={s.card}>
                 <h2 style={s.cardTitle}>Subject Sessions</h2>
@@ -520,7 +520,7 @@ export default function Progress() {
             {/* ── Sleep & stress averages ── */}
             <div style={{ ...s.card, marginBottom: 0 }}>
               <h2 style={s.cardTitle}>Wellness Averages</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.75rem' }} className="mob-wellness-row">
                 {[
                   { lbl: 'Avg Sleep', val: `${summary.avg_sleep_duration}h`, sub: 'target: 7–8h', ok: summary.avg_sleep_duration >= 7 && summary.avg_sleep_duration <= 8.5, grad: 'linear-gradient(135deg,#06b6d4,#6366f1)' },
                   { lbl: 'Avg Stress', val: `${summary.avg_stress_level}/10`, sub: 'target: ≤ 5', ok: summary.avg_stress_level <= 5, grad: 'linear-gradient(135deg,#f59e0b,#f97316)' },

@@ -36,12 +36,12 @@ export default function Register() {
   }
 
   return (
-    <div style={s.page}>
+    <div style={s.page} className="mob-auth-page">
       <div style={s.orb1} />
       <div style={s.orb2} />
       <div style={s.orb3} />
 
-      <div className="glass animate-slide-up" style={s.card}>
+      <div className="glass animate-slide-up mob-auth-card" style={s.card}>
         <div style={s.logoWrap}>
           <span style={s.logoIcon}>◈</span>
           <span className="grad-text" style={s.logoText}>TwinMind</span>

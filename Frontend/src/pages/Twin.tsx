@@ -415,7 +415,7 @@ export default function Twin() {
         {error && <p style={{ color: '#f87171', textAlign: 'center', marginTop: '3rem' }}>{error}</p>}
 
         {twin && (
-          <div style={s.grid}>
+          <div style={s.grid} className="mob-twin-row">
 
             {/* ── Level & XP card ── */}
             {progress && (
@@ -500,7 +500,7 @@ export default function Twin() {
             )}
 
             {/* Avatar card */}
-            <div style={s.avatarCard} className="animate-slide-up">
+            <div style={s.avatarCard} className="animate-slide-up mob-twin-avatar">
               {/* Avatar with rings + particles */}
               <div style={{ position: 'relative', width: '130px', height: '130px', marginBottom: '1rem' }}>
                 <Particles riskLevel={twin.risk_level} />
@@ -597,7 +597,7 @@ export default function Twin() {
             </div>
 
             {/* Vitals card */}
-            <div style={s.card} className="animate-slide-up">
+            <div style={s.card} className="animate-slide-up mob-twin-vitals">
               <h3 style={s.cardTitle}>Twin Vitals</h3>
               <ScoreBar label="Overall Score"       value={twin.overall_score}    grad={SCORE_GRADS[0]} delay={0} />
               <ScoreBar label="Academic Performance" value={twin.academic_score}   grad={SCORE_GRADS[1]} delay={100} />

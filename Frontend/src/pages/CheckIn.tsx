@@ -284,7 +284,7 @@ export default function CheckIn() {
               </label>
             </div>
 
-            <div style={s.row2}>
+            <div style={s.row2} className="mob-form-row">
               <label style={s.label}>
                 {t('checkin_study_hours')}
                 <input type="number" value={studyHours} onChange={e => setStudyHours(e.target.value)}
@@ -297,7 +297,7 @@ export default function CheckIn() {
               </label>
             </div>
 
-            <div style={s.row2}>
+            <div style={s.row2} className="mob-form-row">
               <label style={s.label}>
                 {t('checkin_attendance')}
                 <input type="number" value={attendance} onChange={e => setAttendance(e.target.value)}
@@ -310,7 +310,7 @@ export default function CheckIn() {
               </label>
             </div>
 
-            <div style={s.row2}>
+            <div style={s.row2} className="mob-form-row">
               <label style={s.label}>
                 {t('checkin_quiz_score')}
                 <input type="number" value={quizScore} onChange={e => setQuizScore(e.target.value)}

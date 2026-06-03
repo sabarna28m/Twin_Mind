@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, FileText, Upload, BarChart2, CheckSquare, Trophy, Brain, Zap, MessageCircle, Layers } from 'lucide-react';
+import { BookOpen, FileText, Upload, BarChart2, CheckSquare, Trophy, Brain, Zap, MessageCircle, Layers, Menu } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import ThemeToggle from '../components/ThemeToggle';
@@ -8,6 +8,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 import NotificationBell from '../components/NotificationBell';
 import PlanContent from '../components/PlanContent';
 import TutorialOverlay from '../components/TutorialOverlay';
+import MobileNav from '../components/MobileNav';
 import api from '../services/api';
 import { getLevelColor, getLevelGradient, LEVEL_NAMES, type GamificationProgress, type WeeklyChallengeData } from '../utils/gamification';
 
@@ -238,6 +239,7 @@ export default function Dashboard() {
   const [chQuiz,           setChQuiz]           = useState('');
   const [chCheckin,        setChCheckin]         = useState('');
   const [savingChallenge,  setSavingChallenge]  = useState(false);
+  const [drawerOpen,       setDrawerOpen]       = useState(false);
 
   const refreshData = useCallback(() => {
     Promise.all([
@@ -390,19 +392,36 @@ export default function Dashboard() {
   return (
     <div style={s.shell}>
 
+      {/* ── Mobile nav drawer ── */}
+      <MobileNav
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        userName={user?.full_name ?? undefined}
+        avatarSrc={avatarSrc ?? undefined}
+        onLogout={logout}
+      />
+
       {/* ── Navbar ── */}
-      <header style={s.nav} className="nav-premium">
+      <header style={s.nav} className="nav-premium mob-nav">
         <div style={s.navLeft}>
+          {/* Hamburger — mobile only */}
+          <button
+            className="mob-hamburger"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
           <span style={s.logoIcon}>◈</span>
           <span style={s.navLogo}>TwinMind</span>
           {wsConnected && (
-            <div style={s.liveBadge}>
+            <div style={s.liveBadge} className="mob-hide-mobile">
               <span style={s.liveDot} className="live-dot" />
               Live
             </div>
           )}
         </div>
-        <nav style={s.navCenter}>
+        <nav style={s.navCenter} className="mob-nav-links">
           {NAV_KEYS.map(({ key, to, Icon: NavIcon }) => (
             <Link key={to} to={to} className="nav-link" {...(NAV_TOUR[to] ? { 'data-tour': NAV_TOUR[to] } : {})}>
               <NavIcon size={13} strokeWidth={2.5} />
@@ -410,30 +429,32 @@ export default function Dashboard() {
             </Link>
           ))}
         </nav>
-        <div style={s.navRight}>
-          <LanguageSwitcher />
+        <div style={s.navRight} className="mob-nav-right">
+          <span className="mob-hide-mobile"><LanguageSwitcher /></span>
           <ThemeToggle />
-          <NotificationBell />
+          <span className="mob-hide-mobile"><NotificationBell /></span>
           <Link to="/profile" style={s.navUser} data-tour="profile">
             {avatarSrc
               ? <img src={avatarSrc} alt="" style={s.navAvatar} />
               : <span style={s.navInitials}>{firstName[0]?.toUpperCase()}</span>}
-            {user?.full_name}
+            <span className="mob-nav-user-text">{user?.full_name}</span>
           </Link>
-          <button className="sign-out-btn" onClick={logout}>{t('sign_out')}</button>
+          <span className="mob-hide-mobile">
+            <button className="sign-out-btn" onClick={logout}>{t('sign_out')}</button>
+          </span>
         </div>
       </header>
 
-      <main style={s.main}>
+      <main style={s.main} className="mob-dash-main">
 
         {/* ── Hero ── */}
-        <section style={s.heroCard} className="animate-slide-up hero-animated" data-tour="dashboard">
+        <section style={s.heroCard} className="animate-slide-up hero-animated mob-hero-card" data-tour="dashboard">
           <div style={s.heroOrb1} />
           <div style={s.heroOrb2} />
-          <div style={s.heroContent}>
+          <div style={s.heroContent} className="mob-hero-content">
 
             {/* Left */}
-            <div style={s.heroLeft}>
+            <div style={s.heroLeft} className="mob-hero-left">
               <p style={s.greetingLabel}>{greeting} ✦</p>
 
               <h1 style={s.heroName}>
@@ -451,7 +472,7 @@ export default function Dashboard() {
             </div>
 
             {/* Right — twin health */}
-            <div style={s.heroRight}>
+            <div style={s.heroRight} className="mob-hero-right">
               <div style={s.healthChip}>
                 <div style={{
                   ...s.healthDot,
@@ -510,7 +531,7 @@ export default function Dashboard() {
         </section>
 
         {/* ── Stat cards ── */}
-        <section style={s.statsGrid}>
+        <section style={s.statsGrid} className="mob-stats-4">
           <StatCard icon="▶"  grad="linear-gradient(135deg,#6366f1,#818cf8)" value={sessionCount} label={t('stat_sessions')}  delay={0}   />
           <StatCard icon="⏱"  grad="linear-gradient(135deg,#8b5cf6,#a78bfa)" value={totalHours}  unit="h" label={t('stat_hours')} delay={70}  />
           <StatCard icon="🔥" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={streak}      label={t('stat_streak')}   delay={140} />
@@ -590,7 +611,7 @@ export default function Dashboard() {
         )}
 
         {/* ── Chart + Actions ── */}
-        <div style={s.midRow}>
+        <div style={s.midRow} className="mob-mid-row">
 
           {/* 7-day chart */}
           <section style={s.panel} className="glass-panel">
@@ -619,7 +640,7 @@ export default function Dashboard() {
           {/* Quick actions icon grid */}
           <section style={s.panel} className="glass-panel">
             <h2 style={s.panelTitle}>{t('quick_actions')}</h2>
-            <div style={s.actionGrid}>
+            <div style={s.actionGrid} className="mob-action-grid">
               {QA_DEFS.map(a => (
                 <Link key={a.labelKey} to={a.to} style={{ textDecoration: 'none' }}>
                   <div className="action-tile" {...(a.to === '/predict' ? { 'data-tour': 'predict' } : {})}>
@@ -783,7 +804,7 @@ export default function Dashboard() {
               </div>
 
               {/* 7-day grid */}
-              <div style={sp.dayGrid}>
+              <div style={sp.dayGrid} className="mob-day-grid">
                 {smartPlan.days.map((d, i) => (
                   <div key={i} style={sp.dayCol}>
                     <p style={sp.dayName}>{d.day.slice(0, 3).toUpperCase()}</p>
@@ -821,8 +842,8 @@ export default function Dashboard() {
 
       {/* ── Full Plan Modal ── */}
       {showPlanModal && savedPlan && (
-        <div style={s.modalOverlay} onClick={() => setShowPlanModal(false)}>
-          <div style={s.modalBox} onClick={e => e.stopPropagation()}>
+        <div style={s.modalOverlay} className="mob-modal-overlay" onClick={() => setShowPlanModal(false)}>
+          <div style={s.modalBox} className="mob-modal-box" onClick={e => e.stopPropagation()}>
             <div style={s.modalHeader}>
               <div>
                 <p style={s.modalTitle}>{t('modal_plan_title')}</p>
