@@ -1,9 +1,9 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import RecaptchaWidget from '../components/RecaptchaWidget';
 
 const RECAPTCHA_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MuLNMNjA';
 
@@ -11,13 +11,13 @@ export default function Login() {
   const { login } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
-  const [email, setEmail]             = useState('');
-  const [password, setPassword]       = useState('');
+  const [email, setEmail]               = useState('');
+  const [password, setPassword]         = useState('');
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [error, setError]             = useState('');
-  const [loading, setLoading]         = useState(false);
+  const [captchaKey, setCaptchaKey]     = useState(0);
+  const [error, setError]               = useState('');
+  const [loading, setLoading]           = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -30,7 +30,8 @@ export default function Login() {
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(detail ?? t('login_error'));
-      recaptchaRef.current?.reset();
+      // reset captcha on failure by remounting the widget
+      setCaptchaKey(k => k + 1);
       setCaptchaToken(null);
     } finally {
       setLoading(false);
@@ -69,12 +70,10 @@ export default function Login() {
           </label>
 
           <div style={s.captchaWrap}>
-            <ReCAPTCHA
-              ref={recaptchaRef}
+            <RecaptchaWidget
+              key={captchaKey}
               sitekey={RECAPTCHA_SITE_KEY}
-              theme="dark"
-              onChange={token => setCaptchaToken(token)}
-              onExpired={() => setCaptchaToken(null)}
+              onChange={setCaptchaToken}
             />
           </div>
 
@@ -146,8 +145,6 @@ const s: Record<string, React.CSSProperties> = {
     borderRadius: '10px', color: '#f87171', fontSize: '0.875rem',
   },
   captchaWrap: {
-    display: 'flex',
-    justifyContent: 'center',
     padding: '0.25rem 0',
     borderRadius: '12px',
     overflow: 'hidden',
