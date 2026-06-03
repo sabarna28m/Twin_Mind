@@ -513,6 +513,55 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
 }
 
 /* ══════════════════════════════
+   Focus Session component
+   ══════════════════════════════ */
+
+/* Preset quick-select buttons */
+.focus-preset-btn:hover:not(:disabled) {
+  background: rgba(0,212,255,0.15) !important;
+  border-color: rgba(0,212,255,0.45) !important;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 4px 16px rgba(0,212,255,0.18);
+}
+.focus-preset-btn:active:not(:disabled) { transform: scale(0.97); }
+
+/* Control buttons */
+.focus-ctrl-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+}
+.focus-ctrl-btn:active:not(:disabled) { transform: translateY(0) scale(0.97); }
+.focus-ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Spinner-style number input: hide arrows (Chrome/Safari) */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* History item hover */
+.history-item-hover:hover { background: rgba(0,212,255,0.04); }
+
+/* Responsive: compact layout on small screens */
+@media (max-width: 480px) {
+  /* Shrink timer circle */
+  .focus-circle-wrap svg { width: 180px !important; height: 180px !important; }
+  .focus-time-display { font-size: 1.6rem !important; }
+
+  /* Stack preset buttons to 2-col */
+  .focus-presets { gap: 0.4rem !important; }
+}
+
+/* Light theme adjustments */
+html[data-theme="light"] .focus-preset-btn {
+  background: rgba(0,212,255,0.07) !important;
+  border-color: rgba(0,212,255,0.3) !important;
+}
+html[data-theme="light"] .focus-ctrl-ghost {
+  background: rgba(0,0,0,0.04) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  color: #475569 !important;
+}
+
+/* ══════════════════════════════
    Theme toggle button
    ══════════════════════════════ */
 

@@ -194,6 +194,7 @@ const QA_DEFS = [
   { labelKey: 'qa_twin',         descKey: 'qa_desc_twin',     icon: '◈',  grad: 'linear-gradient(135deg,#06b6d4,#6366f1)', to: '/twin'         },
   { labelKey: 'qa_checkin',      descKey: 'qa_desc_log',      icon: '✓',  grad: 'linear-gradient(135deg,#34d399,#10b981)', to: '/checkin'      },
   { labelKey: 'qa_battles',      descKey: 'qa_desc_battles',  icon: '⚔️', grad: 'linear-gradient(135deg,#ef4444,#f97316)', to: '/battles'      },
+  { labelKey: 'qa_focus',        descKey: 'qa_desc_focus',    icon: '⏱',  grad: 'linear-gradient(135deg,#00D4FF,#7C3AED)', to: '/focus'        },
 ];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }

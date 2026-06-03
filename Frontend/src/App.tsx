@@ -22,6 +22,7 @@ import Quiz from './pages/Quiz';
 import Battles from './pages/Battles';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import FocusSession from './pages/FocusSession';
 
 export default function App() {
   return (
@@ -151,6 +152,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Battles />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/focus"
+            element={
+              <ProtectedRoute>
+                <FocusSession />
               </ProtectedRoute>
             }
           />
