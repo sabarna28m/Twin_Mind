@@ -6,8 +6,10 @@ AI Study Video Recommendations
 """
 
 import json
+import os
 import re
 import time
+from pathlib import Path
 from typing import List
 
 import httpx
@@ -17,6 +19,35 @@ from pydantic import BaseModel
 from app.api.routes.auth import get_current_user
 from app.core.config import settings
 from app.models.user import User
+
+# Absolute path to Backend/.env  (config.py → core/ → app/ → Backend/)
+_ENV_FILE = Path(__file__).resolve().parents[3] / ".env"
+
+
+def _get_youtube_key() -> str:
+    """
+    Read YOUTUBE_API_KEY with three fallbacks so the server does NOT need
+    to be restarted after the key is added to .env:
+
+    1. settings.youtube_api_key  — populated at startup if key was present then
+    2. os.environ                — populated if the var was exported in the shell
+    3. Direct .env file read     — works even when the file changed post-startup
+    """
+    key = settings.youtube_api_key or os.environ.get("YOUTUBE_API_KEY", "")
+    if key:
+        return key
+
+    # Fallback: parse .env ourselves so a server restart is not required
+    if _ENV_FILE.exists():
+        for line in _ENV_FILE.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line.startswith("YOUTUBE_API_KEY=") and not line.startswith("#"):
+                value = line.split("=", 1)[1].strip().strip('"').strip("'")
+                if value:
+                    # Cache it back into os.environ so subsequent calls are free
+                    os.environ["YOUTUBE_API_KEY"] = value
+                    return value
+    return ""
 
 router = APIRouter(prefix="/videos", tags=["videos"])
 
@@ -300,13 +331,13 @@ async def search_study_videos(
         if now - ts < CACHE_TTL:
             return {**cached, "cached": True}
 
-    # API key guard
-    api_key = getattr(settings, "youtube_api_key", "")
+    # API key guard — reads live from .env so no server restart is needed
+    api_key = _get_youtube_key()
     if not api_key:
         raise HTTPException(
             503,
             "YouTube API key not configured. "
-            "Add YOUTUBE_API_KEY=<your-key> to Backend/.env and restart the server. "
+            "Add YOUTUBE_API_KEY=<your-key> to Backend/.env. "
             "Get a free key at https://console.cloud.google.com → YouTube Data API v3."
         )
 
