@@ -24,6 +24,7 @@ from app.models import battle  # noqa: F401
 from app.models import google_token  # noqa: F401
 from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes, notifications as notif_routes, quiz as quiz_routes, gamification as gamif_routes, battles as battle_routes, calendar as calendar_routes, smart_plan as smart_plan_routes
 from app.api.routes import websocket as ws_routes
+from app.api.routes import videos as video_routes
 from app.ml.predictor import get_model  # warm up model at startup
 
 Base.metadata.create_all(bind=engine)
@@ -159,6 +160,7 @@ app.include_router(gamif_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(battle_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(calendar_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(smart_plan_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(video_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(ws_routes.router)
 
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"

@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     groq_api_key: str = ""
     gemini_api_key: str = ""
+    youtube_api_key: str = ""
 
     mail_username: str = ""
     mail_password: str = ""

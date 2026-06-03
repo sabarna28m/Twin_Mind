@@ -550,6 +550,93 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
   .focus-presets { gap: 0.4rem !important; }
 }
 
+/* ══════════════════════════════
+   Study Videos component
+   ══════════════════════════════ */
+
+/* Skeleton pulse */
+@keyframes sv-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+.sv-pulse { animation: sv-pulse 1.5s ease-in-out infinite; }
+
+/* Spinner */
+@keyframes sv-spin {
+  to { transform: rotate(360deg); }
+}
+.sv-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: sv-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Video card hover */
+.sv-card:hover {
+  transform: translateY(-5px) scale(1.01);
+}
+.sv-card:hover .sv-thumb-wrap img {
+  transform: scale(1.04);
+}
+.sv-play-overlay:hover { background: rgba(0,0,0,0.25) !important; }
+.sv-play-overlay:hover > div {
+  transform: scale(1.12);
+  box-shadow: 0 0 36px rgba(0,212,255,0.7) !important;
+}
+
+/* Buttons */
+.sv-watch-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.sv-preview-btn:hover {
+  background: rgba(0,212,255,0.14) !important;
+  transform: translateY(-1px);
+}
+
+/* Search input glow */
+.sv-search-input:focus {
+  border-color: rgba(0,212,255,0.5) !important;
+  box-shadow: 0 0 0 3px rgba(0,212,255,0.1) !important;
+}
+.sv-search-btn:not(:disabled):hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 32px rgba(0,212,255,0.5) !important;
+}
+
+/* Quick topic chips */
+.sv-chip:hover:not(:disabled) {
+  background: rgba(0,212,255,0.1) !important;
+  border-color: rgba(0,212,255,0.3) !important;
+  color: #00D4FF !important;
+  transform: translateY(-2px);
+}
+
+/* Prerequisite chips */
+.sv-prereq-chip:hover:not(:disabled) {
+  background: rgba(245,158,11,0.18) !important;
+  transform: translateY(-1px);
+}
+
+/* Responsive: single column on mobile */
+@media (max-width: 540px) {
+  .sv-card { border-radius: 14px !important; }
+}
+
+/* Light theme overrides for videos */
+html[data-theme="light"] .sv-chip {
+  background: rgba(0,0,0,0.04) !important;
+  border-color: rgba(0,0,0,0.09) !important;
+  color: var(--text-m) !important;
+}
+html[data-theme="light"] .sv-chip:hover:not(:disabled) {
+  background: rgba(0,212,255,0.1) !important;
+  border-color: rgba(0,212,255,0.3) !important;
+  color: #0098b8 !important;
+}
+
 /* Light theme adjustments */
 html[data-theme="light"] .focus-preset-btn {
   background: rgba(0,212,255,0.07) !important;
