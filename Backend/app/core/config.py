@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     google_client_secret: str = ""
     google_redirect_uri: str = "http://localhost:8000/api/v1/calendar/callback"
 
+    # Google reCAPTCHA — defaults are Google's official test keys (always pass)
+    recaptcha_secret_key: str = "6LeIxAcTAAAAAGG-vFI1TnRWxMIksjbgpeBS8bJ8"
+
     class Config:
         env_file = ".env"
         extra = "ignore"

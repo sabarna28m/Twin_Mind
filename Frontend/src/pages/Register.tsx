@@ -1,29 +1,38 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+
+const RECAPTCHA_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MuLNMNjA';
 
 export default function Register() {
   const { register } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
+  const [fullName, setFullName]         = useState('');
+  const [email, setEmail]               = useState('');
+  const [password, setPassword]         = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [error, setError]               = useState('');
+  const [loading, setLoading]           = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!captchaToken) return;
     setError('');
     setLoading(true);
     try {
-      await register(email, fullName, password);
+      await register(email, fullName, password, captchaToken);
       navigate('/login');
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg ?? t('register_error'));
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(detail ?? t('register_error'));
+      recaptchaRef.current?.reset();
+      setCaptchaToken(null);
     } finally {
       setLoading(false);
     }
@@ -64,7 +73,23 @@ export default function Register() {
               onChange={e => setPassword(e.target.value)}
               placeholder="Min. 8 characters" minLength={8} required />
           </label>
-          <button className="grad-btn" type="submit" disabled={loading} style={{ marginTop: '0.5rem' }}>
+
+          <div style={s.captchaWrap}>
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={RECAPTCHA_SITE_KEY}
+              theme="dark"
+              onChange={token => setCaptchaToken(token)}
+              onExpired={() => setCaptchaToken(null)}
+            />
+          </div>
+
+          <button
+            className="grad-btn"
+            type="submit"
+            disabled={loading || !captchaToken}
+            style={{ marginTop: '0.25rem' }}
+          >
             {loading ? t('register_btn_loading') : t('register_btn')}
           </button>
         </form>
@@ -81,31 +106,31 @@ const s: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100svh', display: 'flex', alignItems: 'center', justifyContent: 'center',
     padding: '1.5rem',
-    background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(139,92,246,0.18) 0%, transparent 70%), #080d1a',
+    background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,0.14) 0%, transparent 70%), #060b18',
     position: 'relative', overflow: 'hidden',
   },
   orb1: {
     position: 'absolute', width: '600px', height: '600px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(139,92,246,0.16) 0%, transparent 65%)',
+    background: 'radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 65%)',
     top: '-220px', right: '-180px', animation: 'orb-drift-2 13s ease-in-out infinite', pointerEvents: 'none',
   },
   orb2: {
     position: 'absolute', width: '450px', height: '450px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(99,102,241,0.14) 0%, transparent 65%)',
+    background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 65%)',
     bottom: '-120px', left: '-120px', animation: 'orb-drift-1 11s ease-in-out infinite', pointerEvents: 'none',
   },
   orb3: {
     position: 'absolute', width: '280px', height: '280px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(6,182,212,0.09) 0%, transparent 65%)',
+    background: 'radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 65%)',
     top: '25%', left: '5%', animation: 'orb-drift-3 9s ease-in-out infinite', pointerEvents: 'none',
   },
   card: {
     position: 'relative', zIndex: 1, width: '100%', maxWidth: '420px',
     padding: '2.75rem 2.25rem', borderRadius: '20px',
-    boxShadow: '0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
+    boxShadow: '0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.15)',
   },
   logoWrap: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.4rem' },
-  logoIcon: { fontSize: '1.6rem', color: '#6366f1', lineHeight: 1 },
+  logoIcon: { fontSize: '1.6rem', color: '#00D4FF', lineHeight: 1, filter: 'drop-shadow(0 0 8px rgba(0,212,255,0.6))' },
   logoText: { fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' },
   tagline: { textAlign: 'center', fontSize: '0.8rem', color: '#475569', marginBottom: '1.75rem' },
   title: { fontSize: '1.25rem', fontWeight: 700, color: '#f1f5f9', textAlign: 'center', marginBottom: '1.5rem' },
@@ -120,6 +145,13 @@ const s: Record<string, React.CSSProperties> = {
     background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
     borderRadius: '10px', color: '#f87171', fontSize: '0.875rem',
   },
+  captchaWrap: {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '0.25rem 0',
+    borderRadius: '12px',
+    overflow: 'hidden',
+  },
   footer: { marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#475569' },
-  link: { color: '#818cf8', textDecoration: 'none', fontWeight: 600 },
+  link: { color: '#00D4FF', textDecoration: 'none', fontWeight: 600 },
 };

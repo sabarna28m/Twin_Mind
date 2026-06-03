@@ -1,27 +1,37 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+
+const RECAPTCHA_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MuLNMNjA';
 
 export default function Login() {
   const { login } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
+  const [email, setEmail]             = useState('');
+  const [password, setPassword]       = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [error, setError]             = useState('');
+  const [loading, setLoading]         = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!captchaToken) return;
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      await login(email, password, captchaToken);
       navigate('/');
-    } catch {
-      setError(t('login_error'));
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(detail ?? t('login_error'));
+      recaptchaRef.current?.reset();
+      setCaptchaToken(null);
     } finally {
       setLoading(false);
     }
@@ -57,7 +67,23 @@ export default function Login() {
               placeholder="••••••••" required />
             <Link to="/forgot-password" style={s.forgotLink}>{t('login_forgot')}</Link>
           </label>
-          <button className="grad-btn" type="submit" disabled={loading} style={{ marginTop: '0.5rem' }}>
+
+          <div style={s.captchaWrap}>
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={RECAPTCHA_SITE_KEY}
+              theme="dark"
+              onChange={token => setCaptchaToken(token)}
+              onExpired={() => setCaptchaToken(null)}
+            />
+          </div>
+
+          <button
+            className="grad-btn"
+            type="submit"
+            disabled={loading || !captchaToken}
+            style={{ marginTop: '0.25rem' }}
+          >
             {loading ? t('login_btn_loading') : t('login_btn')}
           </button>
         </form>
@@ -77,34 +103,34 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     padding: '1.5rem',
-    background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.18) 0%, transparent 70%), #080d1a',
+    background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,212,255,0.12) 0%, transparent 70%), #060b18',
     position: 'relative',
     overflow: 'hidden',
   },
   orb1: {
     position: 'absolute', width: '600px', height: '600px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 65%)',
+    background: 'radial-gradient(circle, rgba(0,212,255,0.14) 0%, transparent 65%)',
     top: '-200px', left: '-200px', animation: 'orb-drift-1 12s ease-in-out infinite', pointerEvents: 'none',
   },
   orb2: {
     position: 'absolute', width: '500px', height: '500px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(139,92,246,0.14) 0%, transparent 65%)',
+    background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 65%)',
     bottom: '-150px', right: '-150px', animation: 'orb-drift-2 14s ease-in-out infinite', pointerEvents: 'none',
   },
   orb3: {
     position: 'absolute', width: '300px', height: '300px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 65%)',
+    background: 'radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 65%)',
     bottom: '15%', left: '15%', animation: 'orb-drift-3 10s ease-in-out infinite', pointerEvents: 'none',
   },
   card: {
     position: 'relative', zIndex: 1, width: '100%', maxWidth: '420px',
     padding: '2.75rem 2.25rem', borderRadius: '20px',
-    boxShadow: '0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
+    boxShadow: '0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,212,255,0.1)',
   },
   logoWrap: {
     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.4rem',
   },
-  logoIcon: { fontSize: '1.6rem', color: '#6366f1', lineHeight: 1 },
+  logoIcon: { fontSize: '1.6rem', color: '#00D4FF', lineHeight: 1, filter: 'drop-shadow(0 0 8px rgba(0,212,255,0.6))' },
   logoText: { fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' },
   tagline: { textAlign: 'center', fontSize: '0.8rem', color: '#475569', marginBottom: '1.75rem' },
   title: { fontSize: '1.25rem', fontWeight: 700, color: '#f1f5f9', textAlign: 'center', marginBottom: '1.5rem' },
@@ -119,10 +145,17 @@ const s: Record<string, React.CSSProperties> = {
     background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
     borderRadius: '10px', color: '#f87171', fontSize: '0.875rem',
   },
+  captchaWrap: {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '0.25rem 0',
+    borderRadius: '12px',
+    overflow: 'hidden',
+  },
   footer: { marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#475569' },
-  link: { color: '#818cf8', textDecoration: 'none', fontWeight: 600 },
+  link: { color: '#00D4FF', textDecoration: 'none', fontWeight: 600 },
   forgotLink: {
-    alignSelf: 'flex-end', fontSize: '0.75rem', color: '#6366f1',
+    alignSelf: 'flex-end', fontSize: '0.75rem', color: '#00D4FF',
     textDecoration: 'none', fontWeight: 500, marginTop: '2px',
   },
 };
