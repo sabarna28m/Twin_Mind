@@ -49,11 +49,11 @@ const T: Record<LangCode, Translations> = {
     qa_sessions: 'Sessions', qa_materials: 'Materials', qa_progress: 'Progress',
     qa_quiz: 'Quiz', qa_predict: 'Predict', qa_achievements: 'Achievements',
     qa_simulate: 'Simulate', qa_mentor: 'Mentor', qa_twin: 'Twin',
-    qa_checkin: 'Check-in', qa_language: 'Language', qa_battles: 'Battles', qa_focus: 'Focus', qa_videos: 'AI Videos', qa_burnout: 'Burnout',
+    qa_checkin: 'Check-in', qa_language: 'Language', qa_battles: 'Battles', qa_focus: 'Focus', qa_videos: 'AI Videos', qa_burnout: 'Burnout', qa_subjects: 'Subjects',
     qa_desc_study: 'Study', qa_desc_upload: 'Upload', qa_desc_analytics: 'Analytics',
     qa_desc_quiz: 'AI Quiz', qa_desc_ml: 'ML Score', qa_desc_badges: 'Badges',
     qa_desc_whatif: 'What-If', qa_desc_advice: 'AI Advice', qa_desc_twin: 'Digital Twin',
-    qa_desc_log: 'Log Today', qa_desc_language: 'Switch', qa_desc_battles: 'vs Peers', qa_desc_focus: 'Deep Work', qa_desc_videos: 'YouTube AI', qa_desc_burnout: 'Risk Score',
+    qa_desc_log: 'Log Today', qa_desc_language: 'Switch', qa_desc_battles: 'vs Peers', qa_desc_focus: 'Deep Work', qa_desc_videos: 'YouTube AI', qa_desc_burnout: 'Risk Score', qa_desc_subjects: 'Heatmap',
     /* study plan */
     my_study_plan: 'My Study Plan', generate_new: 'Generate new →', view_full_plan: 'View Full Plan',
     no_plan_title: 'No saved study plan yet',

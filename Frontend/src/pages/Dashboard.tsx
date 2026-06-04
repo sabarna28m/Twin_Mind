@@ -12,6 +12,7 @@ import MobileNav from '../components/MobileNav';
 import api from '../services/api';
 import { getLevelColor, getLevelGradient, LEVEL_NAMES, type GamificationProgress, type WeeklyChallengeData } from '../utils/gamification';
 import BurnoutWidget from '../components/BurnoutWidget';
+import SubjectWidgets from '../components/SubjectWidgets';
 
 const BACKEND = 'http://localhost:8000';
 
@@ -199,6 +200,7 @@ const QA_DEFS = [
   { labelKey: 'qa_focus',        descKey: 'qa_desc_focus',    icon: '⏱',  grad: 'linear-gradient(135deg,#00D4FF,#7C3AED)', to: '/focus'        },
   { labelKey: 'qa_videos',       descKey: 'qa_desc_videos',   icon: '▶',  grad: 'linear-gradient(135deg,#ef4444,#f97316)', to: '/videos'       },
   { labelKey: 'qa_burnout',      descKey: 'qa_desc_burnout',  icon: '🧠', grad: 'linear-gradient(135deg,#ef4444,#f59e0b)', to: '/burnout'      },
+  { labelKey: 'qa_subjects',     descKey: 'qa_desc_subjects', icon: '📊', grad: 'linear-gradient(135deg,#6366f1,#06b6d4)', to: '/subjects'     },
 ];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }
@@ -541,6 +543,18 @@ export default function Dashboard() {
           <Link to="/achievements" style={{ textDecoration: 'none' }}>
             <StatCard icon="🏆" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={badgeCount} label={t('stat_badges')} delay={280} />
           </Link>
+        </section>
+
+        {/* ── Subject Performance Widgets ── */}
+        <section style={s.panel} className="glass-panel">
+          <div style={s.panelHead}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '1rem' }}>📊</span>
+              <h2 style={s.panelTitle}>Subject Performance</h2>
+            </div>
+            <Link to="/subjects" style={s.panelCta}>Full Analysis →</Link>
+          </div>
+          <SubjectWidgets />
         </section>
 
         {/* ── Burnout Risk Widget ── */}

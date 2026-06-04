@@ -902,3 +902,15 @@ html[data-theme="light"] .focus-ctrl-ghost {
 @media (max-width: 600px) {
   .burnout-alert-actions { flex-direction: column !important; align-items: flex-start !important; }
 }
+
+/* ── Subject Analysis responsive ── */
+@media (max-width: 900px) {
+  .subj-det-grid  { grid-template-columns: repeat(2,1fr) !important; }
+  .subj-widget-grid { grid-template-columns: repeat(2,1fr) !important; }
+}
+@media (max-width: 600px) {
+  .subj-det-grid  { grid-template-columns: 1fr 1fr !important; }
+  .subj-heatmap   { grid-template-columns: repeat(2,1fr) !important; }
+  .subj-rec-grid  { grid-template-columns: 1fr !important; }
+  .subj-widget-grid { grid-template-columns: 1fr !important; }
+}
