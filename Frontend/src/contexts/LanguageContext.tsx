@@ -805,7 +805,7 @@ const T: Record<LangCode, Translations> = {
     qa_desc_study: 'Estudiar', qa_desc_upload: 'Subir', qa_desc_analytics: 'Análisis',
     qa_desc_quiz: 'Quiz IA', qa_desc_ml: 'Puntuación ML', qa_desc_badges: 'Insignias',
     qa_desc_whatif: 'Y si…', qa_desc_advice: 'Consejo IA', qa_desc_twin: 'Gemelo digital',
-    qa_desc_log: 'Registrar hoy', qa_desc_language: 'Cambiar', qa_desc_battles: 'vs Amigos', qa_desc_focus: 'Trabalho Profundo', qa_desc_videos: 'YouTube IA', qa_desc_focus: 'Trabajo Profundo', qa_desc_videos: 'YouTube IA',
+    qa_desc_log: 'Registrar hoy', qa_desc_language: 'Cambiar', qa_desc_battles: 'vs Amigos', qa_desc_focus: 'Trabajo Profundo', qa_desc_videos: 'YouTube IA',
     my_study_plan: 'Mi plan de estudio', generate_new: 'Generar nuevo →',
     view_full_plan: 'Ver plan completo',
     no_plan_title: 'Sin plan de estudio aún',

@@ -64,7 +64,7 @@ export default function SubjectWidgets() {
   if (!data || (!data.weakest && !data.strongest && !data.focus_today)) return (
     <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '18px', padding: '1.5rem', textAlign: 'center' as const }}>
       <p style={{ margin: '0 0 0.6rem', fontSize: '1.5rem' }}>📊</p>
-      <p style={{ margin: '0 0 0.85rem', fontSize: '0.85rem', color: 'var(--text)', fontWeight: 600, color: 'var(--text-h)' }}>No subject data yet</p>
+      <p style={{ margin: '0 0 0.85rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-h)' }}>No subject data yet</p>
       <Link to="/subjects" style={{ fontSize: '0.8rem', fontWeight: 700, color: '#818cf8', textDecoration: 'none', padding: '0.35rem 0.9rem', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '8px' }}>
         Add First Record →
       </Link>

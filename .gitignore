@@ -20,3 +20,8 @@ dist/
 *.log
 *.log.err
 Backend/uploads/
+
+# Env files — NEVER commit real secrets
+.env
+.env.*
+!.env.example

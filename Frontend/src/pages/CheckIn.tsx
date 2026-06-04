@@ -249,7 +249,7 @@ export default function CheckIn() {
   return (
     <div style={s.shell}>
       {newBadges.length > 0 && <BadgeNotification badges={newBadges} onDone={() => setNewBadges([])} />}
-      {levelUpData && <LevelUpCelebration type="level_up" level={levelUpData.level} levelName={levelUpData.level_name} xp={levelUpData.xp} onClose={() => setLevelUpData(null)} />}
+      {levelUpData && <LevelUpCelebration type="level_up" level={levelUpData.level} xp={levelUpData.xp} onClose={() => setLevelUpData(null)} />}
       {streakMilestone && <LevelUpCelebration type="streak" streak={streakMilestone} onClose={() => setStreakMilestone(null)} />}
 
       <header style={s.nav}>
