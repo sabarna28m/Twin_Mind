@@ -26,6 +26,7 @@ import FocusSession from './pages/FocusSession';
 import StudyVideos from './pages/StudyVideos';
 import Burnout from './pages/Burnout';
 import SubjectAnalysis from './pages/SubjectAnalysis';
+import AIFocusDetector from './pages/AIFocusDetector';
 
 export default function App() {
   return (
@@ -187,6 +188,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <SubjectAnalysis />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai-focus"
+            element={
+              <ProtectedRoute>
+                <AIFocusDetector />
               </ProtectedRoute>
             }
           />

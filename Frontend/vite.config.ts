@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    exclude: ['@vladmandic/face-api'],
+  },
   server: {
     host: true,        // listen on 0.0.0.0 so Docker port mapping works
     port: 5173,

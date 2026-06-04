@@ -54,6 +54,7 @@ const T: Record<LangCode, Translations> = {
     qa_desc_quiz: 'AI Quiz', qa_desc_ml: 'ML Score', qa_desc_badges: 'Badges',
     qa_desc_whatif: 'What-If', qa_desc_advice: 'AI Advice', qa_desc_twin: 'Digital Twin',
     qa_desc_log: 'Log Today', qa_desc_language: 'Switch', qa_desc_battles: 'vs Peers', qa_desc_focus: 'Deep Work', qa_desc_videos: 'YouTube AI', qa_desc_burnout: 'Risk Score', qa_desc_subjects: 'Heatmap',
+    qa_ai_focus: 'AI Focus', qa_desc_ai_focus: 'Eye Track',
     /* study plan */
     my_study_plan: 'My Study Plan', generate_new: 'Generate new →', view_full_plan: 'View Full Plan',
     no_plan_title: 'No saved study plan yet',

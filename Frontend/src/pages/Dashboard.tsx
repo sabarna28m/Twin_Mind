@@ -201,6 +201,7 @@ const QA_DEFS = [
   { labelKey: 'qa_videos',       descKey: 'qa_desc_videos',   icon: '▶',  grad: 'linear-gradient(135deg,#ef4444,#f97316)', to: '/videos'       },
   { labelKey: 'qa_burnout',      descKey: 'qa_desc_burnout',  icon: '🧠', grad: 'linear-gradient(135deg,#ef4444,#f59e0b)', to: '/burnout'      },
   { labelKey: 'qa_subjects',     descKey: 'qa_desc_subjects', icon: '📊', grad: 'linear-gradient(135deg,#6366f1,#06b6d4)', to: '/subjects'     },
+  { labelKey: 'qa_ai_focus',    descKey: 'qa_desc_ai_focus', icon: '👁',  grad: 'linear-gradient(135deg,#10b981,#00D4FF)', to: '/ai-focus'     },
 ];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }
