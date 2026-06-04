@@ -159,6 +159,12 @@ with engine.connect() as _conn:
         ),
         "CREATE INDEX IF NOT EXISTS ix_subject_records_user_id ON subject_records(user_id)",
         "CREATE INDEX IF NOT EXISTS ix_subject_records_subject ON subject_records(subject)",
+        # AI notification fields
+        "ALTER TABLE notifications ADD COLUMN priority VARCHAR(20)",
+        "ALTER TABLE notifications ADD COLUMN category VARCHAR(50)",
+        "ALTER TABLE notifications ADD COLUMN emoji VARCHAR(10)",
+        "ALTER TABLE notifications ADD COLUMN title VARCHAR(200)",
+        "ALTER TABLE notifications ADD COLUMN action_url VARCHAR(300)",
     ]:
         try:
             _conn.execute(text(_sql))

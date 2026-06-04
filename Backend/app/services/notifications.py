@@ -11,6 +11,11 @@ def _create(
     notification_type: str,
     message: str,
     reference_key: Optional[str] = None,
+    priority: Optional[str] = None,
+    category: Optional[str] = None,
+    emoji: Optional[str] = None,
+    title: Optional[str] = None,
+    action_url: Optional[str] = None,
 ) -> Optional[Notification]:
     if reference_key:
         exists = db.query(Notification).filter(
@@ -24,6 +29,11 @@ def _create(
         notification_type=notification_type,
         message=message,
         reference_key=reference_key,
+        priority=priority,
+        category=category,
+        emoji=emoji,
+        title=title,
+        action_url=action_url,
     )
     db.add(n)
     db.commit()
