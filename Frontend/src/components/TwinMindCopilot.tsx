@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000/api/v1';
+import { API_URL as API_BASE } from '../lib/config';
 
 interface Msg { id: string; role: 'user' | 'assistant'; content: string; streaming?: boolean }
 function uid() { return Math.random().toString(36).slice(2); }

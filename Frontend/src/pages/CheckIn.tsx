@@ -4,6 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { WS_URL } from '../lib/config';
 import BadgeNotification, { type Badge } from '../components/BadgeNotification';
 import BackButton from '../components/BackButton';
 import LevelUpCelebration from '../components/LevelUpCelebration';
@@ -120,7 +121,7 @@ export default function CheckIn() {
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
     const connect = () => {
       if (dead) return;
-      const ws = new WebSocket(`ws://localhost:8000/ws/${user.id}?token=${encodeURIComponent(token)}`);
+      const ws = new WebSocket(`${WS_URL}/ws/${user.id}?token=${encodeURIComponent(token)}`);
       wsRef.current = ws;
       ws.onopen  = () => setWsConnected(true);
       ws.onmessage = (event) => {

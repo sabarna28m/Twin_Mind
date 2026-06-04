@@ -9,7 +9,7 @@ import LiveBadge from '../components/LiveBadge';
 import PlanContent from '../components/PlanContent';
 import BackButton from '../components/BackButton';
 
-const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000/api/v1';
+import { API_URL as API_BASE } from '../lib/config';
 
 interface ChatMessage {
   id: string;

@@ -5,10 +5,16 @@ class Settings(BaseSettings):
     app_name: str = "TwinMind API"
     debug: bool = False
     api_v1_prefix: str = "/api/v1"
+
+    # CORS — comma-separated in env: CORS_ORIGINS=https://twinmind.vercel.app,http://localhost:5173
     cors_origins: list[str] = [
         "http://localhost:5173",
         "http://localhost:5174",
     ]
+
+    # Database — SQLite for local dev, PostgreSQL for production
+    # Set DATABASE_URL=postgresql://user:pass@host:port/dbname on Render
+    database_url: str = "sqlite:///./twinmind.db"
 
     secret_key: str = "change-me-in-production-use-a-long-random-string"
     algorithm: str = "HS256"
@@ -29,7 +35,6 @@ class Settings(BaseSettings):
     google_client_secret: str = ""
     google_redirect_uri: str = "http://localhost:8000/api/v1/calendar/callback"
 
-    # Google reCAPTCHA — defaults are Google's official test keys (always pass)
     recaptcha_secret_key: str = "6LeIxAcTAAAAAGG-vFI1TnRWxMIksjbgpeBS8bJ8"
 
     class Config:

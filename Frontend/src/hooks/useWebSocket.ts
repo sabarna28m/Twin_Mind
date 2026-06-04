@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { WS_URL } from '../lib/config';
 
 /**
  * Connects to the backend WebSocket at /ws/{userId} and returns whether
@@ -25,7 +26,7 @@ export function useWebSocket(
     const connect = () => {
       if (dead) return;
       const ws = new WebSocket(
-        `ws://localhost:8000/ws/${userId}?token=${encodeURIComponent(token)}`
+        `${WS_URL}/ws/${userId}?token=${encodeURIComponent(token)}`
       );
       wsRef.current = ws;
 

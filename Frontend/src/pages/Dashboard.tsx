@@ -10,6 +10,7 @@ import PlanContent from '../components/PlanContent';
 import TutorialOverlay from '../components/TutorialOverlay';
 import MobileNav from '../components/MobileNav';
 import api from '../services/api';
+import { BACKEND_URL, WS_URL } from '../lib/config';
 import { getLevelColor, getLevelGradient, LEVEL_NAMES, type GamificationProgress, type WeeklyChallengeData } from '../utils/gamification';
 import BurnoutWidget from '../components/BurnoutWidget';
 import SubjectWidgets from '../components/SubjectWidgets';
@@ -19,7 +20,7 @@ import SmartDailyMission from '../components/SmartDailyMission';
 import FocusZoneHero from '../components/FocusZoneHero';
 import HeroPriorityCard from '../components/HeroPriorityCard';
 
-const BACKEND = 'http://localhost:8000';
+const BACKEND = BACKEND_URL;
 
 interface LearningEntry {
   date: string;
@@ -292,7 +293,7 @@ export default function Dashboard() {
     const connect = () => {
       if (dead) return;
       const ws = new WebSocket(
-        `ws://localhost:8000/ws/${user.id}?token=${encodeURIComponent(token)}`
+        `${WS_URL}/ws/${user.id}?token=${encodeURIComponent(token)}`
       );
       wsRef.current = ws;
 

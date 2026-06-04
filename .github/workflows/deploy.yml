@@ -1,0 +1,81 @@
+##############################################################
+# TwinMind — CI/CD Pipeline
+# Triggers on push to main.
+# Jobs:
+#   1. ci       — type-check + build frontend
+#   2. backend  — trigger Render deploy hook
+#   3. frontend — trigger Vercel deploy
+##############################################################
+
+name: Deploy TwinMind
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── 1. Frontend CI (runs on every PR and push) ─────────────
+  ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
+  # ── 2. Deploy Backend to Render ────────────────────────────
+  deploy-backend:
+    name: Deploy Backend → Render
+    runs-on: ubuntu-latest
+    needs: ci
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Trigger Render deploy hook
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+            --fail \
+            "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+        # Set RENDER_DEPLOY_HOOK_URL in GitHub repo secrets:
+        # Render dashboard → your service → Settings → Deploy Hook → Copy URL
+
+  # ── 3. Deploy Frontend to Vercel ───────────────────────────
+  deploy-frontend:
+    name: Deploy Frontend → Vercel
+    runs-on: ubuntu-latest
+    needs: ci
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: Frontend
+          vercel-args: '--prod'

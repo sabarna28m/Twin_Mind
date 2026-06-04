@@ -5,8 +5,9 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
 import api from '../services/api';
+import { BACKEND_URL } from '../lib/config';
 
-const BACKEND = 'http://localhost:8000';
+const BACKEND = BACKEND_URL;
 
 interface CalStatus { configured: boolean; connected: boolean }
 

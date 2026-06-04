@@ -2,8 +2,9 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { API_URL } from '../lib/config';
 
-const API = 'http://localhost:8000/api/v1';
+const API = API_URL;
 
 export default function ForgotPassword() {
   const { t } = useLanguage();
