@@ -13,6 +13,11 @@ import api from '../services/api';
 import { getLevelColor, getLevelGradient, LEVEL_NAMES, type GamificationProgress, type WeeklyChallengeData } from '../utils/gamification';
 import BurnoutWidget from '../components/BurnoutWidget';
 import SubjectWidgets from '../components/SubjectWidgets';
+import AICommandCenter from '../components/AICommandCenter';
+import AITwinAssistant from '../components/AITwinAssistant';
+import SmartDailyMission from '../components/SmartDailyMission';
+import FocusZoneHero from '../components/FocusZoneHero';
+import HeroPriorityCard from '../components/HeroPriorityCard';
 
 const BACKEND = 'http://localhost:8000';
 
@@ -452,7 +457,7 @@ export default function Dashboard() {
 
       <main style={s.main} className="mob-dash-main">
 
-        {/* ── Hero ── */}
+        {/* ── 1. Hero ── */}
         <section style={s.heroCard} className="animate-slide-up hero-animated mob-hero-card" data-tour="dashboard">
           <div style={s.heroOrb1} />
           <div style={s.heroOrb2} />
@@ -461,7 +466,6 @@ export default function Dashboard() {
             {/* Left */}
             <div style={s.heroLeft} className="mob-hero-left">
               <p style={s.greetingLabel}>{greeting} ✦</p>
-
               <h1 style={s.heroName}>
                 {firstName}&nbsp;
                 <span style={{ display: 'inline-block', animation: 'float 3s ease-in-out infinite' }}>👋</span>
@@ -502,8 +506,6 @@ export default function Dashboard() {
                   ? 'Log a check-in to activate'
                   : `Based on last ${Math.min(entries.length, 7)} day${entries.length > 1 ? 's' : ''}`}
               </p>
-
-              {/* XP / Level mini display */}
               {gamProgress && (
                 <div style={{ marginTop: '0.85rem', width: '100%' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', marginBottom: '0.35rem' }}>
@@ -535,49 +537,99 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* ── Stat cards ── */}
-        <section style={s.statsGrid} className="mob-stats-4">
-          <StatCard icon="▶"  grad="linear-gradient(135deg,#6366f1,#818cf8)" value={sessionCount} label={t('stat_sessions')}  delay={0}   />
-          <StatCard icon="⏱"  grad="linear-gradient(135deg,#8b5cf6,#a78bfa)" value={totalHours}  unit="h" label={t('stat_hours')} delay={70}  />
-          <StatCard icon="🔥" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={streak}      label={t('stat_streak')}   delay={140} />
-          <StatCard icon="📝" grad="linear-gradient(135deg,#10b981,#34d399)" value={noteCount}   label={t('stat_notes')}    delay={210} />
-          <Link to="/achievements" style={{ textDecoration: 'none' }}>
-            <StatCard icon="🏆" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={badgeCount} label={t('stat_badges')} delay={280} />
-          </Link>
-        </section>
+        {/* ── 2. Hero Priority Card (Today's AI Recommendation) ── */}
+        <HeroPriorityCard />
 
-        {/* ── Subject Performance Widgets ── */}
+        {/* ── 3. AI Command Center ── */}
+        <AICommandCenter brainReadiness={health.pct} streak={streak} level={gamProgress?.level} />
+
+        {/* ── 4. AI Twin Assistant + Smart Daily Mission ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }} className="mob-mid-row">
+          <AITwinAssistant />
+          <SmartDailyMission />
+        </div>
+
+        {/* ── 4. Focus Zone Hero ── */}
+        <FocusZoneHero />
+
+        {/* ── 5. Subject Intelligence Panel ── */}
         <section style={s.panel} className="glass-panel">
           <div style={s.panelHead}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span style={{ fontSize: '1rem' }}>📊</span>
-              <h2 style={s.panelTitle}>Subject Performance</h2>
+              <h2 style={s.panelTitle}>Subject Intelligence</h2>
             </div>
             <Link to="/subjects" style={s.panelCta}>Full Analysis →</Link>
           </div>
           <SubjectWidgets />
         </section>
 
-        {/* ── Burnout Risk Widget ── */}
-        <section style={{ display: 'grid', gridTemplateColumns: 'minmax(220px,280px) 1fr', gap: '1rem', alignItems: 'start' }} className="mob-mid-row">
-          <BurnoutWidget />
-          <div style={{ background: 'var(--glass-bg, rgba(255,255,255,0.04))', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '1.25rem', display: 'flex', flexDirection: 'column' as const, gap: '0.6rem', justifyContent: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-              <span style={{ fontSize: '1rem' }}>🧠</span>
-              <h2 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-h)' }}>Burnout Prevention</h2>
+        {/* ── 6. Quick AI Actions (full-width, hero prominence) ── */}
+        <section style={s.panel} className="glass-panel">
+          <div style={s.panelHead}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '1rem' }}>⚡</span>
+              <h2 style={s.panelTitle}>{t('quick_actions')}</h2>
             </div>
-            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text)', lineHeight: 1.6, opacity: 0.85 }}>
-              Track your daily study load, sleep, breaks, mood, and energy to monitor burnout risk in real-time.
-            </p>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' as const }}>
-              {[{ label: '🟢 0–39 Low', color: '#10b981' }, { label: '🟡 40–69 Medium', color: '#f59e0b' }, { label: '🔴 70–100 High', color: '#ef4444' }].map(r => (
-                <span key={r.label} style={{ padding: '0.2rem 0.6rem', borderRadius: '99px', fontSize: '0.68rem', fontWeight: 600, background: `${r.color}15`, color: r.color, border: `1px solid ${r.color}33` }}>{r.label}</span>
-              ))}
+          </div>
+          <div style={s.actionGrid} className="mob-action-grid">
+            {QA_DEFS.map(a => (
+              <Link key={a.labelKey} to={a.to} style={{ textDecoration: 'none' }}>
+                <div className="action-tile" {...(a.to === '/predict' ? { 'data-tour': 'predict' } : {})}>
+                  <div className="action-icon-big" style={{ ...s.actionIconBig, background: a.grad }}>
+                    <span style={s.actionIconGlyph}>{a.icon}</span>
+                  </div>
+                  <p style={s.actionTileLabel}>{t(a.labelKey)}</p>
+                  <p style={s.actionTileDesc}>{t(a.descKey)}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ── 7. Burnout Prevention Center ── */}
+        <section style={s.panel} className="glass-panel">
+          <div style={s.panelHead}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '1rem' }}>🧠</span>
+              <h2 style={s.panelTitle}>Burnout Prevention Center</h2>
+            </div>
+            <Link to="/burnout" style={s.panelCta}>Full Analysis →</Link>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px,280px) 1fr', gap: '1rem', alignItems: 'start' }} className="mob-mid-row">
+            <BurnoutWidget />
+            <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.75rem' }}>
+              <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text)', lineHeight: 1.65, opacity: 0.88 }}>
+                Track your daily study load, sleep, breaks, mood, and energy to monitor burnout risk in real-time.
+                TwinMind AI detects early warning signs before they impact your performance.
+              </p>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' as const }}>
+                {[
+                  { label: '🟢 0–39 Low Risk',    color: '#10b981' },
+                  { label: '🟡 40–69 Medium Risk', color: '#f59e0b' },
+                  { label: '🔴 70–100 High Risk',  color: '#ef4444' },
+                ].map(r => (
+                  <span key={r.label} style={{ padding: '0.22rem 0.65rem', borderRadius: '99px', fontSize: '0.68rem', fontWeight: 600, background: `${r.color}15`, color: r.color, border: `1px solid ${r.color}30` }}>{r.label}</span>
+                ))}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.5rem' }}>
+                {[
+                  { icon: '😴', label: 'Sleep Quality', desc: 'Track sleep hours & quality'  },
+                  { icon: '🧘', label: 'Stress Levels', desc: 'Daily mood & energy check-in'  },
+                  { icon: '💡', label: 'Recovery Tips', desc: 'AI-generated recommendations'  },
+                ].map(f => (
+                  <div key={f.label} style={{ padding: '0.65rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px' }}>
+                    <p style={{ margin: '0 0 0.2rem', fontSize: '1rem' }}>{f.icon}</p>
+                    <p style={{ margin: '0 0 0.1rem', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-h)' }}>{f.label}</p>
+                    <p style={{ margin: 0, fontSize: '0.63rem', color: 'var(--text)', lineHeight: 1.4 }}>{f.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        {/* ── Weekly Challenge ── */}
+        {/* ── 8. Weekly Challenge ── */}
         {weeklyChallenge && (
           <section style={s.panel} className="glass-panel">
             <div style={s.panelHead}>
@@ -594,8 +646,6 @@ export default function Dashboard() {
                 {weeklyChallenge.has_challenge ? 'Update' : 'Set Challenge'}
               </button>
             </div>
-
-            {/* Set-challenge form */}
             {showChallengeForm && (
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', flexWrap: 'wrap' as const, marginBottom: '0.85rem', padding: '0.85rem', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)', borderRadius: '10px' }}>
                 {[
@@ -613,12 +663,11 @@ export default function Dashboard() {
                 </button>
               </div>
             )}
-
             {weeklyChallenge.has_challenge && weeklyChallenge.targets ? (
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.55rem' }}>
                 {[
-                  { label: 'Study Hours', cur: weeklyChallenge.progress.study_hours, target: weeklyChallenge.targets.study_hours, unit: 'h' },
-                  { label: 'Quizzes',     cur: weeklyChallenge.progress.quiz_count,   target: weeklyChallenge.targets.quiz_count,   unit: '' },
+                  { label: 'Study Hours',   cur: weeklyChallenge.progress.study_hours,  target: weeklyChallenge.targets.study_hours,  unit: 'h'     },
+                  { label: 'Quizzes',       cur: weeklyChallenge.progress.quiz_count,   target: weeklyChallenge.targets.quiz_count,   unit: ''      },
                   { label: 'Check-in Days', cur: weeklyChallenge.progress.checkin_days, target: weeklyChallenge.targets.checkin_days, unit: ' days' },
                 ].filter(m => m.target).map(m => {
                   const pct = Math.min(100, Math.round((m.cur / m.target!) * 100));
@@ -646,54 +695,109 @@ export default function Dashboard() {
           </section>
         )}
 
-        {/* ── Chart + Actions ── */}
-        <div style={s.midRow} className="mob-mid-row">
-
-          {/* 7-day chart */}
-          <section style={s.panel} className="glass-panel">
-            <div style={s.panelHead}>
-              <h2 style={s.panelTitle}>{t('chart_title')}</h2>
-              <Link to="/checkin" style={s.panelCta}>{t('chart_log_today')}</Link>
-            </div>
-            {last7.some(d => d.hours > 0) ? (
-              <>
-                <StudyChart data={last7} />
-                <div style={s.chartFooter}>
-                  <span style={s.chartStat}>{t('chart_this_week')}&nbsp;<strong style={s.chartStatVal}>{weekHours.toFixed(1)}h</strong></span>
-                  <span style={s.chartStat}>{t('chart_daily_avg')}&nbsp;<strong style={s.chartStatVal}>{(weekHours / 7).toFixed(1)}h</strong></span>
-                </div>
-              </>
-            ) : (
-              <div style={s.emptyState}>
-                <p style={s.emptyIcon}>📊</p>
-                <p style={s.emptyText}>{t('no_data_title')}</p>
-                <p style={s.emptySub}>{t('no_data_sub')}</p>
-                <Link to="/checkin" style={s.emptyBtn}>{t('no_data_btn')}</Link>
+        {/* ── 9. 7-day Study Chart ── */}
+        <section style={s.panel} className="glass-panel">
+          <div style={s.panelHead}>
+            <h2 style={s.panelTitle}>{t('chart_title')}</h2>
+            <Link to="/checkin" style={s.panelCta}>{t('chart_log_today')}</Link>
+          </div>
+          {last7.some(d => d.hours > 0) ? (
+            <>
+              <StudyChart data={last7} />
+              <div style={s.chartFooter}>
+                <span style={s.chartStat}>{t('chart_this_week')}&nbsp;<strong style={s.chartStatVal}>{weekHours.toFixed(1)}h</strong></span>
+                <span style={s.chartStat}>{t('chart_daily_avg')}&nbsp;<strong style={s.chartStatVal}>{(weekHours / 7).toFixed(1)}h</strong></span>
               </div>
-            )}
-          </section>
-
-          {/* Quick actions icon grid */}
-          <section style={s.panel} className="glass-panel">
-            <h2 style={s.panelTitle}>{t('quick_actions')}</h2>
-            <div style={s.actionGrid} className="mob-action-grid">
-              {QA_DEFS.map(a => (
-                <Link key={a.labelKey} to={a.to} style={{ textDecoration: 'none' }}>
-                  <div className="action-tile" {...(a.to === '/predict' ? { 'data-tour': 'predict' } : {})}>
-                    <div className="action-icon-big" style={{ ...s.actionIconBig, background: a.grad }}>
-                      <span style={s.actionIconGlyph}>{a.icon}</span>
-                    </div>
-                    <p style={s.actionTileLabel}>{t(a.labelKey)}</p>
-                    <p style={s.actionTileDesc}>{t(a.descKey)}</p>
-                  </div>
-                </Link>
-              ))}
+            </>
+          ) : (
+            <div style={s.emptyState}>
+              <p style={s.emptyIcon}>📊</p>
+              <p style={s.emptyText}>{t('no_data_title')}</p>
+              <p style={s.emptySub}>{t('no_data_sub')}</p>
+              <Link to="/checkin" style={s.emptyBtn}>{t('no_data_btn')}</Link>
             </div>
-          </section>
+          )}
+        </section>
 
-        </div>
+        {/* ── 10. Smart Plan ── */}
+        <section style={sp.card}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <span style={{ fontSize: '1.15rem' }}>◈</span>
+              <h2 style={sp.title}>Smart Plan</h2>
+            </div>
+            <button onClick={generatePlan} disabled={planLoading} style={sp.regenBtn}>
+              {planLoading ? '⟳ Generating…' : smartPlan ? '⟳ Regenerate' : '✦ Generate Plan'}
+            </button>
+          </div>
+          {planError && <div style={sp.errorBox}>{planError}</div>}
+          {!smartPlan && !planLoading && !planError && (
+            <div style={sp.emptyWrap}>
+              <p style={sp.emptyIcon}>🧠</p>
+              <p style={sp.emptyTitle}>AI-Powered Weekly Schedule</p>
+              <p style={sp.emptySub}>
+                Generate a personalized 7-day study plan based on your performance data, weak areas, and academic goals.
+              </p>
+              <button onClick={generatePlan} style={sp.generateBigBtn}>Generate My Smart Plan</button>
+            </div>
+          )}
+          {planLoading && (
+            <div style={sp.loadingWrap}>
+              <div style={sp.spinner} className="spin" />
+              <p style={sp.loadingText}>Analyzing your performance data…</p>
+            </div>
+          )}
+          {smartPlan && !planLoading && (
+            <>
+              <div style={sp.headline}>
+                <p style={sp.headlineText}>
+                  Raise expected performance from&nbsp;
+                  <span style={sp.scoreFrom}>{smartPlan.current_score}%</span>
+                  &nbsp;to&nbsp;
+                  <span style={sp.scoreTo}>{smartPlan.target_score}%</span>
+                  &nbsp;over the next 3 weeks
+                </p>
+                <span style={sp.hoursBadge}>{smartPlan.daily_hours}h/day recommended</span>
+              </div>
+              <div style={sp.dayGrid} className="mob-day-grid">
+                {smartPlan.days.map((d, i) => (
+                  <div key={i} style={sp.dayCol}>
+                    <p style={sp.dayName}>{d.day.slice(0, 3).toUpperCase()}</p>
+                    {d.tasks.map((task, j) => (
+                      <div key={j} style={sp.taskCard}>
+                        <span style={sp.taskDot} />
+                        <span style={sp.taskText}>{task}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div style={sp.reportBox}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.85rem' }}>◈</span>
+                    <span style={sp.reportTitle}>Twin Report</span>
+                  </div>
+                  <button onClick={() => downloadPDF(smartPlan)} style={sp.downloadBtn}>↓ Download PDF</button>
+                </div>
+                <p style={sp.forecastText}>{smartPlan.forecast}</p>
+              </div>
+            </>
+          )}
+        </section>
 
-        {/* ── Upcoming Calendar Events ── */}
+        {/* ── 11. Productivity Metrics (supporting role — moved to bottom) ── */}
+        <section style={s.statsGrid} className="mob-stats-4">
+          <StatCard icon="▶"  grad="linear-gradient(135deg,#6366f1,#818cf8)" value={sessionCount} label={t('stat_sessions')}  delay={0}   />
+          <StatCard icon="⏱"  grad="linear-gradient(135deg,#8b5cf6,#a78bfa)" value={totalHours}  unit="h" label={t('stat_hours')} delay={70}  />
+          <StatCard icon="🔥" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={streak}      label={t('stat_streak')}   delay={140} />
+          <StatCard icon="📝" grad="linear-gradient(135deg,#10b981,#34d399)" value={noteCount}   label={t('stat_notes')}    delay={210} />
+          <Link to="/achievements" style={{ textDecoration: 'none' }}>
+            <StatCard icon="🏆" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={badgeCount} label={t('stat_badges')} delay={280} />
+          </Link>
+        </section>
+
+        {/* ── 12. Upcoming Calendar Events ── */}
         {calEvents.length > 0 && (
           <section style={s.panel} className="glass-panel">
             <div style={s.panelHead}>
@@ -712,30 +816,11 @@ export default function Dashboard() {
                   : d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) +
                     ' · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
                 return (
-                  <a
-                    key={ev.id}
-                    href={ev.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '0.75rem',
-                      padding: '0.6rem 0.75rem',
-                      background: 'rgba(99,102,241,0.06)',
-                      border: '1px solid rgba(99,102,241,0.15)',
-                      borderRadius: '10px',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <div style={{
-                      width: '32px', height: '32px', borderRadius: '8px', flexShrink: 0,
-                      background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '0.85rem',
-                    }}>📅</div>
+                  <a key={ev.id} href={ev.link} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.6rem 0.75rem', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)', borderRadius: '10px', textDecoration: 'none' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', flexShrink: 0, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>📅</div>
                     <div style={{ minWidth: 0 }}>
-                      <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-h)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-                        {ev.title}
-                      </p>
+                      <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-h)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{ev.title}</p>
                       <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--text)' }}>{label}</p>
                     </div>
                     <span style={{ marginLeft: 'auto', fontSize: '0.7rem', color: '#818cf8', flexShrink: 0 }}>↗</span>
@@ -746,7 +831,7 @@ export default function Dashboard() {
           </section>
         )}
 
-        {/* ── My Study Plan card ── */}
+        {/* ── 13. My Study Plan ── */}
         <section style={s.panel} className="glass-panel">
           <div style={s.panelHead}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -755,26 +840,19 @@ export default function Dashboard() {
             </div>
             <Link to="/mentor" style={s.panelCta}>{t('generate_new')}</Link>
           </div>
-
           {savedPlan ? (
             <div>
               <p style={s.planDate}>
                 {t('plan_saved')} {new Date(savedPlan.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
               </p>
               <div style={s.planPreview}>
-                {savedPlan.plan_text
-                  .split('\n')
-                  .filter(l => l.trim())
-                  .slice(0, 4)
-                  .map((line, i) => {
-                    const clean = line.replace(/^#{1,3}\s*/, '').replace(/\*\*/g, '');
-                    return <p key={i} style={i === 0 ? s.planPreviewHead : s.planPreviewLine}>{clean}</p>;
-                  })}
+                {savedPlan.plan_text.split('\n').filter(l => l.trim()).slice(0, 4).map((line, i) => {
+                  const clean = line.replace(/^#{1,3}\s*/, '').replace(/\*\*/g, '');
+                  return <p key={i} style={i === 0 ? s.planPreviewHead : s.planPreviewLine}>{clean}</p>;
+                })}
                 <p style={s.planFade}>…</p>
               </div>
-              <button onClick={() => setShowPlanModal(true)} style={s.viewPlanBtn}>
-                {t('view_full_plan')}
-              </button>
+              <button onClick={() => setShowPlanModal(true)} style={s.viewPlanBtn}>{t('view_full_plan')}</button>
             </div>
           ) : (
             <div style={s.emptyState}>
@@ -783,91 +861,6 @@ export default function Dashboard() {
               <p style={s.emptySub}>{t('no_plan_sub')}</p>
               <Link to="/mentor" style={s.emptyBtn}>{t('go_to_mentor')}</Link>
             </div>
-          )}
-        </section>
-
-        {/* ── Smart Plan ── */}
-        <section style={sp.card}>
-          {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <span style={{ fontSize: '1.15rem' }}>◈</span>
-              <h2 style={sp.title}>Smart Plan</h2>
-            </div>
-            <button
-              onClick={generatePlan}
-              disabled={planLoading}
-              style={sp.regenBtn}
-            >
-              {planLoading ? '⟳ Generating…' : smartPlan ? '⟳ Regenerate' : '✦ Generate Plan'}
-            </button>
-          </div>
-
-          {planError && (
-            <div style={sp.errorBox}>{planError}</div>
-          )}
-
-          {!smartPlan && !planLoading && !planError && (
-            <div style={sp.emptyWrap}>
-              <p style={sp.emptyIcon}>🧠</p>
-              <p style={sp.emptyTitle}>AI-Powered Weekly Schedule</p>
-              <p style={sp.emptySub}>
-                Generate a personalized 7-day study plan based on your performance data, weak areas, and academic goals.
-              </p>
-              <button onClick={generatePlan} style={sp.generateBigBtn}>Generate My Smart Plan</button>
-            </div>
-          )}
-
-          {planLoading && (
-            <div style={sp.loadingWrap}>
-              <div style={sp.spinner} className="spin" />
-              <p style={sp.loadingText}>Analyzing your performance data…</p>
-            </div>
-          )}
-
-          {smartPlan && !planLoading && (
-            <>
-              {/* Headline */}
-              <div style={sp.headline}>
-                <p style={sp.headlineText}>
-                  Raise expected performance from&nbsp;
-                  <span style={sp.scoreFrom}>{smartPlan.current_score}%</span>
-                  &nbsp;to&nbsp;
-                  <span style={sp.scoreTo}>{smartPlan.target_score}%</span>
-                  &nbsp;over the next 3 weeks
-                </p>
-                <span style={sp.hoursBadge}>{smartPlan.daily_hours}h/day recommended</span>
-              </div>
-
-              {/* 7-day grid */}
-              <div style={sp.dayGrid} className="mob-day-grid">
-                {smartPlan.days.map((d, i) => (
-                  <div key={i} style={sp.dayCol}>
-                    <p style={sp.dayName}>{d.day.slice(0, 3).toUpperCase()}</p>
-                    {d.tasks.map((task, j) => (
-                      <div key={j} style={sp.taskCard}>
-                        <span style={sp.taskDot} />
-                        <span style={sp.taskText}>{task}</span>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-
-              {/* Twin Report */}
-              <div style={sp.reportBox}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.85rem' }}>◈</span>
-                    <span style={sp.reportTitle}>Twin Report</span>
-                  </div>
-                  <button onClick={() => downloadPDF(smartPlan)} style={sp.downloadBtn}>
-                    ↓ Download PDF
-                  </button>
-                </div>
-                <p style={sp.forecastText}>{smartPlan.forecast}</p>
-              </div>
-            </>
           )}
         </section>
 

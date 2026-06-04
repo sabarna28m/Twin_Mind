@@ -866,8 +866,141 @@ html[data-theme="light"] .focus-ctrl-ghost {
   .mob-twin-row { gap: 0.75rem !important; }
 }
 
-/* ── Theme toggle button
-   ══════════════════════════════════════════════════════ */
+/* ══════════════════════════════
+   AI Dashboard — New Components
+   ══════════════════════════════ */
+
+/* Ping / scale ring animation for FocusZoneHero rings */
+@keyframes ping {
+  0%   { transform: scale(1);    opacity: 0.7; }
+  75%  { transform: scale(1.25); opacity: 0.2; }
+  100% { transform: scale(1.35); opacity: 0;   }
+}
+
+/* Typing dots for AITwinAssistant */
+@keyframes typing-bounce {
+  0%, 80%, 100% { transform: scale(0.7); opacity: 0.45; }
+  40%            { transform: scale(1);   opacity: 1;    }
+}
+.typing-dot {
+  animation: typing-bounce 1.3s ease-in-out infinite;
+}
+
+/* AI Command Center metric card hover */
+.cmd-metric-card {
+  transition: transform 0.22s cubic-bezier(0.16,1,0.3,1),
+              box-shadow 0.22s ease,
+              border-color 0.22s ease !important;
+}
+.cmd-metric-card:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,212,255,0.18) !important;
+}
+
+/* AI Command Center stats bar item hover */
+.cmd-stat-item {
+  transition: background 0.2s ease !important;
+}
+.cmd-stat-item:hover {
+  background: rgba(255,255,255,0.05) !important;
+}
+
+/* AITwinAssistant action button hover */
+a[style*="actionBtn"]:hover,
+.twin-action-btn:hover {
+  background: rgba(99,102,241,0.2) !important;
+  border-color: rgba(99,102,241,0.4) !important;
+}
+
+/* FocusZone primary button hover */
+a[href="/ai-focus"]:hover {
+  box-shadow: 0 6px 32px rgba(0,212,255,0.5) !important;
+  transform: translateY(-2px);
+}
+
+/* Light-theme overrides for new AI components */
+html[data-theme="light"] .cmd-metric-card:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,212,255,0.3) !important;
+}
+
+/* ── AI Command Center: responsive grid ─────────────── */
+/* 4-col → 2-col at tablet, 2-col stays at mobile */
+@media (max-width: 900px) {
+  /* AI command center main grid */
+  [style*="repeat(4, 1fr)"] {
+    /* can't target reliably — use class overrides below */
+  }
+  .mob-cmd-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .mob-cmd-statsbar { flex-wrap: wrap !important; }
+}
+
+@media (max-width: 768px) {
+  /* AI Command Center — 2x2 grid */
+  .mob-cmd-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* Stats bar wraps */
+  .mob-cmd-statsbar {
+    flex-wrap: wrap !important;
+    gap: 0.35rem !important;
+  }
+  .mob-cmd-statsbar > a { flex: 0 0 48% !important; }
+  /* FocusZoneHero: stack on mobile */
+  .mob-fz-content {
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+  .mob-fz-preview { width: 100% !important; }
+  /* AI Twin + Daily Mission: already handled by mob-mid-row */
+}
+
+/* ══════════════════════════════
+   TwinMind Copilot
+   ══════════════════════════════ */
+
+/* Floating button hover */
+button[aria-label="Open TwinMind Copilot"]:hover {
+  transform: translateY(-3px) scale(1.04) !important;
+  box-shadow: 0 8px 32px rgba(99,102,241,0.55), 0 0 0 1px rgba(255,255,255,0.15) !important;
+}
+
+/* Quick chip hover */
+.copilot-chip:hover:not(:disabled) {
+  background: rgba(99,102,241,0.22) !important;
+  border-color: rgba(99,102,241,0.45) !important;
+  color: #c7d2fe !important;
+}
+
+/* Panel input focus */
+.copilot-input:focus {
+  border-color: rgba(99,102,241,0.5) !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12) !important;
+}
+
+/* Mobile: panel full-width */
+@media (max-width: 480px) {
+  /* Copilot panel: nearly full screen on small phones */
+  div[style*="390px"][style*="580px"] {
+    width: calc(100vw - 24px) !important;
+    right: 12px !important;
+    bottom: 76px !important;
+  }
+}
+
+/* ── HeroPriorityCard hover states ────────────────────── */
+.priority-rec-item:hover {
+  background: rgba(0,212,255,0.07) !important;
+  border-color: rgba(0,212,255,0.2) !important;
+}
+.priority-start-btn:hover {
+  box-shadow: 0 6px 28px rgba(99,102,241,0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ── Focus Coach analytics grid: 2-col on mobile ──────── */
+@media (max-width: 600px) {
+  /* Focus coach 4-col → 2-col */
+  [style*="repeat(4,1fr)"] { grid-template-columns: repeat(2,1fr) !important; }
+}
+
 /* ══════════════════════════════
    Theme toggle button
    ══════════════════════════════ */

@@ -25,10 +25,33 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 /* ─── Presets (seconds) ─── */
 const PRESETS = [
   { label: '25 min', seconds: 25 * 60 },
-  { label: '50 min', seconds: 50 * 60 },
-  { label: '1 hour', seconds: 60 * 60 },
-  { label: '2 hours', seconds: 120 * 60 },
+  { label: '45 min', seconds: 45 * 60 },
+  { label: '90 min', seconds: 90 * 60 },
+  { label: '2 hrs',  seconds: 120 * 60 },
 ] as const;
+
+/* ─── AI Coach messages keyed by milestone ─── */
+const COACH_MSGS = {
+  ready:     ['Set your timer and enter the Focus Zone. I\'ll coach you in real-time. 🎯',
+              'Deep work begins with a single session. Ready when you are.',
+              'Your brain performs best in focused bursts. Let\'s build that habit.'],
+  start:     ['Great start! Your brain is warming up — stay with it.',
+              'Focus session initiated. I\'m tracking your progress.'],
+  min5:      ['You\'re entering the flow state. This is where real learning happens!',
+              'First 5 minutes done. Deep focus kicks in now — keep going.'],
+  min15:     ['Outstanding! 15 minutes of deep focus. You\'re in the zone. 🔥',
+              'Flow state achieved. Excellent concentration — don\'t stop!'],
+  min25:     ['25 minutes! Pomodoro complete. You may take a 5-minute break.',
+              'Excellent deep work session. Your brain is absorbing information well.'],
+  min45:     ['45 minutes of deep focus! Consider a 10-min break to consolidate learning.',
+              'Extended focus session — your retention is at peak right now.'],
+  min60:     ['One full hour! Exceptional performance. Schedule a proper break now.',
+              'World-class focus for 60 minutes. Take care of your brain — rest first.'],
+  paused:    ['Session paused. Breathe. Resume whenever you\'re ready — I\'ll be here.',
+              'Take a moment, then come back stronger. You\'re doing great.'],
+  completed: ['🎉 Session complete! You crushed it. Rest well — you earned it.',
+              '✅ Excellent work! Your focus score is looking strong today.'],
+};
 
 const HISTORY_KEY = 'twinmind_focus_history';
 
@@ -131,6 +154,10 @@ export default function FocusSession() {
   /* notification banner */
   const [showNotif, setShowNotif] = useState(false);
 
+  /* AI coach */
+  const [coachMsg, setCoachMsg] = useState(COACH_MSGS.ready[0]);
+  const coachTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const intervalRef       = useRef<ReturnType<typeof setInterval> | null>(null);
   const startedDurRef     = useRef(0);
 
@@ -185,6 +212,33 @@ export default function FocusSession() {
     const t = setTimeout(() => setShowNotif(false), 6000);
     return () => clearTimeout(t);
   }, [showNotif]);
+
+  /* ── AI coach messages driven by elapsed time ── */
+  useEffect(() => {
+    if (coachTimerRef.current) clearTimeout(coachTimerRef.current);
+    if (status === 'ready' || status === 'completed') {
+      const pool = status === 'completed' ? COACH_MSGS.completed : COACH_MSGS.ready;
+      setCoachMsg(pool[Math.floor(Math.random() * pool.length)]);
+      return;
+    }
+    if (status === 'paused') {
+      setCoachMsg(COACH_MSGS.paused[Math.floor(Math.random() * COACH_MSGS.paused.length)]);
+      return;
+    }
+    // running — pick message based on elapsed seconds
+    const elapsed = totalSec - remainingSec;
+    const pick = (pool: string[]) => pool[Math.floor(Math.random() * pool.length)];
+    if      (elapsed < 30)     setCoachMsg(pick(COACH_MSGS.start));
+    else if (elapsed < 5*60)   setCoachMsg(pick(COACH_MSGS.start));
+    else if (elapsed < 15*60)  setCoachMsg(pick(COACH_MSGS.min5));
+    else if (elapsed < 25*60)  setCoachMsg(pick(COACH_MSGS.min15));
+    else if (elapsed < 45*60)  setCoachMsg(pick(COACH_MSGS.min25));
+    else if (elapsed < 60*60)  setCoachMsg(pick(COACH_MSGS.min45));
+    else                        setCoachMsg(pick(COACH_MSGS.min60));
+
+    // Refresh every 5 minutes while running
+    coachTimerRef.current = setTimeout(() => {}, 300_000);
+  }, [status, Math.floor((totalSec - remainingSec) / 300)]);
 
   /* ── actions ── */
   function handleStart() {
@@ -420,6 +474,69 @@ export default function FocusSession() {
             </div>
           </div>
 
+          {/* ─── AI Focus Coach + Live Analytics ─── */}
+          <div style={coach.wrap} className="glass-panel animate-fade-in">
+            <div style={coach.orb} />
+
+            {/* Coach header */}
+            <div style={coach.header}>
+              <div style={coach.avatarWrap}>
+                <div style={coach.avatar}>◈</div>
+                <div style={coach.avatarRing} />
+              </div>
+              <div>
+                <p style={coach.name}>AI Focus Coach</p>
+                <p style={coach.statusLine}>
+                  <span style={{ ...coach.dot, background: status === 'running' ? '#10b981' : status === 'completed' ? '#6366f1' : '#f59e0b' }} className={status === 'running' ? 'live-dot' : undefined} />
+                  {status === 'running' ? 'Monitoring your session' : status === 'completed' ? 'Session complete' : status === 'paused' ? 'Session paused' : 'Ready to coach'}
+                </p>
+              </div>
+            </div>
+
+            {/* Coach message */}
+            <div style={coach.msgBox}>
+              <p style={coach.msgText}>{coachMsg}</p>
+            </div>
+
+            {/* Live analytics row */}
+            <div style={coach.analyticsRow}>
+              {[
+                {
+                  icon: '⏱', label: 'Elapsed',
+                  value: isActive || status === 'completed'
+                    ? fmtDuration(totalSec - remainingSec)
+                    : '—',
+                  color: '#00D4FF',
+                },
+                {
+                  icon: '🎯', label: 'Focus Score',
+                  value: status === 'running'
+                    ? `${Math.min(99, 60 + Math.round((totalSec - remainingSec) / 60 * 0.65))}%`
+                    : status === 'completed' ? '✅ Done' : '—',
+                  color: '#10b981',
+                },
+                {
+                  icon: '📊', label: 'Productivity',
+                  value: status === 'running' && totalSec > 0
+                    ? `${Math.round(progress * 100)}%`
+                    : status === 'completed' ? '100%' : '—',
+                  color: '#f59e0b',
+                },
+                {
+                  icon: '🔥', label: 'Sessions Done',
+                  value: String(history.length),
+                  color: '#ef4444',
+                },
+              ].map((m, i) => (
+                <div key={i} style={coach.metricCard}>
+                  <span style={{ fontSize: '1rem' }}>{m.icon}</span>
+                  <p style={{ ...coach.metricValue, color: m.color }}>{m.value}</p>
+                  <p style={coach.metricLabel}>{m.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* ─── History card ─── */}
           <div style={s.historyCard} className="glass-panel">
             <div style={s.historyHeader}>
@@ -478,6 +595,66 @@ export default function FocusSession() {
     </div>
   );
 }
+
+/* ══════════════════════════════════════
+   AI Coach styles
+   ══════════════════════════════════════ */
+const coach: Record<string, React.CSSProperties> = {
+  wrap: {
+    position: 'relative', overflow: 'hidden',
+    background: 'linear-gradient(135deg, rgba(6,4,18,0.96) 0%, rgba(14,6,36,0.96) 100%)',
+    border: '1px solid rgba(99,102,241,0.25)',
+    borderRadius: '20px', padding: '1.5rem',
+    display: 'flex', flexDirection: 'column' as const, gap: '1rem',
+  },
+  orb: {
+    position: 'absolute', width: '250px', height: '250px', borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)',
+    top: '-80px', right: '-60px', pointerEvents: 'none',
+    animation: 'orb-drift-3 12s ease-in-out infinite',
+  },
+  header: { display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'relative', zIndex: 1 },
+  avatarWrap: { position: 'relative', flexShrink: 0 },
+  avatar: {
+    width: '44px', height: '44px', borderRadius: '50%',
+    background: 'linear-gradient(135deg, #6366f1, #00D4FF)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: '1.2rem', color: '#fff',
+    boxShadow: '0 0 20px rgba(99,102,241,0.4)',
+    animation: 'breathe 3.5s ease-in-out infinite',
+  },
+  avatarRing: {
+    position: 'absolute', inset: '-5px', borderRadius: '50%',
+    border: '1.5px solid rgba(99,102,241,0.28)',
+    animation: 'breathe 3.5s ease-in-out infinite',
+  },
+  name:       { margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#e2e8f0' },
+  statusLine: { margin: 0, fontSize: '0.67rem', color: 'rgba(148,163,184,0.6)', display: 'flex', alignItems: 'center', gap: '0.3rem' },
+  dot:        { display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0 },
+  msgBox: {
+    padding: '0.85rem 1rem',
+    background: 'rgba(99,102,241,0.07)',
+    border: '1px solid rgba(99,102,241,0.16)',
+    borderRadius: '14px', borderLeft: '2px solid rgba(99,102,241,0.45)',
+    position: 'relative', zIndex: 1,
+  },
+  msgText: {
+    margin: 0, fontSize: '0.82rem', color: 'rgba(226,232,240,0.88)', lineHeight: 1.6,
+    fontStyle: 'italic',
+  },
+  analyticsRow: {
+    display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.65rem',
+    position: 'relative', zIndex: 1,
+  },
+  metricCard: {
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.07)',
+    borderRadius: '12px', padding: '0.75rem 0.6rem',
+    display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '0.2rem',
+  },
+  metricValue: { margin: 0, fontSize: '1rem', fontWeight: 800, lineHeight: 1.1 },
+  metricLabel: { margin: 0, fontSize: '0.6rem', color: 'rgba(148,163,184,0.5)', fontWeight: 600, letterSpacing: '0.05em' },
+};
 
 /* ══════════════════════════════════════
    TimeField sub-styles
