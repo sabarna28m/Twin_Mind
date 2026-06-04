@@ -893,3 +893,12 @@ html[data-theme="light"] .focus-ctrl-ghost {
   transform: scale(1.08);
   box-shadow: 0 0 16px rgba(0,212,255,0.2);
 }
+
+/* ── Burnout page responsive ── */
+@media (max-width: 768px) {
+  .burnout-two-col { grid-template-columns: 1fr !important; }
+  .burnout-rec-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 600px) {
+  .burnout-alert-actions { flex-direction: column !important; align-items: flex-start !important; }
+}

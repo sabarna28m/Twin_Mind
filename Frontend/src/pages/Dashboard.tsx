@@ -11,6 +11,7 @@ import TutorialOverlay from '../components/TutorialOverlay';
 import MobileNav from '../components/MobileNav';
 import api from '../services/api';
 import { getLevelColor, getLevelGradient, LEVEL_NAMES, type GamificationProgress, type WeeklyChallengeData } from '../utils/gamification';
+import BurnoutWidget from '../components/BurnoutWidget';
 
 const BACKEND = 'http://localhost:8000';
 
@@ -197,6 +198,7 @@ const QA_DEFS = [
   { labelKey: 'qa_battles',      descKey: 'qa_desc_battles',  icon: '⚔️', grad: 'linear-gradient(135deg,#ef4444,#f97316)', to: '/battles'      },
   { labelKey: 'qa_focus',        descKey: 'qa_desc_focus',    icon: '⏱',  grad: 'linear-gradient(135deg,#00D4FF,#7C3AED)', to: '/focus'        },
   { labelKey: 'qa_videos',       descKey: 'qa_desc_videos',   icon: '▶',  grad: 'linear-gradient(135deg,#ef4444,#f97316)', to: '/videos'       },
+  { labelKey: 'qa_burnout',      descKey: 'qa_desc_burnout',  icon: '🧠', grad: 'linear-gradient(135deg,#ef4444,#f59e0b)', to: '/burnout'      },
 ];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }
@@ -539,6 +541,25 @@ export default function Dashboard() {
           <Link to="/achievements" style={{ textDecoration: 'none' }}>
             <StatCard icon="🏆" grad="linear-gradient(135deg,#f59e0b,#fbbf24)" value={badgeCount} label={t('stat_badges')} delay={280} />
           </Link>
+        </section>
+
+        {/* ── Burnout Risk Widget ── */}
+        <section style={{ display: 'grid', gridTemplateColumns: 'minmax(220px,280px) 1fr', gap: '1rem', alignItems: 'start' }} className="mob-mid-row">
+          <BurnoutWidget />
+          <div style={{ background: 'var(--glass-bg, rgba(255,255,255,0.04))', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '1.25rem', display: 'flex', flexDirection: 'column' as const, gap: '0.6rem', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+              <span style={{ fontSize: '1rem' }}>🧠</span>
+              <h2 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-h)' }}>Burnout Prevention</h2>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text)', lineHeight: 1.6, opacity: 0.85 }}>
+              Track your daily study load, sleep, breaks, mood, and energy to monitor burnout risk in real-time.
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' as const }}>
+              {[{ label: '🟢 0–39 Low', color: '#10b981' }, { label: '🟡 40–69 Medium', color: '#f59e0b' }, { label: '🔴 70–100 High', color: '#ef4444' }].map(r => (
+                <span key={r.label} style={{ padding: '0.2rem 0.6rem', borderRadius: '99px', fontSize: '0.68rem', fontWeight: 600, background: `${r.color}15`, color: r.color, border: `1px solid ${r.color}33` }}>{r.label}</span>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* ── Weekly Challenge ── */}

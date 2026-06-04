@@ -24,6 +24,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import FocusSession from './pages/FocusSession';
 import StudyVideos from './pages/StudyVideos';
+import Burnout from './pages/Burnout';
 
 export default function App() {
   return (
@@ -169,6 +170,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <StudyVideos />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/burnout"
+            element={
+              <ProtectedRoute>
+                <Burnout />
               </ProtectedRoute>
             }
           />
