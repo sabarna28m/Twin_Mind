@@ -24,6 +24,7 @@ from app.models import battle  # noqa: F401
 from app.models import google_token  # noqa: F401
 from app.models import burnout  # noqa: F401
 from app.models import subject_performance  # noqa: F401
+from app.models import smart_plan_record  # noqa: F401
 from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes, notifications as notif_routes, quiz as quiz_routes, gamification as gamif_routes, battles as battle_routes, calendar as calendar_routes, smart_plan as smart_plan_routes
 from app.api.routes import websocket as ws_routes
 from app.api.routes import videos as video_routes
@@ -159,6 +160,15 @@ with engine.connect() as _conn:
         ),
         "CREATE INDEX IF NOT EXISTS ix_subject_records_user_id ON subject_records(user_id)",
         "CREATE INDEX IF NOT EXISTS ix_subject_records_subject ON subject_records(subject)",
+        (
+            "CREATE TABLE IF NOT EXISTS smart_plan_records ("
+            "id INTEGER PRIMARY KEY, "
+            "user_id INTEGER NOT NULL REFERENCES users(id), "
+            "plan_content TEXT NOT NULL, "
+            "generated_at DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "is_active BOOLEAN NOT NULL DEFAULT 1)"
+        ),
+        "CREATE INDEX IF NOT EXISTS ix_smart_plan_records_user_id ON smart_plan_records(user_id)",
         # AI notification fields
         "ALTER TABLE notifications ADD COLUMN priority VARCHAR(20)",
         "ALTER TABLE notifications ADD COLUMN category VARCHAR(50)",

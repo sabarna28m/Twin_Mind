@@ -281,6 +281,9 @@ export default function Dashboard() {
     api.get<WeeklyChallengeData>('/gamification/weekly-challenge')
       .then(r => setWeeklyChallenge(r.data))
       .catch(() => {});
+    api.get<SmartPlan>('/smart-plan/current')
+      .then(r => setSmartPlan(r.data))
+      .catch(() => {});  // 404 is expected when no plan saved yet
   }, []);
 
   // WebSocket — connect on mount, auto-reconnect on drop
@@ -330,6 +333,7 @@ export default function Dashboard() {
     try {
       const { data } = await api.post<SmartPlan>('/smart-plan/generate');
       setSmartPlan(data);
+      api.post('/smart-plan/save', data).catch(() => {});
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setPlanError(detail ?? 'Failed to generate plan. Please try again.');

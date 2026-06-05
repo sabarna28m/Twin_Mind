@@ -12,6 +12,7 @@ from app.core.database import get_db
 from app.models.user import User
 from app.models.learning_data import LearningData
 from app.models.student_profile import StudentProfile
+from app.models.smart_plan_record import SmartPlanRecord
 from app.api.routes.auth import get_current_user
 from app.ml.predictor import predict
 
@@ -205,3 +206,45 @@ def generate_smart_plan(
         forecast=str(data.get("forecast", pred["risk_label"])),
         days=day_plans,
     )
+
+
+@router.post("/save", status_code=204)
+def save_smart_plan(
+    payload: SmartPlanResponse,
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    # Deactivate all previous active plans for this user
+    db.query(SmartPlanRecord).filter(
+        SmartPlanRecord.user_id == current_user.id,
+        SmartPlanRecord.is_active == True,  # noqa: E712
+    ).update({"is_active": False})
+
+    record = SmartPlanRecord(
+        user_id=current_user.id,
+        plan_content=json.dumps(payload.model_dump()),
+        is_active=True,
+    )
+    db.add(record)
+    db.commit()
+
+
+@router.get("/current", response_model=SmartPlanResponse)
+def get_current_smart_plan(
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    record = (
+        db.query(SmartPlanRecord)
+        .filter(
+            SmartPlanRecord.user_id == current_user.id,
+            SmartPlanRecord.is_active == True,  # noqa: E712
+        )
+        .order_by(SmartPlanRecord.generated_at.desc())
+        .first()
+    )
+    if not record:
+        raise HTTPException(status_code=404, detail="No saved plan found.")
+
+    data = json.loads(record.plan_content)
+    return SmartPlanResponse(**data)
