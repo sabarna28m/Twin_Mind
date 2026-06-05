@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 from typing import List, Optional
@@ -33,6 +34,8 @@ router = APIRouter(prefix="/mentor", tags=["mentor"])
 
 _client: Optional[Groq] = None
 
+MAX_FILE_CHARS = 12_000   # ~3 000 tokens — keeps Groq well within context limit
+
 
 def _get_client() -> Groq:
     global _client
@@ -40,32 +43,44 @@ def _get_client() -> Groq:
         _client = Groq(api_key=settings.groq_api_key)
     return _client
 
-GROQ_MODEL       = "llama-3.3-70b-versatile"
-GROQ_VISION_MODEL = "llava-v1.5-7b-4096-preview"
+
+GROQ_MODEL = "llama-3.3-70b-versatile"
 
 
-def _analyze_image_with_groq(image_b64: str, user_message: str) -> str:
-    client = _get_client()
-    prompt = (
-        f'The student asks: "{user_message}"'
-        if user_message.strip()
-        else "Describe this image in detail, noting all text, diagrams, equations, and charts visible."
-    )
-    response = client.chat.completions.create(
-        model=GROQ_VISION_MODEL,
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "image_url", "image_url": {"url": image_b64}},
-                    {"type": "text", "text": prompt},
-                ],
+def _analyze_image_with_gemini(image_bytes: bytes, mime_type: str) -> Optional[str]:
+    """
+    Analyse an image with Gemini 1.5 Flash and return a plain-text description.
+    Returns None (fallback) when the quota is exhausted; raises for other errors.
+    """
+    if not settings.gemini_api_key:
+        return None  # no key configured → fallback
+
+    try:
+        import google.generativeai as genai  # imported lazily to avoid startup cost
+        genai.configure(api_key=settings.gemini_api_key)
+        model = genai.GenerativeModel("gemini-1.5-flash")
+
+        image_part = {
+            "inline_data": {
+                "mime_type": mime_type,
+                "data": base64.b64encode(image_bytes).decode("utf-8"),
             }
-        ],
-        max_tokens=1024,
-        temperature=0.4,
-    )
-    return response.choices[0].message.content
+        }
+        prompt = (
+            "You are an academic AI assistant analysing an image for a student. "
+            "Extract ALL visible content: text, equations, diagrams, charts, tables, code, "
+            "and any other academic material. Be thorough — the student's AI tutor will use "
+            "your description to answer questions about this image."
+        )
+        response = model.generate_content([image_part, prompt])
+        return response.text
+    except Exception as exc:
+        err = str(exc).lower()
+        if any(k in err for k in ("429", "quota", "resource has been exhausted", "rate_limit", "rate limit")):
+            logger.warning("Gemini quota exceeded: %s", exc)
+            return None  # trigger fallback
+        logger.error("Gemini image analysis failed: %s", exc, exc_info=True)
+        raise
 
 
 def _build_system_prompt(
@@ -340,7 +355,44 @@ async def upload_file(
         except Exception as exc:
             raise HTTPException(status_code=422, detail=f"Failed to read PDF: {exc}")
 
+    # Truncate to stay within Groq's context window
+    if len(text) > MAX_FILE_CHARS:
+        omitted = len(text) - MAX_FILE_CHARS
+        text = text[:MAX_FILE_CHARS] + f"\n\n[... {omitted:,} characters omitted — file too large to include in full ...]"
+
     return {"filename": filename, "text": text}
+
+
+@router.post("/analyze-image")
+async def analyze_image(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Analyse an uploaded image with Gemini Vision and return a text description.
+    Falls back gracefully when Gemini quota is exhausted.
+    """
+    filename = file.filename or "image"
+    mime_type = file.content_type or "image/jpeg"
+    if not mime_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Only image files are supported")
+
+    image_bytes = await file.read()
+
+    try:
+        description = _analyze_image_with_gemini(image_bytes, mime_type)
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"Image analysis failed: {exc}")
+
+    if description is None:
+        # Quota exhausted or no key — tell the AI what was uploaded and ask user to describe it
+        return {
+            "filename": filename,
+            "description": None,
+            "fallback": True,
+        }
+
+    return {"filename": filename, "description": description, "fallback": False}
 
 
 @router.post("/sessions", response_model=ChatSessionSummary, status_code=201)
@@ -441,24 +493,9 @@ def mentor_chat(
     for m in payload.history:
         messages.append({"role": m.role, "content": m.content})
 
-    # If image attached: analyse with Groq llava vision, then pass description to Groq text model
-    if payload.image:
-        try:
-            image_description = _analyze_image_with_groq(payload.image, payload.message)
-            user_content = (
-                f"[Image analysed by vision model]\n{image_description}\n\n"
-                f"---\n"
-                f"{payload.message or 'Please help me with this image.'}"
-            )
-        except Exception as exc:
-            logger.error("Image analysis failed: %s", exc, exc_info=True)
-            user_content = (
-                f"[Image analysis failed — {type(exc).__name__}: {exc}]\n\n"
-                f"{payload.message or 'I uploaded an image but analysis failed.'}"
-            )
-    else:
-        user_content = payload.message
-    messages.append({"role": "user", "content": user_content})
+    # Image and file context is pre-processed by the frontend before reaching here;
+    # payload.message already contains any extracted text or image description.
+    messages.append({"role": "user", "content": payload.message})
     user_id = current_user.id
 
     def event_stream():

@@ -138,11 +138,13 @@ export default function Mentor() {
   const [savingPlan,     setSavingPlan]     = useState(false);
 
   // Multimedia input state
-  const [isRecording,    setIsRecording]    = useState(false);
-  const [attachedImage,  setAttachedImage]  = useState<{ base64: string; name: string } | null>(null);
-  const [attachedFile,   setAttachedFile]   = useState<{ name: string; content: string } | null>(null);
-  const [isReadingFile,  setIsReadingFile]  = useState(false);
-  const [readingFileName, setReadingFileName] = useState<string | null>(null);
+  const [isRecording,      setIsRecording]      = useState(false);
+  const [attachedImage,    setAttachedImage]    = useState<{ name: string; description: string | null; fallback: boolean } | null>(null);
+  const [attachedFile,     setAttachedFile]     = useState<{ name: string; content: string } | null>(null);
+  const [isReadingFile,    setIsReadingFile]    = useState(false);
+  const [readingFileName,  setReadingFileName]  = useState<string | null>(null);
+  const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
+  const [analyzingImageName, setAnalyzingImageName] = useState<string | null>(null);
 
   const bottomRef      = useRef<HTMLDivElement>(null);
   const planBottomRef  = useRef<HTMLDivElement>(null);
@@ -263,13 +265,34 @@ export default function Mentor() {
     setIsRecording(true);
   }
 
-  function handleImageFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImageFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setAttachedImage({ base64: reader.result as string, name: file.name });
-    reader.readAsDataURL(file);
     e.target.value = '';
+
+    setIsAnalyzingImage(true);
+    setAnalyzingImageName(file.name);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch(`${API_BASE}/mentor/analyze-image`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        alert(`Could not analyse image: ${err.detail ?? response.status}`);
+        return;
+      }
+      const result = await response.json() as { filename: string; description: string | null; fallback: boolean };
+      setAttachedImage({ name: result.filename, description: result.description, fallback: result.fallback });
+    } catch {
+      alert('Failed to analyse image. Please try again.');
+    } finally {
+      setIsAnalyzingImage(false);
+      setAnalyzingImageName(null);
+    }
   }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -308,15 +331,33 @@ export default function Mentor() {
     if (!text.trim() && !hasImage && !hasFile) return;
     if (streaming) return;
 
-    // Build the API message (file content prepended as context)
+    // Build the API message (file text and image description prepended as context)
     let apiMessage = text.trim();
+
     if (hasFile && attachedFile) {
       const prefix = `[Attached file: ${attachedFile.name}]\n\n${attachedFile.content}\n\n---\n\n`;
-      apiMessage = prefix + (apiMessage || 'Please analyze this file and summarize the key points for me.');
+      apiMessage = prefix + (apiMessage || 'Please analyse this file and summarise the key points for me.');
     }
-    if (!apiMessage.trim()) apiMessage = 'Please analyze this image and help me understand it.';
 
-    // Build display content shown in chat bubble
+    if (hasImage && attachedImage) {
+      let imageCtx: string;
+      if (attachedImage.fallback) {
+        imageCtx =
+          `[Image uploaded: ${attachedImage.name} — automated analysis unavailable due to quota limits. ` +
+          `Please describe what you see in the image so I can help you better.]`;
+      } else {
+        imageCtx =
+          `[Image uploaded: ${attachedImage.name}]\n` +
+          `[Image content extracted by Gemini Vision]\n` +
+          `${attachedImage.description}\n` +
+          `[End of image content]`;
+      }
+      apiMessage = imageCtx + (apiMessage ? `\n\n---\n\n${apiMessage}` : '\n\nPlease help me understand this image.');
+    }
+
+    if (!apiMessage.trim()) apiMessage = 'Please help me with what I shared.';
+
+    // Build display content shown in the chat bubble
     const displayParts: string[] = [];
     if (hasFile  && attachedFile)  displayParts.push(`📎 ${attachedFile.name}`);
     if (hasImage && attachedImage) displayParts.push(`🖼 ${attachedImage.name}`);
@@ -326,8 +367,6 @@ export default function Mentor() {
     const userMsg: ChatMessage = { id: uid(), role: 'user', content: displayParts.join('\n') || apiMessage };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
-
-    const capturedImage = attachedImage;
     setAttachedImage(null);
     setAttachedFile(null);
 
@@ -336,13 +375,10 @@ export default function Mentor() {
     setStreaming(true);
 
     try {
-      const body: Record<string, unknown> = { message: apiMessage, history };
-      if (capturedImage) body.image = capturedImage.base64;
-
       const response = await fetch(`${API_BASE}/mentor/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ message: apiMessage, history }),
       });
 
       if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
@@ -633,8 +669,18 @@ export default function Mentor() {
             />
 
             {/* Attachment preview chips */}
-            {(attachedImage || attachedFile || isReadingFile) && (
+            {(attachedImage || attachedFile || isReadingFile || isAnalyzingImage) && (
               <div style={mc.attachRow}>
+                {isAnalyzingImage && analyzingImageName && (
+                  <div style={{ ...mc.attachChip, opacity: 0.75 }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <span style={mc.chipName}>Analysing image…</span>
+                  </div>
+                )}
                 {isReadingFile && readingFileName && (
                   <div style={{ ...mc.attachChip, opacity: 0.75 }}>
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -644,13 +690,15 @@ export default function Mentor() {
                   </div>
                 )}
                 {attachedImage && (
-                  <div style={mc.attachChip}>
+                  <div style={{ ...mc.attachChip, ...(attachedImage.fallback ? { borderColor: 'rgba(234,179,8,0.4)', background: 'rgba(234,179,8,0.08)' } : {}) }}>
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                       <circle cx="8.5" cy="8.5" r="1.5"/>
                       <polyline points="21 15 16 10 5 21"/>
                     </svg>
-                    <span style={mc.chipName}>{attachedImage.name}</span>
+                    <span style={mc.chipName}>
+                      {attachedImage.name}{attachedImage.fallback ? ' ⚠️' : ' ✓'}
+                    </span>
                     <button onClick={() => setAttachedImage(null)} style={mc.chipClose}>✕</button>
                   </div>
                 )}
@@ -659,7 +707,7 @@ export default function Mentor() {
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                     </svg>
-                    <span style={mc.chipName}>{attachedFile.name}</span>
+                    <span style={mc.chipName}>{attachedFile.name} ✓</span>
                     <button onClick={() => setAttachedFile(null)} style={mc.chipClose}>✕</button>
                   </div>
                 )}
@@ -692,9 +740,9 @@ export default function Mentor() {
               {/* Image upload */}
               <button
                 onClick={() => imageInputRef.current?.click()}
-                disabled={streaming}
+                disabled={streaming || isAnalyzingImage}
                 title="Upload image (JPG, PNG)"
-                style={mc.mediaBtn}
+                style={{ ...mc.mediaBtn, opacity: (streaming || isAnalyzingImage) ? 0.5 : 1 }}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
@@ -726,11 +774,11 @@ export default function Mentor() {
               />
               <button
                 onClick={() => sendMessage(input)}
-                disabled={(!input.trim() && !attachedImage && !attachedFile) || streaming}
+                disabled={(!input.trim() && !attachedImage && !attachedFile) || streaming || isAnalyzingImage || isReadingFile}
                 style={{
                   ...mc.sendBtn,
-                  opacity: ((!input.trim() && !attachedImage && !attachedFile) || streaming) ? 0.5 : 1,
-                  cursor: ((!input.trim() && !attachedImage && !attachedFile) || streaming) ? 'not-allowed' : 'pointer',
+                  opacity: ((!input.trim() && !attachedImage && !attachedFile) || streaming || isAnalyzingImage || isReadingFile) ? 0.5 : 1,
+                  cursor: ((!input.trim() && !attachedImage && !attachedFile) || streaming || isAnalyzingImage || isReadingFile) ? 'not-allowed' : 'pointer',
                 }}
               >
                 {streaming ? '…' : '→'}
