@@ -55,8 +55,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const { data } = await api.get<StudentProfile>('/student-profile', { headers });
           setStudentProfile(data);
-        } catch {
-          setStudentProfile(null);
+        } catch (err: unknown) {
+          const status = (err as { response?: { status?: number } })?.response?.status;
+          if (status === 404) setStudentProfile(null);
         }
         setProfileLoaded(true);
       })

@@ -1,29 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import ProtectedRoute from './components/ProtectedRoute';
-
-class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
-  state = { error: null };
-  static getDerivedStateFromError(error: Error) { return { error }; }
-  componentDidCatch(error: Error, info: ErrorInfo) { console.error('App error:', error, info); }
-  render() {
-    if (this.state.error) {
-      const err = this.state.error as Error;
-      return (
-        <div style={{ minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#060b18', padding: '2rem', gap: '1rem' }}>
-          <span style={{ fontSize: '2rem' }}>⚠️</span>
-          <p style={{ color: '#f1f5f9', fontWeight: 700, margin: 0, fontSize: '1.1rem' }}>Something went wrong</p>
-          <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.85rem', maxWidth: '480px', textAlign: 'center' }}>{err.message}</p>
-          <button onClick={() => window.location.reload()} style={{ marginTop: '0.5rem', padding: '0.5rem 1.5rem', background: '#00D4FF', color: '#060b18', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem' }}>Reload</button>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
 import TwinMindCopilot from './components/TwinMindCopilot';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -52,7 +31,6 @@ import AIFocusDetector from './pages/AIFocusDetector';
 
 export default function App() {
   return (
-    <ErrorBoundary>
     <ThemeProvider>
     <LanguageProvider>
     <BrowserRouter>
@@ -229,6 +207,5 @@ export default function App() {
     </BrowserRouter>
     </LanguageProvider>
     </ThemeProvider>
-    </ErrorBoundary>
   );
 }

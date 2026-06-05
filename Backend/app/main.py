@@ -1,11 +1,8 @@
-import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from sqlalchemy import text
-
-logger = logging.getLogger(__name__)
 
 from app.core.config import settings
 from app.core.database import engine, Base
@@ -34,11 +31,7 @@ from app.api.routes import burnout as burnout_routes
 from app.api.routes import subject_performance as subj_routes
 from app.ml.predictor import get_model  # warm up model at startup
 
-try:
-    Base.metadata.create_all(bind=engine)
-    logger.info("Database tables verified/created.")
-except Exception as _e:
-    logger.error("create_all failed (another process may be running): %s", _e)
+Base.metadata.create_all(bind=engine)
 
 # Add columns to existing DBs that predate these migrations
 with engine.connect() as _conn:
