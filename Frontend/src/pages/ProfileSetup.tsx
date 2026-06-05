@@ -13,10 +13,48 @@ const LEARNING_PREFS = [
   'Self-paced',
 ];
 
-const SEMESTER_OPTIONS = [
-  'Semester 1', 'Semester 2', 'Semester 3', 'Semester 4',
-  'Semester 5', 'Semester 6', 'Semester 7', 'Semester 8',
-  'Year 1', 'Year 2', 'Year 3', 'Year 4',
+const SEMESTER_GROUPS: { label: string; options: string[] }[] = [
+  {
+    label: 'School Students',
+    options: Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`),
+  },
+  {
+    label: 'Undergraduate College',
+    options: [
+      'Semester 1', 'Semester 2', 'Semester 3', 'Semester 4',
+      'Semester 5', 'Semester 6', 'Semester 7', 'Semester 8',
+      'Year 1', 'Year 2', 'Year 3', 'Year 4',
+    ],
+  },
+  {
+    label: 'Postgraduate',
+    options: ['PG Semester 1', 'PG Semester 2', 'PG Semester 3', 'PG Semester 4', 'PG Year 1', 'PG Year 2'],
+  },
+  {
+    label: 'Doctoral / PhD',
+    options: Array.from({ length: 5 }, (_, i) => `PhD Year ${i + 1}`),
+  },
+  {
+    label: 'Professional Courses',
+    options: [
+      'Module 1', 'Module 2', 'Module 3', 'Module 4', 'Module 5', 'Module 6',
+      'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5',
+    ],
+  },
+  {
+    label: 'Online / Self Learning',
+    options: ['Beginner Level', 'Intermediate Level', 'Advanced Level', 'Self-paced'],
+  },
+  {
+    label: 'Other',
+    options: ['Not Applicable'],
+  },
+];
+
+const COURSE_SUGGESTIONS = [
+  'School', 'B.Tech', 'B.E.', 'B.Sc', 'B.Com', 'B.A.', 'BCA', 'BBA',
+  'MBA', 'MCA', 'M.Tech', 'M.Sc', 'M.Com', 'M.A.',
+  'PhD', 'Diploma', 'NPTEL', 'Certification Course', 'Self Learning',
 ];
 
 export default function ProfileSetup() {
@@ -143,9 +181,13 @@ export default function ProfileSetup() {
               value={course}
               onChange={e => setCourse(e.target.value)}
               style={s.input}
-              placeholder="e.g. Computer Science, Business Administration"
+              placeholder="e.g. B.Tech, MBA, PhD, Self Learning…"
+              list="course-suggestions"
               required
             />
+            <datalist id="course-suggestions">
+              {COURSE_SUGGESTIONS.map(c => <option key={c} value={c} />)}
+            </datalist>
           </label>
 
           {/* Semester */}
@@ -158,8 +200,12 @@ export default function ProfileSetup() {
               required
             >
               <option value="" disabled>Select…</option>
-              {SEMESTER_OPTIONS.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
+              {SEMESTER_GROUPS.map(group => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.options.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </label>
