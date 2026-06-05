@@ -18,12 +18,18 @@ if _is_sqlite:
     )
 else:
     # PostgreSQL — connection pool tuned for Render free tier (1 shared DB)
+    # lock_timeout:      fail fast if another process holds a DDL lock (startup hang fix)
+    # statement_timeout: hard ceiling per query so no request hangs forever
     engine = create_engine(
         _db_url,
-        pool_size=5,
-        max_overflow=10,
+        pool_size=3,
+        max_overflow=5,
         pool_pre_ping=True,       # reconnect on stale connections
         pool_recycle=300,         # recycle every 5 min
+        connect_args={
+            "options": "-c lock_timeout=8000 -c statement_timeout=30000",
+            "connect_timeout": 10,
+        },
     )
 
 
