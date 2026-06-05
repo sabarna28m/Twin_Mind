@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,11 +15,11 @@ const LEARNING_PREFS = [
 
 const SEMESTER_GROUPS: { label: string; options: string[] }[] = [
   {
-    label: 'School Students',
+    label: '📚 School Students · Class 1 to 12',
     options: Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`),
   },
   {
-    label: 'Undergraduate College',
+    label: '🎓 Undergraduate College · Semester 1–8 or Year 1–4',
     options: [
       'Semester 1', 'Semester 2', 'Semester 3', 'Semester 4',
       'Semester 5', 'Semester 6', 'Semester 7', 'Semester 8',
@@ -27,28 +27,38 @@ const SEMESTER_GROUPS: { label: string; options: string[] }[] = [
     ],
   },
   {
-    label: 'Postgraduate',
+    label: '🏛️ Postgraduate · PG Semester or PG Year',
     options: ['PG Semester 1', 'PG Semester 2', 'PG Semester 3', 'PG Semester 4', 'PG Year 1', 'PG Year 2'],
   },
   {
-    label: 'Doctoral / PhD',
+    label: '🔬 Doctoral / PhD · PhD Year 1 to 5',
     options: Array.from({ length: 5 }, (_, i) => `PhD Year ${i + 1}`),
   },
   {
-    label: 'Professional Courses',
+    label: '📖 Professional Courses · Module (NPTEL, CA) or Level (AWS, certs)',
     options: [
       'Module 1', 'Module 2', 'Module 3', 'Module 4', 'Module 5', 'Module 6',
       'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5',
     ],
   },
   {
-    label: 'Online / Self Learning',
+    label: '💻 Online / Self Learning · Beginner to Advanced',
     options: ['Beginner Level', 'Intermediate Level', 'Advanced Level', 'Self-paced'],
   },
   {
-    label: 'Other',
+    label: '❓ Other',
     options: ['Not Applicable'],
   },
+];
+
+const GUIDE_ITEMS = [
+  { emoji: '📚', cat: 'School Students', hint: 'Select Class 1–12' },
+  { emoji: '🎓', cat: 'College Students', hint: 'Select Semester 1–8 or Year 1–4' },
+  { emoji: '🏛️', cat: 'Postgraduate', hint: 'Select PG Semester or PG Year' },
+  { emoji: '🔬', cat: 'PhD / Doctoral', hint: 'Select PhD Year' },
+  { emoji: '📖', cat: 'Professional Courses', hint: 'Module → NPTEL, Coursera, CA  ·  Level → AWS, language, certs' },
+  { emoji: '💻', cat: 'Self Learning', hint: 'Select Beginner, Intermediate, or Advanced' },
+  { emoji: '❓', cat: 'Not sure?', hint: 'Select Not Applicable' },
 ];
 
 const COURSE_SUGGESTIONS = [
@@ -71,8 +81,21 @@ export default function ProfileSetup() {
   const [subjectInput, setSubjectInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [showGuide, setShowGuide] = useState(false);
+  const guideRef = useRef<HTMLDivElement>(null);
 
   const isEditing = !!studentProfile;
+
+  useEffect(() => {
+    if (!showGuide) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (guideRef.current && !guideRef.current.contains(e.target as Node)) {
+        setShowGuide(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showGuide]);
 
   // Pre-fill if editing existing profile
   useEffect(() => {
@@ -191,13 +214,40 @@ export default function ProfileSetup() {
           </label>
 
           {/* Semester */}
-          <label style={s.label}>
-            Current Semester / Year
+          <div ref={guideRef}>
+            <div style={s.semesterLabelRow}>
+              <span style={s.semesterLabelText}>Current Semester / Year</span>
+              <button
+                type="button"
+                onClick={() => setShowGuide(v => !v)}
+                style={showGuide ? { ...s.guideBtn, ...s.guideBtnActive } : s.guideBtn}
+                aria-label="Show semester guide"
+                aria-expanded={showGuide}
+              >?</button>
+            </div>
+
+            {showGuide && (
+              <div style={s.guideCard}>
+                <p style={s.guideTitle}>Which option should I pick?</p>
+                {GUIDE_ITEMS.map(item => (
+                  <div key={item.cat} style={s.guideRow}>
+                    <span style={s.guideEmoji}>{item.emoji}</span>
+                    <div>
+                      <span style={s.guideCat}>{item.cat}</span>
+                      <span style={s.guideArrow}> → </span>
+                      <span style={s.guideHint}>{item.hint}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <select
               value={semester}
               onChange={e => setSemester(e.target.value)}
-              style={s.select}
+              style={{ ...s.select, marginTop: '0.375rem' }}
               required
+              aria-label="Current Semester / Year"
             >
               <option value="" disabled>Select…</option>
               {SEMESTER_GROUPS.map(group => (
@@ -208,7 +258,7 @@ export default function ProfileSetup() {
                 </optgroup>
               ))}
             </select>
-          </label>
+          </div>
 
           {/* Academic Goals */}
           <label style={s.label}>
@@ -464,5 +514,81 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: '1rem',
     fontWeight: 600,
     cursor: 'pointer',
+  },
+  semesterLabelRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.4rem',
+  },
+  semesterLabelText: {
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: 'var(--text)',
+  },
+  guideBtn: {
+    width: '18px',
+    height: '18px',
+    borderRadius: '50%',
+    border: '1px solid var(--border)',
+    background: 'transparent',
+    color: 'var(--text)',
+    fontSize: '0.7rem',
+    fontWeight: 700,
+    lineHeight: 1,
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
+    flexShrink: 0,
+    transition: 'border-color 0.15s, color 0.15s, background 0.15s',
+  },
+  guideBtnActive: {
+    border: '1px solid var(--accent)',
+    background: 'var(--accent-bg)',
+    color: 'var(--accent)',
+  },
+  guideCard: {
+    marginTop: '0.5rem',
+    padding: '0.85rem 1rem',
+    background: 'rgba(15, 23, 42, 0.92)',
+    backdropFilter: 'blur(12px)',
+    border: '1px solid rgba(0, 212, 255, 0.2)',
+    borderRadius: '10px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '0.55rem',
+  },
+  guideTitle: {
+    margin: '0 0 0.35rem',
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    color: 'var(--accent)',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.04em',
+  },
+  guideRow: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '0.5rem',
+  },
+  guideEmoji: {
+    fontSize: '0.95rem',
+    flexShrink: 0,
+    marginTop: '1px',
+  },
+  guideCat: {
+    fontSize: '0.8rem',
+    fontWeight: 600,
+    color: '#e2e8f0',
+  },
+  guideArrow: {
+    fontSize: '0.8rem',
+    color: 'var(--accent)',
+    fontWeight: 700,
+  },
+  guideHint: {
+    fontSize: '0.775rem',
+    color: '#94a3b8',
   },
 };
