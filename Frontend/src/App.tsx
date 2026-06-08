@@ -2,8 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { GOOGLE_CLIENT_ID } from './lib/config';
-import type { ReactNode } from 'react';
-
 // Only mount GoogleOAuthProvider when a client ID is actually configured.
 // Without this guard, an empty clientId causes @react-oauth/google to throw
 // before the ErrorBoundary can catch it, producing a blank white screen.
