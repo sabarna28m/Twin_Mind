@@ -263,27 +263,52 @@ function SubjectModal({ s, recs, plan, onClose }: {
 
 // ── Add-Record Modal ───────────────────────────────────────────────────
 
-function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+function AddModal({
+  onClose,
+  onSaved,
+  profileSubjects,
+}: {
+  onClose: () => void;
+  onSaved: () => void;
+  profileSubjects: string[];
+}) {
   const defaultForm: FormState = {
-    subject: DEFAULT_SUBJECTS[0], date: today(), score: 70,
+    subject: profileSubjects[0] ?? '',
+    date: today(), score: 70,
     study_hours: 1.5, confidence: 3, source: 'manual', notes: '', topics: {},
   };
-  const [form, setForm] = useState<FormState>(defaultForm);
-  const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState('');
-  const topics = SUBJECT_TOPICS[form.subject] ?? [];
+  const [form, setForm]       = useState<FormState>(defaultForm);
+  const [saving, setSaving]   = useState(false);
+  const [err, setErr]         = useState('');
+
+  // Dynamic topic management — no hardcoded lists
+  const [customTopics, setCustomTopics] = useState<{ name: string; score: number }[]>([]);
+  const [topicInput, setTopicInput]     = useState('');
+
+  function addTopic() {
+    const name = topicInput.trim();
+    if (!name || customTopics.some(t => t.name === name)) return;
+    setCustomTopics(prev => [...prev, { name, score: 70 }]);
+    setTopicInput('');
+  }
+
+  function removeTopic(name: string) {
+    setCustomTopics(prev => prev.filter(t => t.name !== name));
+  }
+
+  function setTopicScore(name: string, score: number) {
+    setCustomTopics(prev => prev.map(t => t.name === name ? { ...t, score } : t));
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true); setErr('');
     try {
-      const topicPayload = topics.map(name => ({
-        name, score: form.topics[name] ?? 50,
-      }));
       await api.post('/subject-performance/record', {
         subject: form.subject, date: form.date, score: form.score,
         study_hours: form.study_hours, confidence: form.confidence,
-        source: form.source, notes: form.notes, topics: topicPayload,
+        source: form.source, notes: form.notes,
+        topics: customTopics.map(t => ({ name: t.name, score: t.score })),
       });
       onSaved();
     } catch (e: unknown) {
@@ -301,11 +326,26 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
         <div style={{ ...md.body, paddingBottom: '1.5rem' }}>
           <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.9rem' }}>
 
+            {/* Subject — pulled from profile */}
             <div style={af.row}>
               <label style={af.label}>Subject</label>
-              <select value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value, topics: {} }))} style={af.input}>
-                {DEFAULT_SUBJECTS.map(s => <option key={s}>{s}</option>)}
-              </select>
+              {profileSubjects.length === 0 ? (
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#f59e0b', padding: '0.5rem 0.75rem', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: '8px' }}>
+                  No subjects found.{' '}
+                  <Link to="/profile/setup" style={{ color: '#f59e0b', fontWeight: 700 }}>
+                    Add subjects in your profile →
+                  </Link>
+                </p>
+              ) : (
+                <select
+                  value={form.subject}
+                  onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
+                  style={af.input}
+                  required
+                >
+                  {profileSubjects.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              )}
             </div>
 
             <div style={af.row2}>
@@ -354,26 +394,61 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
               </div>
             </div>
 
-            {/* Topic scores */}
-            {topics.length > 0 && (
-              <div>
-                <label style={af.label}>Topic Scores</label>
-                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.4rem', marginTop: '0.45rem' }}>
-                  {topics.map(t => {
-                    const ts = form.topics[t] ?? 50;
-                    return (
-                      <div key={t} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-h)', width: '130px', flexShrink: 0 }}>{t}</span>
-                        <input type="range" min={0} max={100} value={ts}
-                          onChange={e => setForm(f => ({ ...f, topics: { ...f.topics, [t]: +e.target.value } }))}
-                          style={{ flex: 1, accentColor: scoreColor(ts) }} />
-                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: scoreColor(ts), width: '32px', textAlign: 'right' as const }}>{ts}</span>
-                      </div>
-                    );
-                  })}
-                </div>
+            {/* Dynamic topic scores */}
+            <div>
+              <label style={{ ...af.label, marginBottom: '0.45rem', display: 'block' }}>
+                Topic / Chapter Scores <span style={{ color: 'var(--text)', fontWeight: 400, textTransform: 'none' as const }}>(optional)</span>
+              </label>
+
+              {/* Add topic input row */}
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <input
+                  type="text"
+                  value={topicInput}
+                  onChange={e => setTopicInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTopic(); } }}
+                  placeholder="e.g. Chapter 3, Matrices, SQL Joins…"
+                  style={{ ...af.input, flex: 1, margin: 0 }}
+                />
+                <button
+                  type="button"
+                  onClick={addTopic}
+                  disabled={!topicInput.trim()}
+                  style={{ padding: '0 0.85rem', background: 'rgba(99,102,241,0.18)', border: '1px solid rgba(99,102,241,0.4)', borderRadius: '8px', color: '#818cf8', fontSize: '0.8rem', fontWeight: 700, cursor: topicInput.trim() ? 'pointer' : 'not-allowed', opacity: topicInput.trim() ? 1 : 0.5, whiteSpace: 'nowrap' as const, fontFamily: 'inherit' }}
+                >
+                  + Add
+                </button>
               </div>
-            )}
+
+              {/* Topic list with score sliders */}
+              {customTopics.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.45rem' }}>
+                  {customTopics.map(t => (
+                    <div key={t.name} style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', padding: '0.4rem 0.6rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-h)', width: '120px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }} title={t.name}>{t.name}</span>
+                      <input
+                        type="range" min={0} max={100} value={t.score}
+                        onChange={e => setTopicScore(t.name, +e.target.value)}
+                        style={{ flex: 1, accentColor: scoreColor(t.score) }}
+                      />
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: scoreColor(t.score), width: '32px', textAlign: 'right' as const }}>{t.score}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeTopic(t.name)}
+                        style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.85rem', padding: '0 0.1rem', lineHeight: 1, flexShrink: 0 }}
+                        aria-label={`Remove ${t.name}`}
+                      >✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {customTopics.length === 0 && (
+                <p style={{ margin: 0, fontSize: '0.72rem', color: '#334155' }}>
+                  Type a chapter or topic name above and click + Add to score it.
+                </p>
+              )}
+            </div>
 
             <div>
               <label style={af.label}>Notes (optional)</label>
@@ -384,7 +459,11 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
 
             {err && <p style={{ margin: 0, padding: '0.55rem 0.8rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: '#fca5a5', fontSize: '0.8rem' }}>{err}</p>}
 
-            <button type="submit" disabled={saving} style={{ padding: '0.75rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: '12px', color: '#fff', fontSize: '0.9rem', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, fontFamily: 'inherit' }}>
+            <button
+              type="submit"
+              disabled={saving || profileSubjects.length === 0}
+              style={{ padding: '0.75rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: '12px', color: '#fff', fontSize: '0.9rem', fontWeight: 800, cursor: (saving || profileSubjects.length === 0) ? 'not-allowed' : 'pointer', opacity: (saving || profileSubjects.length === 0) ? 0.6 : 1, fontFamily: 'inherit' }}
+            >
               {saving ? 'Saving…' : '+ Save Record'}
             </button>
           </form>
@@ -397,7 +476,8 @@ function AddModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
 // ── Main Page ──────────────────────────────────────────────────────────
 
 export default function SubjectAnalysis() {
-  const { user } = useAuth();
+  const { user, studentProfile } = useAuth();
+  const profileSubjects = studentProfile?.subjects ?? [];
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<SubjectSummary | null>(null);
@@ -687,7 +767,11 @@ export default function SubjectAnalysis() {
         <SubjectModal s={selected} recs={selectedRecs} plan={selectedPlan} onClose={() => setSelected(null)} />
       )}
       {showAdd && (
-        <AddModal onClose={() => setShowAdd(false)} onSaved={() => { setShowAdd(false); setLoading(true); load(); }} />
+        <AddModal
+          profileSubjects={profileSubjects}
+          onClose={() => setShowAdd(false)}
+          onSaved={() => { setShowAdd(false); setLoading(true); load(); }}
+        />
       )}
     </div>
   );
