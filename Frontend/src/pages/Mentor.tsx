@@ -139,7 +139,7 @@ export default function Mentor() {
 
   // Multimedia input state
   const [isRecording,      setIsRecording]      = useState(false);
-  const [attachedImage,    setAttachedImage]    = useState<{ name: string; description: string | null; fallback: boolean } | null>(null);
+  const [attachedImage,    setAttachedImage]    = useState<{ name: string; description: string | null; groq_context: string | null; fallback: boolean } | null>(null);
   const [attachedFile,     setAttachedFile]     = useState<{ name: string; content: string } | null>(null);
   const [isReadingFile,    setIsReadingFile]    = useState(false);
   const [readingFileName,  setReadingFileName]  = useState<string | null>(null);
@@ -285,8 +285,8 @@ export default function Mentor() {
         alert(`Could not analyse image: ${err.detail ?? response.status}`);
         return;
       }
-      const result = await response.json() as { filename: string; description: string | null; fallback: boolean };
-      setAttachedImage({ name: result.filename, description: result.description, fallback: result.fallback });
+      const result = await response.json() as { filename: string; description: string | null; groq_context: string | null; fallback: boolean };
+      setAttachedImage({ name: result.filename, description: result.description, groq_context: result.groq_context, fallback: result.fallback });
     } catch {
       alert('Failed to analyse image. Please try again.');
     } finally {
@@ -340,19 +340,17 @@ export default function Mentor() {
     }
 
     if (hasImage && attachedImage) {
+      // Step 3 — use the pre-formatted groq_context returned by the backend,
+      // or the fallback message if Gemini was unavailable.
       let imageCtx: string;
-      if (attachedImage.fallback) {
+      if (attachedImage.fallback || !attachedImage.groq_context) {
         imageCtx =
-          `[Image uploaded: ${attachedImage.name} — automated analysis unavailable due to quota limits. ` +
-          `Please describe what you see in the image so I can help you better.]`;
+          `The user uploaded an image called "${attachedImage.name}" but automated analysis ` +
+          `was unavailable. Please ask them to describe what is in the image so you can help.`;
       } else {
-        imageCtx =
-          `[Image uploaded: ${attachedImage.name}]\n` +
-          `[Image content extracted by Gemini Vision]\n` +
-          `${attachedImage.description}\n` +
-          `[End of image content]`;
+        imageCtx = attachedImage.groq_context;
       }
-      apiMessage = imageCtx + (apiMessage ? `\n\n---\n\n${apiMessage}` : '\n\nPlease help me understand this image.');
+      apiMessage = imageCtx + (apiMessage ? `\n\nUser question: ${apiMessage}` : '');
     }
 
     if (!apiMessage.trim()) apiMessage = 'Please help me with what I shared.';

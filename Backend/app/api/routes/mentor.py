@@ -47,31 +47,24 @@ def _get_client() -> Groq:
 GROQ_MODEL = "llama-3.3-70b-versatile"
 
 
-_GEMINI_URL = (
-    "https://generativelanguage.googleapis.com/v1beta/models"
-    "/gemini-2.0-flash:generateContent"
-)
-_GEMINI_PROMPT = (
-    "You are an academic AI assistant analysing an image for a student. "
-    "Extract ALL visible content: text, equations, diagrams, charts, tables, "
-    "code, and any other academic material. Be thorough — the student's AI "
-    "tutor will use your description to answer questions about this image."
-)
-
-
 def _analyze_image_with_gemini(image_bytes: bytes, mime_type: str) -> Optional[str]:
     """
-    Call Gemini 2.0 Flash REST API directly with the image as inline_data.
-    Returns a plain-text description, or None when quota is exhausted / no key.
-    Raises on any other error so the caller can surface it to the user.
+    Step 1 — Call Gemini 2.0 Flash via the REST API using requests.
+    Step 2 — Extract and return the plain-text description.
+    Returns None when quota is exhausted or the API key is missing.
+    Raises RuntimeError on any other failure so the caller can surface it.
     """
     if not settings.gemini_api_key:
         logger.warning("GEMINI_API_KEY is not configured — image analysis unavailable")
         return None
 
-    import httpx  # already in requirements
+    import requests  # standard HTTP library
 
-    payload = {
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models"
+        f"/gemini-2.0-flash:generateContent?key={settings.gemini_api_key}"
+    )
+    body = {
         "contents": [{
             "parts": [
                 {
@@ -80,46 +73,41 @@ def _analyze_image_with_gemini(image_bytes: bytes, mime_type: str) -> Optional[s
                         "data": base64.b64encode(image_bytes).decode("utf-8"),
                     }
                 },
-                {"text": _GEMINI_PROMPT},
+                {"text": "Describe what you see in this image in detail"},
             ]
         }]
     }
 
     logger.info(
-        "Gemini request: model=gemini-2.0-flash  mime_type=%s  image_size=%d bytes",
+        "Gemini request → model=gemini-2.0-flash  mime_type=%s  size=%d bytes",
         mime_type, len(image_bytes),
     )
 
     try:
-        resp = httpx.post(
-            _GEMINI_URL,
-            params={"key": settings.gemini_api_key},
-            json=payload,
-            timeout=30,
-        )
+        resp = requests.post(url, json=body, timeout=30)
     except Exception as exc:
         logger.error("Gemini HTTP request failed: %s", exc, exc_info=True)
         raise RuntimeError(f"Could not reach Gemini API: {exc}") from exc
 
-    logger.info("Gemini response: status=%s  body_preview=%s", resp.status_code, resp.text[:300])
+    logger.info("Gemini response → status=%d  body=%s", resp.status_code, resp.text[:400])
 
     if resp.status_code == 429:
-        logger.warning("Gemini quota exceeded (429) — falling back to manual description")
+        logger.warning("Gemini quota exceeded (429)")
         return None
 
-    if not resp.is_success:
-        raise RuntimeError(
-            f"Gemini API returned {resp.status_code}: {resp.text[:300]}"
-        )
+    if not resp.ok:
+        raise RuntimeError(f"Gemini API error {resp.status_code}: {resp.text[:300]}")
 
     data = resp.json()
+    logger.info("Gemini parsed response → %s", json.dumps(data)[:400])
+
     try:
         description = data["candidates"][0]["content"]["parts"][0]["text"]
     except (KeyError, IndexError) as exc:
-        logger.error("Unexpected Gemini response shape: %s", json.dumps(data)[:500])
+        logger.error("Unexpected Gemini response shape: %s", json.dumps(data))
         raise RuntimeError(f"Could not parse Gemini response: {exc}") from exc
 
-    logger.info("Gemini analysis complete — description length: %d chars", len(description))
+    logger.info("Gemini description extracted — length=%d chars", len(description))
     return description
 
 
@@ -409,8 +397,12 @@ async def analyze_image(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Analyse an uploaded image with Gemini Vision and return a text description.
-    Falls back gracefully when Gemini quota is exhausted.
+    Step 1: receive image, call Gemini 2.0 Flash for description.
+    Step 2: extract description text.
+    Step 3: return a groq_context string already formatted for Groq:
+            "The user uploaded an image. Here is what it contains: {desc}.
+             Now respond to their question about it."
+    Falls back gracefully when Gemini quota is exhausted or key is missing.
     """
     filename = file.filename or "image"
     mime_type = file.content_type or "image/jpeg"
@@ -418,21 +410,38 @@ async def analyze_image(
         raise HTTPException(status_code=400, detail="Only image files are supported")
 
     image_bytes = await file.read()
+    logger.info("analyze-image: filename=%s  mime=%s  size=%d", filename, mime_type, len(image_bytes))
 
     try:
         description = _analyze_image_with_gemini(image_bytes, mime_type)
     except Exception as exc:
+        logger.error("analyze-image failed: %s", exc, exc_info=True)
         raise HTTPException(status_code=422, detail=f"Image analysis failed: {exc}")
 
     if description is None:
-        # Quota exhausted or no key — tell the AI what was uploaded and ask user to describe it
+        # Quota exhausted or key missing — fallback: ask user to describe the image
+        logger.warning("analyze-image: Gemini unavailable, returning fallback")
         return {
             "filename": filename,
             "description": None,
+            "groq_context": None,
             "fallback": True,
         }
 
-    return {"filename": filename, "description": description, "fallback": False}
+    # Step 3 — format the context string that gets passed to Groq
+    groq_context = (
+        f"The user uploaded an image. "
+        f"Here is what it contains: {description}. "
+        f"Now respond to their question about it."
+    )
+    logger.info("analyze-image success — groq_context length=%d", len(groq_context))
+
+    return {
+        "filename": filename,
+        "description": description,
+        "groq_context": groq_context,
+        "fallback": False,
+    }
 
 
 @router.post("/sessions", response_model=ChatSessionSummary, status_code=201)
