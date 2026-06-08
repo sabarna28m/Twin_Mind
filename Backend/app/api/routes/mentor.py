@@ -47,40 +47,80 @@ def _get_client() -> Groq:
 GROQ_MODEL = "llama-3.3-70b-versatile"
 
 
+_GEMINI_URL = (
+    "https://generativelanguage.googleapis.com/v1beta/models"
+    "/gemini-2.0-flash:generateContent"
+)
+_GEMINI_PROMPT = (
+    "You are an academic AI assistant analysing an image for a student. "
+    "Extract ALL visible content: text, equations, diagrams, charts, tables, "
+    "code, and any other academic material. Be thorough — the student's AI "
+    "tutor will use your description to answer questions about this image."
+)
+
+
 def _analyze_image_with_gemini(image_bytes: bytes, mime_type: str) -> Optional[str]:
     """
-    Analyse an image with Gemini 1.5 Flash and return a plain-text description.
-    Returns None (fallback) when the quota is exhausted; raises for other errors.
+    Call Gemini 2.0 Flash REST API directly with the image as inline_data.
+    Returns a plain-text description, or None when quota is exhausted / no key.
+    Raises on any other error so the caller can surface it to the user.
     """
     if not settings.gemini_api_key:
-        return None  # no key configured → fallback
+        logger.warning("GEMINI_API_KEY is not configured — image analysis unavailable")
+        return None
+
+    import httpx  # already in requirements
+
+    payload = {
+        "contents": [{
+            "parts": [
+                {
+                    "inline_data": {
+                        "mime_type": mime_type,
+                        "data": base64.b64encode(image_bytes).decode("utf-8"),
+                    }
+                },
+                {"text": _GEMINI_PROMPT},
+            ]
+        }]
+    }
+
+    logger.info(
+        "Gemini request: model=gemini-2.0-flash  mime_type=%s  image_size=%d bytes",
+        mime_type, len(image_bytes),
+    )
 
     try:
-        import google.generativeai as genai  # imported lazily to avoid startup cost
-        genai.configure(api_key=settings.gemini_api_key)
-        model = genai.GenerativeModel("gemini-2.0-flash")
-
-        image_part = {
-            "inline_data": {
-                "mime_type": mime_type,
-                "data": base64.b64encode(image_bytes).decode("utf-8"),
-            }
-        }
-        prompt = (
-            "You are an academic AI assistant analysing an image for a student. "
-            "Extract ALL visible content: text, equations, diagrams, charts, tables, code, "
-            "and any other academic material. Be thorough — the student's AI tutor will use "
-            "your description to answer questions about this image."
+        resp = httpx.post(
+            _GEMINI_URL,
+            params={"key": settings.gemini_api_key},
+            json=payload,
+            timeout=30,
         )
-        response = model.generate_content([image_part, prompt])
-        return response.text
     except Exception as exc:
-        err = str(exc).lower()
-        if any(k in err for k in ("429", "quota", "resource has been exhausted", "rate_limit", "rate limit")):
-            logger.warning("Gemini quota exceeded: %s", exc)
-            return None  # trigger fallback
-        logger.error("Gemini image analysis failed: %s", exc, exc_info=True)
-        raise
+        logger.error("Gemini HTTP request failed: %s", exc, exc_info=True)
+        raise RuntimeError(f"Could not reach Gemini API: {exc}") from exc
+
+    logger.info("Gemini response: status=%s  body_preview=%s", resp.status_code, resp.text[:300])
+
+    if resp.status_code == 429:
+        logger.warning("Gemini quota exceeded (429) — falling back to manual description")
+        return None
+
+    if not resp.is_success:
+        raise RuntimeError(
+            f"Gemini API returned {resp.status_code}: {resp.text[:300]}"
+        )
+
+    data = resp.json()
+    try:
+        description = data["candidates"][0]["content"]["parts"][0]["text"]
+    except (KeyError, IndexError) as exc:
+        logger.error("Unexpected Gemini response shape: %s", json.dumps(data)[:500])
+        raise RuntimeError(f"Could not parse Gemini response: {exc}") from exc
+
+    logger.info("Gemini analysis complete — description length: %d chars", len(description))
+    return description
 
 
 def _build_system_prompt(
