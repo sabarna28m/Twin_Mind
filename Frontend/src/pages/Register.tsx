@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { GOOGLE_CLIENT_ID } from '../lib/config';
 import CustomCaptcha from '../components/CustomCaptcha';
+import PasswordInput from '../components/PasswordInput';
+import PasswordStrength from '../components/PasswordStrength';
 
 export default function Register() {
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
@@ -35,6 +39,20 @@ export default function Register() {
     }
   }
 
+  async function handleGoogleSuccess(credential: string) {
+    setError('');
+    setLoading(true);
+    try {
+      await loginWithGoogle(credential);
+      navigate('/');
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(detail ?? 'Google sign-up failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div style={s.page} className="mob-auth-page">
       <div style={s.orb1} />
@@ -51,6 +69,30 @@ export default function Register() {
 
         {error && <div style={s.error}>{error}</div>}
 
+        {/* Google Sign-Up */}
+        {GOOGLE_CLIENT_ID && (
+          <div style={s.googleWrap}>
+            <GoogleLogin
+              onSuccess={cr => cr.credential && handleGoogleSuccess(cr.credential)}
+              onError={() => setError('Google sign-up failed. Please try again.')}
+              theme="filled_black"
+              size="large"
+              text="signup_with"
+              width={372}
+              useOneTap={false}
+            />
+          </div>
+        )}
+
+        {/* Divider */}
+        {GOOGLE_CLIENT_ID && (
+          <div style={s.divider}>
+            <span style={s.dividerLine} />
+            <span style={s.dividerText}>or sign up with email</span>
+            <span style={s.dividerLine} />
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} style={s.form}>
           <label style={s.label}>
             {t('register_fullname')}
@@ -64,17 +106,22 @@ export default function Register() {
               onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com" required />
           </label>
-          <label style={s.label}>
-            {t('register_password')}
-            <input className="dark-input" type="password" value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="Min. 8 characters" minLength={8} required />
-          </label>
+          <div>
+            <label style={s.label}>
+              {t('register_password')}
+              <PasswordInput
+                value={password}
+                onChange={setPassword}
+                placeholder="Min. 8 characters"
+                minLength={8}
+                required
+                autoComplete="new-password"
+              />
+            </label>
+            <PasswordStrength password={password} />
+          </div>
 
-          <CustomCaptcha
-            onValid={setCaptchaValid}
-            resetKey={captchaReset}
-          />
+          <CustomCaptcha onValid={setCaptchaValid} resetKey={captchaReset} />
 
           <button
             className="grad-btn"
@@ -126,6 +173,17 @@ const s: Record<string, React.CSSProperties> = {
   logoText: { fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' },
   tagline: { textAlign: 'center', fontSize: '0.8rem', color: '#475569', marginBottom: '1.75rem' },
   title: { fontSize: '1.25rem', fontWeight: 700, color: '#f1f5f9', textAlign: 'center', marginBottom: '1.5rem' },
+  googleWrap: { display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' },
+  divider: {
+    display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem',
+  },
+  dividerLine: {
+    flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)',
+  },
+  dividerText: {
+    fontSize: '0.72rem', color: '#334155', whiteSpace: 'nowrap' as const,
+    fontWeight: 500, letterSpacing: '0.04em',
+  },
   form: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   label: {
     display: 'flex', flexDirection: 'column', gap: '0.45rem',

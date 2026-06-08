@@ -16,3 +16,7 @@ export const BACKEND_URL: string = API_URL.replace(/\/api\/v1\/?$/, '');
 export const WS_URL: string = BACKEND_URL
   .replace(/^https:\/\//, 'wss://')
   .replace(/^http:\/\//, 'ws://');
+
+/** Google OAuth Client ID — set VITE_GOOGLE_CLIENT_ID in .env */
+export const GOOGLE_CLIENT_ID: string =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '';

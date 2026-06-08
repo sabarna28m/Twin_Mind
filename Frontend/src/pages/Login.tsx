@@ -1,21 +1,24 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { GOOGLE_CLIENT_ID } from '../lib/config';
 import CustomCaptcha from '../components/CustomCaptcha';
+import PasswordInput from '../components/PasswordInput';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const [email, setEmail]           = useState('');
-  const [password, setPassword]     = useState('');
+  const [email, setEmail]               = useState('');
+  const [password, setPassword]         = useState('');
   const [captchaValid, setCaptchaValid] = useState(false);
   const [captchaReset, setCaptchaReset] = useState(0);
-  const [error, setError]           = useState('');
-  const [loading, setLoading]       = useState(false);
+  const [error, setError]               = useState('');
+  const [loading, setLoading]           = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -29,6 +32,20 @@ export default function Login() {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(detail ?? t('login_error'));
       setCaptchaReset(r => r + 1);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleSuccess(credential: string) {
+    setError('');
+    setLoading(true);
+    try {
+      await loginWithGoogle(credential);
+      navigate('/');
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(detail ?? 'Google sign-in failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -50,6 +67,30 @@ export default function Login() {
 
         {error && <div style={s.error}>{error}</div>}
 
+        {/* Google Sign-In */}
+        {GOOGLE_CLIENT_ID && (
+          <div style={s.googleWrap}>
+            <GoogleLogin
+              onSuccess={cr => cr.credential && handleGoogleSuccess(cr.credential)}
+              onError={() => setError('Google sign-in failed. Please try again.')}
+              theme="filled_black"
+              size="large"
+              text="continue_with"
+              width={372}
+              useOneTap={false}
+            />
+          </div>
+        )}
+
+        {/* Divider */}
+        {GOOGLE_CLIENT_ID && (
+          <div style={s.divider}>
+            <span style={s.dividerLine} />
+            <span style={s.dividerText}>or continue with email</span>
+            <span style={s.dividerLine} />
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} style={s.form}>
           <label style={s.label}>
             {t('login_email')}
@@ -59,16 +100,17 @@ export default function Login() {
           </label>
           <label style={s.label}>
             {t('login_password')}
-            <input className="dark-input" type="password" value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••" required />
+            <PasswordInput
+              value={password}
+              onChange={setPassword}
+              placeholder="••••••••"
+              required
+              autoComplete="current-password"
+            />
             <Link to="/forgot-password" style={s.forgotLink}>{t('login_forgot')}</Link>
           </label>
 
-          <CustomCaptcha
-            onValid={setCaptchaValid}
-            resetKey={captchaReset}
-          />
+          <CustomCaptcha onValid={setCaptchaValid} resetKey={captchaReset} />
 
           <button
             className="grad-btn"
@@ -120,6 +162,17 @@ const s: Record<string, React.CSSProperties> = {
   logoText: { fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' },
   tagline: { textAlign: 'center', fontSize: '0.8rem', color: '#475569', marginBottom: '1.75rem' },
   title: { fontSize: '1.25rem', fontWeight: 700, color: '#f1f5f9', textAlign: 'center', marginBottom: '1.5rem' },
+  googleWrap: { display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' },
+  divider: {
+    display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem',
+  },
+  dividerLine: {
+    flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)',
+  },
+  dividerText: {
+    fontSize: '0.72rem', color: '#334155', whiteSpace: 'nowrap' as const,
+    fontWeight: 500, letterSpacing: '0.04em',
+  },
   form: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   label: {
     display: 'flex', flexDirection: 'column', gap: '0.45rem',

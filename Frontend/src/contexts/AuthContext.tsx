@@ -27,6 +27,7 @@ interface AuthContextValue {
   studentProfile: StudentProfile | null;
   profileLoaded: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (credential: string) => Promise<void>;
   register: (email: string, fullName: string, password: string) => Promise<void>;
   logout: () => void;
   refreshStudentProfile: () => Promise<void>;
@@ -99,6 +100,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(data.access_token);
   }
 
+  /** Exchange a Google credential (ID token) for a TwinMind session token. */
+  async function loginWithGoogle(credential: string) {
+    const { data } = await api.post<{ access_token: string }>('/auth/google-login', { credential });
+    localStorage.setItem('token', data.access_token);
+    setProfileLoaded(false);
+    setToken(data.access_token);
+  }
+
   async function register(email: string, fullName: string, password: string) {
     await api.post('/auth/register', { email, full_name: fullName, password });
   }
@@ -112,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, studentProfile, profileLoaded, login, register, logout, refreshStudentProfile, refreshUser }}>
+    <AuthContext.Provider value={{ user, token, studentProfile, profileLoaded, login, loginWithGoogle, register, logout, refreshStudentProfile, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

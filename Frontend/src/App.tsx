@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { GOOGLE_CLIENT_ID } from './lib/config';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -52,6 +54,7 @@ import AIFocusDetector from './pages/AIFocusDetector';
 
 export default function App() {
   return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <ErrorBoundary>
     <ThemeProvider>
     <LanguageProvider>
@@ -230,5 +233,6 @@ export default function App() {
     </LanguageProvider>
     </ThemeProvider>
     </ErrorBoundary>
+    </GoogleOAuthProvider>
   );
 }

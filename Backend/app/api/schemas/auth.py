@@ -43,3 +43,8 @@ class ForgotPasswordRequest(BaseModel):
 class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
+
+
+class GoogleLoginRequest(BaseModel):
+    # Google ID token (credential) returned by the Google Identity Services button
+    credential: str

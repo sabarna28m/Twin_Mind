@@ -3,6 +3,8 @@ import type { FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { API_URL } from '../lib/config';
+import PasswordInput from '../components/PasswordInput';
+import PasswordStrength from '../components/PasswordStrength';
 
 const API = API_URL;
 
@@ -88,28 +90,39 @@ export default function ResetPassword() {
             {status === 'error' && <div style={s.error}>{message}</div>}
 
             <form onSubmit={handleSubmit} style={s.form}>
-              <label style={s.label}>
-                {t('reset_new_pw')}
-                <input
-                  className="dark-input"
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder="Min. 8 characters"
-                  required
-                  autoFocus
-                />
-              </label>
+              <div>
+                <label style={s.label}>
+                  {t('reset_new_pw')}
+                  <PasswordInput
+                    value={password}
+                    onChange={setPassword}
+                    placeholder="Min. 8 characters"
+                    required
+                    autoFocus
+                    autoComplete="new-password"
+                  />
+                </label>
+                <PasswordStrength password={password} />
+              </div>
               <label style={s.label}>
                 {t('reset_confirm_pw')}
-                <input
-                  className="dark-input"
-                  type="password"
+                <PasswordInput
                   value={confirm}
-                  onChange={e => setConfirm(e.target.value)}
+                  onChange={setConfirm}
                   placeholder="Repeat password"
                   required
+                  autoComplete="new-password"
                 />
+                {/* Live match indicator */}
+                {confirm && (
+                  <span style={{
+                    fontSize: '0.7rem', marginTop: '0.2rem',
+                    color: password === confirm ? '#10b981' : '#ef4444',
+                    display: 'flex', alignItems: 'center', gap: '0.3rem',
+                  }}>
+                    {password === confirm ? '✓ Passwords match' : '✗ Passwords do not match'}
+                  </span>
+                )}
               </label>
               <button
                 className="grad-btn"
@@ -133,14 +146,10 @@ export default function ResetPassword() {
 
 const s: Record<string, React.CSSProperties> = {
   page: {
-    minHeight: '100svh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    minHeight: '100svh', display: 'flex', alignItems: 'center', justifyContent: 'center',
     padding: '1.5rem',
     background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.18) 0%, transparent 70%), #080d1a',
-    position: 'relative',
-    overflow: 'hidden',
+    position: 'relative', overflow: 'hidden',
   },
   orb1: {
     position: 'absolute', width: '600px', height: '600px', borderRadius: '50%',
@@ -157,14 +166,11 @@ const s: Record<string, React.CSSProperties> = {
     padding: '2.75rem 2.25rem', borderRadius: '20px',
     boxShadow: '0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
   },
-  logoWrap: {
-    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.4rem',
-  },
+  logoWrap: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.4rem' },
   logoIcon: { fontSize: '1.6rem', color: '#6366f1', lineHeight: 1 },
   logoText: { fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.5px' },
   tagline: { textAlign: 'center', fontSize: '0.8rem', color: '#475569', marginBottom: '1.75rem' },
   title: { fontSize: '1.25rem', fontWeight: 700, color: '#f1f5f9', textAlign: 'center', marginBottom: '0.75rem' },
-  description: { fontSize: '0.875rem', color: '#64748b', textAlign: 'center', marginBottom: '1.5rem', lineHeight: 1.6 },
   form: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   label: {
     display: 'flex', flexDirection: 'column', gap: '0.45rem',
@@ -181,6 +187,5 @@ const s: Record<string, React.CSSProperties> = {
   success: { textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' },
   successIcon: { fontSize: '2.5rem', color: '#10b981' },
   successText: { fontSize: '0.9rem', color: '#94a3b8', lineHeight: 1.6 },
-  successSub: { fontSize: '0.8rem', color: '#475569', lineHeight: 1.6 },
   backLink: { color: '#818cf8', textDecoration: 'none', fontWeight: 600, fontSize: '0.875rem', marginTop: '0.5rem' },
 };

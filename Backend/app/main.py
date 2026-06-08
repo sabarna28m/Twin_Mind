@@ -170,6 +170,9 @@ with engine.connect() as _conn:
             "is_active BOOLEAN NOT NULL DEFAULT 1)"
         ),
         "CREATE INDEX IF NOT EXISTS ix_smart_plan_records_user_id ON smart_plan_records(user_id)",
+        # Google OAuth columns on users table
+        "ALTER TABLE users ADD COLUMN oauth_provider VARCHAR(50)",
+        "ALTER TABLE users ADD COLUMN oauth_id VARCHAR(255)",
         # AI notification fields
         "ALTER TABLE notifications ADD COLUMN priority VARCHAR(20)",
         "ALTER TABLE notifications ADD COLUMN category VARCHAR(50)",

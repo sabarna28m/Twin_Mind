@@ -20,6 +20,7 @@ from app.models.password_reset import PasswordResetToken
 from app.api.schemas.auth import (
     RegisterRequest, LoginRequest, TokenResponse, UserResponse,
     UpdateProfileRequest, ForgotPasswordRequest, ResetPasswordRequest,
+    GoogleLoginRequest,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -69,8 +70,80 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
 @router.post("/login", response_model=TokenResponse)
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email).first()
-    if not user or not verify_password(payload.password, user.hashed_password):
+    if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    # OAuth-only accounts have no password — guide the user to sign in with Google
+    if not user.hashed_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This account was created with Google. Please sign in with Google.",
+        )
+    if not verify_password(payload.password, user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    token = create_access_token({"sub": str(user.id), "email": user.email})
+    return {"access_token": token, "token_type": "bearer"}
+
+
+@router.post("/google-login", response_model=TokenResponse)
+def google_login(payload: GoogleLoginRequest, db: Session = Depends(get_db)):
+    """
+    Verify a Google ID token issued by the Google Identity Services button,
+    then find-or-create a TwinMind user and return a JWT session token.
+    """
+    if not settings.google_client_id:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google authentication is not configured on this server.",
+        )
+
+    # Verify the Google ID token using Google's public keys
+    try:
+        from google.oauth2 import id_token as google_id_token
+        from google.auth.transport import requests as google_requests
+        idinfo = google_id_token.verify_oauth2_token(
+            payload.credential,
+            google_requests.Request(),
+            settings.google_client_id,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid Google token: {exc}",
+        )
+
+    google_sub   = idinfo["sub"]          # unique Google user ID
+    google_email = idinfo.get("email", "")
+    google_name  = idinfo.get("name", google_email.split("@")[0])
+
+    if not google_email:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Google account has no email address.")
+
+    # Find existing user by email (handles linking email/password + Google accounts)
+    user = db.query(User).filter(User.email == google_email).first()
+
+    if user:
+        # Existing user — update OAuth info if it was an email-only account
+        if not user.oauth_provider:
+            user.oauth_provider = "google"
+            user.oauth_id       = google_sub
+            db.commit()
+        if not user.is_active:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is deactivated.")
+    else:
+        # New user — create account automatically (no email verification needed;
+        # Google already verified the email)
+        user = User(
+            email           = google_email,
+            full_name       = google_name,
+            hashed_password = None,   # OAuth-only — no local password
+            oauth_provider  = "google",
+            oauth_id        = google_sub,
+            is_active       = True,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
     token = create_access_token({"sub": str(user.id), "email": user.email})
     return {"access_token": token, "token_type": "bearer"}
 
