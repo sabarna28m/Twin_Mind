@@ -10,6 +10,7 @@ from app.core.database import get_db
 from app.models.subject_performance import SubjectRecord
 from app.models.quiz import QuizSession
 from app.models.session import Session as StudySession
+from app.models.student_profile import StudentProfile
 from app.models.user import User
 from app.api.routes.auth import get_current_user
 from app.api.schemas.subject_performance import (
@@ -20,11 +21,9 @@ from app.api.schemas.subject_performance import (
 
 router = APIRouter(prefix="/subject-performance", tags=["subject-performance"])
 
-DEFAULT_SUBJECTS = [
-    "Mathematics", "Physics", "Chemistry",
-    "Biology", "English", "Computer Science",
-]
-
+# Lookup helpers for well-known subjects — used only when the user has
+# actual data for these subjects.  They are NOT defaults that appear for
+# every user.
 SUBJECT_TOPICS: dict[str, list[str]] = {
     "Mathematics":      ["Algebra", "Calculus", "Statistics", "Geometry", "Trigonometry"],
     "Physics":          ["Mechanics", "Optics", "Thermodynamics", "Electromagnetism", "Modern Physics"],
@@ -32,15 +31,28 @@ SUBJECT_TOPICS: dict[str, list[str]] = {
     "Biology":          ["Botany", "Zoology", "Genetics", "Ecology", "Physiology"],
     "English":          ["Grammar", "Literature", "Writing", "Comprehension", "Vocabulary"],
     "Computer Science": ["Algorithms", "Data Structures", "Programming", "Databases", "Networks"],
+    "Machine Learning": ["Supervised Learning", "Unsupervised Learning", "Neural Networks", "Model Evaluation"],
+    "Computer Networks": ["OSI Model", "TCP/IP", "Routing", "Security", "Wireless Networks"],
+    "DBMS":             ["Relational Model", "SQL", "Normalization", "Transactions", "Indexing"],
+    "Operating Systems": ["Processes", "Memory Management", "File Systems", "Scheduling", "Deadlocks"],
+    "Data Structures":  ["Arrays", "Linked Lists", "Trees", "Graphs", "Hashing"],
+    "Algorithms":       ["Sorting", "Searching", "Dynamic Programming", "Greedy", "Graph Algorithms"],
+    "Software Engineering": ["SDLC", "Design Patterns", "Testing", "Agile", "Version Control"],
 }
 
 SUBJECT_SPECIFIC_ADVICE: dict[str, str] = {
-    "Physics":          "Derive formulas from first principles and solve 5 numerical problems daily.",
-    "Chemistry":        "Use flashcards for organic reaction mechanisms; attempt chapter-end problems weekly.",
-    "Mathematics":      "Practice problem sets every day — consistency beats marathon sessions.",
-    "Biology":          "Draw diagrams and flowcharts for processes like cell division and photosynthesis.",
-    "English":          "Read one article per day; identify grammar patterns and practice writing summaries.",
-    "Computer Science": "Code daily, even 30 minutes. Work through algorithm challenges on LeetCode/HackerRank.",
+    "Physics":           "Derive formulas from first principles and solve 5 numerical problems daily.",
+    "Chemistry":         "Use flashcards for organic reaction mechanisms; attempt chapter-end problems weekly.",
+    "Mathematics":       "Practice problem sets every day — consistency beats marathon sessions.",
+    "Biology":           "Draw diagrams and flowcharts for processes like cell division and photosynthesis.",
+    "English":           "Read one article per day; identify grammar patterns and practice writing summaries.",
+    "Computer Science":  "Code daily, even 30 minutes. Work through algorithm challenges on LeetCode/HackerRank.",
+    "Machine Learning":  "Implement algorithms from scratch before using libraries — understanding beats memorisation.",
+    "Computer Networks": "Build small packet-tracer labs; trace packets through every OSI layer as you study.",
+    "DBMS":              "Write SQL queries for every concept you learn; test on a real database (SQLite is fine).",
+    "Operating Systems": "Trace through OS algorithms on paper; implement a simple scheduler or memory allocator.",
+    "Data Structures":   "Visualise every operation with diagrams; code each structure from scratch at least once.",
+    "Algorithms":        "Solve 3 LeetCode/Codeforces problems per day, focusing on your weakest pattern first.",
 }
 
 
@@ -339,6 +351,42 @@ def list_records(
     if subject:
         q = q.filter(SubjectRecord.subject == subject)
     return q.order_by(SubjectRecord.date.desc()).limit(limit).all()
+
+
+@router.put("/record/{record_id}", response_model=SubjectRecordResponse)
+def update_record(
+    record_id: int,
+    payload: SubjectRecordCreate,
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    rec = db.query(SubjectRecord).filter(
+        SubjectRecord.id == record_id,
+        SubjectRecord.user_id == current_user.id,
+    ).first()
+    if not rec:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
+
+    rec.subject     = payload.subject
+    rec.date        = payload.date
+    rec.score       = payload.score
+    rec.study_hours = payload.study_hours
+    rec.confidence  = payload.confidence
+    rec.source      = payload.source
+    rec.topics_json = json.dumps([t.model_dump() for t in payload.topics])
+    rec.notes       = payload.notes
+
+    db.commit()
+    db.refresh(rec)
+    out = SubjectRecordResponse.model_validate(rec)
+    try:
+        out.topics = [
+            TopicSummary(name=t["name"], score=t["score"], risk=_risk(t["score"]))
+            for t in json.loads(rec.topics_json or "[]")
+        ]
+    except Exception:
+        pass
+    return out
 
 
 @router.delete("/record/{record_id}", status_code=status.HTTP_204_NO_CONTENT)

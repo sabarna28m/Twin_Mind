@@ -36,23 +36,31 @@ interface Analysis {
 interface FormState {
   subject: string; date: string; score: number; study_hours: number;
   confidence: number; source: string; notes: string;
-  topics: Record<string, number>;
+}
+
+/** Shape of a saved record returned by GET/POST/PUT /subject-performance/records */
+interface SubjectRecord {
+  id: number;
+  subject: string;
+  date: string;
+  score: number;
+  study_hours: number;
+  confidence: number;
+  source: string;
+  topics: Topic[];
+  notes: string;
+  created_at: string | null;
 }
 
 // ── Constants ──────────────────────────────────────────────────────────
 
-const DEFAULT_SUBJECTS = ['Mathematics','Physics','Chemistry','Biology','English','Computer Science'];
-const SUBJECT_TOPICS: Record<string,string[]> = {
-  'Mathematics':      ['Algebra','Calculus','Statistics','Geometry','Trigonometry'],
-  'Physics':          ['Mechanics','Optics','Thermodynamics','Electromagnetism','Modern Physics'],
-  'Chemistry':        ['Organic Chemistry','Inorganic Chemistry','Physical Chemistry','Analytical Chemistry'],
-  'Biology':          ['Botany','Zoology','Genetics','Ecology','Physiology'],
-  'English':          ['Grammar','Literature','Writing','Comprehension','Vocabulary'],
-  'Computer Science': ['Algorithms','Data Structures','Programming','Databases','Networks'],
-};
+// Icons for well-known subjects — custom subjects fall back to 📚
 const SUBJECT_ICONS: Record<string,string> = {
   'Mathematics':'∑','Physics':'⚛','Chemistry':'⚗',
   'Biology':'🧬','English':'📖','Computer Science':'💻',
+  'Machine Learning':'🤖','Computer Networks':'🌐','DBMS':'🗄',
+  'Operating Systems':'⚙','Data Structures':'🌲','Algorithms':'🔍',
+  'Software Engineering':'🛠','Chemistry Lab':'🧪','Economics':'📈',
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -261,29 +269,41 @@ function SubjectModal({ s, recs, plan, onClose }: {
   );
 }
 
-// ── Add-Record Modal ───────────────────────────────────────────────────
+// ── Record Modal (Add + Edit) ──────────────────────────────────────────
 
-function AddModal({
+function RecordModal({
   onClose,
   onSaved,
   profileSubjects,
+  editRecord,       // pre-filled when editing an existing record
 }: {
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (saved: SubjectRecord) => void;
   profileSubjects: string[];
+  editRecord?: SubjectRecord;
 }) {
-  const defaultForm: FormState = {
-    subject: profileSubjects[0] ?? '',
-    date: today(), score: 70,
-    study_hours: 1.5, confidence: 3, source: 'manual', notes: '', topics: {},
-  };
-  const [form, setForm]       = useState<FormState>(defaultForm);
-  const [saving, setSaving]   = useState(false);
-  const [err, setErr]         = useState('');
+  const isEdit = Boolean(editRecord);
 
-  // Dynamic topic management — no hardcoded lists
-  const [customTopics, setCustomTopics] = useState<{ name: string; score: number }[]>([]);
-  const [topicInput, setTopicInput]     = useState('');
+  const makeDefault = (): FormState => ({
+    subject:     editRecord?.subject     ?? profileSubjects[0] ?? '',
+    date:        editRecord?.date        ?? today(),
+    score:       editRecord?.score       ?? 70,
+    study_hours: editRecord?.study_hours ?? 1.5,
+    confidence:  editRecord?.confidence  ?? 3,
+    source:      editRecord?.source      ?? 'manual',
+    notes:       editRecord?.notes       ?? '',
+  });
+
+  const [form, setForm]     = useState<FormState>(makeDefault);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr]       = useState('');
+  const [saved, setSaved]   = useState(false);   // success flash state
+
+  // Dynamic topics — pre-fill from existing record when editing
+  const [customTopics, setCustomTopics] = useState<{ name: string; score: number }[]>(
+    () => (editRecord?.topics ?? []).map(t => ({ name: t.name, score: t.score }))
+  );
+  const [topicInput, setTopicInput] = useState('');
 
   function addTopic() {
     const name = topicInput.trim();
@@ -302,28 +322,49 @@ function AddModal({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.subject) { setErr('Please select a subject.'); return; }
     setSaving(true); setErr('');
     try {
-      await api.post('/subject-performance/record', {
+      const payload = {
         subject: form.subject, date: form.date, score: form.score,
         study_hours: form.study_hours, confidence: form.confidence,
         source: form.source, notes: form.notes,
         topics: customTopics.map(t => ({ name: t.name, score: t.score })),
-      });
-      onSaved();
+      };
+
+      const res = isEdit
+        ? await api.put<SubjectRecord>(`/subject-performance/record/${editRecord!.id}`, payload)
+        : await api.post<SubjectRecord>('/subject-performance/record', payload);
+
+      setSaved(true);
+      onSaved(res.data);
+      // Close after brief success flash
+      setTimeout(onClose, 1200);
     } catch (e: unknown) {
-      setErr((e as { response?: { data?: { detail?: string } } })?.response?.data?.detail ?? 'Failed to save');
-    } finally { setSaving(false); }
+      setErr((e as { response?: { data?: { detail?: string } } })?.response?.data?.detail ?? 'Failed to save. Please try again.');
+      setSaving(false);
+    }
   }
 
   return (
     <div style={md.overlay} onClick={onClose}>
       <div style={{ ...md.panel, maxWidth: '520px' }} onClick={e => e.stopPropagation()}>
         <div style={{ ...md.header, borderBottomColor: 'rgba(99,102,241,0.25)' }}>
-          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--text-h)' }}>Add Performance Record</h2>
+          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--text-h)' }}>
+            {isEdit ? '✏️ Edit Record' : '+ Add Performance Record'}
+          </h2>
           <button style={md.closeBtn} onClick={onClose}>✕</button>
         </div>
         <div style={{ ...md.body, paddingBottom: '1.5rem' }}>
+
+          {/* Success flash */}
+          {saved && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.75rem 1rem', marginBottom: '1rem', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '10px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600 }}>
+              <span style={{ fontSize: '1.1rem' }}>✓</span>
+              Record {isEdit ? 'updated' : 'saved'} successfully!
+            </div>
+          )}
+
           <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.9rem' }}>
 
             {/* Subject — pulled from profile */}
@@ -332,17 +373,10 @@ function AddModal({
               {profileSubjects.length === 0 ? (
                 <p style={{ margin: 0, fontSize: '0.8rem', color: '#f59e0b', padding: '0.5rem 0.75rem', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: '8px' }}>
                   No subjects found.{' '}
-                  <Link to="/profile/setup" style={{ color: '#f59e0b', fontWeight: 700 }}>
-                    Add subjects in your profile →
-                  </Link>
+                  <Link to="/profile/setup" style={{ color: '#f59e0b', fontWeight: 700 }}>Add subjects in your profile →</Link>
                 </p>
               ) : (
-                <select
-                  value={form.subject}
-                  onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-                  style={af.input}
-                  required
-                >
+                <select value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} style={af.input} required>
                   {profileSubjects.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               )}
@@ -351,7 +385,7 @@ function AddModal({
             <div style={af.row2}>
               <div style={{ flex: 1 }}>
                 <label style={af.label}>Date</label>
-                <input type="date" value={form.date} max={today()} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={af.input} />
+                <input type="date" value={form.date} max={today()} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} style={af.input} required />
               </div>
               <div style={{ flex: 1 }}>
                 <label style={af.label}>Source</label>
@@ -384,8 +418,7 @@ function AddModal({
                 <label style={af.label}>Confidence</label>
                 <div style={{ display: 'flex', gap: '0.3rem', marginTop: '0.35rem' }}>
                   {[1,2,3,4,5].map(n => (
-                    <button key={n} type="button"
-                      onClick={() => setForm(f => ({ ...f, confidence: n }))}
+                    <button key={n} type="button" onClick={() => setForm(f => ({ ...f, confidence: n }))}
                       style={{ flex: 1, height: '32px', borderRadius: '6px', border: `1px solid ${form.confidence === n ? '#8b5cf6' : 'rgba(255,255,255,0.1)'}`, background: form.confidence === n ? 'rgba(139,92,246,0.25)' : 'transparent', color: form.confidence === n ? '#a78bfa' : 'var(--text)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700 }}
                     >{n}</button>
                   ))}
@@ -397,74 +430,50 @@ function AddModal({
             {/* Dynamic topic scores */}
             <div>
               <label style={{ ...af.label, marginBottom: '0.45rem', display: 'block' }}>
-                Topic / Chapter Scores <span style={{ color: 'var(--text)', fontWeight: 400, textTransform: 'none' as const }}>(optional)</span>
+                Topic / Chapter Scores <span style={{ color: 'var(--text)', fontWeight: 400, textTransform: 'none' as const, fontSize: '0.72rem' }}>(optional)</span>
               </label>
-
-              {/* Add topic input row */}
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <input
-                  type="text"
-                  value={topicInput}
+                  type="text" value={topicInput}
                   onChange={e => setTopicInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTopic(); } }}
                   placeholder="e.g. Chapter 3, Matrices, SQL Joins…"
                   style={{ ...af.input, flex: 1, margin: 0 }}
                 />
-                <button
-                  type="button"
-                  onClick={addTopic}
-                  disabled={!topicInput.trim()}
+                <button type="button" onClick={addTopic} disabled={!topicInput.trim()}
                   style={{ padding: '0 0.85rem', background: 'rgba(99,102,241,0.18)', border: '1px solid rgba(99,102,241,0.4)', borderRadius: '8px', color: '#818cf8', fontSize: '0.8rem', fontWeight: 700, cursor: topicInput.trim() ? 'pointer' : 'not-allowed', opacity: topicInput.trim() ? 1 : 0.5, whiteSpace: 'nowrap' as const, fontFamily: 'inherit' }}
-                >
-                  + Add
-                </button>
+                >+ Add</button>
               </div>
-
-              {/* Topic list with score sliders */}
-              {customTopics.length > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.45rem' }}>
+              {customTopics.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.4rem' }}>
                   {customTopics.map(t => (
-                    <div key={t.name} style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', padding: '0.4rem 0.6rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div key={t.name} style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', padding: '0.35rem 0.6rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-h)', width: '120px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }} title={t.name}>{t.name}</span>
-                      <input
-                        type="range" min={0} max={100} value={t.score}
-                        onChange={e => setTopicScore(t.name, +e.target.value)}
-                        style={{ flex: 1, accentColor: scoreColor(t.score) }}
-                      />
+                      <input type="range" min={0} max={100} value={t.score} onChange={e => setTopicScore(t.name, +e.target.value)} style={{ flex: 1, accentColor: scoreColor(t.score) }} />
                       <span style={{ fontSize: '0.75rem', fontWeight: 700, color: scoreColor(t.score), width: '32px', textAlign: 'right' as const }}>{t.score}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeTopic(t.name)}
-                        style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.85rem', padding: '0 0.1rem', lineHeight: 1, flexShrink: 0 }}
-                        aria-label={`Remove ${t.name}`}
-                      >✕</button>
+                      <button type="button" onClick={() => removeTopic(t.name)} aria-label={`Remove ${t.name}`}
+                        style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.85rem', padding: '0 0.1rem', lineHeight: 1, flexShrink: 0 }}>✕</button>
                     </div>
                   ))}
                 </div>
-              )}
-
-              {customTopics.length === 0 && (
-                <p style={{ margin: 0, fontSize: '0.72rem', color: '#334155' }}>
-                  Type a chapter or topic name above and click + Add to score it.
-                </p>
+              ) : (
+                <p style={{ margin: 0, fontSize: '0.72rem', color: '#334155' }}>Type a topic/chapter name and click + Add to score it.</p>
               )}
             </div>
 
             <div>
               <label style={af.label}>Notes (optional)</label>
               <textarea rows={2} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-                placeholder="Any context about this session..."
+                placeholder="Any context about this session…"
                 style={{ ...af.input, resize: 'vertical' as const, minHeight: '56px' }} />
             </div>
 
             {err && <p style={{ margin: 0, padding: '0.55rem 0.8rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: '#fca5a5', fontSize: '0.8rem' }}>{err}</p>}
 
-            <button
-              type="submit"
-              disabled={saving || profileSubjects.length === 0}
-              style={{ padding: '0.75rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: '12px', color: '#fff', fontSize: '0.9rem', fontWeight: 800, cursor: (saving || profileSubjects.length === 0) ? 'not-allowed' : 'pointer', opacity: (saving || profileSubjects.length === 0) ? 0.6 : 1, fontFamily: 'inherit' }}
+            <button type="submit" disabled={saving || saved || profileSubjects.length === 0}
+              style={{ padding: '0.75rem', background: saved ? 'rgba(16,185,129,0.2)' : 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: saved ? '1px solid rgba(16,185,129,0.4)' : 'none', borderRadius: '12px', color: saved ? '#34d399' : '#fff', fontSize: '0.9rem', fontWeight: 800, cursor: (saving || saved || profileSubjects.length === 0) ? 'not-allowed' : 'pointer', opacity: profileSubjects.length === 0 ? 0.5 : 1, fontFamily: 'inherit' }}
             >
-              {saving ? 'Saving…' : '+ Save Record'}
+              {saved ? '✓ Saved!' : saving ? 'Saving…' : isEdit ? '✓ Update Record' : '+ Save Record'}
             </button>
           </form>
         </div>
@@ -478,13 +487,16 @@ function AddModal({
 export default function SubjectAnalysis() {
   const { user, studentProfile } = useAuth();
   const profileSubjects = studentProfile?.subjects ?? [];
-  const [analysis, setAnalysis] = useState<Analysis | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<SubjectSummary | null>(null);
+  const [analysis, setAnalysis]         = useState<Analysis | null>(null);
+  const [loading, setLoading]           = useState(true);
+  const [selected, setSelected]         = useState<SubjectSummary | null>(null);
   const [trendSubject, setTrendSubject] = useState<string>('');
-  const [showAdd, setShowAdd] = useState(false);
+  const [showAdd, setShowAdd]           = useState(false);
+  const [editRecord, setEditRecord]     = useState<SubjectRecord | null>(null);
   const [notifications, setNotifications] = useState<string[]>([]);
   const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
+  const [records, setRecords]           = useState<SubjectRecord[]>([]);
+  const [deletingId, setDeletingId]     = useState<number | null>(null);
 
   const load = async () => {
     try {
@@ -499,7 +511,26 @@ export default function SubjectAnalysis() {
     } finally { setLoading(false); }
   };
 
-  useEffect(() => { if (user) load(); }, [user]);
+  const loadRecords = async () => {
+    try {
+      const res = await api.get<SubjectRecord[]>('/subject-performance/records');
+      setRecords(res.data);
+    } catch { /* ignore */ }
+  };
+
+  useEffect(() => { if (user) { load(); loadRecords(); } }, [user]);
+
+  async function deleteRecord(id: number) {
+    if (!confirm('Delete this record? This cannot be undone.')) return;
+    setDeletingId(id);
+    try {
+      await api.delete(`/subject-performance/record/${id}`);
+      setRecords(prev => prev.filter(r => r.id !== id));
+      // Refresh analysis so heatmap/charts update
+      load();
+    } catch { /* ignore */ }
+    finally { setDeletingId(null); }
+  }
 
   const trendData = analysis?.subjects
     .find(s => s.subject === trendSubject)
@@ -760,17 +791,70 @@ export default function SubjectAnalysis() {
             )}
           </>
         )}
+
+        {/* ── Records List ── always shown when there are records */}
+        {records.length > 0 && (
+          <section style={p.card}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem', flexWrap: 'wrap' as const, gap: '0.5rem' }}>
+              <h2 style={{ ...p.cardTitle, margin: 0 }}>📝 All Records ({records.length})</h2>
+              <button style={p.addBtn} onClick={() => setShowAdd(true)}>+ Add Record</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
+              {records.map(rec => (
+                <div key={rec.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.85rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', flexWrap: 'wrap' as const }}>
+                  <span style={{ fontSize: '1rem', flexShrink: 0 }}>{SUBJECT_ICONS[rec.subject] ?? '📚'}</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-h)', minWidth: '100px' }}>{rec.subject}</span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text)' }}>{rec.date}</span>
+                  <span style={{ fontWeight: 800, fontSize: '0.9rem', color: scoreColor(rec.score), minWidth: '44px' }}>{rec.score.toFixed(0)}%</span>
+                  <span style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem', borderRadius: '99px', background: 'rgba(255,255,255,0.06)', color: 'var(--text)', textTransform: 'capitalize' as const }}>{rec.source.replace('_', ' ')}</span>
+                  {rec.study_hours > 0 && (
+                    <span style={{ fontSize: '0.72rem', color: '#06b6d4' }}>⏱ {rec.study_hours.toFixed(1)}h</span>
+                  )}
+                  {rec.topics.length > 0 && (
+                    <span style={{ fontSize: '0.72rem', color: '#8b5cf6' }}>🏷 {rec.topics.length} topic{rec.topics.length !== 1 ? 's' : ''}</span>
+                  )}
+                  {rec.notes && (
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, opacity: 0.6 }} title={rec.notes}>"{rec.notes}"</span>
+                  )}
+                  <div style={{ display: 'flex', gap: '0.4rem', marginLeft: 'auto', flexShrink: 0 }}>
+                    <button
+                      onClick={() => setEditRecord(rec)}
+                      style={{ padding: '0.25rem 0.65rem', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '7px', color: '#818cf8', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+                    >✏️ Edit</button>
+                    <button
+                      onClick={() => deleteRecord(rec.id)}
+                      disabled={deletingId === rec.id}
+                      style={{ padding: '0.25rem 0.65rem', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '7px', color: '#f87171', fontSize: '0.72rem', fontWeight: 700, cursor: deletingId === rec.id ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: deletingId === rec.id ? 0.5 : 1 }}
+                    >{deletingId === rec.id ? '…' : '🗑 Delete'}</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
       </div>
 
       {/* Modals */}
       {selected && (
         <SubjectModal s={selected} recs={selectedRecs} plan={selectedPlan} onClose={() => setSelected(null)} />
       )}
-      {showAdd && (
-        <AddModal
+      {(showAdd || editRecord) && (
+        <RecordModal
           profileSubjects={profileSubjects}
-          onClose={() => setShowAdd(false)}
-          onSaved={() => { setShowAdd(false); setLoading(true); load(); }}
+          editRecord={editRecord ?? undefined}
+          onClose={() => { setShowAdd(false); setEditRecord(null); }}
+          onSaved={(saved) => {
+            if (editRecord) {
+              // Update the record in-place in the list
+              setRecords(prev => prev.map(r => r.id === saved.id ? saved : r));
+            } else {
+              // Prepend the new record to the top of the list
+              setRecords(prev => [saved, ...prev]);
+            }
+            setLoading(true);
+            load();
+          }}
         />
       )}
     </div>
