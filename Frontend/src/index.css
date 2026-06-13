@@ -1047,3 +1047,40 @@ button[aria-label="Open TwinMind Copilot"]:hover {
   .subj-rec-grid  { grid-template-columns: 1fr !important; }
   .subj-widget-grid { grid-template-columns: 1fr !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Form Select — cross-browser dropdown option visibility fix.
+   Root cause: inline background:rgba(255,255,255,0.05) on the
+   <select> makes Chrome/Edge render option text invisible.
+   !important is required to beat the inline style specificity.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Dark theme (default) */
+select.form-select {
+  background-color: #0f1a2e !important; /* solid --bg-elevated */
+  color: #f1f5f9 !important;            /* solid --text-h dark  */
+  cursor: pointer;
+}
+select.form-select option {
+  background-color: #0f1a2e;
+  color: #f1f5f9;
+}
+select.form-select option:checked {
+  background-color: #1e1b4b;            /* indigo-950 for selected */
+  color: #c7d2fe;
+}
+
+/* Light theme */
+html[data-theme="light"] select.form-select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(0,0,0,0.12) !important;
+}
+html[data-theme="light"] select.form-select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+html[data-theme="light"] select.form-select option:checked {
+  background-color: #e0e7ff;
+  color: #1e1b4b;
+}

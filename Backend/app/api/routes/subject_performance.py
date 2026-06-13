@@ -56,6 +56,7 @@ SUBJECT_SPECIFIC_ADVICE: dict[str, str] = {
 }
 
 
+
 # ── Pure helpers ───────────────────────────────────────────────────────
 
 def _risk(score: float) -> str:
@@ -249,6 +250,13 @@ def get_analysis(
 ):
     today = DateType.today()
 
+    # Subjects come from the user's profile — this is the single source of truth.
+    profile = db.query(StudentProfile).filter(StudentProfile.user_id == current_user.id).first()
+    profile_subjects = (
+        [s.strip() for s in (profile.subjects or "").split(",") if s.strip()]
+        if profile else []
+    )
+
     all_records = db.query(SubjectRecord).filter(SubjectRecord.user_id == current_user.id).all()
     all_quizzes = db.query(QuizSession).filter(QuizSession.user_id == current_user.id).all()
     all_sessions = db.query(StudySession).filter(
@@ -256,13 +264,20 @@ def get_analysis(
         StudySession.status == "completed",
     ).all()
 
-    custom_subjects = (
+    # Any subjects with recorded data that the user may have removed from their profile
+    # still appear so historical analytics are preserved.
+    data_subjects = (
         {r.subject for r in all_records}
         | {q.subject for q in all_quizzes if q.subject}
         | {s.subject for s in all_sessions if s.subject}
-    ) - set(DEFAULT_SUBJECTS)
+    )
+    extra_subjects = sorted(data_subjects - set(profile_subjects))
 
-    all_names = DEFAULT_SUBJECTS + sorted(custom_subjects)
+    # Profile subjects first (user-defined order), then any historical extras
+    all_names = profile_subjects + extra_subjects
+
+    if not all_names:
+        return SubjectAnalysisResponse()
 
     summaries: list[SubjectSummary] = []
     for subj in all_names:
@@ -350,7 +365,19 @@ def list_records(
     q = db.query(SubjectRecord).filter(SubjectRecord.user_id == current_user.id)
     if subject:
         q = q.filter(SubjectRecord.subject == subject)
-    return q.order_by(SubjectRecord.date.desc()).limit(limit).all()
+    recs = q.order_by(SubjectRecord.date.desc()).limit(limit).all()
+    result = []
+    for rec in recs:
+        out = SubjectRecordResponse.model_validate(rec)
+        try:
+            out.topics = [
+                TopicSummary(name=t["name"], score=t["score"], risk=_risk(t["score"]))
+                for t in json.loads(rec.topics_json or "[]")
+            ]
+        except Exception:
+            pass
+        result.append(out)
+    return result
 
 
 @router.put("/record/{record_id}", response_model=SubjectRecordResponse)

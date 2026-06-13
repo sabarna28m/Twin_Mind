@@ -7,8 +7,39 @@ import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
 import { getLevelColor, getLevelGradient, LEVEL_NAMES, LEVEL_COLORS, type GamificationProgress } from '../utils/gamification';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Legend,
+} from 'recharts';
 
-interface HistoryPoint { date: string; overall_score: number; }
+interface HistoryPoint {
+  date: string;
+  overall_score: number;
+  twin_intelligence_score: number;
+  knowledge_growth: number;
+  consistency_level: number;
+  focus_quality: number;
+  study_hours: number;
+  notes_created: number;
+  quiz_accuracy: number | null;
+  focus_sessions: number;
+  score_delta: number | null;
+  ai_explanation: string;
+}
+
+interface CognitiveHeatmap {
+  knowledge_areas: number;
+  memory_strength: number;
+  focus_stability: number;
+  learning_speed: number;
+  prediction_confidence: number;
+}
+
+interface EvolutionEvent {
+  date: string;
+  icon: string;
+  description: string;
+}
 
 interface FutureTwin {
   overall_score: number;
@@ -36,6 +67,15 @@ interface TwinState {
   future_twin: FutureTwin | null;
   future_twin_60: FutureTwin | null;
   future_twin_90: FutureTwin | null;
+  twin_intelligence_score: number;
+  confidence_level: number;
+  twin_maturity_level: number;
+  prediction_reliability: number;
+  behavior_understanding: string;
+  current_state_label: string;
+  cognitive_heatmap: CognitiveHeatmap | null;
+  ai_insights: string[];
+  evolution_timeline: EvolutionEvent[];
 }
 
 const RISK_COLOR  = { low: '#10b981', medium: '#f59e0b', high: '#ef4444' };
@@ -347,6 +387,385 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
   );
 }
 
+// ── Layer config for the multi-layer graph ─────────────────────────────
+const LAYERS = [
+  { key: 'twin_intelligence_score', label: 'Twin Intelligence', color: '#818cf8', dashed: false },
+  { key: 'knowledge_growth',        label: 'Knowledge Growth',  color: '#34d399', dashed: false },
+  { key: 'consistency_level',       label: 'Consistency',       color: '#f59e0b', dashed: false },
+  { key: 'focus_quality',           label: 'Focus Quality',     color: '#06b6d4', dashed: false },
+] as const;
+
+type LayerKey = typeof LAYERS[number]['key'];
+
+// ── Custom Recharts tooltip ────────────────────────────────────────────
+function EvoTooltip({ active, payload, label }: {
+  active?: boolean;
+  payload?: { dataKey: string; value: number; color: string }[];
+  label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  const pt = (payload[0] as { payload: HistoryPoint }).payload;
+  return (
+    <div style={{
+      background: 'rgba(8,13,26,0.97)', border: '1px solid rgba(129,140,248,0.3)',
+      borderRadius: '14px', padding: '0.85rem 1rem', maxWidth: '280px',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+    }}>
+      <p style={{ margin: '0 0 0.55rem', fontSize: '0.78rem', fontWeight: 800, color: '#818cf8' }}>{pt.date}</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem 0.75rem', marginBottom: '0.6rem' }}>
+        {payload.map(l => (
+          <div key={l.dataKey}>
+            <span style={{ fontSize: '0.62rem', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              {LAYERS.find(x => x.key === l.dataKey)?.label ?? l.dataKey}
+            </span>
+            <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 800, color: l.color }}>{Math.round(l.value)}</p>
+          </div>
+        ))}
+      </div>
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.5rem', marginBottom: '0.45rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.25rem 0.75rem', fontSize: '0.7rem' }}>
+          <span style={{ color: '#475569' }}>Study: <strong style={{ color: '#f1f5f9' }}>{pt.study_hours}h</strong></span>
+          <span style={{ color: '#475569' }}>Notes: <strong style={{ color: '#f1f5f9' }}>{pt.notes_created}</strong></span>
+          {pt.quiz_accuracy !== null && (
+            <span style={{ color: '#475569' }}>Quiz: <strong style={{ color: '#10b981' }}>{pt.quiz_accuracy?.toFixed(0)}%</strong></span>
+          )}
+          <span style={{ color: '#475569' }}>Sessions: <strong style={{ color: '#f1f5f9' }}>{pt.focus_sessions}</strong></span>
+        </div>
+      </div>
+      {pt.ai_explanation && (
+        <div style={{ padding: '0.45rem 0.6rem', background: 'rgba(129,140,248,0.08)', borderRadius: '8px', border: '1px solid rgba(129,140,248,0.2)' }}>
+          <p style={{ margin: '0 0 0.2rem', fontSize: '0.6rem', fontWeight: 700, color: '#818cf8', letterSpacing: '0.08em' }}>AI INSIGHT</p>
+          <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8', lineHeight: 1.5 }}>{pt.ai_explanation}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Cognitive heatmap bar ──────────────────────────────────────────────
+function HeatBar({ label, value, desc }: { label: string; value: number; desc: string }) {
+  const color = value >= 70 ? '#10b981' : value >= 45 ? '#f59e0b' : '#ef4444';
+  const band  = value >= 70 ? 'Strong' : value >= 45 ? 'Developing' : 'Needs Work';
+  return (
+    <div style={{ marginBottom: '0.85rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+        <div>
+          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#f1f5f9' }}>{label}</span>
+          <span style={{ marginLeft: '0.5rem', fontSize: '0.62rem', color: '#475569' }}>{desc}</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.68rem', fontWeight: 700, padding: '0.12rem 0.5rem', borderRadius: '99px', background: `${color}18`, color, border: `1px solid ${color}30` }}>{band}</span>
+          <span style={{ fontSize: '0.88rem', fontWeight: 800, color }}>{Math.round(value)}</span>
+        </div>
+      </div>
+      <div style={{ height: '7px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
+        <div className="score-bar-fill" style={{ width: `${value}%`, height: '100%', background: color, borderRadius: '99px', boxShadow: `0 0 8px ${color}60` }} />
+      </div>
+    </div>
+  );
+}
+
+// ── Main Evolution Dashboard ───────────────────────────────────────────
+function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
+  const [activeLayers, setActiveLayers] = useState<Set<LayerKey>>(
+    new Set(LAYERS.map(l => l.key))
+  );
+
+  function toggleLayer(key: LayerKey) {
+    setActiveLayers(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) { if (next.size > 1) next.delete(key); }
+      else next.add(key);
+      return next;
+    });
+  }
+
+  const hasHistory = twin.history.length >= 2;
+  const hm = twin.cognitive_heatmap;
+
+  const tisDelta = twin.history.length >= 2
+    ? twin.history[twin.history.length - 1].twin_intelligence_score
+      - twin.history[twin.history.length - 2].twin_intelligence_score
+    : null;
+
+  const MATURITY_LABELS = ['', 'Infant', 'Developing', 'Maturing', 'Advanced', 'Expert'];
+  const maturityColor = ['', '#ef4444', '#f59e0b', '#06b6d4', '#8b5cf6', '#10b981'][twin.twin_maturity_level] || '#818cf8';
+
+  return (
+    <>
+      {/* ── 1. Twin Intelligence Score header ── */}
+      <div style={{ ...s.card, ...s.fullWidth, padding: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+          <span style={{ fontSize: '1.1rem' }}>◈</span>
+          <h3 style={{ ...s.cardTitle, marginBottom: 0 }}>Digital Twin Evolution Dashboard</h3>
+          <span style={{ marginLeft: 'auto', fontSize: '0.68rem', fontWeight: 700, color: '#475569', padding: '0.18rem 0.55rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '99px' }}>
+            Real-time · {twin.data_points} data pts
+          </span>
+        </div>
+
+        {/* KPI row */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.75rem' }} className="mob-4-col">
+          {/* TIS */}
+          <div style={{ padding: '1rem', background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.2)', borderRadius: '14px' }}>
+            <p style={{ margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Twin Intelligence Score</p>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
+              <span style={{ fontSize: '2rem', fontWeight: 900, color: '#f1f5f9', lineHeight: 1 }}>{Math.round(twin.twin_intelligence_score)}</span>
+              <span style={{ fontSize: '0.75rem', color: '#475569' }}>/100</span>
+              {tisDelta !== null && (
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: tisDelta >= 0 ? '#10b981' : '#ef4444' }}>
+                  {tisDelta >= 0 ? '+' : ''}{tisDelta.toFixed(1)}
+                </span>
+              )}
+            </div>
+            <p style={{ margin: '0.35rem 0 0', fontSize: '0.65rem', color: '#475569', lineHeight: 1.4 }}>
+              A composite score measuring how well the twin understands your learning behavior.
+            </p>
+          </div>
+
+          {/* Confidence */}
+          <div style={{ padding: '1rem', background: 'rgba(6,182,212,0.07)', border: '1px solid rgba(6,182,212,0.2)', borderRadius: '14px' }}>
+            <p style={{ margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, color: '#06b6d4', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Confidence Level</p>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
+              <span style={{ fontSize: '2rem', fontWeight: 900, color: '#f1f5f9', lineHeight: 1 }}>{Math.round(twin.confidence_level)}</span>
+              <span style={{ fontSize: '0.75rem', color: '#475569' }}>%</span>
+            </div>
+            <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden', marginTop: '0.4rem' }}>
+              <div style={{ width: `${twin.confidence_level}%`, height: '100%', background: '#06b6d4', borderRadius: '99px', transition: 'width 1s ease' }} />
+            </div>
+            <p style={{ margin: '0.3rem 0 0', fontSize: '0.65rem', color: '#475569' }}>How sure the twin is about its predictions based on your data density.</p>
+          </div>
+
+          {/* Maturity */}
+          <div style={{ padding: '1rem', background: `${maturityColor}0d`, border: `1px solid ${maturityColor}30`, borderRadius: '14px' }}>
+            <p style={{ margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, color: maturityColor, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Twin Maturity</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+              <span style={{ fontSize: '1.75rem', fontWeight: 900, color: '#f1f5f9', lineHeight: 1 }}>L{twin.twin_maturity_level}</span>
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: maturityColor }}>{MATURITY_LABELS[twin.twin_maturity_level]}</span>
+            </div>
+            <div style={{ display: 'flex', gap: '3px' }}>
+              {[1,2,3,4,5].map(l => (
+                <div key={l} style={{ flex: 1, height: '4px', borderRadius: '99px', background: l <= twin.twin_maturity_level ? maturityColor : 'rgba(255,255,255,0.06)' }} />
+              ))}
+            </div>
+            <p style={{ margin: '0.3rem 0 0', fontSize: '0.65rem', color: '#475569' }}>Grows as you log more data over time. Expert at Level 5.</p>
+          </div>
+
+          {/* State */}
+          <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px' }}>
+            <p style={{ margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Current State</p>
+            <p style={{ margin: '0 0 0.35rem', fontSize: '1rem', fontWeight: 800, color: '#f1f5f9', lineHeight: 1.25 }}>{twin.current_state_label}</p>
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.62rem', padding: '0.12rem 0.45rem', borderRadius: '99px', background: 'rgba(139,92,246,0.12)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}>
+                Reliability {Math.round(twin.prediction_reliability)}%
+              </span>
+              <span style={{ fontSize: '0.62rem', padding: '0.12rem 0.45rem', borderRadius: '99px', background: 'rgba(99,102,241,0.1)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.2)' }}>
+                Behavior: {twin.behavior_understanding}
+              </span>
+            </div>
+            <p style={{ margin: '0.3rem 0 0', fontSize: '0.65rem', color: '#475569' }}>The twin's assessment of your current academic mode.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 2. Multi-layer evolution graph ── */}
+      <div style={{ ...s.card, ...s.fullWidth }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div>
+            <h3 style={{ ...s.cardTitle, marginBottom: '0.2rem' }}>Multi-Layer Evolution Graph</h3>
+            <p style={{ margin: 0, fontSize: '0.72rem', color: '#475569' }}>
+              Each line is a different dimension of how your twin is evolving. Hover a point to see what drove the change.
+            </p>
+          </div>
+          {/* Layer toggles */}
+          <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+            {LAYERS.map(l => {
+              const on = activeLayers.has(l.key);
+              return (
+                <button key={l.key} onClick={() => toggleLayer(l.key)}
+                  style={{ padding: '0.25rem 0.65rem', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', background: on ? `${l.color}20` : 'rgba(255,255,255,0.03)', color: on ? l.color : '#475569', border: `1px solid ${on ? l.color + '50' : 'rgba(255,255,255,0.08)'}` }}>
+                  {l.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {!hasHistory ? (
+          <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#475569' }}>
+            <p style={{ fontSize: '1.5rem', margin: '0 0 0.5rem' }}>◈</p>
+            <p style={{ margin: 0, fontSize: '0.85rem' }}>Log at least 2 check-ins to activate the evolution graph.</p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={twin.history} margin={{ top: 5, right: 16, bottom: 5, left: -20 }}>
+              <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }}
+                axisLine={false} tickLine={false}
+                tickFormatter={d => {
+                  const parts = d.split('-');
+                  return parts.length === 3 ? `${parts[1]}/${parts[2]}` : d;
+                }}
+              />
+              <YAxis domain={[0, 100]} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }} axisLine={false} tickLine={false} />
+              <Tooltip content={<EvoTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.08)' }} />
+              {LAYERS.filter(l => activeLayers.has(l.key)).map(l => (
+                <Line
+                  key={l.key} type="monotone" dataKey={l.key}
+                  stroke={l.color} strokeWidth={activeLayers.size === 1 ? 2.5 : 1.8}
+                  dot={{ fill: l.color, r: 3, strokeWidth: 0 }}
+                  activeDot={{ r: 6, stroke: l.color, strokeWidth: 2, fill: '#08131a' }}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        )}
+
+        {/* Legend explanation */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0.4rem', marginTop: '0.85rem' }}>
+          {LAYERS.map(l => (
+            <div key={l.key} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', opacity: activeLayers.has(l.key) ? 1 : 0.35, transition: 'opacity 0.2s' }}>
+              <div style={{ width: '12px', height: '3px', background: l.color, borderRadius: '99px', marginTop: '6px', flexShrink: 0 }} />
+              <div>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: l.color }}>{l.label}</span>
+                <p style={{ margin: 0, fontSize: '0.62rem', color: '#475569', lineHeight: 1.4 }}>
+                  {l.key === 'twin_intelligence_score' && 'Composite score of all learning dimensions.'}
+                  {l.key === 'knowledge_growth' && 'How much new knowledge you acquired this session.'}
+                  {l.key === 'consistency_level' && 'Attendance and assignment completion regularity.'}
+                  {l.key === 'focus_quality' && 'Study intensity balanced with stress levels.'}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── 3. Evolution Timeline + Cognitive Heatmap (side by side) ── */}
+      <div style={{ ...s.fullWidth, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="mob-twin-row">
+
+        {/* Timeline */}
+        <div style={s.card}>
+          <h3 style={s.cardTitle}>Evolution Timeline</h3>
+          {twin.evolution_timeline.length === 0 ? (
+            <p style={{ color: '#475569', fontSize: '0.82rem' }}>Log more check-ins to build your evolution story.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+              {twin.evolution_timeline.map((ev, i) => (
+                <div key={i} style={{ display: 'flex', gap: '0.75rem', paddingBottom: i < twin.evolution_timeline.length - 1 ? '0.9rem' : 0 }}>
+                  {/* Timeline line */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', flexShrink: 0 }}>{ev.icon}</div>
+                    {i < twin.evolution_timeline.length - 1 && (
+                      <div style={{ width: '1px', flex: 1, background: 'rgba(255,255,255,0.06)', marginTop: '4px' }} />
+                    )}
+                  </div>
+                  <div style={{ paddingTop: '4px' }}>
+                    <p style={{ margin: '0 0 0.2rem', fontSize: '0.65rem', fontWeight: 700, color: '#818cf8', letterSpacing: '0.06em' }}>
+                      {ev.date}
+                    </p>
+                    <p style={{ margin: 0, fontSize: '0.77rem', color: '#94a3b8', lineHeight: 1.5 }}>{ev.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Cognitive Heatmap */}
+        <div style={s.card}>
+          <div style={{ marginBottom: '1rem' }}>
+            <h3 style={{ ...s.cardTitle, marginBottom: '0.2rem' }}>Cognitive Heatmap</h3>
+            <p style={{ margin: 0, fontSize: '0.72rem', color: '#475569' }}>
+              How your brain's learning dimensions are performing.
+            </p>
+          </div>
+          {/* Legend */}
+          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+            {[['#10b981','Strong ≥70'],['#f59e0b','Developing 45–69'],['#ef4444','Needs Work <45']].map(([c,l]) => (
+              <span key={l} style={{ fontSize: '0.62rem', fontWeight: 600, color: c, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: c, display: 'inline-block' }} />{l}
+              </span>
+            ))}
+          </div>
+          {hm ? (
+            <>
+              <HeatBar label="Knowledge Areas"       value={hm.knowledge_areas}      desc="Academic depth across subjects" />
+              <HeatBar label="Memory Strength"       value={hm.memory_strength}       desc="Quiz & assignment retention" />
+              <HeatBar label="Focus Stability"       value={hm.focus_stability}       desc="Consistency of focused sessions" />
+              <HeatBar label="Learning Speed"        value={hm.learning_speed}        desc="Rate of score improvement" />
+              <HeatBar label="Prediction Confidence" value={hm.prediction_confidence} desc="Data density for reliable forecasts" />
+            </>
+          ) : (
+            <p style={{ color: '#475569', fontSize: '0.82rem' }}>Log check-ins to build your cognitive profile.</p>
+          )}
+        </div>
+      </div>
+
+      {/* ── 4. AI Insights ── */}
+      {twin.ai_insights.length > 0 && (
+        <div style={{ ...s.card, ...s.fullWidth }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <h3 style={{ ...s.cardTitle, marginBottom: '0.2rem' }}>AI Twin Insights</h3>
+            <p style={{ margin: 0, fontSize: '0.72rem', color: '#475569' }}>
+              Observations generated by the digital twin based on your actual behavioral patterns.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0.7rem' }} className="mob-twin-row">
+            {twin.ai_insights.map((insight, i) => (
+              <div key={i} style={{ display: 'flex', gap: '0.6rem', padding: '0.85rem', background: 'rgba(129,140,248,0.06)', border: '1px solid rgba(129,140,248,0.15)', borderRadius: '12px' }}>
+                <span style={{ fontSize: '1rem', flexShrink: 0, marginTop: '1px' }}>
+                  {i === 0 ? '🔮' : i === 1 ? '📊' : i === 2 ? '🎯' : '💡'}
+                </span>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.6 }}>{insight}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 5. Twin Evolution Explanation card ── */}
+      <div style={{ ...s.card, ...s.fullWidth }}>
+        <h3 style={{ ...s.cardTitle, marginBottom: '1rem' }}>What These Metrics Mean</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0.7rem' }} className="mob-twin-row">
+          {[
+            {
+              label: 'Twin Intelligence Score',
+              value: `${Math.round(twin.twin_intelligence_score)}/100`,
+              color: '#818cf8',
+              explain: 'A composite score from your study hours, quiz performance, assignment completion, and focus quality. Higher = the twin knows you better.',
+            },
+            {
+              label: 'Twin Maturity Level',
+              value: `Level ${twin.twin_maturity_level}/5 — ${MATURITY_LABELS[twin.twin_maturity_level]}`,
+              color: maturityColor,
+              explain: 'Grows as you log more data over longer periods. A mature twin makes more accurate predictions and generates deeper insights.',
+            },
+            {
+              label: 'Prediction Reliability',
+              value: `${Math.round(twin.prediction_reliability)}%`,
+              color: '#a78bfa',
+              explain: 'How confident the twin is in its future predictions. Increases with more consistent and complete check-in data.',
+            },
+            {
+              label: 'Behavior Understanding',
+              value: twin.behavior_understanding,
+              color: '#34d399',
+              explain: 'How deeply the twin understands your patterns. Ranges from Low (just started) to Expert (30+ data points with consistent logging).',
+            },
+          ].map(m => (
+            <div key={m.label} style={{ padding: '0.85rem', background: `${m.color}08`, border: `1px solid ${m.color}20`, borderRadius: '12px' }}>
+              <p style={{ margin: '0 0 0.15rem', fontSize: '0.62rem', fontWeight: 700, color: m.color, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{m.label}</p>
+              <p style={{ margin: '0 0 0.4rem', fontSize: '0.95rem', fontWeight: 800, color: '#f1f5f9' }}>{m.value}</p>
+              <p style={{ margin: 0, fontSize: '0.73rem', color: '#64748b', lineHeight: 1.5 }}>{m.explain}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function Twin() {
   const { user, token } = useAuth();
   const { t } = useLanguage();
@@ -626,37 +1045,8 @@ export default function Twin() {
               )}
             </div>
 
-            {/* Evolution card */}
-            <div style={{ ...s.card, ...s.fullWidth }}>
-              <h3 style={s.cardTitle}>Twin Evolution</h3>
-              {twin.history.length < 2 ? (
-                <p style={{ color: '#475569', fontSize: '0.875rem' }}>
-                  Log at least 2 check-ins to see your twin evolving over time.
-                </p>
-              ) : (
-                <>
-                  <SparkLine history={twin.history} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
-                    <span style={{ fontSize: '0.72rem', color: '#475569' }}>{twin.history[0].date}</span>
-                    <span style={{ fontSize: '0.72rem', color: '#475569' }}>{twin.history[twin.history.length - 1].date}</span>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {[...twin.history].reverse().slice(0, 5).map(h => {
-                      const barColor = h.overall_score >= 70 ? '#10b981' : h.overall_score >= 50 ? '#f59e0b' : '#ef4444';
-                      return (
-                        <div key={h.date} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <span style={{ fontSize: '0.75rem', color: '#475569', width: '90px', flexShrink: 0 }}>{h.date}</span>
-                          <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
-                            <div className="score-bar-fill" style={{ width: `${h.overall_score}%`, height: '100%', background: barColor, borderRadius: '99px' }} />
-                          </div>
-                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#f1f5f9', width: '28px', textAlign: 'right' as const }}>{Math.round(h.overall_score)}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-            </div>
+            {/* ── Digital Twin Evolution Dashboard ── */}
+            <DigitalTwinEvolutionDashboard twin={twin} />
 
             {/* Future Twin card */}
             <FutureTwinCard twin={twin} />

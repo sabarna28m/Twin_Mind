@@ -376,8 +376,10 @@ function RecordModal({
                   <Link to="/profile/setup" style={{ color: '#f59e0b', fontWeight: 700 }}>Add subjects in your profile →</Link>
                 </p>
               ) : (
-                <select value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} style={af.input} required>
-                  {profileSubjects.map(s => <option key={s} value={s}>{s}</option>)}
+                <select value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} style={af.input} className="form-select" required>
+                  {profileSubjects.map(s => (
+                    <option key={s} value={s} style={{ background: '#0f1a2e', color: '#f1f5f9' }}>{s}</option>
+                  ))}
                 </select>
               )}
             </div>
@@ -389,8 +391,10 @@ function RecordModal({
               </div>
               <div style={{ flex: 1 }}>
                 <label style={af.label}>Source</label>
-                <select value={form.source} onChange={e => setForm(f => ({ ...f, source: e.target.value }))} style={af.input}>
-                  {['manual','quiz','exam','assignment','mock_test'].map(s => <option key={s} value={s}>{s.replace('_',' ')}</option>)}
+                <select value={form.source} onChange={e => setForm(f => ({ ...f, source: e.target.value }))} style={af.input} className="form-select">
+                  {['manual','quiz','exam','assignment','mock_test'].map(s => (
+                    <option key={s} value={s} style={{ background: '#0f1a2e', color: '#f1f5f9' }}>{s.replace('_',' ')}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -572,19 +576,7 @@ export default function SubjectAnalysis() {
             <div style={{ width: '40px', height: '40px', margin: '0 auto 1rem', border: '3px solid rgba(99,102,241,0.2)', borderTop: '3px solid #818cf8', borderRadius: '50%' }} className="spin" />
             <p style={{ color: 'var(--text)', fontSize: '0.9rem' }}>Analysing your performance data…</p>
           </div>
-        ) : !analysis || withData.length === 0 ? (
-          // Empty state
-          <div style={p.emptyWrap}>
-            <div style={p.emptyCard}>
-              <p style={{ fontSize: '3.5rem', margin: '0 0 1rem' }}>📊</p>
-              <h2 style={{ margin: '0 0 0.6rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-h)' }}>No performance data yet</h2>
-              <p style={{ margin: '0 0 1.75rem', fontSize: '0.87rem', color: 'var(--text)', lineHeight: 1.65, maxWidth: '380px' }}>
-                Add your first subject record to unlock your personal performance heatmap, AI weakness detection, topic analysis, and recovery plans.
-              </p>
-              <button style={p.addBigBtn} onClick={() => setShowAdd(true)}>+ Add First Record</button>
-            </div>
-          </div>
-        ) : (
+        ) : analysis && withData.length > 0 ? (
           <>
             {/* ── Focus Subject ── */}
             {analysis.focus_today && (
@@ -790,7 +782,31 @@ export default function SubjectAnalysis() {
               </section>
             )}
           </>
-        )}
+        ) : profileSubjects.length === 0 && records.length === 0 ? (
+          <div style={p.emptyWrap}>
+            <div style={p.emptyCard}>
+              <p style={{ fontSize: '3.5rem', margin: '0 0 1rem' }}>📚</p>
+              <h2 style={{ margin: '0 0 0.6rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-h)' }}>No subjects configured yet</h2>
+              <p style={{ margin: '0 0 1.75rem', fontSize: '0.87rem', color: 'var(--text)', lineHeight: 1.65, maxWidth: '380px' }}>
+                Add your subjects in your profile to activate Subject Analysis, the performance heatmap, AI weakness detection, and personalized recovery plans.
+              </p>
+              <Link to="/profile/setup" style={{ display: 'inline-block', padding: '0.75rem 2rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: '12px', color: '#fff', fontSize: '0.95rem', fontWeight: 800, textDecoration: 'none', boxShadow: '0 4px 20px rgba(99,102,241,0.35)' }}>
+                Set Up Profile →
+              </Link>
+            </div>
+          </div>
+        ) : records.length === 0 ? (
+          <div style={p.emptyWrap}>
+            <div style={p.emptyCard}>
+              <p style={{ fontSize: '3.5rem', margin: '0 0 1rem' }}>📊</p>
+              <h2 style={{ margin: '0 0 0.6rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-h)' }}>No performance data yet</h2>
+              <p style={{ margin: '0 0 1.75rem', fontSize: '0.87rem', color: 'var(--text)', lineHeight: 1.65, maxWidth: '380px' }}>
+                Add your first subject record to unlock your personal performance heatmap, AI weakness detection, topic analysis, and recovery plans.
+              </p>
+              <button style={p.addBigBtn} onClick={() => setShowAdd(true)}>+ Add First Record</button>
+            </div>
+          </div>
+        ) : null}
 
         {/* ── Records List ── always shown when there are records */}
         {records.length > 0 && (

@@ -39,12 +39,6 @@ interface SearchResponse {
   cached:               boolean;
 }
 
-/* ─── Preset topics ─── */
-const QUICK_TOPICS = [
-  'Data Structures', 'Machine Learning', 'DBMS', 'Operating Systems',
-  'Calculus', 'Neural Networks', 'Java Programming', 'Linear Algebra',
-  'Algorithms', 'Computer Networks', 'Deep Learning', 'Statistics',
-];
 
 /* ─── Difficulty config ─── */
 const DIFF_STYLE: Record<string, { color: string; bg: string; border: string }> = {
@@ -459,7 +453,8 @@ const vc: Record<string, React.CSSProperties> = {
 
 /* ═══════════════════════════════════════ */
 export default function StudyVideos() {
-  const { user, token } = useAuth();
+  const { user, token, studentProfile } = useAuth();
+  const quickTopics = studentProfile?.subjects ?? [];
   const wsConnected = useWebSocket(user?.id, token, () => {});
 
   const [query,   setQuery]   = useState('');
@@ -576,23 +571,25 @@ export default function StudyVideos() {
               </button>
             </form>
 
-            {/* Quick topics */}
-            <div style={s.quickRow}>
-              <span style={s.quickLabel}>Quick topics:</span>
-              <div style={s.quickChips}>
-                {QUICK_TOPICS.map(t => (
-                  <button
-                    key={t}
-                    style={s.chip}
-                    className="sv-chip"
-                    onClick={() => handleSearch(t)}
-                    disabled={loading}
-                  >
-                    {t}
-                  </button>
-                ))}
+            {/* Quick topics — your profile subjects */}
+            {quickTopics.length > 0 && (
+              <div style={s.quickRow}>
+                <span style={s.quickLabel}>Your subjects:</span>
+                <div style={s.quickChips}>
+                  {quickTopics.map(t => (
+                    <button
+                      key={t}
+                      style={s.chip}
+                      className="sv-chip"
+                      onClick={() => handleSearch(t)}
+                      disabled={loading}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Error state */}

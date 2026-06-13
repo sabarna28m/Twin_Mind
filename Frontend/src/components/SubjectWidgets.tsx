@@ -63,11 +63,19 @@ export default function SubjectWidgets() {
 
   if (!data || (!data.weakest && !data.strongest && !data.focus_today)) return (
     <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '18px', padding: '1.5rem', textAlign: 'center' as const }}>
-      <p style={{ margin: '0 0 0.6rem', fontSize: '1.5rem' }}>📊</p>
-      <p style={{ margin: '0 0 0.85rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-h)' }}>No subject data yet</p>
-      <Link to="/subjects" style={{ fontSize: '0.8rem', fontWeight: 700, color: '#818cf8', textDecoration: 'none', padding: '0.35rem 0.9rem', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '8px' }}>
-        Add First Record →
-      </Link>
+      <p style={{ margin: '0 0 0.6rem', fontSize: '1.5rem' }}>📚</p>
+      <p style={{ margin: '0 0 0.4rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-h)' }}>No subject data yet</p>
+      <p style={{ margin: '0 0 0.85rem', fontSize: '0.75rem', color: 'var(--text)', lineHeight: 1.5 }}>
+        Add your subjects in your profile, then log performance records to activate Subject Intelligence.
+      </p>
+      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' as const }}>
+        <Link to="/profile/setup" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#06b6d4', textDecoration: 'none', padding: '0.32rem 0.8rem', background: 'rgba(6,182,212,0.1)', border: '1px solid rgba(6,182,212,0.25)', borderRadius: '8px' }}>
+          Configure Subjects →
+        </Link>
+        <Link to="/subjects" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#818cf8', textDecoration: 'none', padding: '0.32rem 0.8rem', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '8px' }}>
+          Add Records →
+        </Link>
+      </div>
     </div>
   );
 
