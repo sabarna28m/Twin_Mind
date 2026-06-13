@@ -25,6 +25,7 @@ from app.models import google_token  # noqa: F401
 from app.models import burnout  # noqa: F401
 from app.models import subject_performance  # noqa: F401
 from app.models import smart_plan_record  # noqa: F401
+from app.models import career_twin  # noqa: F401
 from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes, notifications as notif_routes, quiz as quiz_routes, gamification as gamif_routes, battles as battle_routes, calendar as calendar_routes, smart_plan as smart_plan_routes
 from app.api.routes import websocket as ws_routes
 from app.api.routes import videos as video_routes
@@ -174,6 +175,24 @@ with engine.connect() as _conn:
         # Google OAuth columns on users table
         "ALTER TABLE users ADD COLUMN oauth_provider VARCHAR(50)",
         "ALTER TABLE users ADD COLUMN oauth_id VARCHAR(255)",
+        # Career Twin table
+        (
+            "CREATE TABLE IF NOT EXISTS career_twin_state ("
+            "id INTEGER PRIMARY KEY, "
+            "user_id INTEGER NOT NULL REFERENCES users(id) UNIQUE, "
+            "resume_score REAL DEFAULT 0.0, "
+            "linkedin_score REAL DEFAULT 0.0, "
+            "interview_score REAL DEFAULT 0.0, "
+            "coding_score REAL DEFAULT 0.0, "
+            "employability_score REAL DEFAULT 0.0, "
+            "skills_json TEXT DEFAULT '[]', "
+            "certifications_json TEXT DEFAULT '[]', "
+            "last_resume_text TEXT DEFAULT '', "
+            "score_history_json TEXT DEFAULT '[]', "
+            "created_at DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
+        ),
+        "CREATE INDEX IF NOT EXISTS ix_career_twin_state_user_id ON career_twin_state(user_id)",
         # AI notification fields
         "ALTER TABLE notifications ADD COLUMN priority VARCHAR(20)",
         "ALTER TABLE notifications ADD COLUMN category VARCHAR(50)",
