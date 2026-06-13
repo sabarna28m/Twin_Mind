@@ -27,7 +27,7 @@ const T: Record<LangCode, Translations> = {
     /* nav */
     nav_sessions: 'Sessions', nav_notes: 'Notes', nav_materials: 'Materials',
     nav_progress: 'Progress', nav_checkin: 'Check-in', nav_achievements: 'Achievements',
-    nav_quiz: 'Quiz', nav_simulate: 'Simulate', nav_mentor: 'Mentor', nav_twin: 'Twin', nav_career: 'Career',
+    nav_quiz: 'Quiz', nav_simulate: 'Simulate', nav_mentor: 'Mentor', nav_twin: 'Twin', nav_career: 'Career', nav_comm_twin: 'Comm Twin',
     /* common */
     sign_out: 'Sign out', loading: 'Loading…', live: 'Live',
     save: 'Save', cancel: 'Cancel', delete: 'Delete', close: 'Close',
@@ -55,7 +55,7 @@ const T: Record<LangCode, Translations> = {
     qa_desc_whatif: 'What-If', qa_desc_advice: 'AI Advice', qa_desc_twin: 'Digital Twin',
     qa_desc_log: 'Log Today', qa_desc_language: 'Switch', qa_desc_battles: 'vs Peers', qa_desc_focus: 'Deep Work', qa_desc_videos: 'YouTube AI', qa_desc_burnout: 'Risk Score', qa_desc_subjects: 'Heatmap',
     qa_ai_focus: 'AI Focus', qa_desc_ai_focus: 'Eye Track',
-    qa_career: 'Career', qa_desc_career: 'Career AI',
+    qa_career: 'Career', qa_desc_career: 'Career AI', qa_comm_twin: 'Comm Twin', qa_desc_comm_twin: 'Speak AI',
     /* study plan */
     my_study_plan: 'My Study Plan', generate_new: 'Generate new →', view_full_plan: 'View Full Plan',
     no_plan_title: 'No saved study plan yet',
@@ -173,7 +173,7 @@ const T: Record<LangCode, Translations> = {
   hi: {
     nav_sessions: 'सत्र', nav_notes: 'नोट्स', nav_materials: 'सामग्री',
     nav_progress: 'प्रगति', nav_checkin: 'चेक-इन', nav_achievements: 'उपलब्धियां',
-    nav_quiz: 'क्विज़', nav_simulate: 'सिमुलेट', nav_mentor: 'मेंटर', nav_twin: 'ट्विन', nav_career: 'करिअर', nav_career: 'करियर',
+    nav_quiz: 'क्विज़', nav_simulate: 'सिमुलेट', nav_mentor: 'मेंटर', nav_twin: 'ट्विन', nav_career: 'करिअर', nav_comm_twin: 'संवाद', nav_career: 'करियर', nav_comm_twin: 'कम्युनिकेशन',
     sign_out: 'साइन आउट', loading: 'लोड हो रहा है…', live: 'लाइव',
     save: 'सहेजें', cancel: 'रद्द करें', delete: 'हटाएं', close: 'बंद करें',
     back_dashboard: '← डैशबोर्ड',
@@ -293,7 +293,7 @@ const T: Record<LangCode, Translations> = {
   bn: {
     nav_sessions: 'সেশন', nav_notes: 'নোট', nav_materials: 'উপকরণ',
     nav_progress: 'অগ্রগতি', nav_checkin: 'চেক-ইন', nav_achievements: 'অর্জন',
-    nav_quiz: 'কুইজ', nav_simulate: 'সিমুলেট', nav_mentor: 'মেন্টর', nav_twin: 'টুইন', nav_career: 'ক্যারিয়ার',
+    nav_quiz: 'কুইজ', nav_simulate: 'সিমুলেট', nav_mentor: 'মেন্টর', nav_twin: 'টুইন', nav_career: 'ক্যারিয়ার', nav_comm_twin: 'কমিউনিকেশন',
     sign_out: 'সাইন আউট', loading: 'লোড হচ্ছে…', live: 'লাইভ',
     save: 'সংরক্ষণ', cancel: 'বাতিল', delete: 'মুছুন', close: 'বন্ধ',
     back_dashboard: '← ড্যাশবোর্ড',
@@ -416,7 +416,7 @@ const T: Record<LangCode, Translations> = {
   ta: {
     nav_sessions: 'அமர்வுகள்', nav_notes: 'குறிப்புகள்', nav_materials: 'பொருட்கள்',
     nav_progress: 'முன்னேற்றம்', nav_checkin: 'செக்-இன்', nav_achievements: 'சாதனைகள்',
-    nav_quiz: 'வினாடி வினா', nav_simulate: 'உருவகப்படுத்து', nav_mentor: 'வழிகாட்டி', nav_twin: 'இரட்டை', nav_career: 'வாழ்க்கை',
+    nav_quiz: 'வினாடி வினா', nav_simulate: 'உருவகப்படுத்து', nav_mentor: 'வழிகாட்டி', nav_twin: 'இரட்டை', nav_career: 'வாழ்க்கை', nav_comm_twin: 'தொடர்பு',
     sign_out: 'வெளியேறு', loading: 'ஏற்றுகிறது…', live: 'நேரலை',
     save: 'சேமி', cancel: 'ரத்து', delete: 'நீக்கு', close: 'மூடு',
     back_dashboard: '← டாஷ்போர்டு',
@@ -539,7 +539,7 @@ const T: Record<LangCode, Translations> = {
   te: {
     nav_sessions: 'సెషన్లు', nav_notes: 'నోట్స్', nav_materials: 'పదార్థాలు',
     nav_progress: 'పురోగతి', nav_checkin: 'చెక్-ఇన్', nav_achievements: 'విజయాలు',
-    nav_quiz: 'క్విజ్', nav_simulate: 'అనుకరించు', nav_mentor: 'మెంటర్', nav_twin: 'ట్విన్', nav_career: 'కెరీర్',
+    nav_quiz: 'క్విజ్', nav_simulate: 'అనుకరించు', nav_mentor: 'మెంటర్', nav_twin: 'ట్విన్', nav_career: 'కెరీర్', nav_comm_twin: 'కమ్యూనికేషన్',
     sign_out: 'సైన్ అవుట్', loading: 'లోడ్ అవుతోంది…', live: 'లైవ్',
     save: 'సేవ్', cancel: 'రద్దు', delete: 'తొలగించు', close: 'మూసివేయి',
     back_dashboard: '← డాష్‌బోర్డ్',
@@ -662,7 +662,7 @@ const T: Record<LangCode, Translations> = {
   mr: {
     nav_sessions: 'सत्रे', nav_notes: 'नोट्स', nav_materials: 'साहित्य',
     nav_progress: 'प्रगती', nav_checkin: 'चेक-इन', nav_achievements: 'उपलब्धी',
-    nav_quiz: 'प्रश्नमंजुषा', nav_simulate: 'अनुकरण', nav_mentor: 'मार्गदर्शक', nav_twin: 'ट्विन', nav_career: 'करिअर', nav_career: 'करियर',
+    nav_quiz: 'प्रश्नमंजुषा', nav_simulate: 'अनुकरण', nav_mentor: 'मार्गदर्शक', nav_twin: 'ट्विन', nav_career: 'करिअर', nav_comm_twin: 'संवाद', nav_career: 'करियर', nav_comm_twin: 'कम्युनिकेशन',
     sign_out: 'साइन आउट', loading: 'लोड होत आहे…', live: 'लाइव्ह',
     save: 'जतन करा', cancel: 'रद्द करा', delete: 'हटवा', close: 'बंद करा',
     back_dashboard: '← डॅशबोर्ड',
@@ -785,7 +785,7 @@ const T: Record<LangCode, Translations> = {
   es: {
     nav_sessions: 'Sesiones', nav_notes: 'Notas', nav_materials: 'Materiales',
     nav_progress: 'Progreso', nav_checkin: 'Check-in', nav_achievements: 'Logros',
-    nav_quiz: 'Cuestionario', nav_simulate: 'Simular', nav_mentor: 'Mentor', nav_twin: 'Gemelo', nav_career: 'Carrera',
+    nav_quiz: 'Cuestionario', nav_simulate: 'Simular', nav_mentor: 'Mentor', nav_twin: 'Gemelo', nav_career: 'Carrera', nav_comm_twin: 'Comunicación',
     sign_out: 'Cerrar sesión', loading: 'Cargando…', live: 'En vivo',
     save: 'Guardar', cancel: 'Cancelar', delete: 'Eliminar', close: 'Cerrar',
     back_dashboard: '← Panel',
@@ -907,7 +907,7 @@ const T: Record<LangCode, Translations> = {
   fr: {
     nav_sessions: 'Séances', nav_notes: 'Notes', nav_materials: 'Supports',
     nav_progress: 'Progrès', nav_checkin: 'Check-in', nav_achievements: 'Succès',
-    nav_quiz: 'Quiz', nav_simulate: 'Simuler', nav_mentor: 'Mentor', nav_twin: 'Jumeau', nav_career: 'Carrière',
+    nav_quiz: 'Quiz', nav_simulate: 'Simuler', nav_mentor: 'Mentor', nav_twin: 'Jumeau', nav_career: 'Carrière', nav_comm_twin: 'Communication',
     sign_out: 'Se déconnecter', loading: 'Chargement…', live: 'En direct',
     save: 'Enregistrer', cancel: 'Annuler', delete: 'Supprimer', close: 'Fermer',
     back_dashboard: '← Tableau de bord',
@@ -1029,7 +1029,7 @@ const T: Record<LangCode, Translations> = {
   de: {
     nav_sessions: 'Sitzungen', nav_notes: 'Notizen', nav_materials: 'Materialien',
     nav_progress: 'Fortschritt', nav_checkin: 'Check-in', nav_achievements: 'Erfolge',
-    nav_quiz: 'Quiz', nav_simulate: 'Simulieren', nav_mentor: 'Mentor', nav_twin: 'Zwilling', nav_career: 'Karriere',
+    nav_quiz: 'Quiz', nav_simulate: 'Simulieren', nav_mentor: 'Mentor', nav_twin: 'Zwilling', nav_career: 'Karriere', nav_comm_twin: 'Kommunikation',
     sign_out: 'Abmelden', loading: 'Lädt…', live: 'Live',
     save: 'Speichern', cancel: 'Abbrechen', delete: 'Löschen', close: 'Schließen',
     back_dashboard: '← Dashboard',
@@ -1151,7 +1151,7 @@ const T: Record<LangCode, Translations> = {
   ja: {
     nav_sessions: 'セッション', nav_notes: 'ノート', nav_materials: '教材',
     nav_progress: '進捗', nav_checkin: 'チェックイン', nav_achievements: '実績',
-    nav_quiz: 'クイズ', nav_simulate: 'シミュレート', nav_mentor: 'メンター', nav_twin: 'ツイン', nav_career: 'キャリア',
+    nav_quiz: 'クイズ', nav_simulate: 'シミュレート', nav_mentor: 'メンター', nav_twin: 'ツイン', nav_career: 'キャリア', nav_comm_twin: 'コミュニケーション',
     sign_out: 'サインアウト', loading: '読み込み中…', live: 'ライブ',
     save: '保存', cancel: 'キャンセル', delete: '削除', close: '閉じる',
     back_dashboard: '← ダッシュボード',
@@ -1273,7 +1273,7 @@ const T: Record<LangCode, Translations> = {
   zh: {
     nav_sessions: '学习课程', nav_notes: '笔记', nav_materials: '学习资料',
     nav_progress: '进度', nav_checkin: '打卡', nav_achievements: '成就',
-    nav_quiz: '测验', nav_simulate: '模拟', nav_mentor: '导师', nav_twin: '数字分身', nav_career: '职业',
+    nav_quiz: '测验', nav_simulate: '模拟', nav_mentor: '导师', nav_twin: '数字分身', nav_career: '职业', nav_comm_twin: '沟通',
     sign_out: '退出登录', loading: '加载中…', live: '实时',
     save: '保存', cancel: '取消', delete: '删除', close: '关闭',
     back_dashboard: '← 仪表板',
@@ -1395,7 +1395,7 @@ const T: Record<LangCode, Translations> = {
   ar: {
     nav_sessions: 'الجلسات', nav_notes: 'الملاحظات', nav_materials: 'المواد',
     nav_progress: 'التقدم', nav_checkin: 'تسجيل الحضور', nav_achievements: 'الإنجازات',
-    nav_quiz: 'الاختبار', nav_simulate: 'محاكاة', nav_mentor: 'المرشد', nav_twin: 'التوأم', nav_career: 'المسار المهني',
+    nav_quiz: 'الاختبار', nav_simulate: 'محاكاة', nav_mentor: 'المرشد', nav_twin: 'التوأم', nav_career: 'المسار المهني', nav_comm_twin: 'التواصل',
     sign_out: 'تسجيل الخروج', loading: 'جارٍ التحميل…', live: 'مباشر',
     save: 'حفظ', cancel: 'إلغاء', delete: 'حذف', close: 'إغلاق',
     back_dashboard: '← لوحة التحكم',
@@ -1517,7 +1517,7 @@ const T: Record<LangCode, Translations> = {
   pt: {
     nav_sessions: 'Sessões', nav_notes: 'Notas', nav_materials: 'Materiais',
     nav_progress: 'Progresso', nav_checkin: 'Check-in', nav_achievements: 'Conquistas',
-    nav_quiz: 'Quiz', nav_simulate: 'Simular', nav_mentor: 'Mentor', nav_twin: 'Gêmeo', nav_career: 'Carreira',
+    nav_quiz: 'Quiz', nav_simulate: 'Simular', nav_mentor: 'Mentor', nav_twin: 'Gêmeo', nav_career: 'Carreira', nav_comm_twin: 'Comunicação',
     sign_out: 'Sair', loading: 'Carregando…', live: 'Ao vivo',
     save: 'Salvar', cancel: 'Cancelar', delete: 'Excluir', close: 'Fechar',
     back_dashboard: '← Painel',
@@ -1639,7 +1639,7 @@ const T: Record<LangCode, Translations> = {
   ko: {
     nav_sessions: '세션', nav_notes: '노트', nav_materials: '학습 자료',
     nav_progress: '진도', nav_checkin: '체크인', nav_achievements: '업적',
-    nav_quiz: '퀴즈', nav_simulate: '시뮬레이션', nav_mentor: '멘토', nav_twin: '트윈', nav_career: '커리어',
+    nav_quiz: '퀴즈', nav_simulate: '시뮬레이션', nav_mentor: '멘토', nav_twin: '트윈', nav_career: '커리어', nav_comm_twin: '커뮤니케이션',
     sign_out: '로그아웃', loading: '로딩 중…', live: '라이브',
     save: '저장', cancel: '취소', delete: '삭제', close: '닫기',
     back_dashboard: '← 대시보드',

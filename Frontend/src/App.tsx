@@ -59,6 +59,7 @@ import Burnout from './pages/Burnout';
 import SubjectAnalysis from './pages/SubjectAnalysis';
 import AIFocusDetector from './pages/AIFocusDetector';
 import CareerDevelopment from './pages/CareerDevelopment';
+import CommTwin from './pages/CommTwin';
 
 export default function App() {
   return (
@@ -238,6 +239,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <CareerDevelopment />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/comm-twin"
+            element={
+              <ProtectedRoute>
+                <CommTwin />
               </ProtectedRoute>
             }
           />
