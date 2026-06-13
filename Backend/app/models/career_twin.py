@@ -24,6 +24,11 @@ class CareerTwin(Base):
     # Raw text of the most recently uploaded resume
     last_resume_text = Column(Text, default="")
 
+    # LinkedIn Digital Twin — full analysis JSON from last upload/paste
+    linkedin_profile_json = Column(Text, default="{}")
+    # LinkedIn Digital Twin — persisted list of achievement/certificate objects
+    linkedin_achievements_json = Column(Text, default="[]")
+
     # JSON array of score snapshots for analytics charts
     # Each entry: {"date": "YYYY-MM-DD", "event": "...", "resume": N, "linkedin": N,
     #              "interview": N, "coding": N, "employability": N}

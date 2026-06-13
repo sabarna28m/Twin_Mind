@@ -193,6 +193,8 @@ with engine.connect() as _conn:
             "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
         ),
         "CREATE INDEX IF NOT EXISTS ix_career_twin_state_user_id ON career_twin_state(user_id)",
+        "ALTER TABLE career_twin_state ADD COLUMN linkedin_profile_json TEXT DEFAULT '{}'",
+        "ALTER TABLE career_twin_state ADD COLUMN linkedin_achievements_json TEXT DEFAULT '[]'",
         # AI notification fields
         "ALTER TABLE notifications ADD COLUMN priority VARCHAR(20)",
         "ALTER TABLE notifications ADD COLUMN category VARCHAR(50)",

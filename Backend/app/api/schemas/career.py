@@ -76,6 +76,112 @@ class LinkedInAnalyzeResponse(BaseModel):
     twin_updated: bool = False
 
 
+# ── LinkedIn Digital Twin ─────────────────────────────────────────────────────
+
+class AchievementItem(BaseModel):
+    id: str
+    title: str
+    achievement_type: str          # certificate|internship|project|skill|other
+    raw_text: str
+    skills_gained: List[str]
+    technologies: List[str]
+    difficulty_level: str          # Beginner|Intermediate|Advanced
+    career_value: str
+    industry_relevance: str
+    impact_score: int
+    career_value_score: int
+    recruiter_appeal_score: int
+    why_it_matters: str
+    how_it_improves: str
+    career_paths_supported: List[str]
+    uploaded_at: str
+
+
+class AchievementAnalyzeResponse(BaseModel):
+    achievement: AchievementItem
+    twin_updated: bool = True
+
+
+class LinkedInImprovementItem(BaseModel):
+    section: str
+    current_version: str
+    suggested_version: str
+    reason: str
+
+
+class LinkedInChecklistItem(BaseModel):
+    key: str
+    label: str
+    completed: bool
+    recommendation: str
+
+
+class LinkedInTwinPrediction(BaseModel):
+    months: int
+    career_growth: str
+    recruiter_interest: int
+    employability_score: int
+    skill_growth: str
+    opportunities: List[str]
+
+
+class LinkedInSectionScore(BaseModel):
+    name: str
+    score: int
+    feedback: str
+    suggestion: str
+
+
+class LinkedInTwinFullResponse(BaseModel):
+    # Five core scores
+    profile_strength: int
+    recruiter_visibility: int
+    personal_branding: int
+    industry_relevance_score: int
+    network_readiness: int
+    overall_score: int
+
+    # Per-section scores
+    sections: List[LinkedInSectionScore]
+
+    # Generated content
+    suggested_headline: str
+    suggested_about: str
+
+    # Before/After improvements
+    improvements: List[LinkedInImprovementItem]
+
+    # Optimization checklist
+    checklist: List[LinkedInChecklistItem]
+    checklist_completion: int
+
+    # AI recommendations
+    suitable_roles: List[str]
+    internship_opportunities: List[str]
+    missing_skills: List[str]
+    missing_certifications: List[str]
+    important_projects: List[str]
+    learning_priorities: List[str]
+
+    # Stored achievements
+    achievements: List[AchievementItem]
+    achievements_count: int
+
+    # Predictions
+    predictions: Dict[str, LinkedInTwinPrediction]
+
+    # Meta
+    last_analyzed: Optional[str]
+    twin_insight: str
+    twin_updated: bool = True
+
+
+class ManualAchievementRequest(BaseModel):
+    title: str
+    description: str
+    achievement_type: str = "achievement"
+
+
 # ── Interview ─────────────────────────────────────────────────────────────────
 
 class InterviewMsg(BaseModel):

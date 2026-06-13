@@ -657,124 +657,656 @@ function ResumeUploadSection() {
   );
 }
 
-// ── Section: LinkedIn ─────────────────────────────────────────────────────────
+// ── Section: LinkedIn Digital Twin ───────────────────────────────────────────
+
+// ── Types specific to LinkedIn Twin
+interface LIAchievement { id:string; title:string; achievement_type:string; raw_text:string; skills_gained:string[]; technologies:string[]; difficulty_level:string; career_value:string; industry_relevance:string; impact_score:number; career_value_score:number; recruiter_appeal_score:number; why_it_matters:string; how_it_improves:string; career_paths_supported:string[]; uploaded_at:string }
+interface LIImprovement  { section:string; current_version:string; suggested_version:string; reason:string }
+interface LIChecklist    { key:string; label:string; completed:boolean; recommendation:string }
+interface LIPrediction   { months:number; career_growth:string; recruiter_interest:number; employability_score:number; skill_growth:string; opportunities:string[] }
+interface LISectionScore { name:string; score:number; feedback:string; suggestion:string }
+interface LITwin {
+  profile_strength:number; recruiter_visibility:number; personal_branding:number;
+  industry_relevance_score:number; network_readiness:number; overall_score:number;
+  sections:LISectionScore[]; suggested_headline:string; suggested_about:string;
+  improvements:LIImprovement[]; checklist:LIChecklist[]; checklist_completion:number;
+  suitable_roles:string[]; internship_opportunities:string[];
+  missing_skills:string[]; missing_certifications:string[];
+  important_projects:string[]; learning_priorities:string[];
+  achievements:LIAchievement[]; achievements_count:number;
+  predictions:Record<string, LIPrediction>; last_analyzed:string|null;
+  twin_insight:string; twin_updated:boolean;
+}
+
+const LI_SUB_TABS = [
+  { id:'input',     label:'Input',     icon:'📥' },
+  { id:'profile',   label:'Twin',      icon:'👤' },
+  { id:'achieve',   label:'Achieve',   icon:'🏆' },
+  { id:'optimize',  label:'Optimize',  icon:'⚙️' },
+  { id:'predict',   label:'Predict',   icon:'🔮' },
+];
 
 function LinkedInSection() {
-  const [text, setText] = useState('');
-  const [role, setRole] = useState('');
-  const [result, setResult] = useState<LinkedInResult|null>(null);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState('');
+  const [liTab, setLiTab] = useState<'input'|'profile'|'achieve'|'optimize'|'predict'>('input');
+  const [twinData, setTwinData] = useState<LITwin|null>(null);
+  const [twinLoading, setTwinLoading] = useState(true);
 
-  async function analyze() {
-    if (!text.trim()) return;
-    setLoading(true); setErr(''); setResult(null);
-    try {
-      const r = await api.post<LinkedInResult>('/career/linkedin/analyze', { profile_text: text, target_role: role||undefined });
-      setResult(r.data);
-    } catch (e:unknown) {
-      const d=(e as {response?:{data?:{detail?:string}}})?.response?.data?.detail;
-      setErr(d ?? 'Analysis failed.');
-    } finally { setLoading(false); }
-  }
+  // Load existing twin state on mount
+  useEffect(() => {
+    api.get<LITwin>('/career/linkedin/twin')
+      .then(r => { setTwinData(r.data); if (r.data.last_analyzed) setLiTab('profile'); })
+      .catch(() => {})
+      .finally(() => setTwinLoading(false));
+  }, []);
 
   const sc = (v:number) => v>=70?GREEN:v>=50?AMBER:RED;
 
-  return (
-    <div style={{ display:'flex', flexDirection:'column', gap:'1.5rem' }}>
-      <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
-        <div style={{ color:TEXT, fontWeight:700, fontSize:'1rem', marginBottom:'1rem' }}>LinkedIn Profile Optimizer</div>
-        <div style={{ color:MUTED, fontSize:'0.82rem', marginBottom:'1rem' }}>Paste your LinkedIn profile content — headline, About section, experience entries, skills list.</div>
-        <input placeholder="Target role (optional)" value={role} onChange={e=>setRole(e.target.value)}
-          style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.6rem 1rem', color:TEXT, fontSize:'0.88rem', marginBottom:'0.75rem', boxSizing:'border-box' }} />
-        <textarea placeholder="Paste your LinkedIn profile text here…" value={text} onChange={e=>setText(e.target.value)} rows={9}
-          style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.75rem 1rem', color:TEXT, fontSize:'0.83rem', resize:'vertical', boxSizing:'border-box' }} />
-        <button onClick={analyze} disabled={loading||!text.trim()}
-          style={{ marginTop:'0.75rem', width:'100%', padding:'0.7rem', background:loading||!text.trim()?DIM:`linear-gradient(135deg,#0077b5,${CYAN})`, border:'none', borderRadius:10, color:'#fff', fontWeight:700, cursor:loading||!text.trim()?'not-allowed':'pointer' }}>
-          {loading?'Analyzing…':'🔍 Optimize LinkedIn'}
-        </button>
-        {err && <div style={{ color:RED, fontSize:'0.82rem', marginTop:8 }}>{err}</div>}
-      </div>
+  // ── Sub-tab: Input ─────────────────────────────────────────────────────────
+  function InputTab() {
+    const [inputMode, setInputMode] = useState<'paste'|'file'|'url'>('paste');
+    const [profileText, setProfileText] = useState('');
+    const [profileUrl, setProfileUrl] = useState('');
+    const [role, setRole] = useState('');
+    const [file, setFile] = useState<File|null>(null);
+    const [loading, setLoading] = useState(false);
+    const [err, setErr] = useState('');
+    const [progress, setProgress] = useState(0);
+    const fileRef = useRef<HTMLInputElement>(null);
 
-      {loading && <Loader text="AI is analyzing your LinkedIn profile…" />}
+    async function analyze() {
+      setLoading(true); setErr(''); setProgress(10);
+      try {
+        const fd = new FormData();
+        if (file) fd.append('file', file);
+        fd.append('profile_text', profileText);
+        fd.append('profile_url', profileUrl);
+        fd.append('target_role', role || 'Software Developer');
+        setProgress(40);
+        const r = await api.post<LITwin>('/career/linkedin/upload', fd, {
+          headers:{ 'Content-Type':'multipart/form-data' },
+          onUploadProgress: (e) => setProgress(40 + Math.round((e.loaded/(e.total||1))*40)),
+        });
+        setProgress(100);
+        setTwinData(r.data);
+        setLiTab('profile');
+      } catch(e:unknown) {
+        const d=(e as {response?:{data?:{detail?:string}}})?.response?.data?.detail;
+        setErr(d ?? 'Analysis failed. Please try again.');
+      } finally { setLoading(false); setProgress(0); }
+    }
 
-      {result && (
-        <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
-          {/* 4 scores */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'0.75rem' }}>
-            {[
-              { label:'Profile Score',      value:result.score,                color:sc(result.score)                },
-              { label:'Visibility',         value:result.visibility_score,     color:sc(result.visibility_score)     },
-              { label:'Personal Brand',     value:result.personal_brand_score, color:sc(result.personal_brand_score) },
-              { label:'Recruiter Appeal',   value:result.recruiter_score,      color:sc(result.recruiter_score)      },
-            ].map(({ label, value, color }) => (
-              <div key={label} style={{ background:CARD, border:BORDER, borderRadius:14, padding:'0.9rem', textAlign:'center' }}>
-                <div style={{ fontSize:'0.68rem', color:MUTED, textTransform:'uppercase', letterSpacing:1 }}>{label}</div>
-                <div style={{ fontSize:'1.9rem', fontWeight:800, color, margin:'4px 0' }}>{value}</div>
-                <Bar value={value} color={color} height={3} />
+    const INPUT_MODES = [
+      { id:'paste', label:'Paste Text',  icon:'📋' },
+      { id:'file',  label:'Upload File', icon:'📁' },
+      { id:'url',   label:'Profile URL', icon:'🔗' },
+    ] as const;
+
+    return (
+      <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
+        {/* Mode selector */}
+        <div style={{ display:'flex', gap:6 }}>
+          {INPUT_MODES.map(m => (
+            <button key={m.id} onClick={() => setInputMode(m.id)}
+              style={{ padding:'0.45rem 1rem', borderRadius:8, border:`1px solid ${inputMode===m.id?'#0077b5':'rgba(255,255,255,0.1)'}`, background:inputMode===m.id?'#0077b522':'transparent', color:inputMode===m.id?'#5cb8ff':MUTED, cursor:'pointer', fontWeight:600, fontSize:'0.82rem' }}>
+              {m.icon} {m.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem', display:'flex', flexDirection:'column', gap:'0.75rem' }}>
+          <input placeholder="Target role (e.g. AI Engineer)" value={role} onChange={e=>setRole(e.target.value)}
+            style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.6rem 1rem', color:TEXT, fontSize:'0.88rem', boxSizing:'border-box' }} />
+
+          {inputMode === 'paste' && (
+            <textarea placeholder="Paste your full LinkedIn profile here — include Headline, About, Experience, Skills, Projects, Certifications…" value={profileText} onChange={e=>setProfileText(e.target.value)} rows={10}
+              style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.75rem 1rem', color:TEXT, fontSize:'0.83rem', resize:'vertical', boxSizing:'border-box' }} />
+          )}
+
+          {inputMode === 'file' && (
+            <div>
+              <div onClick={() => fileRef.current?.click()}
+                style={{ border:`2px dashed ${file?GREEN:'rgba(255,255,255,0.15)'}`, borderRadius:14, padding:'2.5rem', textAlign:'center', cursor:'pointer', background:file?`${GREEN}06`:'transparent' }}>
+                <input ref={fileRef} type="file" accept=".pdf,.docx,.txt" style={{ display:'none' }}
+                  onChange={e => setFile(e.target.files?.[0] || null)} />
+                <div style={{ fontSize:'2rem', marginBottom:8 }}>📁</div>
+                {file ? (
+                  <div><div style={{ color:GREEN, fontWeight:700 }}>✓ {file.name}</div><div style={{ color:MUTED, fontSize:'0.78rem' }}>Click to change</div></div>
+                ) : (
+                  <div><div style={{ color:TEXT, fontWeight:600 }}>Upload LinkedIn PDF or profile export</div><div style={{ color:MUTED, fontSize:'0.78rem' }}>PDF, DOCX, or TXT — max 5 MB</div></div>
+                )}
               </div>
-            ))}
-          </div>
+              <textarea placeholder="Optional: add extra context or notes…" value={profileText} onChange={e=>setProfileText(e.target.value)} rows={3}
+                style={{ width:'100%', marginTop:8, background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.65rem 1rem', color:TEXT, fontSize:'0.82rem', resize:'none', boxSizing:'border-box' }} />
+            </div>
+          )}
 
-          {/* Section scores bar */}
-          <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.25rem' }}>
-            <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Section Analysis</div>
-            {Object.entries(result.section_scores).map(([k,v]) => {
-              const c = sc(v);
-              return (
-                <div key={k} style={{ marginBottom:'0.8rem' }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
-                    <span style={{ fontSize:'0.82rem', color:MUTED }}>{k}</span>
-                    <span style={{ fontSize:'0.82rem', fontWeight:700, color:c }}>{v}/100</span>
+          {inputMode === 'url' && (
+            <div style={{ display:'flex', flexDirection:'column', gap:'0.65rem' }}>
+              <input placeholder="https://linkedin.com/in/yourprofile" value={profileUrl} onChange={e=>setProfileUrl(e.target.value)}
+                style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.6rem 1rem', color:TEXT, fontSize:'0.88rem', boxSizing:'border-box' }} />
+              <div style={{ background:`${AMBER}0a`, border:`1px solid ${AMBER}25`, borderRadius:8, padding:'0.65rem 0.85rem', fontSize:'0.78rem', color:AMBER }}>
+                LinkedIn requires authentication to scrape profiles. Please also paste your profile content below for analysis.
+              </div>
+              <textarea placeholder="Paste your profile content here as well…" value={profileText} onChange={e=>setProfileText(e.target.value)} rows={7}
+                style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.75rem 1rem', color:TEXT, fontSize:'0.83rem', resize:'vertical', boxSizing:'border-box' }} />
+            </div>
+          )}
+
+          {progress > 0 && progress < 100 && (
+            <div>
+              <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
+                <span style={{ fontSize:'0.73rem', color:MUTED }}>Analyzing…</span>
+                <span style={{ fontSize:'0.73rem', color:CYAN }}>{progress}%</span>
+              </div>
+              <Bar value={progress} color={CYAN} height={4} />
+            </div>
+          )}
+
+          <button onClick={analyze} disabled={loading || (!profileText.trim() && !file && !profileUrl.trim())}
+            style={{ padding:'0.75rem', background:loading?DIM:`linear-gradient(135deg,#0077b5,${CYAN})`, border:'none', borderRadius:10, color:'#fff', fontWeight:700, cursor:'pointer', fontSize:'0.95rem' }}>
+            {loading ? 'Analyzing with AI…' : '🔍 Analyze LinkedIn Profile'}
+          </button>
+          {err && <div style={{ color:RED, fontSize:'0.82rem' }}>{err}</div>}
+        </div>
+
+        {twinLoading && <Loader text="Loading LinkedIn Twin…" />}
+        {!twinLoading && twinData && !twinData.last_analyzed && (
+          <div style={{ background:`${INDIGO}0a`, border:`1px solid ${INDIGO}30`, borderRadius:14, padding:'1.25rem', display:'flex', gap:'1rem', alignItems:'flex-start' }}>
+            <span style={{ fontSize:'1.6rem' }}>💡</span>
+            <div>
+              <div style={{ color:INDIGO, fontWeight:700, marginBottom:4 }}>How to get the most from LinkedIn Digital Twin</div>
+              <div style={{ color:MUTED, fontSize:'0.83rem', lineHeight:1.7 }}>
+                1. Paste or upload your full LinkedIn profile content.<br/>
+                2. Upload your certificates and achievements in the <strong style={{ color:CYAN }}>Achievements</strong> tab.<br/>
+                3. Check the <strong style={{ color:CYAN }}>Optimize</strong> tab for checklist and before/after improvements.<br/>
+                4. View your career growth forecasts in the <strong style={{ color:CYAN }}>Predict</strong> tab.
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Sub-tab: Twin Profile ──────────────────────────────────────────────────
+  function ProfileTab() {
+    if (!twinData || !twinData.last_analyzed) return (
+      <div style={{ padding:'3rem', textAlign:'center', color:MUTED }}>
+        <div style={{ fontSize:'2.5rem', marginBottom:'0.75rem' }}>👤</div>
+        <div style={{ fontWeight:700, color:TEXT, marginBottom:6 }}>No profile analyzed yet</div>
+        <div style={{ fontSize:'0.85rem', marginBottom:'1rem' }}>Go to the Input tab to upload or paste your LinkedIn profile.</div>
+        <button onClick={() => setLiTab('input')} style={{ padding:'0.55rem 1.5rem', background:INDIGO, border:'none', borderRadius:10, color:'#fff', fontWeight:600, cursor:'pointer' }}>Go to Input</button>
+      </div>
+    );
+    const d = twinData;
+    return (
+      <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
+        {/* Twin insight */}
+        <div style={{ background:`linear-gradient(135deg,#0077b520,${CYAN}10)`, border:'1px solid #0077b540', borderRadius:18, padding:'1.5rem', display:'flex', gap:'1rem', alignItems:'flex-start' }}>
+          <div style={{ position:'relative', display:'inline-flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <ScoreRing score={d.overall_score} color={sc(d.overall_score)} size={100} />
+            <div style={{ position:'absolute', textAlign:'center' }}>
+              <div style={{ fontSize:'1.5rem', fontWeight:900, color:TEXT, lineHeight:1 }}>{d.overall_score}</div>
+              <div style={{ fontSize:'0.6rem', color:MUTED }}>Score</div>
+            </div>
+          </div>
+          <div style={{ flex:1 }}>
+            <div style={{ color:'#5cb8ff', fontWeight:700, fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>LinkedIn Digital Twin</div>
+            <div style={{ color:TEXT, fontSize:'0.93rem', lineHeight:1.6, marginBottom:'0.75rem' }}>{d.twin_insight}</div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:'0.5rem' }}>
+              {[
+                { label:'Profile',   value:d.profile_strength       },
+                { label:'Visibility',value:d.recruiter_visibility    },
+                { label:'Branding',  value:d.personal_branding       },
+                { label:'Industry',  value:d.industry_relevance_score},
+                { label:'Network',   value:d.network_readiness       },
+              ].map(({ label, value }) => {
+                const c = sc(value);
+                return (
+                  <div key={label} style={{ textAlign:'center' }}>
+                    <div style={{ fontSize:'0.65rem', color:MUTED, marginBottom:3 }}>{label}</div>
+                    <div style={{ fontWeight:800, fontSize:'1.1rem', color:c }}>{value}</div>
+                    <Bar value={value} color={c} height={3} />
                   </div>
-                  <Bar value={v} color={c} height={6} />
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Section scores */}
+        {d.sections.length > 0 && (
+          <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.25rem' }}>
+            <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Section-by-Section Analysis</div>
+            {d.sections.map(sec => {
+              const c = sc(sec.score);
+              return (
+                <div key={sec.name} style={{ marginBottom:'0.85rem' }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
+                    <span style={{ fontSize:'0.83rem', color:TEXT }}>{sec.name}</span>
+                    <span style={{ fontSize:'0.83rem', fontWeight:700, color:c }}>{sec.score}/100</span>
+                  </div>
+                  <Bar value={sec.score} color={c} height={6} />
+                  <div style={{ fontSize:'0.75rem', color:DIM, marginTop:3 }}>{sec.feedback}</div>
+                  {sec.suggestion && <div style={{ fontSize:'0.75rem', color:CYAN, marginTop:2 }}>→ {sec.suggestion}</div>}
                 </div>
               );
             })}
           </div>
+        )}
 
-          {/* Generated content */}
-          <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.25rem' }}>
-            <div style={{ color:CYAN, fontWeight:700, fontSize:'0.88rem', marginBottom:8 }}>✨ Optimized Headline</div>
-            <div style={{ background:`${CYAN}08`, border:`1px solid ${CYAN}25`, borderRadius:8, padding:'0.75rem', color:TEXT, fontSize:'0.9rem', lineHeight:1.6 }}>{result.optimized_headline}</div>
-          </div>
-          <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.25rem' }}>
-            <div style={{ color:CYAN, fontWeight:700, fontSize:'0.88rem', marginBottom:8 }}>✨ Optimized About Section</div>
-            <div style={{ background:`${CYAN}06`, border:`1px solid ${CYAN}20`, borderRadius:8, padding:'0.85rem', color:MUTED, fontSize:'0.86rem', lineHeight:1.75 }}>{result.optimized_summary}</div>
-          </div>
-
-          {/* Columns grid */}
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-              <div style={{ color:INDIGO, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>💡 Suggestions</div>
-              {result.suggestions.map((s,i) => <div key={i} style={{ color:MUTED, fontSize:'0.81rem', marginBottom:4 }}>→ {s}</div>)}
-            </div>
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-              <div style={{ color:AMBER, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>🔑 Keyword Recommendations</div>
-              <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.keyword_recommendations.map(k=><Tag key={k} text={k} color={AMBER}/>)}</div>
-            </div>
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-              <div style={{ color:RED, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>Missing Skills</div>
-              <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.missing_skills.map(s=><Tag key={s} text={s} color={RED}/>)}</div>
-            </div>
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-              <div style={{ color:GREEN, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>🎓 Missing Certifications</div>
-              <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.missing_certifications.map(c=><Tag key={c} text={c} color={GREEN}/>)}</div>
-            </div>
-          </div>
-
+        {/* Generated content */}
+        {d.suggested_headline && (
           <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-            <div style={{ color:PURPLE, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>🤝 Networking Suggestions</div>
-            {result.networking_suggestions.map((s,i) => <div key={i} style={{ color:MUTED, fontSize:'0.81rem', marginBottom:4 }}>• {s}</div>)}
+            <div style={{ color:CYAN, fontWeight:700, fontSize:'0.83rem', marginBottom:8 }}>✨ Suggested Headline</div>
+            <div style={{ background:`${CYAN}08`, border:`1px solid ${CYAN}25`, borderRadius:8, padding:'0.75rem', color:TEXT, fontSize:'0.9rem', lineHeight:1.6 }}>{d.suggested_headline}</div>
+          </div>
+        )}
+        {d.suggested_about && (
+          <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+            <div style={{ color:CYAN, fontWeight:700, fontSize:'0.83rem', marginBottom:8 }}>✨ Suggested About Section</div>
+            <div style={{ background:`${CYAN}06`, border:`1px solid ${CYAN}20`, borderRadius:8, padding:'0.85rem', color:MUTED, fontSize:'0.86rem', lineHeight:1.75 }}>{d.suggested_about}</div>
+          </div>
+        )}
+
+        {/* Career recommendations */}
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
+          {[
+            { label:'Suitable Roles',         items:d.suitable_roles,          color:GREEN  },
+            { label:'Internship Opportunities',items:d.internship_opportunities, color:CYAN   },
+            { label:'Missing Skills',          items:d.missing_skills,          color:RED    },
+            { label:'Missing Certifications',  items:d.missing_certifications,  color:AMBER  },
+            { label:'Important Projects',      items:d.important_projects,      color:PURPLE },
+            { label:'Learning Priorities',     items:d.learning_priorities,     color:INDIGO },
+          ].map(({ label, items, color }) => items.length > 0 && (
+            <div key={label} style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1rem' }}>
+              <div style={{ color, fontWeight:700, fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:0.8, marginBottom:'0.55rem' }}>{label}</div>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>{items.map(item => <Tag key={item} text={item} color={color} />)}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ color:DIM, fontSize:'0.72rem', textAlign:'right' }}>Last analyzed: {d.last_analyzed ? new Date(d.last_analyzed).toLocaleString() : '—'}</div>
+      </div>
+    );
+  }
+
+  // ── Sub-tab: Achievements ──────────────────────────────────────────────────
+  function AchievementsTab() {
+    const [uploadMode, setUploadMode] = useState<'file'|'manual'>('file');
+    const [achFile, setAchFile] = useState<File|null>(null);
+    const [achType, setAchType] = useState('certificate');
+    const [manualTitle, setManualTitle] = useState('');
+    const [manualDesc, setManualDesc] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [err, setErr] = useState('');
+    const [expandedId, setExpandedId] = useState<string|null>(null);
+    const achFileRef = useRef<HTMLInputElement>(null);
+
+    const achievements = twinData?.achievements || [];
+
+    async function uploadCert() {
+      if (!achFile) return;
+      setLoading(true); setErr('');
+      try {
+        const fd = new FormData();
+        fd.append('file', achFile);
+        fd.append('achievement_type', achType);
+        const r = await api.post<{ achievement:LIAchievement; twin_updated:boolean }>('/career/linkedin/certificate', fd, { headers:{ 'Content-Type':'multipart/form-data' } });
+        setTwinData(prev => prev ? { ...prev, achievements:[r.data.achievement, ...prev.achievements], achievements_count:prev.achievements_count+1 } : prev);
+        setAchFile(null);
+      } catch(e:unknown) {
+        const d=(e as {response?:{data?:{detail?:string}}})?.response?.data?.detail;
+        setErr(d ?? 'Upload failed.');
+      } finally { setLoading(false); }
+    }
+
+    async function addManual() {
+      if (!manualTitle.trim() || !manualDesc.trim()) return;
+      setLoading(true); setErr('');
+      try {
+        const r = await api.post<{ achievement:LIAchievement }>('/career/linkedin/achievement', { title:manualTitle, description:manualDesc, achievement_type:achType });
+        setTwinData(prev => prev ? { ...prev, achievements:[r.data.achievement, ...prev.achievements], achievements_count:prev.achievements_count+1 } : prev);
+        setManualTitle(''); setManualDesc('');
+      } catch(e:unknown) {
+        const d=(e as {response?:{data?:{detail?:string}}})?.response?.data?.detail;
+        setErr(d ?? 'Failed to add achievement.');
+      } finally { setLoading(false); }
+    }
+
+    async function deleteAchievement(id: string) {
+      try {
+        await api.delete(`/career/linkedin/achievement/${id}`);
+        setTwinData(prev => prev ? { ...prev, achievements:prev.achievements.filter(a=>a.id!==id), achievements_count:prev.achievements_count-1 } : prev);
+      } catch { /* ignore */ }
+    }
+
+    const ACH_TYPES = ['certificate','internship','project','skill','hackathon','award','course','other'];
+    const scoreColor = (v:number) => v>=80?GREEN:v>=60?CYAN:v>=40?AMBER:RED;
+
+    return (
+      <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
+        {/* Upload panel */}
+        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+          <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Add Achievement or Certificate</div>
+          <div style={{ display:'flex', gap:6, marginBottom:'1rem' }}>
+            {[{id:'file' as const, label:'Upload File'}, {id:'manual' as const, label:'Manual Entry'}].map(m => (
+              <button key={m.id} onClick={() => setUploadMode(m.id)}
+                style={{ padding:'0.38rem 0.9rem', borderRadius:8, border:`1px solid ${uploadMode===m.id?CYAN:'rgba(255,255,255,0.1)'}`, background:uploadMode===m.id?`${CYAN}18`:'transparent', color:uploadMode===m.id?CYAN:MUTED, cursor:'pointer', fontWeight:600, fontSize:'0.8rem' }}>
+                {m.label}
+              </button>
+            ))}
           </div>
 
-          {result.twin_updated && (
-            <div style={{ background:`${GREEN}0a`, border:`1px solid ${GREEN}30`, borderRadius:12, padding:'0.75rem 1rem', display:'flex', gap:'0.75rem', alignItems:'center' }}>
-              <span>🤖</span><span style={{ color:GREEN, fontSize:'0.83rem', fontWeight:600 }}>Career Twin updated with LinkedIn score.</span>
+          <div style={{ marginBottom:'0.75rem' }}>
+            <div style={{ color:MUTED, fontSize:'0.73rem', marginBottom:4 }}>Type</div>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
+              {ACH_TYPES.map(t => (
+                <button key={t} onClick={() => setAchType(t)}
+                  style={{ padding:'0.3rem 0.75rem', borderRadius:6, border:`1px solid ${achType===t?PURPLE:'rgba(255,255,255,0.1)'}`, background:achType===t?`${PURPLE}22`:'transparent', color:achType===t?PURPLE:MUTED, cursor:'pointer', fontSize:'0.76rem', fontWeight:achType===t?700:400, textTransform:'capitalize' }}>
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {uploadMode === 'file' ? (
+            <div>
+              <div onClick={() => achFileRef.current?.click()}
+                style={{ border:`2px dashed ${achFile?GREEN:'rgba(255,255,255,0.15)'}`, borderRadius:12, padding:'1.75rem', textAlign:'center', cursor:'pointer', marginBottom:'0.75rem' }}>
+                <input ref={achFileRef} type="file" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png" style={{ display:'none' }}
+                  onChange={e => setAchFile(e.target.files?.[0] || null)} />
+                {achFile ? (
+                  <div><div style={{ color:GREEN, fontWeight:700 }}>✓ {achFile.name}</div><div style={{ color:MUTED, fontSize:'0.75rem' }}>Click to change</div></div>
+                ) : (
+                  <div><div style={{ fontSize:'1.5rem', marginBottom:5 }}>📜</div><div style={{ color:TEXT, fontWeight:600, fontSize:'0.88rem' }}>Upload Certificate / Document</div><div style={{ color:MUTED, fontSize:'0.75rem' }}>PDF, DOCX, TXT, JPG, PNG</div></div>
+                )}
+              </div>
+              <button onClick={uploadCert} disabled={loading || !achFile}
+                style={{ width:'100%', padding:'0.65rem', background:loading||!achFile?DIM:`linear-gradient(135deg,${PURPLE},${INDIGO})`, border:'none', borderRadius:10, color:'#fff', fontWeight:700, cursor:'pointer' }}>
+                {loading ? 'Analyzing…' : 'Analyze & Add Achievement'}
+              </button>
+            </div>
+          ) : (
+            <div style={{ display:'flex', flexDirection:'column', gap:'0.6rem' }}>
+              <input placeholder="Achievement title (e.g. AWS Certified Solutions Architect)" value={manualTitle} onChange={e=>setManualTitle(e.target.value)}
+                style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.6rem 1rem', color:TEXT, fontSize:'0.88rem', boxSizing:'border-box' }} />
+              <textarea placeholder="Describe the achievement, what you learned, technologies used, outcome…" value={manualDesc} onChange={e=>setManualDesc(e.target.value)} rows={4}
+                style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.65rem 1rem', color:TEXT, fontSize:'0.83rem', resize:'vertical', boxSizing:'border-box' }} />
+              <button onClick={addManual} disabled={loading || !manualTitle.trim() || !manualDesc.trim()}
+                style={{ padding:'0.65rem', background:loading||!manualTitle.trim()||!manualDesc.trim()?DIM:`linear-gradient(135deg,${PURPLE},${INDIGO})`, border:'none', borderRadius:10, color:'#fff', fontWeight:700, cursor:'pointer' }}>
+                {loading ? 'Analyzing…' : 'Add Achievement'}
+              </button>
             </div>
           )}
+          {err && <div style={{ color:RED, fontSize:'0.8rem', marginTop:6 }}>{err}</div>}
         </div>
-      )}
+
+        {/* Achievement cards */}
+        {achievements.length === 0 ? (
+          <div style={{ padding:'2rem', textAlign:'center', color:MUTED }}>
+            <div style={{ fontSize:'2rem', marginBottom:8 }}>🏆</div>
+            No achievements added yet. Upload certificates, internship letters, or add manually.
+          </div>
+        ) : (
+          <div style={{ display:'flex', flexDirection:'column', gap:'0.85rem' }}>
+            <div style={{ color:MUTED, fontSize:'0.78rem' }}>{achievements.length} achievement{achievements.length!==1?'s':''} stored in your LinkedIn Twin</div>
+            {achievements.map(a => {
+              const open = expandedId === a.id;
+              const avgScore = Math.round((a.impact_score + a.career_value_score + a.recruiter_appeal_score) / 3);
+              return (
+                <div key={a.id} style={{ background:CARD, border:BORDER, borderRadius:16, overflow:'hidden' }}>
+                  <div onClick={() => setExpandedId(open ? null : a.id)} style={{ padding:'1rem 1.25rem', cursor:'pointer', display:'flex', alignItems:'center', gap:'0.85rem' }}>
+                    <div style={{ width:42, height:42, borderRadius:10, background:`${PURPLE}22`, border:`1px solid ${PURPLE}44`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.2rem', flexShrink:0 }}>
+                      {a.achievement_type==='certificate'?'🎓':a.achievement_type==='internship'?'💼':a.achievement_type==='project'?'🛠':a.achievement_type==='hackathon'?'⚡':a.achievement_type==='award'?'🏆':'📜'}
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ color:TEXT, fontWeight:700, fontSize:'0.88rem' }}>{a.title}</div>
+                      <div style={{ display:'flex', gap:6, marginTop:4, flexWrap:'wrap' }}>
+                        <Tag text={a.achievement_type} color={PURPLE} />
+                        <Tag text={a.difficulty_level} color={a.difficulty_level==='Advanced'?RED:a.difficulty_level==='Intermediate'?AMBER:GREEN} />
+                        {a.skills_gained.slice(0,2).map(s => <Tag key={s} text={s} color={CYAN} />)}
+                      </div>
+                    </div>
+                    <div style={{ textAlign:'center', flexShrink:0 }}>
+                      <div style={{ fontSize:'1.3rem', fontWeight:800, color:scoreColor(avgScore) }}>{avgScore}</div>
+                      <div style={{ fontSize:'0.65rem', color:MUTED }}>Score</div>
+                    </div>
+                    <span style={{ color:MUTED, fontSize:'0.7rem' }}>{open?'▲':'▼'}</span>
+                  </div>
+
+                  {open && (
+                    <div style={{ padding:'1rem 1.25rem', borderTop:'1px solid rgba(255,255,255,0.06)', display:'flex', flexDirection:'column', gap:'0.85rem' }}>
+                      {/* Scores */}
+                      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'0.6rem' }}>
+                        {[
+                          { label:'Impact',         value:a.impact_score           },
+                          { label:'Career Value',   value:a.career_value_score     },
+                          { label:'Recruiter Appeal',value:a.recruiter_appeal_score},
+                        ].map(({ label, value }) => (
+                          <div key={label} style={{ background:'rgba(255,255,255,0.03)', borderRadius:10, padding:'0.65rem', textAlign:'center' }}>
+                            <div style={{ fontSize:'0.68rem', color:MUTED, marginBottom:3 }}>{label}</div>
+                            <div style={{ fontWeight:800, fontSize:'1.1rem', color:scoreColor(value) }}>{value}</div>
+                            <Bar value={value} color={scoreColor(value)} height={3} />
+                          </div>
+                        ))}
+                      </div>
+                      {/* Why it matters */}
+                      <div style={{ background:`${GREEN}08`, border:`1px solid ${GREEN}25`, borderRadius:10, padding:'0.75rem' }}>
+                        <div style={{ color:GREEN, fontWeight:700, fontSize:'0.75rem', marginBottom:4 }}>WHY IT MATTERS</div>
+                        <div style={{ color:MUTED, fontSize:'0.82rem', lineHeight:1.6 }}>{a.why_it_matters}</div>
+                      </div>
+                      <div style={{ background:`${CYAN}08`, border:`1px solid ${CYAN}25`, borderRadius:10, padding:'0.75rem' }}>
+                        <div style={{ color:CYAN, fontWeight:700, fontSize:'0.75rem', marginBottom:4 }}>HOW IT IMPROVES EMPLOYABILITY</div>
+                        <div style={{ color:MUTED, fontSize:'0.82rem', lineHeight:1.6 }}>{a.how_it_improves}</div>
+                      </div>
+                      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'0.6rem' }}>
+                        <div>
+                          <div style={{ fontSize:'0.7rem', color:MUTED, marginBottom:4 }}>Skills Gained</div>
+                          <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>{a.skills_gained.map(s=><Tag key={s} text={s} color={GREEN}/>)}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize:'0.7rem', color:MUTED, marginBottom:4 }}>Technologies</div>
+                          <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>{a.technologies.map(t=><Tag key={t} text={t} color={INDIGO}/>)}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize:'0.7rem', color:MUTED, marginBottom:4 }}>Career Paths</div>
+                          <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>{a.career_paths_supported.map(p=><Tag key={p} text={p} color={PURPLE}/>)}</div>
+                        </div>
+                      </div>
+                      <div style={{ fontSize:'0.75rem', color:MUTED, fontStyle:'italic' }}>{a.career_value}</div>
+                      <div style={{ display:'flex', justifyContent:'flex-end' }}>
+                        <button onClick={() => deleteAchievement(a.id)}
+                          style={{ padding:'0.35rem 0.9rem', background:`${RED}15`, border:`1px solid ${RED}30`, borderRadius:7, color:RED, cursor:'pointer', fontSize:'0.75rem' }}>
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Sub-tab: Optimize ──────────────────────────────────────────────────────
+  function OptimizeTab() {
+    const [activeImp, setActiveImp] = useState<number|null>(null);
+    if (!twinData || !twinData.last_analyzed) return (
+      <div style={{ padding:'3rem', textAlign:'center', color:MUTED }}>
+        Analyze your profile first to see optimization suggestions.
+        <br/><button onClick={() => setLiTab('input')} style={{ marginTop:'1rem', padding:'0.5rem 1.5rem', background:INDIGO, border:'none', borderRadius:8, color:'#fff', cursor:'pointer', fontWeight:600 }}>Go to Input</button>
+      </div>
+    );
+    const { checklist, checklist_completion, improvements } = twinData;
+    const completedN = checklist.filter(c => c.completed).length;
+    const completionColor = checklist_completion>=80?GREEN:checklist_completion>=50?AMBER:RED;
+    return (
+      <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
+        {/* Checklist */}
+        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem' }}>
+            <div style={{ color:TEXT, fontWeight:700 }}>Optimization Checklist</div>
+            <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
+              <span style={{ color:MUTED, fontSize:'0.8rem' }}>{completedN}/{checklist.length} completed</span>
+              <span style={{ fontWeight:800, fontSize:'1.1rem', color:completionColor }}>{checklist_completion}%</span>
+            </div>
+          </div>
+          <Bar value={checklist_completion} color={completionColor} height={8} />
+          <div style={{ display:'flex', flexDirection:'column', gap:'0.6rem', marginTop:'1rem' }}>
+            {checklist.map(item => (
+              <div key={item.key} style={{ display:'flex', alignItems:'flex-start', gap:'0.75rem', padding:'0.65rem 0.85rem', background:item.completed?`${GREEN}08`:'rgba(255,255,255,0.02)', border:`1px solid ${item.completed?GREEN+'30':'rgba(255,255,255,0.06)'}`, borderRadius:10 }}>
+                <span style={{ fontSize:'1rem', flexShrink:0, marginTop:1 }}>{item.completed ? '✅' : '⬜'}</span>
+                <div style={{ flex:1 }}>
+                  <div style={{ color:item.completed?GREEN:TEXT, fontWeight:item.completed?600:400, fontSize:'0.85rem' }}>{item.label}</div>
+                  {!item.completed && <div style={{ color:DIM, fontSize:'0.75rem', marginTop:2 }}>{item.recommendation}</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Before / After improvements */}
+        {improvements.length > 0 && (
+          <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+            <div style={{ color:TEXT, fontWeight:700, marginBottom:'0.5rem' }}>Before → After Improvements</div>
+            <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:'1rem' }}>Click a card to expand</div>
+            {improvements.map((imp, i) => {
+              const open = activeImp === i;
+              return (
+                <div key={i} onClick={() => setActiveImp(open?null:i)}
+                  style={{ border:`1px solid ${open?INDIGO:'rgba(255,255,255,0.08)'}`, borderRadius:12, marginBottom:'0.65rem', overflow:'hidden', cursor:'pointer' }}>
+                  <div style={{ padding:'0.7rem 1rem', background:open?`${INDIGO}12`:'rgba(255,255,255,0.02)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                    <span style={{ color:INDIGO, fontWeight:700, fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:1 }}>{imp.section}</span>
+                    <span style={{ color:MUTED, fontSize:'0.7rem' }}>{open?'▲ Collapse':'▼ See Improvement'}</span>
+                  </div>
+                  {open ? (
+                    <div style={{ padding:'0.9rem 1rem', display:'flex', flexDirection:'column', gap:'0.65rem' }}>
+                      <div style={{ background:`${RED}0a`, border:`1px solid ${RED}25`, borderRadius:8, padding:'0.65rem' }}>
+                        <div style={{ fontSize:'0.68rem', color:RED, fontWeight:700, marginBottom:4, textTransform:'uppercase' }}>Current</div>
+                        <div style={{ color:MUTED, fontSize:'0.82rem', lineHeight:1.55 }}>{imp.current_version}</div>
+                      </div>
+                      <div style={{ background:`${GREEN}0a`, border:`1px solid ${GREEN}25`, borderRadius:8, padding:'0.65rem' }}>
+                        <div style={{ fontSize:'0.68rem', color:GREEN, fontWeight:700, marginBottom:4, textTransform:'uppercase' }}>Suggested</div>
+                        <div style={{ color:TEXT, fontSize:'0.83rem', lineHeight:1.55 }}>{imp.suggested_version}</div>
+                      </div>
+                      <div style={{ fontSize:'0.74rem', color:DIM, fontStyle:'italic' }}>Why: {imp.reason}</div>
+                    </div>
+                  ) : (
+                    <div style={{ padding:'0.5rem 1rem' }}>
+                      <div style={{ color:DIM, fontSize:'0.79rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{imp.current_version}</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Sub-tab: Predict ───────────────────────────────────────────────────────
+  function PredictTab() {
+    if (!twinData || !twinData.last_analyzed) return (
+      <div style={{ padding:'3rem', textAlign:'center', color:MUTED }}>
+        Analyze your profile first to unlock Digital Twin predictions.
+        <br/><button onClick={() => setLiTab('input')} style={{ marginTop:'1rem', padding:'0.5rem 1.5rem', background:INDIGO, border:'none', borderRadius:8, color:'#fff', cursor:'pointer', fontWeight:600 }}>Go to Input</button>
+      </div>
+    );
+    const periods = [
+      { key:'3m', label:'3 Months',  color:CYAN   },
+      { key:'6m', label:'6 Months',  color:INDIGO  },
+      { key:'12m',label:'12 Months', color:GREEN  },
+    ] as const;
+    return (
+      <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
+        <div style={{ background:`linear-gradient(135deg,${PURPLE}15,${INDIGO}10)`, border:`1px solid ${PURPLE}35`, borderRadius:18, padding:'1.25rem', display:'flex', gap:'0.85rem' }}>
+          <span style={{ fontSize:'1.8rem' }}>🔮</span>
+          <div>
+            <div style={{ color:PURPLE, fontWeight:700, fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>Digital Twin Career Forecast</div>
+            <div style={{ color:TEXT, fontSize:'0.9rem', lineHeight:1.6 }}>{twinData.twin_insight}</div>
+          </div>
+        </div>
+        {periods.map(({ key, label, color }) => {
+          const p = twinData.predictions[key];
+          if (!p) return null;
+          return (
+            <div key={key} style={{ background:CARD, border:`1px solid ${color}30`, borderRadius:18, padding:'1.5rem' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem' }}>
+                <div style={{ color:color, fontWeight:800, fontSize:'1rem' }}>{label} Ahead</div>
+                <div style={{ display:'flex', gap:6 }}>
+                  <Tag text={`Recruiter: ${p.recruiter_interest}%`}   color={color} />
+                  <Tag text={`Employable: ${p.employability_score}%`} color={color} />
+                </div>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.85rem', marginBottom:'0.85rem' }}>
+                <div style={{ background:'rgba(255,255,255,0.03)', borderRadius:10, padding:'0.75rem' }}>
+                  <div style={{ fontSize:'0.7rem', color:MUTED, marginBottom:4 }}>Career Growth</div>
+                  <div style={{ color:TEXT, fontSize:'0.85rem', lineHeight:1.5 }}>{p.career_growth}</div>
+                </div>
+                <div style={{ background:'rgba(255,255,255,0.03)', borderRadius:10, padding:'0.75rem' }}>
+                  <div style={{ fontSize:'0.7rem', color:MUTED, marginBottom:4 }}>Skill Growth</div>
+                  <div style={{ color:TEXT, fontSize:'0.85rem', lineHeight:1.5 }}>{p.skill_growth}</div>
+                </div>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.65rem', marginBottom:'0.85rem' }}>
+                <div>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
+                    <span style={{ fontSize:'0.75rem', color:MUTED }}>Recruiter Interest</span>
+                    <span style={{ fontSize:'0.75rem', fontWeight:700, color }}>{p.recruiter_interest}%</span>
+                  </div>
+                  <Bar value={p.recruiter_interest} color={color} height={6} />
+                </div>
+                <div>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
+                    <span style={{ fontSize:'0.75rem', color:MUTED }}>Employability</span>
+                    <span style={{ fontSize:'0.75rem', fontWeight:700, color }}>{p.employability_score}%</span>
+                  </div>
+                  <Bar value={p.employability_score} color={color} height={6} />
+                </div>
+              </div>
+              {p.opportunities.length > 0 && (
+                <div>
+                  <div style={{ fontSize:'0.7rem', color:MUTED, marginBottom:5 }}>Upcoming Opportunities</div>
+                  <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{p.opportunities.map(o => <Tag key={o} text={o} color={color} />)}</div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
+      {/* Internal sub-tab bar */}
+      <div style={{ display:'flex', gap:0, background:'rgba(255,255,255,0.03)', borderRadius:12, padding:4, border:BORDER }}>
+        {LI_SUB_TABS.map(t => {
+          const active = liTab === t.id;
+          const hasData = twinData && twinData.last_analyzed;
+          const locked = (t.id !== 'input' && t.id !== 'achieve') && !hasData;
+          return (
+            <button key={t.id} onClick={() => !locked && setLiTab(t.id as typeof liTab)}
+              style={{ flex:1, padding:'0.55rem 0.5rem', borderRadius:9, border:'none', background:active?'rgba(255,255,255,0.09)':'transparent', color:locked?DIM:active?TEXT:MUTED, cursor:locked?'not-allowed':'pointer', fontSize:'0.78rem', fontWeight:active?700:400, display:'flex', alignItems:'center', justifyContent:'center', gap:'0.3rem', transition:'all 0.15s' }}>
+              <span>{t.icon}</span><span>{t.label}</span>
+              {locked && <span style={{ fontSize:'0.6rem' }}>🔒</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Content */}
+      {liTab === 'input'    && <InputTab />}
+      {liTab === 'profile'  && <ProfileTab />}
+      {liTab === 'achieve'  && <AchievementsTab />}
+      {liTab === 'optimize' && <OptimizeTab />}
+      {liTab === 'predict'  && <PredictTab />}
     </div>
   );
 }

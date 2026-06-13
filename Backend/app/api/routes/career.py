@@ -1,5 +1,6 @@
 import io
 import json
+import uuid
 from datetime import date, datetime
 from typing import List, Optional
 
@@ -20,6 +21,9 @@ from app.api.schemas.career import (
     CareerReadinessResponse,
     ResumeAnalyzeRequest, ResumeAnalyzeResponse, ResumeSection, BulletImprovement,
     LinkedInAnalyzeRequest, LinkedInAnalyzeResponse,
+    AchievementItem, AchievementAnalyzeResponse,
+    LinkedInImprovementItem, LinkedInChecklistItem, LinkedInTwinPrediction,
+    LinkedInSectionScore, LinkedInTwinFullResponse, ManualAchievementRequest,
     InterviewChatRequest, InterviewChatResponse,
     SkillGapResponse, LearningStep,
     CareerRecommendationsResponse, CareerRecommendation,
@@ -525,6 +529,451 @@ Respond ONLY with valid JSON:
         keyword_recommendations=data.get("keyword_recommendations", []),
         twin_updated=True,
     )
+
+
+# ── LinkedIn Digital Twin helpers ─────────────────────────────────────────────
+
+def _get_li_achievements(twin: CareerTwin) -> list[dict]:
+    return json.loads(twin.linkedin_achievements_json or "[]")
+
+
+def _save_li_achievements(twin: CareerTwin, achievements: list[dict], db: DBSession) -> None:
+    twin.linkedin_achievements_json = json.dumps(achievements[-50:])  # keep latest 50
+    db.commit()
+
+
+def _analyze_achievement_text(text: str, achiev_type: str) -> dict:
+    prompt = f"""You are a career coach analyzing a professional achievement or certificate.
+
+ACHIEVEMENT/CERTIFICATE TEXT:
+{text[:3000]}
+
+TYPE: {achiev_type}
+
+Respond ONLY with valid JSON:
+{{
+  "title": "<concise title for this achievement>",
+  "skills_gained": ["skill1", "skill2", "skill3"],
+  "technologies": ["tech1", "tech2"],
+  "difficulty_level": "<Beginner|Intermediate|Advanced>",
+  "career_value": "<1 sentence on career value>",
+  "industry_relevance": "<which industries value this>",
+  "impact_score": <0-100>,
+  "career_value_score": <0-100>,
+  "recruiter_appeal_score": <0-100>,
+  "why_it_matters": "<2 sentences: why recruiters care>",
+  "how_it_improves": "<2 sentences: how it improves employability>",
+  "career_paths_supported": ["path1", "path2", "path3"]
+}}"""
+    return _groq_json(prompt, max_tokens=700) or {}
+
+
+def _run_linkedin_twin_analysis(profile_text: str, role: str, achievements: list[dict]) -> tuple[dict, dict]:
+    """Two focused Groq calls for reliability. Returns (analysis_data, recommendations_data)."""
+    achiev_summary = ", ".join(
+        f"{a.get('title','?')} ({', '.join(a.get('skills_gained', [])[:2])})"
+        for a in achievements[:6]
+    ) if achievements else "None yet"
+
+    # Call 1: Profile scoring + content + checklist + improvements
+    prompt1 = f"""You are a LinkedIn optimization expert and personal branding specialist.
+Analyze this LinkedIn profile for a {role} role.
+
+PROFILE TEXT:
+{profile_text[:4500]}
+
+UPLOADED ACHIEVEMENTS/CERTS: {achiev_summary}
+
+Respond ONLY with valid JSON (no extra text):
+{{
+  "profile_strength": <0-100>,
+  "recruiter_visibility": <0-100>,
+  "personal_branding": <0-100>,
+  "industry_relevance_score": <0-100>,
+  "network_readiness": <0-100>,
+  "overall_score": <0-100>,
+  "sections": [
+    {{"name": "Headline",        "score": <0-100>, "feedback": "...", "suggestion": "..."}},
+    {{"name": "About",           "score": <0-100>, "feedback": "...", "suggestion": "..."}},
+    {{"name": "Experience",      "score": <0-100>, "feedback": "...", "suggestion": "..."}},
+    {{"name": "Skills",          "score": <0-100>, "feedback": "...", "suggestion": "..."}},
+    {{"name": "Projects",        "score": <0-100>, "feedback": "...", "suggestion": "..."}},
+    {{"name": "Certifications",  "score": <0-100>, "feedback": "...", "suggestion": "..."}},
+    {{"name": "Recommendations", "score": <0-100>, "feedback": "...", "suggestion": "..."}}
+  ],
+  "suggested_headline": "<compelling headline under 220 chars with keywords>",
+  "suggested_about": "<improved About section, 4-5 sentences, first-person, impact-driven>",
+  "improvements": [
+    {{"section": "Headline",    "current_version": "<extract from profile or describe>", "suggested_version": "<improved>", "reason": "..."}},
+    {{"section": "About",       "current_version": "<extract or describe>",               "suggested_version": "<improved>", "reason": "..."}},
+    {{"section": "Experience",  "current_version": "<weak bullet or description>",        "suggested_version": "<stronger>",  "reason": "..."}},
+    {{"section": "Skills",      "current_version": "<current skills list>",               "suggested_version": "<optimized>", "reason": "..."}}
+  ],
+  "checklist": [
+    {{"key": "headline",      "label": "Strong Keyword-Rich Headline",   "completed": <true|false>, "recommendation": "..."}},
+    {{"key": "about",         "label": "Compelling About Section",       "completed": <true|false>, "recommendation": "..."}},
+    {{"key": "skills",        "label": "15+ Relevant Skills Listed",     "completed": <true|false>, "recommendation": "..."}},
+    {{"key": "experience",    "label": "Quantified Experience Bullets",  "completed": <true|false>, "recommendation": "..."}},
+    {{"key": "projects",      "label": "Portfolio Projects Added",       "completed": <true|false>, "recommendation": "..."}},
+    {{"key": "certifications","label": "Industry Certifications Listed", "completed": <true|false>, "recommendation": "..."}},
+    {{"key": "photo",         "label": "Professional Profile Photo",     "completed": <true|false>, "recommendation": "..."}},
+    {{"key": "connections",   "label": "500+ Connections",               "completed": <true|false>, "recommendation": "..."}},
+    {{"key": "keywords",      "label": "Industry Keywords in Profile",   "completed": <true|false>, "recommendation": "..."}},
+    {{"key": "recommendations","label": "Peer Recommendations Added",   "completed": <true|false>, "recommendation": "..."}}
+  ]
+}}"""
+
+    # Call 2: Recommendations + predictions
+    prompt2 = f"""Based on this LinkedIn profile for a {role} position and their achievements ({achiev_summary}), generate career recommendations and predictions.
+
+PROFILE SUMMARY: {profile_text[:1500]}
+
+Respond ONLY with valid JSON:
+{{
+  "suitable_roles": ["role1", "role2", "role3", "role4"],
+  "internship_opportunities": ["opp1", "opp2", "opp3"],
+  "missing_skills": ["skill1", "skill2", "skill3", "skill4"],
+  "missing_certifications": ["cert1", "cert2", "cert3"],
+  "important_projects": ["project1", "project2", "project3"],
+  "learning_priorities": ["p1", "p2", "p3"],
+  "twin_insight": "<1 compelling sentence (max 35 words) predicting career trajectory>",
+  "predictions": {{
+    "3m": {{
+      "months": 3,
+      "career_growth": "<short description>",
+      "recruiter_interest": <0-100>,
+      "employability_score": <0-100>,
+      "skill_growth": "<short description>",
+      "opportunities": ["opp1", "opp2"]
+    }},
+    "6m": {{
+      "months": 6,
+      "career_growth": "<short description>",
+      "recruiter_interest": <0-100>,
+      "employability_score": <0-100>,
+      "skill_growth": "<short description>",
+      "opportunities": ["opp1", "opp2"]
+    }},
+    "12m": {{
+      "months": 12,
+      "career_growth": "<short description>",
+      "recruiter_interest": <0-100>,
+      "employability_score": <0-100>,
+      "skill_growth": "<short description>",
+      "opportunities": ["opp1", "opp2"]
+    }}
+  }}
+}}"""
+
+    analysis = _groq_json(prompt1, max_tokens=2200) or {}
+    recs      = _groq_json(prompt2, max_tokens=1200) or {}
+    return analysis, recs
+
+
+def _build_linkedin_twin_response(
+    analysis: dict, recs: dict,
+    achievements: list[dict],
+    now_str: str,
+) -> LinkedInTwinFullResponse:
+    sections = [
+        LinkedInSectionScore(
+            name=s.get("name", ""), score=int(s.get("score", 50)),
+            feedback=s.get("feedback", ""), suggestion=s.get("suggestion", ""),
+        )
+        for s in analysis.get("sections", [])
+    ]
+    improvements = [
+        LinkedInImprovementItem(**imp)
+        for imp in analysis.get("improvements", [])
+        if isinstance(imp, dict) and all(k in imp for k in ["section","current_version","suggested_version","reason"])
+    ]
+    checklist_raw = analysis.get("checklist", [])
+    checklist = [
+        LinkedInChecklistItem(**c)
+        for c in checklist_raw
+        if isinstance(c, dict) and all(k in c for k in ["key","label","completed","recommendation"])
+    ]
+    completed = sum(1 for c in checklist if c.completed)
+    completion_pct = round(completed / len(checklist) * 100) if checklist else 0
+
+    raw_preds = recs.get("predictions", {})
+    predictions: dict[str, LinkedInTwinPrediction] = {}
+    for key in ["3m", "6m", "12m"]:
+        p = raw_preds.get(key, {})
+        if isinstance(p, dict):
+            predictions[key] = LinkedInTwinPrediction(
+                months=int(p.get("months", {"3m":3,"6m":6,"12m":12}[key])),
+                career_growth=p.get("career_growth", "Steady progress expected."),
+                recruiter_interest=int(p.get("recruiter_interest", 50)),
+                employability_score=int(p.get("employability_score", 50)),
+                skill_growth=p.get("skill_growth", "Gradual improvement."),
+                opportunities=p.get("opportunities", []),
+            )
+
+    achiev_models = [AchievementItem(**a) for a in achievements if _valid_achievement(a)]
+
+    return LinkedInTwinFullResponse(
+        profile_strength=int(analysis.get("profile_strength", 50)),
+        recruiter_visibility=int(analysis.get("recruiter_visibility", 50)),
+        personal_branding=int(analysis.get("personal_branding", 50)),
+        industry_relevance_score=int(analysis.get("industry_relevance_score", 50)),
+        network_readiness=int(analysis.get("network_readiness", 50)),
+        overall_score=int(analysis.get("overall_score", 50)),
+        sections=sections,
+        suggested_headline=analysis.get("suggested_headline", ""),
+        suggested_about=analysis.get("suggested_about", ""),
+        improvements=improvements,
+        checklist=checklist,
+        checklist_completion=completion_pct,
+        suitable_roles=recs.get("suitable_roles", []),
+        internship_opportunities=recs.get("internship_opportunities", []),
+        missing_skills=recs.get("missing_skills", []),
+        missing_certifications=recs.get("missing_certifications", []),
+        important_projects=recs.get("important_projects", []),
+        learning_priorities=recs.get("learning_priorities", []),
+        achievements=achiev_models,
+        achievements_count=len(achiev_models),
+        predictions=predictions,
+        last_analyzed=now_str,
+        twin_insight=recs.get("twin_insight", "Your LinkedIn profile is evolving — keep adding achievements."),
+        twin_updated=True,
+    )
+
+
+def _valid_achievement(a: dict) -> bool:
+    required = ["id","title","achievement_type","raw_text","skills_gained","technologies",
+                "difficulty_level","career_value","industry_relevance","impact_score",
+                "career_value_score","recruiter_appeal_score","why_it_matters",
+                "how_it_improves","career_paths_supported","uploaded_at"]
+    return all(k in a for k in required)
+
+
+# ── 3b. LinkedIn Digital Twin — Upload / Analyze ─────────────────────────────
+
+@router.post("/linkedin/upload", response_model=LinkedInTwinFullResponse)
+async def upload_linkedin_profile(
+    file: Optional[UploadFile] = File(None),
+    profile_text: str = Form(""),
+    profile_url: str = Form(""),
+    target_role: str = Form(""),
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    text = ""
+    if file and file.filename:
+        content = await file.read()
+        if len(content) > MAX_UPLOAD_MB * 1024 * 1024:
+            raise HTTPException(413, f"File exceeds {MAX_UPLOAD_MB} MB.")
+        fname = file.filename.lower()
+        if fname.endswith(".pdf"):
+            text = _extract_pdf(content)
+        elif fname.endswith(".docx"):
+            text = _extract_docx(content)
+        elif fname.endswith(".txt"):
+            text = content.decode("utf-8", errors="replace")
+        else:
+            raise HTTPException(415, "Only PDF, DOCX, or TXT files are supported.")
+
+    if profile_text.strip():
+        text = profile_text.strip() + "\n\n" + text
+
+    # URL is stored as metadata; actual scraping is not possible without OAuth
+    if profile_url.strip() and not text.strip():
+        raise HTTPException(400, "LinkedIn scraping requires authentication. Please paste or upload your profile content.")
+
+    if not text.strip():
+        raise HTTPException(400, "Please provide profile content via text paste or file upload.")
+
+    role = target_role.strip() or "Software Developer"
+    twin = _get_or_create_twin(current_user.id, db)
+    achievements = _get_li_achievements(twin)
+
+    analysis, recs = _run_linkedin_twin_analysis(text, role, achievements)
+    if not analysis:
+        raise HTTPException(500, "AI analysis failed. Please try again.")
+
+    now_str = datetime.utcnow().isoformat()
+    response = _build_linkedin_twin_response(analysis, recs, achievements, now_str)
+
+    # Persist profile JSON and update twin score
+    twin.linkedin_profile_json = json.dumps({
+        "profile_text": text[:5000],
+        "target_role": role,
+        "analysis": analysis,
+        "recs": recs,
+        "analyzed_at": now_str,
+    })
+    li_score = float(response.overall_score)
+    _update_twin(current_user.id, db, linkedin_score=li_score, event="linkedin_twin")
+
+    return response
+
+
+# ── 3c. LinkedIn Digital Twin — Certificate Upload ────────────────────────────
+
+@router.post("/linkedin/certificate", response_model=AchievementAnalyzeResponse)
+async def upload_certificate(
+    file: UploadFile = File(...),
+    achievement_type: str = Form("certificate"),
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    content = await file.read()
+    if len(content) > MAX_UPLOAD_MB * 1024 * 1024:
+        raise HTTPException(413, f"File exceeds {MAX_UPLOAD_MB} MB.")
+
+    fname = (file.filename or "").lower()
+    if fname.endswith(".pdf"):
+        text = _extract_pdf(content)
+    elif fname.endswith(".docx"):
+        text = _extract_docx(content)
+    elif fname.endswith(".txt"):
+        text = content.decode("utf-8", errors="replace")
+    elif fname.endswith((".jpg", ".jpeg", ".png", ".webp")):
+        # Try Gemini for images
+        import base64, requests as req
+        if not settings.gemini_api_key:
+            raise HTTPException(415, "Image certificates require GEMINI_API_KEY. Please upload as PDF or paste text.")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={settings.gemini_api_key}"
+        mime = "image/jpeg" if fname.endswith((".jpg",".jpeg")) else "image/png" if fname.endswith(".png") else "image/webp"
+        body = {"contents": [{"parts": [{"inline_data": {"mime_type": mime, "data": base64.b64encode(content).decode()}}, {"text": "Extract all text from this certificate or achievement document. Include name, issuer, date, skills, and any other relevant information."}]}]}
+        try:
+            r = req.post(url, json=body, timeout=20)
+            r.raise_for_status()
+            text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
+        except Exception:
+            raise HTTPException(500, "Image analysis failed. Please upload as PDF instead.")
+    else:
+        raise HTTPException(415, "Supported formats: PDF, DOCX, TXT, JPG, PNG.")
+
+    if not text.strip():
+        raise HTTPException(422, "Could not extract text from this file.")
+
+    data = _analyze_achievement_text(text, achievement_type)
+    if not data:
+        raise HTTPException(500, "Achievement analysis failed.")
+
+    achievement = AchievementItem(
+        id=str(uuid.uuid4()),
+        title=data.get("title", file.filename or "Achievement"),
+        achievement_type=achievement_type,
+        raw_text=text[:2000],
+        skills_gained=data.get("skills_gained", []),
+        technologies=data.get("technologies", []),
+        difficulty_level=data.get("difficulty_level", "Intermediate"),
+        career_value=data.get("career_value", ""),
+        industry_relevance=data.get("industry_relevance", ""),
+        impact_score=int(data.get("impact_score", 60)),
+        career_value_score=int(data.get("career_value_score", 60)),
+        recruiter_appeal_score=int(data.get("recruiter_appeal_score", 60)),
+        why_it_matters=data.get("why_it_matters", ""),
+        how_it_improves=data.get("how_it_improves", ""),
+        career_paths_supported=data.get("career_paths_supported", []),
+        uploaded_at=datetime.utcnow().isoformat(),
+    )
+
+    # Persist to Career Twin
+    twin = _get_or_create_twin(current_user.id, db)
+    achievements = _get_li_achievements(twin)
+    achievements.append(achievement.model_dump())
+    _save_li_achievements(twin, achievements, db)
+
+    # Extract skills into main skills list
+    _update_twin(current_user.id, db, skills=achievement.skills_gained, certifications=[achievement.title], event="certificate")
+
+    return AchievementAnalyzeResponse(achievement=achievement, twin_updated=True)
+
+
+# ── 3d. LinkedIn Digital Twin — Manual Achievement ────────────────────────────
+
+@router.post("/linkedin/achievement", response_model=AchievementAnalyzeResponse)
+def add_manual_achievement(
+    payload: ManualAchievementRequest,
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    text = f"{payload.title}\n\n{payload.description}"
+    data = _analyze_achievement_text(text, payload.achievement_type)
+    if not data:
+        raise HTTPException(500, "Analysis failed.")
+
+    achievement = AchievementItem(
+        id=str(uuid.uuid4()),
+        title=data.get("title", payload.title),
+        achievement_type=payload.achievement_type,
+        raw_text=text[:2000],
+        skills_gained=data.get("skills_gained", []),
+        technologies=data.get("technologies", []),
+        difficulty_level=data.get("difficulty_level", "Intermediate"),
+        career_value=data.get("career_value", ""),
+        industry_relevance=data.get("industry_relevance", ""),
+        impact_score=int(data.get("impact_score", 60)),
+        career_value_score=int(data.get("career_value_score", 60)),
+        recruiter_appeal_score=int(data.get("recruiter_appeal_score", 60)),
+        why_it_matters=data.get("why_it_matters", ""),
+        how_it_improves=data.get("how_it_improves", ""),
+        career_paths_supported=data.get("career_paths_supported", []),
+        uploaded_at=datetime.utcnow().isoformat(),
+    )
+
+    twin = _get_or_create_twin(current_user.id, db)
+    achievements = _get_li_achievements(twin)
+    achievements.append(achievement.model_dump())
+    _save_li_achievements(twin, achievements, db)
+    _update_twin(current_user.id, db, skills=achievement.skills_gained, event="achievement")
+
+    return AchievementAnalyzeResponse(achievement=achievement, twin_updated=True)
+
+
+# ── 3e. LinkedIn Digital Twin — Full Twin State ───────────────────────────────
+
+@router.get("/linkedin/twin", response_model=LinkedInTwinFullResponse)
+def get_linkedin_twin(
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    twin = _get_or_create_twin(current_user.id, db)
+    achievements = _get_li_achievements(twin)
+
+    stored = json.loads(twin.linkedin_profile_json or "{}")
+    if stored:
+        analysis = stored.get("analysis", {})
+        recs     = stored.get("recs", {})
+        now_str  = stored.get("analyzed_at", datetime.utcnow().isoformat())
+        return _build_linkedin_twin_response(analysis, recs, achievements, now_str)
+
+    # No profile analyzed yet — return empty state with achievements only
+    achiev_models = [AchievementItem(**a) for a in achievements if _valid_achievement(a)]
+    return LinkedInTwinFullResponse(
+        profile_strength=0, recruiter_visibility=0, personal_branding=0,
+        industry_relevance_score=0, network_readiness=0, overall_score=0,
+        sections=[], suggested_headline="", suggested_about="",
+        improvements=[], checklist=[], checklist_completion=0,
+        suitable_roles=[], internship_opportunities=[],
+        missing_skills=[], missing_certifications=[],
+        important_projects=[], learning_priorities=[],
+        achievements=achiev_models, achievements_count=len(achiev_models),
+        predictions={}, last_analyzed=None,
+        twin_insight="Upload your LinkedIn profile or paste its content to activate your LinkedIn Digital Twin.",
+        twin_updated=False,
+    )
+
+
+# ── 3f. LinkedIn Digital Twin — Delete Achievement ───────────────────────────
+
+@router.delete("/linkedin/achievement/{achievement_id}")
+def delete_achievement(
+    achievement_id: str,
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    twin = _get_or_create_twin(current_user.id, db)
+    achievements = _get_li_achievements(twin)
+    updated = [a for a in achievements if a.get("id") != achievement_id]
+    if len(updated) == len(achievements):
+        raise HTTPException(404, "Achievement not found.")
+    _save_li_achievements(twin, updated, db)
+    return {"deleted": True, "remaining": len(updated)}
 
 
 # ── 4. Mock Interview ──────────────────────────────────────────────────────
