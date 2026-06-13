@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, FileText, Upload, BarChart2, CheckSquare, Trophy, Brain, Zap, MessageCircle, Layers, Menu } from 'lucide-react';
+import { BookOpen, FileText, Upload, BarChart2, CheckSquare, Trophy, Brain, Zap, MessageCircle, Layers, Menu, Rocket } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import ThemeToggle from '../components/ThemeToggle';
@@ -181,6 +181,7 @@ const NAV_KEYS = [
   { key: 'nav_simulate',     to: '/simulate',      Icon: Zap           },
   { key: 'nav_mentor',       to: '/mentor',        Icon: MessageCircle },
   { key: 'nav_twin',         to: '/twin',          Icon: Layers        },
+  { key: 'nav_career',       to: '/career',        Icon: Rocket        },
 ];
 
 const NAV_TOUR: Record<string, string> = {
@@ -208,6 +209,7 @@ const QA_DEFS = [
   { labelKey: 'qa_burnout',      descKey: 'qa_desc_burnout',  icon: '🧠', grad: 'linear-gradient(135deg,#ef4444,#f59e0b)', to: '/burnout'      },
   { labelKey: 'qa_subjects',     descKey: 'qa_desc_subjects', icon: '📊', grad: 'linear-gradient(135deg,#6366f1,#06b6d4)', to: '/subjects'     },
   { labelKey: 'qa_ai_focus',    descKey: 'qa_desc_ai_focus', icon: '👁',  grad: 'linear-gradient(135deg,#10b981,#00D4FF)', to: '/ai-focus'     },
+  { labelKey: 'qa_career',      descKey: 'qa_desc_career',   icon: '🚀', grad: 'linear-gradient(135deg,#6366f1,#00D4FF)', to: '/career'       },
 ];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }

@@ -31,6 +31,7 @@ from app.api.routes import videos as video_routes
 from app.api.routes import burnout as burnout_routes
 from app.api.routes import subject_performance as subj_routes
 from app.api.routes import test_image as test_image_routes
+from app.api.routes import career as career_routes
 from app.ml.predictor import get_model  # warm up model at startup
 
 Base.metadata.create_all(bind=engine)
@@ -222,6 +223,7 @@ app.include_router(video_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(burnout_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(subj_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(test_image_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(career_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(ws_routes.router)
 
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"

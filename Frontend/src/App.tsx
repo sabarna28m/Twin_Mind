@@ -58,6 +58,7 @@ import StudyVideos from './pages/StudyVideos';
 import Burnout from './pages/Burnout';
 import SubjectAnalysis from './pages/SubjectAnalysis';
 import AIFocusDetector from './pages/AIFocusDetector';
+import CareerDevelopment from './pages/CareerDevelopment';
 
 export default function App() {
   return (
@@ -229,6 +230,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AIFocusDetector />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/career"
+            element={
+              <ProtectedRoute>
+                <CareerDevelopment />
               </ProtectedRoute>
             }
           />
