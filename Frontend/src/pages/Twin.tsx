@@ -11,6 +11,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from 'recharts';
+import HumanVsTwinDashboard from '../components/HumanVsTwinDashboard';
 
 interface HistoryPoint {
   date: string;
@@ -1050,6 +1051,9 @@ export default function Twin() {
 
             {/* Future Twin card */}
             <FutureTwinCard twin={twin} />
+
+            {/* ── Human vs Twin Analysis ── */}
+            <HumanVsTwinDashboard />
           </div>
         )}
       </main>
