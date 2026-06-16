@@ -755,8 +755,8 @@ export default function SmartNotes() {
                   </button>
                 </div>
                 <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
-                  <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)}
-                    style={{ flex: 1, background: 'rgba(0,0,0,0.3)', border: BORDER, borderRadius: 6, padding: '0.28rem 0.5rem', color: MUTED, fontSize: '0.7rem' }}>
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)} className="form-select"
+                    style={{ flex: 1, background: '#1F2937', border: '1px solid #4B5563', borderRadius: 6, padding: '0.28rem 0.5rem', color: '#FFFFFF', fontSize: '0.7rem' }}>
                     <option value="updated">Sort: Updated</option>
                     <option value="created">Sort: Created</option>
                     <option value="title">Sort: Title</option>
@@ -802,8 +802,8 @@ export default function SmartNotes() {
                   {/* Editor top bar */}
                   <div style={{ padding: '0.65rem 1rem', borderBottom: BORDER, display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', background: 'rgba(0,0,0,0.1)', flexShrink: 0 }}>
                     {/* Subject */}
-                    <select value={subject} onChange={e => { setSubject(e.target.value); scheduleSave(title, content, e.target.value, tags); }}
-                      style={{ background: 'rgba(0,0,0,0.3)', border: BORDER, borderRadius: 7, padding: '0.28rem 0.6rem', color: subject ? CYAN : DIM, fontSize: '0.75rem', cursor: 'pointer' }}>
+                    <select value={subject} onChange={e => { setSubject(e.target.value); scheduleSave(title, content, e.target.value, tags); }} className="form-select"
+                      style={{ background: '#1F2937', border: '1px solid #4B5563', borderRadius: 7, padding: '0.28rem 0.6rem', color: '#FFFFFF', fontSize: '0.75rem', cursor: 'pointer' }}>
                       <option value="">No subject</option>
                       {subjects.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>

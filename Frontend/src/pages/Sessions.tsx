@@ -106,7 +106,8 @@ export default function Sessions() {
               <select
                 value={subject}
                 onChange={e => setSubject(e.target.value)}
-                style={{ ...s.input, cursor: 'pointer' }}
+                className="form-select"
+                style={{ ...s.input, cursor: 'pointer', background: '#1F2937', color: '#FFFFFF', border: '1px solid #4B5563' }}
               >
                 <option value="">{t('sessions_form_subject_ph')}</option>
                 {profileSubjects.map(sub => (

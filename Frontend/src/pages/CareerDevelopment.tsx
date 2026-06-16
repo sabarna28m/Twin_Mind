@@ -1402,8 +1402,8 @@ function InterviewSection() {
         8 questions mixing Domain Knowledge, Behavioral, HR, and Situational rounds.<br/>
         Scored on Communication, Confidence, Domain Depth, and Problem Solving.
       </div>
-      <select value={role} onChange={e=>setRole(e.target.value)}
-        style={{ width:'100%', background:'#0d1117', border:BORDER, borderRadius:10, padding:'0.65rem 1rem', color:TEXT, fontSize:'0.9rem', marginBottom:'1rem' }}>
+      <select value={role} onChange={e=>setRole(e.target.value)} className="form-select"
+        style={{ width:'100%', background:'#1F2937', border:'1px solid #4B5563', borderRadius:10, padding:'0.65rem 1rem', color:'#FFFFFF', fontSize:'0.9rem', marginBottom:'1rem' }}>
         {CAREER_OPTIONS.map(o=><option key={o} value={o}>{o}</option>)}
       </select>
       <button onClick={start} style={{ width:'100%', padding:'0.8rem', background:`linear-gradient(135deg,${INDIGO},${PURPLE})`, border:'none', borderRadius:10, color:'#fff', fontWeight:700, cursor:'pointer', fontSize:'1rem' }}>
@@ -1544,7 +1544,7 @@ function CodingSection() {
         <div style={{ flex:1 }}>
           <div style={{ color:MUTED, fontSize:'0.73rem', marginBottom:5 }}>Topic</div>
           <select value={topic} onChange={e=>setTopic(e.target.value)}
-            style={{ background:'#0d1117', border:BORDER, borderRadius:8, padding:'0.4rem 0.75rem', color:TEXT, fontSize:'0.83rem' }}>
+            style={{ background:'#1F2937', border:'1px solid #4B5563', borderRadius:8, padding:'0.4rem 0.75rem', color:'#FFFFFF', fontSize:'0.83rem' }} className="form-select">
             {TOPICS.map(t=><option key={t} value={t.toLowerCase()}>{t}</option>)}
           </select>
         </div>
@@ -1607,7 +1607,7 @@ function CodingSection() {
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <span style={{ color:TEXT, fontWeight:600, fontSize:'0.85rem' }}>Solution Editor</span>
                 <select value={lang} onChange={e=>setLang(e.target.value)}
-                  style={{ background:'#0d1117', border:BORDER, borderRadius:6, padding:'0.28rem 0.5rem', color:MUTED, fontSize:'0.75rem' }}>
+                  style={{ background:'#1F2937', border:'1px solid #4B5563', borderRadius:6, padding:'0.28rem 0.5rem', color:'#FFFFFF', fontSize:'0.75rem' }} className="form-select">
                   {['python','javascript','java','c++','go'].map(l=><option key={l} value={l}>{l}</option>)}
                 </select>
               </div>
@@ -1673,7 +1673,7 @@ function SkillGapSection() {
         <div style={{ flex:1 }}>
           <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:5 }}>Target Career / Role</div>
           <select value={target} onChange={e=>setTarget(e.target.value)}
-            style={{ width:'100%', background:'#0d1117', border:BORDER, borderRadius:10, padding:'0.65rem 1rem', color:TEXT, fontSize:'0.88rem' }}>
+            style={{ width:'100%', background:'#1F2937', border:'1px solid #4B5563', borderRadius:10, padding:'0.65rem 1rem', color:'#FFFFFF', fontSize:'0.88rem' }} className="form-select">
             {CAREER_OPTIONS.map(o=><option key={o} value={o}>{o}</option>)}
           </select>
         </div>
@@ -1884,7 +1884,7 @@ function RoadmapSection() {
         <div style={{ flex:1 }}>
           <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:5 }}>Target Career</div>
           <select value={target} onChange={e=>setTarget(e.target.value)}
-            style={{ width:'100%', background:'#0d1117', border:BORDER, borderRadius:10, padding:'0.65rem 1rem', color:TEXT, fontSize:'0.88rem' }}>
+            style={{ width:'100%', background:'#1F2937', border:'1px solid #4B5563', borderRadius:10, padding:'0.65rem 1rem', color:'#FFFFFF', fontSize:'0.88rem' }} className="form-select">
             {CAREER_OPTIONS.map(o=><option key={o} value={o}>{o}</option>)}
           </select>
         </div>
@@ -2126,9 +2126,8 @@ export default function CareerDevelopment() {
         * { scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.1) transparent; }
         *::-webkit-scrollbar { width:4px; height:4px; }
         *::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
-        input,textarea,select { outline:none; }
-        input:focus,textarea:focus,select:focus { border-color:rgba(99,102,241,0.5) !important; }
-        select option { background:#0d1117; color:#f1f5f9; }
+        input,textarea { outline:none; }
+        input:focus,textarea:focus { border-color:rgba(99,102,241,0.5) !important; }
       `}</style>
 
       {/* Header */}

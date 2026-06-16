@@ -284,6 +284,7 @@ export default function ProfileSetup() {
               value={semester}
               onChange={e => setSemester(e.target.value)}
               style={{ ...s.select, marginTop: '0.375rem' }}
+              className="form-select"
               required
               aria-label="Current Semester / Year"
             >
@@ -434,34 +435,39 @@ const s: Record<string, React.CSSProperties> = {
   },
   input: {
     padding: '0.6rem 0.75rem',
-    border: '1px solid var(--border)',
+    border: '1px solid #4B5563',
     borderRadius: '8px',
     fontSize: '0.95rem',
-    color: 'var(--text-h)',
-    background: 'var(--bg)',
+    color: '#FFFFFF',
+    background: '#1F2937',
     outline: 'none',
+    width: '100%',
+    boxSizing: 'border-box' as const,
   },
   select: {
     padding: '0.6rem 0.75rem',
-    border: '1px solid var(--border)',
+    border: '1px solid #4B5563',
     borderRadius: '8px',
     fontSize: '0.95rem',
-    color: 'var(--text-h)',
-    background: 'var(--bg)',
+    color: '#FFFFFF',
+    background: '#1F2937',
     outline: 'none',
     cursor: 'pointer',
+    width: '100%',
   },
   textarea: {
     padding: '0.6rem 0.75rem',
-    border: '1px solid var(--border)',
+    border: '1px solid #4B5563',
     borderRadius: '8px',
     fontSize: '0.875rem',
-    color: 'var(--text-h)',
-    background: 'var(--bg)',
+    color: '#FFFFFF',
+    background: '#1F2937',
     outline: 'none',
     resize: 'vertical' as const,
     fontFamily: 'inherit',
     lineHeight: '1.5',
+    width: '100%',
+    boxSizing: 'border-box' as const,
   },
   prefLabel: {
     margin: '0 0 0.25rem',

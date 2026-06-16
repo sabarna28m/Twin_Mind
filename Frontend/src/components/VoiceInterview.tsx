@@ -421,10 +421,10 @@ function ControlsBar({ muted, paused, speed, voices, selectedVoice, onMute, onPa
       {/* Language selector */}
       <div style={{ background:'rgba(255,255,255,0.03)', borderRadius:10, padding:'7px 10px', border:BORDER }}>
         <div style={{ fontSize:'0.62rem', color:DIM, textTransform:'uppercase', letterSpacing:1, marginBottom:5 }}>Recognition Language</div>
-        <select value={lang} onChange={e=>onLangChange(e.target.value)}
-          style={{ width:'100%', background:'transparent', border:'none', color:TEXT, fontSize:'0.78rem', cursor:'pointer', outline:'none' }}>
+        <select value={lang} onChange={e=>onLangChange(e.target.value)} className="form-select"
+          style={{ width:'100%', background:'#1F2937', border:'1px solid #4B5563', color:'#FFFFFF', fontSize:'0.78rem', cursor:'pointer', outline:'none', borderRadius:6, padding:'0.3rem 0.5rem' }}>
           {LANGUAGES.map(l=>(
-            <option key={l.code} value={l.code} style={{ background:'#0d1117', color:TEXT }}>{l.label}</option>
+            <option key={l.code} value={l.code}>{l.label}</option>
           ))}
         </select>
       </div>
@@ -841,8 +841,8 @@ export default function VoiceInterview() {
             )}
 
             {/* Role selector */}
-            <select value={role} onChange={e=>setRole(e.target.value)}
-              style={{ width:'100%', background:'rgba(0,0,0,0.3)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:10, padding:'0.7rem 1rem', color:TEXT, fontSize:'0.9rem', marginBottom:'1rem', backdropFilter:'blur(10px)' }}>
+            <select value={role} onChange={e=>setRole(e.target.value)} className="form-select"
+              style={{ width:'100%', background:'#1F2937', border:'1px solid #4B5563', borderRadius:10, padding:'0.7rem 1rem', color:'#FFFFFF', fontSize:'0.9rem', marginBottom:'1rem' }}>
               {CAREER_OPTIONS.map(o=><option key={o} value={o}>{o}</option>)}
             </select>
 
