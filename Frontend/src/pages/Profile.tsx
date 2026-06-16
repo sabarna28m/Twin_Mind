@@ -447,14 +447,14 @@ export default function Profile() {
                 Theme Personalization Score
               </div>
               <div style={{ fontSize: '0.78rem', color: 'var(--text)', marginTop: 3 }}>
-                {themeId === 'cosmos'
+                {themeId === 'galaxy-nexus'
                   ? 'Try a custom theme to unlock your personalization score!'
                   : `✓ ${themeMeta.name} — looking premium!`}
               </div>
             </div>
             <div style={{ textAlign: 'right', flexShrink: 0 }}>
               <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--accent)', lineHeight: 1 }}>
-                {themeId === 'cosmos' ? '40' : '95'}
+                {themeId === 'galaxy-nexus' ? '40' : '95'}
               </div>
               <div style={{ fontSize: '0.62rem', color: 'var(--text)', marginTop: 1 }}>/ 100</div>
             </div>

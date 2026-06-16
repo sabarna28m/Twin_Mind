@@ -34,6 +34,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
   }
 }
 import TwinMindCopilot from './components/TwinMindCopilot';
+import ThemeEngine from './components/ThemeEngine';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -70,6 +71,7 @@ export default function App() {
     <LanguageProvider>
     <BrowserRouter>
       <AuthProvider>
+        <ThemeEngine />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

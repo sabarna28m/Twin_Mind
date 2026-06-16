@@ -2,98 +2,141 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 export type ThemeId =
-  | 'cosmos'
-  | 'forest'
-  | 'sakura'
-  | 'ember'
-  | 'arctic'
-  | 'neon-cyberpunk';
+  | 'galaxy-nexus'
+  | 'sakura-dream'
+  | 'inferno'
+  | 'arctic-aurora'
+  | 'nature-pulse'
+  | 'cyberpunk-neo'
+  | 'ocean-intelligence'
+  | 'neural-brain';
 
 export interface ThemeMeta {
   id: ThemeId;
   name: string;
   icon: string;
+  tagline: string;
   description: string;
   isDark: boolean;
-  /** 4 hex swatches shown in the picker card */
   swatches: [string, string, string, string];
 }
 
 export const THEMES: ThemeMeta[] = [
   {
-    id: 'cosmos',
-    name: 'Cosmos',
+    id: 'galaxy-nexus',
+    name: 'Galaxy Nexus',
     icon: '🌌',
-    description: 'Deep space — the default TwinMind experience',
+    tagline: 'Futuristic AI OS',
+    description: 'Deep space nebula, moving stars, neon holographics',
     isDark: true,
-    swatches: ['#060b18', '#00D4FF', '#6366f1', '#8b5cf6'],
+    swatches: ['#000510', '#00D4FF', '#7C3AED', '#4F46E5'],
   },
   {
-    id: 'forest',
-    name: 'Forest',
-    icon: '🌲',
-    description: 'Dark emerald — focused and grounded',
-    isDark: true,
-    swatches: ['#030a06', '#10b981', '#059669', '#34d399'],
-  },
-  {
-    id: 'sakura',
-    name: 'Sakura',
+    id: 'sakura-dream',
+    name: 'Sakura Dream',
     icon: '🌸',
-    description: 'Cherry blossom — elegant and creative',
+    tagline: 'Calm & focused',
+    description: 'Cherry blossoms, rose-gold glow, soft petals',
     isDark: true,
-    swatches: ['#0f050a', '#ec4899', '#db2777', '#9333ea'],
+    swatches: ['#12020a', '#FF6B9D', '#FF9EC6', '#9333ea'],
   },
   {
-    id: 'ember',
-    name: 'Ember',
+    id: 'inferno',
+    name: 'Inferno',
     icon: '🔥',
-    description: 'Burning fire — intense and energetic',
+    tagline: 'High-performance mode',
+    description: 'Fire particles, energy sparks, amber glow',
     isDark: true,
-    swatches: ['#0a0300', '#f97316', '#ea580c', '#dc2626'],
+    swatches: ['#060100', '#FF4500', '#FF8C00', '#FFD700'],
   },
   {
-    id: 'arctic',
-    name: 'Arctic',
+    id: 'arctic-aurora',
+    name: 'Arctic Aurora',
     icon: '❄️',
-    description: 'Ice blue — clean light interface',
-    isDark: false,
-    swatches: ['#f0f8ff', '#0ea5e9', '#38bdf8', '#6366f1'],
+    tagline: 'Clean & intelligent',
+    description: 'Northern lights, frost glass, snow particles',
+    isDark: true,
+    swatches: ['#00060e', '#00FFCC', '#0ea5e9', '#7C3AED'],
   },
   {
-    id: 'neon-cyberpunk',
-    name: 'Neon Cyberpunk',
-    icon: '🤖',
-    description: 'Pure black — maximum contrast and neon glow',
+    id: 'nature-pulse',
+    name: 'Nature Pulse',
+    icon: '🌲',
+    tagline: 'Growth & development',
+    description: 'Forest canopy, floating leaves, organic flow',
     isDark: true,
-    swatches: ['#000000', '#00ff41', '#00ffff', '#ff00ff'],
+    swatches: ['#010802', '#10b981', '#22c55e', '#86efac'],
+  },
+  {
+    id: 'cyberpunk-neo',
+    name: 'Cyberpunk Neo',
+    icon: '🤖',
+    tagline: 'Next-gen AI lab',
+    description: 'Digital rain, cyber grid, neon holographic panels',
+    isDark: true,
+    swatches: ['#000000', '#00FF41', '#00FFFF', '#FF00FF'],
+  },
+  {
+    id: 'ocean-intelligence',
+    name: 'Ocean Intelligence',
+    icon: '🌊',
+    tagline: 'Deep thinking & reflection',
+    description: 'Rising bubbles, bioluminescence, ocean depth glow',
+    isDark: true,
+    swatches: ['#000814', '#006994', '#00CED1', '#40E0D0'],
+  },
+  {
+    id: 'neural-brain',
+    name: 'Neural Brain',
+    icon: '🧠',
+    tagline: 'Inside your Digital Twin',
+    description: 'Live neural network, synapse pulses, knowledge flow',
+    isDark: true,
+    swatches: ['#020205', '#7C3AED', '#00D4FF', '#10B981'],
   },
 ];
+
+// ── Migration map from old theme IDs ─────────────────────────────────────────
+
+const MIGRATE: Record<string, ThemeId> = {
+  cosmos:           'galaxy-nexus',
+  sakura:           'sakura-dream',
+  ember:            'inferno',
+  arctic:           'arctic-aurora',
+  forest:           'nature-pulse',
+  'neon-cyberpunk': 'cyberpunk-neo',
+  dark:             'galaxy-nexus',
+  light:            'arctic-aurora',
+};
+
+// ── Context ───────────────────────────────────────────────────────────────────
 
 interface ThemeContextValue {
   themeId: ThemeId;
   setTheme: (id: ThemeId) => void;
   themeMeta: ThemeMeta;
-  // Legacy shape kept so existing callers still compile
+  // Legacy API kept so existing callers still compile
   theme: 'dark' | 'light';
   toggle: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  themeId: 'cosmos',
-  setTheme: () => {},
+  themeId:   'galaxy-nexus',
+  setTheme:  () => {},
   themeMeta: THEMES[0],
-  theme: 'dark',
-  toggle: () => {},
+  theme:     'dark',
+  toggle:    () => {},
 });
 
 function getInitialTheme(): ThemeId {
-  const saved = localStorage.getItem('twinmind-theme') as ThemeId | null;
-  if (saved && THEMES.some(t => t.id === saved)) return saved;
-  // migrate legacy dark/light key
+  const saved = localStorage.getItem('twinmind-theme');
+  if (saved) {
+    if (THEMES.some(t => t.id === saved)) return saved as ThemeId;
+    if (MIGRATE[saved]) return MIGRATE[saved];
+  }
   const legacy = localStorage.getItem('theme');
-  if (legacy === 'light') return 'arctic';
-  return 'cosmos';
+  if (legacy && MIGRATE[legacy]) return MIGRATE[legacy];
+  return 'galaxy-nexus';
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -103,7 +146,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.setAttribute('data-theme', themeId);
     localStorage.setItem('twinmind-theme', themeId);
     const meta = THEMES.find(t => t.id === themeId)!;
-    // keep legacy key in sync so old code that reads 'theme' still works
     localStorage.setItem('theme', meta.isDark ? 'dark' : 'light');
   }, [themeId]);
 
@@ -114,7 +156,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   function toggle() {
     setThemeId(prev => {
       const meta = THEMES.find(t => t.id === prev)!;
-      return meta.isDark ? 'arctic' : 'cosmos';
+      return meta.isDark ? 'arctic-aurora' : 'galaxy-nexus';
     });
   }
 

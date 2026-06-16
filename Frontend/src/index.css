@@ -6,9 +6,12 @@
 
 :root {
   /* ── Core Backgrounds ── */
-  --bg:          #060b18;
-  --bg-surface:  #0a1020;
-  --bg-elevated: #0f1a2e;
+  /* --bg is transparent so ThemeEngine (position:fixed,z-index:-1) shows through.
+     Pages that override with a hardcoded colour still work; they just won't
+     show the particle layer — their CSS-variable accents still theme correctly. */
+  --bg:          transparent;
+  --bg-surface:  rgba(255,255,255,0.04);
+  --bg-elevated: rgba(255,255,255,0.07);
 
   /* ── Text ── */
   --text:   #94a3b8;
@@ -1089,287 +1092,288 @@ html[data-theme="light"] select.form-select option:checked {
   color: #1e1b4b;
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   MULTI-THEME SYSTEM
-   Each block below sets CSS custom-property overrides for a theme.
-   Key classes (nav, hero, cards, buttons) use rgba(var(--primary-rgb),…)
-   so they adapt automatically — no per-element overrides needed.
-   ═══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════
+   IMMERSIVE THEME SYSTEM — 8 Unique Atmospheres
+   ThemeEngine.tsx renders position:fixed z-index:-1 particle canvas.
+   Pages using background:var(--bg) (= transparent) reveal it fully.
+   Every CSS class using rgba(var(--primary-rgb),…) auto-adapts.
+   ═══════════════════════════════════════════════════════════════════════ */
 
-/* Smooth theme transition on the document root */
-html {
-  transition: background-color 0.35s ease, color 0.35s ease;
-}
+html { transition: color 0.4s ease; }
 
-/* ── 🌌 Cosmos — explicit (same as :root defaults, kept for clarity) ── */
+/* ── 🌌 Galaxy Nexus ─────────────────────────────────────────────────── */
+html[data-theme="galaxy-nexus"],
 html[data-theme="cosmos"] {
-  --primary-rgb: 0,212,255;
-  --accent-rgb:  99,102,241;
-  color-scheme: dark;
+  --bg:          transparent;
+  --bg-surface:  rgba(255,255,255,0.04);
+  --bg-elevated: rgba(255,255,255,0.07);
+  --text:   #94a3b8; --text-m: #cbd5e1; --text-h: #f1f5f9;
+  --border: rgba(0,212,255,0.12); --border-subtle: rgba(0,212,255,0.05);
+  --primary:#00D4FF; --secondary:#7C3AED; --accent:#6366f1; --accent-2:#8b5cf6;
+  --accent-bg:rgba(0,212,255,0.08); --accent-border:rgba(0,212,255,0.28);
+  --grad-primary:linear-gradient(135deg,#00D4FF 0%,#7C3AED 100%);
+  --glass-bg:rgba(4,8,24,0.72); --glass-border:rgba(0,212,255,0.12);
+  --glow-primary:0 0 40px rgba(0,212,255,0.35);
+  --glow-accent:0 0 30px rgba(99,102,241,0.4);
+  --glow-card:0 8px 40px rgba(0,0,0,0.6),0 0 0 1px rgba(0,212,255,0.08);
+  --primary-rgb:0,212,255; --accent-rgb:99,102,241;
+  color-scheme:dark;
+}
+html[data-theme="galaxy-nexus"] body, html[data-theme="galaxy-nexus"] #root,
+html[data-theme="cosmos"] body, html[data-theme="cosmos"] #root { background:transparent; }
+html[data-theme="galaxy-nexus"] .nav-premium,
+html[data-theme="cosmos"] .nav-premium {
+  background:rgba(0,5,16,0.88)!important;
+  border-bottom-color:rgba(0,212,255,0.18)!important;
+  box-shadow:0 1px 0 rgba(0,212,255,0.08),0 8px 32px rgba(0,0,0,0.55)!important;
+}
+html[data-theme="galaxy-nexus"] .hero-animated,
+html[data-theme="cosmos"] .hero-animated {
+  background:linear-gradient(-45deg,#000510,#00080e,#000a18,#00060e,#000510)!important;
+  background-size:400% 400%!important;
 }
 
-/* ── 🌲 Forest ─────────────────────────────────────────────────────── */
-html[data-theme="forest"] {
-  --bg:          #030a06;
-  --bg-surface:  #041209;
-  --bg-elevated: #06180d;
-  --text:        #6ee7b7;
-  --text-m:      #a7f3d0;
-  --text-h:      #ecfdf5;
-  --border:        rgba(16,185,129,0.14);
-  --border-subtle: rgba(16,185,129,0.06);
-  --primary:       #10b981;
-  --secondary:     #065f46;
-  --accent:        #059669;
-  --accent-2:      #34d399;
-  --accent-green:  #10b981;
-  --accent-cyan:   #6ee7b7;
-  --accent-bg:     rgba(16,185,129,0.1);
-  --accent-border: rgba(16,185,129,0.35);
-  --shadow:        0 25px 60px rgba(0,0,0,0.85);
-  --grad-primary:  linear-gradient(135deg, #10b981 0%, #065f46 100%);
-  --grad-green:    linear-gradient(135deg, #10b981 0%, #34d399 100%);
-  --grad-cyan:     linear-gradient(135deg, #34d399 0%, #059669 100%);
-  --glass-bg:      rgba(3,10,6,0.82);
-  --glass-border:  rgba(16,185,129,0.12);
-  --glow-primary:  0 0 40px rgba(16,185,129,0.3);
-  --glow-accent:   0 0 30px rgba(5,150,105,0.3);
-  --glow-card:     0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(16,185,129,0.08);
-  --primary-rgb:   16,185,129;
-  --accent-rgb:    5,150,105;
-  color-scheme: dark;
-}
-html[data-theme="forest"] body,
-html[data-theme="forest"] #root { background: #030a06; }
-html[data-theme="forest"] .nav-premium {
-  background: rgba(3,10,6,0.94) !important;
-  border-bottom-color: rgba(16,185,129,0.18) !important;
-  box-shadow: 0 1px 0 rgba(16,185,129,0.1), 0 8px 32px rgba(0,0,0,0.55) !important;
-}
-html[data-theme="forest"] .hero-animated {
-  background: linear-gradient(-45deg, #020601, #030d05, #041009, #030b06, #020701) !important;
-  background-size: 400% 400% !important;
-}
-html[data-theme="forest"] .live-dot {
-  animation: forest-live 2s ease-in-out infinite;
-}
-@keyframes forest-live {
-  0%, 100% { box-shadow: 0 0 4px #10b981, 0 0 8px rgba(16,185,129,0.4); opacity:1; }
-  50%       { box-shadow: 0 0 10px #10b981, 0 0 20px rgba(16,185,129,0.7); opacity:0.7; }
-}
-html[data-theme="forest"] ::-webkit-scrollbar-thumb { background: rgba(16,185,129,0.2) !important; }
-html[data-theme="forest"] select.form-select { background-color: #06180d !important; }
-
-/* ── 🌸 Sakura ──────────────────────────────────────────────────────── */
+/* ── 🌸 Sakura Dream ─────────────────────────────────────────────────── */
+html[data-theme="sakura-dream"],
 html[data-theme="sakura"] {
-  --bg:          #0f050a;
-  --bg-surface:  #180a12;
-  --bg-elevated: #20101b;
-  --text:        #fbcfe8;
-  --text-m:      #f9a8d4;
-  --text-h:      #fdf2f8;
-  --border:        rgba(236,72,153,0.14);
-  --border-subtle: rgba(236,72,153,0.06);
-  --primary:       #ec4899;
-  --secondary:     #9333ea;
-  --accent:        #db2777;
-  --accent-2:      #f472b6;
-  --accent-pink:   #ec4899;
-  --accent-bg:     rgba(236,72,153,0.1);
-  --accent-border: rgba(236,72,153,0.35);
-  --shadow:        0 25px 60px rgba(0,0,0,0.85);
-  --grad-primary:  linear-gradient(135deg, #ec4899 0%, #9333ea 100%);
-  --grad-rose:     linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
-  --grad-cyan:     linear-gradient(135deg, #f472b6 0%, #db2777 100%);
-  --glass-bg:      rgba(15,5,10,0.82);
-  --glass-border:  rgba(236,72,153,0.12);
-  --glow-primary:  0 0 40px rgba(236,72,153,0.32);
-  --glow-accent:   0 0 30px rgba(147,51,234,0.28);
-  --glow-card:     0 8px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(236,72,153,0.08);
-  --primary-rgb:   236,72,153;
-  --accent-rgb:    219,39,119;
-  color-scheme: dark;
+  --bg:transparent; --bg-surface:rgba(255,180,200,0.06); --bg-elevated:rgba(255,180,200,0.1);
+  --text:rgba(255,200,215,0.85); --text-m:#f9a8d4; --text-h:#fff0f8;
+  --border:rgba(255,107,157,0.18); --border-subtle:rgba(255,107,157,0.07);
+  --primary:#FF6B9D; --secondary:#9333ea; --accent:#db2777; --accent-2:#f472b6;
+  --accent-bg:rgba(255,107,157,0.1); --accent-border:rgba(255,107,157,0.38);
+  --grad-primary:linear-gradient(135deg,#FF6B9D 0%,#9333ea 100%);
+  --glass-bg:rgba(30,4,18,0.72); --glass-border:rgba(255,107,157,0.15);
+  --glow-primary:0 0 40px rgba(255,107,157,0.4); --glow-accent:0 0 30px rgba(147,51,234,0.35);
+  --glow-card:0 8px 40px rgba(0,0,0,0.6),0 0 0 1px rgba(255,107,157,0.1);
+  --primary-rgb:255,107,157; --accent-rgb:219,39,119;
+  color-scheme:dark;
 }
-html[data-theme="sakura"] body,
-html[data-theme="sakura"] #root { background: #0f050a; }
-html[data-theme="sakura"] .nav-premium {
-  background: rgba(15,5,10,0.94) !important;
-  border-bottom-color: rgba(236,72,153,0.18) !important;
-  box-shadow: 0 1px 0 rgba(236,72,153,0.1), 0 8px 32px rgba(0,0,0,0.55) !important;
+html[data-theme="sakura-dream"] body, html[data-theme="sakura-dream"] #root,
+html[data-theme="sakura"] body, html[data-theme="sakura"] #root { background:transparent; }
+html[data-theme="sakura-dream"] .nav-premium, html[data-theme="sakura"] .nav-premium {
+  background:rgba(18,2,10,0.92)!important; border-bottom-color:rgba(255,107,157,0.22)!important;
+  box-shadow:0 1px 0 rgba(255,107,157,0.12),0 8px 32px rgba(0,0,0,0.6)!important;
 }
-html[data-theme="sakura"] .hero-animated {
-  background: linear-gradient(-45deg, #0f0509, #14060d, #180710, #12060c, #0f0508) !important;
-  background-size: 400% 400% !important;
+html[data-theme="sakura-dream"] .hero-animated, html[data-theme="sakura"] .hero-animated {
+  background:linear-gradient(-45deg,#12020a,#180510,#1c0612,#15030d,#12020a)!important;
+  background-size:400% 400%!important;
 }
-html[data-theme="sakura"] .live-dot {
-  animation: sakura-live 2s ease-in-out infinite;
-}
-@keyframes sakura-live {
-  0%, 100% { box-shadow: 0 0 4px #ec4899, 0 0 8px rgba(236,72,153,0.4); opacity:1; }
-  50%       { box-shadow: 0 0 10px #ec4899, 0 0 20px rgba(236,72,153,0.7); opacity:0.7; }
-}
-html[data-theme="sakura"] ::-webkit-scrollbar-thumb { background: rgba(236,72,153,0.2) !important; }
-html[data-theme="sakura"] select.form-select { background-color: #20101b !important; }
+html[data-theme="sakura-dream"] ::-webkit-scrollbar-thumb,
+html[data-theme="sakura"] ::-webkit-scrollbar-thumb { background:rgba(255,107,157,0.22)!important; }
 
-/* ── 🔥 Ember ───────────────────────────────────────────────────────── */
+/* ── 🔥 Inferno ──────────────────────────────────────────────────────── */
+html[data-theme="inferno"],
 html[data-theme="ember"] {
-  --bg:          #0a0300;
-  --bg-surface:  #130600;
-  --bg-elevated: #1c0900;
-  --text:        #fed7aa;
-  --text-m:      #fdba74;
-  --text-h:      #fff7ed;
-  --border:        rgba(249,115,22,0.14);
-  --border-subtle: rgba(249,115,22,0.06);
-  --primary:       #f97316;
-  --secondary:     #dc2626;
-  --accent:        #ea580c;
-  --accent-2:      #fb923c;
-  --accent-amber:  #f97316;
-  --accent-bg:     rgba(249,115,22,0.1);
-  --accent-border: rgba(249,115,22,0.35);
-  --shadow:        0 25px 60px rgba(0,0,0,0.85);
-  --grad-primary:  linear-gradient(135deg, #f97316 0%, #dc2626 100%);
-  --grad-gold:     linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
-  --grad-cyan:     linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
-  --glass-bg:      rgba(10,3,0,0.82);
-  --glass-border:  rgba(249,115,22,0.12);
-  --glow-primary:  0 0 40px rgba(249,115,22,0.38);
-  --glow-accent:   0 0 30px rgba(220,38,38,0.3);
-  --glow-card:     0 8px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(249,115,22,0.08);
-  --primary-rgb:   249,115,22;
-  --accent-rgb:    234,88,12;
-  color-scheme: dark;
+  --bg:transparent; --bg-surface:rgba(255,80,0,0.06); --bg-elevated:rgba(255,100,0,0.09);
+  --text:rgba(255,210,140,0.88); --text-m:#fdba74; --text-h:#fff7ed;
+  --border:rgba(255,69,0,0.18); --border-subtle:rgba(255,69,0,0.07);
+  --primary:#FF4500; --secondary:#dc2626; --accent:#ea580c; --accent-2:#fb923c;
+  --accent-bg:rgba(255,69,0,0.1); --accent-border:rgba(255,69,0,0.38);
+  --grad-primary:linear-gradient(135deg,#FF4500 0%,#dc2626 100%);
+  --glass-bg:rgba(20,4,0,0.75); --glass-border:rgba(255,69,0,0.14);
+  --glow-primary:0 0 40px rgba(255,69,0,0.45); --glow-accent:0 0 30px rgba(220,38,38,0.38);
+  --glow-card:0 8px 40px rgba(0,0,0,0.65),0 0 0 1px rgba(255,69,0,0.1);
+  --primary-rgb:255,69,0; --accent-rgb:234,88,12;
+  color-scheme:dark;
 }
-html[data-theme="ember"] body,
-html[data-theme="ember"] #root { background: #0a0300; }
-html[data-theme="ember"] .nav-premium {
-  background: rgba(10,3,0,0.96) !important;
-  border-bottom-color: rgba(249,115,22,0.18) !important;
-  box-shadow: 0 1px 0 rgba(249,115,22,0.1), 0 8px 32px rgba(0,0,0,0.6) !important;
+html[data-theme="inferno"] body, html[data-theme="inferno"] #root,
+html[data-theme="ember"] body, html[data-theme="ember"] #root { background:transparent; }
+html[data-theme="inferno"] .nav-premium, html[data-theme="ember"] .nav-premium {
+  background:rgba(6,1,0,0.95)!important; border-bottom-color:rgba(255,69,0,0.25)!important;
+  box-shadow:0 1px 0 rgba(255,69,0,0.14),0 8px 32px rgba(0,0,0,0.65)!important;
 }
-html[data-theme="ember"] .hero-animated {
-  background: linear-gradient(-45deg, #0a0200, #140500, #180700, #110400, #0a0200) !important;
-  background-size: 400% 400% !important;
+html[data-theme="inferno"] .hero-animated, html[data-theme="ember"] .hero-animated {
+  background:linear-gradient(-45deg,#060100,#0a0200,#0c0200,#080100,#060100)!important;
+  background-size:400% 400%!important;
 }
-html[data-theme="ember"] .live-dot {
-  animation: ember-live 2s ease-in-out infinite;
-}
-@keyframes ember-live {
-  0%, 100% { box-shadow: 0 0 4px #f97316, 0 0 8px rgba(249,115,22,0.4); opacity:1; }
-  50%       { box-shadow: 0 0 10px #f97316, 0 0 20px rgba(249,115,22,0.7); opacity:0.7; }
-}
-html[data-theme="ember"] ::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.2) !important; }
-html[data-theme="ember"] select.form-select { background-color: #1c0900 !important; }
+html[data-theme="inferno"] ::-webkit-scrollbar-thumb,
+html[data-theme="ember"] ::-webkit-scrollbar-thumb { background:rgba(255,69,0,0.25)!important; }
 
-/* ── ❄️ Arctic (light) ─────────────────────────────────────────────── */
+/* ── ❄️ Arctic Aurora ────────────────────────────────────────────────── */
+html[data-theme="arctic-aurora"],
 html[data-theme="arctic"] {
-  --bg:          #f0f8ff;
-  --bg-surface:  #e6f3ff;
-  --bg-elevated: #d9edff;
-  --text:        #475569;
-  --text-m:      #334155;
-  --text-h:      #0c1a3d;
-  --border:        rgba(14,165,233,0.2);
-  --border-subtle: rgba(14,165,233,0.08);
-  --primary:       #0ea5e9;
-  --secondary:     #6366f1;
-  --accent:        #38bdf8;
-  --accent-2:      #7dd3fc;
-  --accent-cyan:   #0ea5e9;
-  --accent-blue:   #3b82f6;
-  --accent-bg:     rgba(14,165,233,0.08);
-  --accent-border: rgba(14,165,233,0.3);
-  --shadow:        0 25px 50px rgba(14,165,233,0.15);
-  --grad-primary:  linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
-  --grad-blue:     linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
-  --grad-cyan:     linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
-  --glass-bg:      rgba(255,255,255,0.9);
-  --glass-border:  rgba(14,165,233,0.2);
-  --glow-primary:  0 0 40px rgba(14,165,233,0.22);
-  --glow-accent:   0 0 30px rgba(99,102,241,0.18);
-  --glow-card:     0 8px 32px rgba(14,165,233,0.1), 0 0 0 1px rgba(14,165,233,0.12);
-  --primary-rgb:   14,165,233;
-  --accent-rgb:    56,189,248;
-  color-scheme: light;
+  --bg:transparent; --bg-surface:rgba(0,255,200,0.05); --bg-elevated:rgba(0,200,255,0.08);
+  --text:rgba(150,220,240,0.88); --text-m:#a5f3fc; --text-h:#e0f8ff;
+  --border:rgba(0,220,180,0.18); --border-subtle:rgba(0,200,255,0.07);
+  --primary:#00FFCC; --secondary:#7C3AED; --accent:#0ea5e9; --accent-2:#7dd3fc;
+  --accent-bg:rgba(0,255,200,0.08); --accent-border:rgba(0,255,200,0.35);
+  --grad-primary:linear-gradient(135deg,#00FFCC 0%,#0ea5e9 50%,#7C3AED 100%);
+  --glass-bg:rgba(0,10,22,0.72); --glass-border:rgba(0,220,180,0.16);
+  --glow-primary:0 0 40px rgba(0,255,200,0.38); --glow-accent:0 0 30px rgba(14,165,233,0.35);
+  --glow-card:0 8px 40px rgba(0,0,0,0.6),0 0 0 1px rgba(0,220,180,0.1);
+  --primary-rgb:0,255,204; --accent-rgb:14,165,233;
+  color-scheme:dark;
 }
-/* Arctic reuses the existing light-theme body rule via data-theme="light" alias */
-html[data-theme="arctic"] body,
-html[data-theme="arctic"] #root { background: #f0f8ff; }
-html[data-theme="arctic"] .nav-premium {
-  background: rgba(240,248,255,0.96) !important;
-  border-bottom-color: rgba(14,165,233,0.22) !important;
-  box-shadow: 0 1px 0 rgba(14,165,233,0.1), 0 8px 24px rgba(14,165,233,0.08) !important;
+html[data-theme="arctic-aurora"] body, html[data-theme="arctic-aurora"] #root,
+html[data-theme="arctic"] body, html[data-theme="arctic"] #root { background:transparent; }
+html[data-theme="arctic-aurora"] .nav-premium, html[data-theme="arctic"] .nav-premium {
+  background:rgba(0,4,14,0.92)!important; border-bottom-color:rgba(0,255,200,0.2)!important;
+  box-shadow:0 1px 0 rgba(0,255,200,0.1),0 8px 32px rgba(0,0,0,0.6)!important;
 }
-html[data-theme="arctic"] .nav-link { color: #334155 !important; }
-html[data-theme="arctic"] .nav-link:hover { color: #0c1a3d !important; }
-html[data-theme="arctic"] .hero-animated {
-  background: linear-gradient(-45deg, #e6f3ff, #d9edff, #dce8ff, #e2eeff, #e8f4ff) !important;
-  background-size: 400% 400% !important;
+html[data-theme="arctic-aurora"] .hero-animated, html[data-theme="arctic"] .hero-animated {
+  background:linear-gradient(-45deg,#00060e,#00080e,#000a12,#00060e,#000508)!important;
+  background-size:400% 400%!important;
 }
-html[data-theme="arctic"] .glass-panel { background: rgba(255,255,255,0.75) !important; }
-html[data-theme="arctic"] .action-tile { background: rgba(255,255,255,0.6) !important; border-color: rgba(14,165,233,0.12) !important; }
-html[data-theme="arctic"] .score-bar-track { background: rgba(0,0,0,0.07) !important; }
-html[data-theme="arctic"] ::-webkit-scrollbar-thumb { background: rgba(14,165,233,0.25) !important; }
-html[data-theme="arctic"] select.form-select { background-color: #ffffff !important; color: #0c1a3d !important; }
-html[data-theme="arctic"] select.form-select option { background-color: #ffffff; color: #0c1a3d; }
+html[data-theme="arctic-aurora"] ::-webkit-scrollbar-thumb,
+html[data-theme="arctic"] ::-webkit-scrollbar-thumb { background:rgba(0,255,200,0.22)!important; }
 
-/* ── 🤖 Neon Cyberpunk ─────────────────────────────────────────────── */
+/* ── 🌲 Nature Pulse ─────────────────────────────────────────────────── */
+html[data-theme="nature-pulse"],
+html[data-theme="forest"] {
+  --bg:transparent; --bg-surface:rgba(16,185,129,0.06); --bg-elevated:rgba(16,185,129,0.09);
+  --text:rgba(110,231,183,0.88); --text-m:#a7f3d0; --text-h:#ecfdf5;
+  --border:rgba(16,185,129,0.16); --border-subtle:rgba(16,185,129,0.06);
+  --primary:#10b981; --secondary:#065f46; --accent:#059669; --accent-2:#34d399;
+  --accent-bg:rgba(16,185,129,0.1); --accent-border:rgba(16,185,129,0.38);
+  --grad-primary:linear-gradient(135deg,#10b981 0%,#065f46 100%);
+  --glass-bg:rgba(2,10,4,0.75); --glass-border:rgba(16,185,129,0.13);
+  --glow-primary:0 0 40px rgba(16,185,129,0.38); --glow-accent:0 0 30px rgba(5,150,105,0.35);
+  --glow-card:0 8px 40px rgba(0,0,0,0.65),0 0 0 1px rgba(16,185,129,0.08);
+  --primary-rgb:16,185,129; --accent-rgb:5,150,105;
+  color-scheme:dark;
+}
+html[data-theme="nature-pulse"] body, html[data-theme="nature-pulse"] #root,
+html[data-theme="forest"] body, html[data-theme="forest"] #root { background:transparent; }
+html[data-theme="nature-pulse"] .nav-premium, html[data-theme="forest"] .nav-premium {
+  background:rgba(1,8,2,0.93)!important; border-bottom-color:rgba(16,185,129,0.2)!important;
+  box-shadow:0 1px 0 rgba(16,185,129,0.1),0 8px 32px rgba(0,0,0,0.6)!important;
+}
+html[data-theme="nature-pulse"] .hero-animated, html[data-theme="forest"] .hero-animated {
+  background:linear-gradient(-45deg,#010802,#020c03,#020e03,#010a02,#010802)!important;
+  background-size:400% 400%!important;
+}
+html[data-theme="nature-pulse"] ::-webkit-scrollbar-thumb,
+html[data-theme="forest"] ::-webkit-scrollbar-thumb { background:rgba(16,185,129,0.22)!important; }
+
+/* ── 🤖 Cyberpunk Neo ────────────────────────────────────────────────── */
+html[data-theme="cyberpunk-neo"],
 html[data-theme="neon-cyberpunk"] {
-  --bg:          #000000;
-  --bg-surface:  #050505;
-  --bg-elevated: #0a0a0a;
-  --text:        #00e639;
-  --text-m:      #00ff41;
-  --text-h:      #ffffff;
-  --border:        rgba(0,255,65,0.22);
-  --border-subtle: rgba(0,255,65,0.08);
-  --primary:       #00ff41;
-  --secondary:     #ff00ff;
-  --accent:        #00ffff;
-  --accent-2:      #ff00ff;
-  --accent-green:  #00ff41;
-  --accent-cyan:   #00ffff;
-  --accent-pink:   #ff00ff;
-  --accent-bg:     rgba(0,255,65,0.08);
-  --accent-border: rgba(0,255,65,0.45);
-  --shadow:        0 25px 60px rgba(0,255,65,0.12);
-  --grad-primary:  linear-gradient(135deg, #00ff41 0%, #ff00ff 100%);
-  --grad-green:    linear-gradient(135deg, #00ff41 0%, #00cc33 100%);
-  --grad-cyan:     linear-gradient(135deg, #00ffff 0%, #00ff41 100%);
-  --glass-bg:      rgba(0,0,0,0.94);
-  --glass-border:  rgba(0,255,65,0.22);
-  --glow-primary:  0 0 40px rgba(0,255,65,0.5);
-  --glow-accent:   0 0 30px rgba(255,0,255,0.4);
-  --glow-card:     0 8px 40px rgba(0,0,0,0.9), 0 0 20px rgba(0,255,65,0.08);
-  --primary-rgb:   0,255,65;
-  --accent-rgb:    0,255,255;
-  color-scheme: dark;
+  --bg:transparent; --bg-surface:rgba(0,255,65,0.04); --bg-elevated:rgba(0,255,65,0.07);
+  --text:rgba(0,220,50,0.9); --text-m:#00ff41; --text-h:#ffffff;
+  --border:rgba(0,255,65,0.22); --border-subtle:rgba(0,255,65,0.08);
+  --primary:#00FF41; --secondary:#FF00FF; --accent:#00FFFF; --accent-2:#FF00FF;
+  --accent-bg:rgba(0,255,65,0.08); --accent-border:rgba(0,255,65,0.45);
+  --grad-primary:linear-gradient(135deg,#00FF41 0%,#FF00FF 100%);
+  --glass-bg:rgba(0,0,0,0.88); --glass-border:rgba(0,255,65,0.22);
+  --glow-primary:0 0 40px rgba(0,255,65,0.55); --glow-accent:0 0 30px rgba(255,0,255,0.45);
+  --glow-card:0 8px 40px rgba(0,0,0,0.9),0 0 20px rgba(0,255,65,0.1);
+  --primary-rgb:0,255,65; --accent-rgb:0,255,255;
+  color-scheme:dark;
 }
-html[data-theme="neon-cyberpunk"] body,
-html[data-theme="neon-cyberpunk"] #root { background: #000000; }
-html[data-theme="neon-cyberpunk"] .nav-premium {
-  background: rgba(0,0,0,0.98) !important;
-  border-bottom-color: rgba(0,255,65,0.28) !important;
-  box-shadow: 0 1px 0 rgba(0,255,65,0.15), 0 8px 32px rgba(0,0,0,0.9) !important;
+html[data-theme="cyberpunk-neo"] body, html[data-theme="cyberpunk-neo"] #root,
+html[data-theme="neon-cyberpunk"] body, html[data-theme="neon-cyberpunk"] #root { background:transparent; }
+html[data-theme="cyberpunk-neo"] .nav-premium, html[data-theme="neon-cyberpunk"] .nav-premium {
+  background:rgba(0,0,0,0.97)!important; border-bottom-color:rgba(0,255,65,0.3)!important;
+  box-shadow:0 1px 0 rgba(0,255,65,0.18),0 8px 32px rgba(0,0,0,0.9)!important;
 }
-html[data-theme="neon-cyberpunk"] .hero-animated {
-  background: linear-gradient(-45deg, #000000, #010401, #000300, #010201, #000000) !important;
-  background-size: 400% 400% !important;
+html[data-theme="cyberpunk-neo"] .hero-animated, html[data-theme="neon-cyberpunk"] .hero-animated {
+  background:linear-gradient(-45deg,#000000,#010401,#000300,#010201,#000000)!important;
+  background-size:400% 400%!important;
 }
-html[data-theme="neon-cyberpunk"] .stat-card-premium:hover {
-  border-color: rgba(0,255,65,0.5) !important;
+html[data-theme="cyberpunk-neo"] ::-webkit-scrollbar-thumb,
+html[data-theme="neon-cyberpunk"] ::-webkit-scrollbar-thumb { background:rgba(0,255,65,0.22)!important; }
+html[data-theme="cyberpunk-neo"] select.form-select,
+html[data-theme="neon-cyberpunk"] select.form-select { background-color:#060606!important; color:#00ff41!important; }
+html[data-theme="cyberpunk-neo"] select.form-select option,
+html[data-theme="neon-cyberpunk"] select.form-select option { background-color:#050505; color:#00ff41; }
+
+/* ── 🌊 Ocean Intelligence ────────────────────────────────────────────── */
+html[data-theme="ocean-intelligence"] {
+  --bg:transparent; --bg-surface:rgba(0,105,148,0.08); --bg-elevated:rgba(0,150,200,0.1);
+  --text:rgba(100,210,220,0.9); --text-m:#67e8f9; --text-h:#e0f9ff;
+  --border:rgba(0,206,209,0.18); --border-subtle:rgba(0,206,209,0.07);
+  --primary:#00CED1; --secondary:#006994; --accent:#0891b2; --accent-2:#22d3ee;
+  --accent-bg:rgba(0,206,209,0.08); --accent-border:rgba(0,206,209,0.35);
+  --grad-primary:linear-gradient(135deg,#00CED1 0%,#006994 100%);
+  --glass-bg:rgba(0,8,22,0.75); --glass-border:rgba(0,206,209,0.15);
+  --glow-primary:0 0 40px rgba(0,206,209,0.38); --glow-accent:0 0 30px rgba(8,145,178,0.35);
+  --glow-card:0 8px 40px rgba(0,0,0,0.65),0 0 0 1px rgba(0,206,209,0.1);
+  --primary-rgb:0,206,209; --accent-rgb:8,145,178;
+  color-scheme:dark;
 }
-html[data-theme="neon-cyberpunk"] .glass-panel {
-  border-color: rgba(0,255,65,0.12) !important;
+html[data-theme="ocean-intelligence"] body,
+html[data-theme="ocean-intelligence"] #root { background:transparent; }
+html[data-theme="ocean-intelligence"] .nav-premium {
+  background:rgba(0,4,14,0.93)!important; border-bottom-color:rgba(0,206,209,0.22)!important;
+  box-shadow:0 1px 0 rgba(0,206,209,0.12),0 8px 32px rgba(0,0,0,0.65)!important;
 }
-html[data-theme="neon-cyberpunk"] .live-dot {
-  animation: cyber-live 2s ease-in-out infinite;
+html[data-theme="ocean-intelligence"] .hero-animated {
+  background:linear-gradient(-45deg,#000814,#000c1a,#000e1c,#000a16,#000814)!important;
+  background-size:400% 400%!important;
 }
-@keyframes cyber-live {
-  0%, 100% { box-shadow: 0 0 6px #00ff41, 0 0 12px rgba(0,255,65,0.5); opacity:1; }
-  50%       { box-shadow: 0 0 16px #00ff41, 0 0 32px rgba(0,255,65,0.8); opacity:0.8; }
+html[data-theme="ocean-intelligence"] ::-webkit-scrollbar-thumb { background:rgba(0,206,209,0.22)!important; }
+
+/* ── 🧠 Neural Brain ─────────────────────────────────────────────────── */
+html[data-theme="neural-brain"] {
+  --bg:transparent; --bg-surface:rgba(100,0,200,0.06); --bg-elevated:rgba(120,20,220,0.09);
+  --text:rgba(180,140,255,0.9); --text-m:#c4b5fd; --text-h:#f5f0ff;
+  --border:rgba(139,92,246,0.2); --border-subtle:rgba(99,102,241,0.07);
+  --primary:#8b5cf6; --secondary:#00D4FF; --accent:#7c3aed; --accent-2:#a78bfa;
+  --accent-bg:rgba(139,92,246,0.1); --accent-border:rgba(139,92,246,0.38);
+  --grad-primary:linear-gradient(135deg,#8b5cf6 0%,#00D4FF 100%);
+  --glass-bg:rgba(2,2,10,0.78); --glass-border:rgba(139,92,246,0.15);
+  --glow-primary:0 0 40px rgba(139,92,246,0.45); --glow-accent:0 0 30px rgba(0,212,255,0.35);
+  --glow-card:0 8px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(139,92,246,0.1);
+  --primary-rgb:139,92,246; --accent-rgb:0,212,255;
+  color-scheme:dark;
 }
-html[data-theme="neon-cyberpunk"] ::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.2) !important; }
-html[data-theme="neon-cyberpunk"] select.form-select { background-color: #0a0a0a !important; color: #ffffff !important; }
-html[data-theme="neon-cyberpunk"] select.form-select option { background-color: #050505; color: #00ff41; }
+html[data-theme="neural-brain"] body,
+html[data-theme="neural-brain"] #root { background:transparent; }
+html[data-theme="neural-brain"] .nav-premium {
+  background:rgba(2,2,8,0.95)!important; border-bottom-color:rgba(139,92,246,0.25)!important;
+  box-shadow:0 1px 0 rgba(139,92,246,0.14),0 8px 32px rgba(0,0,0,0.7)!important;
+}
+html[data-theme="neural-brain"] .hero-animated {
+  background:linear-gradient(-45deg,#020205,#040210,#040315,#03020e,#020205)!important;
+  background-size:400% 400%!important;
+}
+html[data-theme="neural-brain"] ::-webkit-scrollbar-thumb { background:rgba(139,92,246,0.22)!important; }
+html[data-theme="neural-brain"] select.form-select { background-color:#0a0a18!important; }
+
+/* ── Shared: glass-panel uses CSS variable glass-bg across all themes ── */
+.glass-panel {
+  background: var(--glass-bg) !important;
+  border-color: var(--glass-border) !important;
+  backdrop-filter: blur(var(--glass-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+}
+
+/* Aurora animation (used by ThemeEngine Arctic overlay) */
+@keyframes aurora-wave {
+  0%   { transform:translateX(-8%) scaleY(1)   skewX(-3deg); opacity:.6; }
+  50%  { transform:translateX(5%)  scaleY(1.3) skewX(4deg);  opacity:1;  }
+  100% { transform:translateX(8%)  scaleY(.8)  skewX(-2deg); opacity:.7; }
+}
+@keyframes nebula-drift {
+  0%   { transform:translate(0,0)       scale(1);   opacity:.8; }
+  33%  { transform:translate(40px,-30px) scale(1.1); opacity:1;  }
+  66%  { transform:translate(-25px,20px) scale(.9);  opacity:.7; }
+  100% { transform:translate(0,0)       scale(1);   opacity:.8; }
+}
+@keyframes ocean-pulse {
+  0%,100% { opacity:.6; transform:scaleX(1); }
+  50%     { opacity:1;  transform:scaleX(1.08); }
+}
+@keyframes brain-pulse {
+  0%,100% { opacity:.5; transform:scale(1); }
+  50%     { opacity:1;  transform:scale(1.12); }
+}
+.cyber-grid-lines {
+  position:absolute; inset:0;
+  background:
+    linear-gradient(rgba(255,0,255,0.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,0,255,0.07) 1px,transparent 1px);
+  background-size:60px 60px;
+  transform:perspective(600px) rotateX(35deg); transform-origin:50% 0%;
+  opacity:.5;
+}
+.cyber-scan-line {
+  position:absolute; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,255,255,0.6),transparent);
+  animation:cyber-scan 4s linear infinite;
+  box-shadow:0 0 12px rgba(0,255,255,0.4);
+}
+@keyframes cyber-scan {
+  0%   { top:-2px; }
+  100% { top:100%; }
+}
