@@ -103,7 +103,7 @@ export default function App() {
             path="/notes"
             element={
               <ProtectedRoute>
-                <Notes />
+                <SmartNotes />
               </ProtectedRoute>
             }
           />
@@ -251,14 +251,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/smart-notes"
-            element={
-              <ProtectedRoute>
-                <SmartNotes />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/smart-notes" element={<Navigate to="/notes" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <TwinMindCopilot />
