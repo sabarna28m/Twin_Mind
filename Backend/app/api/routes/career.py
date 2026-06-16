@@ -25,6 +25,10 @@ from app.api.schemas.career import (
     LinkedInImprovementItem, LinkedInChecklistItem, LinkedInTwinPrediction,
     LinkedInSectionScore, LinkedInTwinFullResponse, ManualAchievementRequest,
     InterviewChatRequest, InterviewChatResponse,
+    VocabularyItem, VocabularyResponse,
+    ScenarioRequest, ScenarioResponse,
+    InterviewReportRequest, InterviewReportResponse,
+    InterviewConfigResponse,
     SkillGapResponse, LearningStep,
     CareerRecommendationsResponse, CareerRecommendation,
     JobMatchResponse, JobMatchEntry,
@@ -772,6 +776,416 @@ CAREER_PROJECTS: dict[str, list[str]] = {
     "Clinical Psychologist": ["Case Formulation Portfolio", "Assessment Report Portfolio", "Research Paper"],
     "Counseling Psychologist": ["Client Case Studies", "Group Therapy Design", "Counseling Portfolio"],
 }
+
+# ── Interview Domain Configuration ────────────────────────────────────────
+
+INTERVIEW_DOMAIN_CONFIGS: dict[str, dict] = {
+    "medical": {
+        "label": "Medical & Healthcare",
+        "categories": {
+            "HR": "personal background, motivation, teamwork, medical ethics, career goals",
+            "Clinical Cases": "patient history, examination, differential diagnosis, management plans, clinical reasoning",
+            "Medical Theory": "anatomy, physiology, pharmacology, pathology, biochemistry",
+            "Emergency Response": "ACLS/BLS/ATLS, triage, critical care, time-sensitive clinical decisions",
+            "Patient Communication": "history taking, breaking bad news, informed consent, counseling, empathy",
+        },
+        "eval_dimensions": ["Clinical Knowledge", "Communication", "Confidence", "Decision Making", "Patient Empathy"],
+        "interviewer_modes": {
+            "friendly": "Junior Medical Officer — supportive, case-based discussion",
+            "technical": "Senior Consultant — rigorous clinical probing, evidence-based questioning",
+            "panel": "Hospital Selection Committee — multi-domain formal assessment",
+            "stress": "Stress Exam Panel — time-pressured emergency scenarios",
+        },
+    },
+    "nursing": {
+        "label": "Nursing & Patient Care",
+        "categories": {
+            "HR": "nursing motivation, teamwork, stress management, professional ethics",
+            "Clinical Practice": "care planning, medication administration, vital signs, wound care",
+            "Patient Care": "patient communication, family counseling, empathy, discharge planning",
+            "Emergency Protocols": "code blue, rapid response, emergency procedures, prioritisation",
+            "Professional Standards": "documentation, evidence-based practice, infection control, continuing education",
+        },
+        "eval_dimensions": ["Clinical Skills", "Patient Care", "Communication", "Confidence", "Professional Ethics"],
+        "interviewer_modes": {
+            "friendly": "Nursing Supervisor — supportive new-graduate interview",
+            "technical": "Clinical Director — detailed clinical competency assessment",
+            "panel": "Hospital Nursing Panel — formal comprehensive evaluation",
+            "stress": "High-Pressure Scenario — emergency under time constraint",
+        },
+    },
+    "pharmacy": {
+        "label": "Pharmacy & Drug Sciences",
+        "categories": {
+            "HR": "pharmacy motivation, ethics, career goals, teamwork",
+            "Drug Knowledge": "pharmacokinetics, drug interactions, mechanism of action, contraindications",
+            "Clinical Pharmacy": "drug therapy monitoring, clinical interventions, patient counseling",
+            "Regulatory Affairs": "GMP, GCP, CDSCO/FDA regulations, drug approval process",
+            "Patient Counseling": "medication adherence, side effects, prescription interpretation, patient safety",
+        },
+        "eval_dimensions": ["Drug Knowledge", "Clinical Reasoning", "Communication", "Confidence", "Regulatory Awareness"],
+        "interviewer_modes": {
+            "friendly": "Senior Pharmacist — mentorship-oriented practical discussion",
+            "technical": "Clinical Pharmacologist — deep pharmacology and drug therapy focus",
+            "panel": "Hospital Pharmacy Committee — formal multi-panel assessment",
+            "stress": "Regulatory Audit Simulation — compliance under pressure",
+        },
+    },
+    "law": {
+        "label": "Law & Legal Practice",
+        "categories": {
+            "HR": "motivation, professional integrity, ethics, career vision",
+            "Legal Reasoning": "statutory interpretation, case analysis, legal arguments, precedent",
+            "Case Studies": "landmark case analysis, moot court scenarios, factual problem solving",
+            "Constitutional Law": "fundamental rights, writs, judicial review, landmark judgments",
+            "Courtroom Skills": "oral advocacy, examination, cross-examination, client management",
+        },
+        "eval_dimensions": ["Legal Knowledge", "Analytical Thinking", "Communication", "Confidence", "Professional Ethics"],
+        "interviewer_modes": {
+            "friendly": "Junior Advocate — collegial, experience-sharing",
+            "technical": "Senior Counsel — rigorous legal knowledge, case examination",
+            "panel": "Law Firm Selection Panel — formal multi-assessor evaluation",
+            "stress": "Courtroom Cross-Examination — adversarial, high-pressure",
+        },
+    },
+    "finance": {
+        "label": "Finance & Commerce",
+        "categories": {
+            "HR": "motivation, work ethic, integrity in finance, career goals",
+            "Financial Analysis": "ratio analysis, DCF, valuation methods, financial statements",
+            "Accounting & Taxation": "GST, income tax, Ind AS, auditing, cost accounting",
+            "Investment & Markets": "equity analysis, derivatives, portfolio theory, risk management",
+            "Case Studies": "financial modelling, M&A scenarios, investment decisions",
+        },
+        "eval_dimensions": ["Financial Knowledge", "Analytical Skills", "Communication", "Confidence", "Problem Solving"],
+        "interviewer_modes": {
+            "friendly": "Finance Manager — supportive career-guiding conversation",
+            "technical": "CFO/Director — deep financial modelling and analysis focus",
+            "panel": "Investment Bank/Big4 Panel — formal multi-round assessment",
+            "stress": "Stress Test — time-pressured case analysis",
+        },
+    },
+    "management": {
+        "label": "Management & Business",
+        "categories": {
+            "HR": "leadership style, conflict resolution, team management, career vision",
+            "Business Strategy": "Porter's Five Forces, SWOT, competitive positioning, strategic planning",
+            "Leadership & OB": "team motivation, change management, organisational behaviour",
+            "Marketing & Sales": "consumer behaviour, 4Ps, digital marketing, brand strategy, GTM",
+            "Case Studies": "consulting frameworks, P&L analysis, market entry cases",
+        },
+        "eval_dimensions": ["Business Acumen", "Leadership", "Communication", "Confidence", "Strategic Thinking"],
+        "interviewer_modes": {
+            "friendly": "HR Manager — culture-fit and motivation assessment",
+            "technical": "Business Director — strategic case and framework testing",
+            "panel": "Consulting/MBA Selection Panel — formal case + fit interview",
+            "stress": "Board Presentation — high-stakes business defence",
+        },
+    },
+    "engineering": {
+        "label": "Engineering & Technology",
+        "categories": {
+            "HR": "background, projects, teamwork, growth mindset, career goals",
+            "Technical Concepts": "domain fundamentals, algorithms, data structures, system principles",
+            "System Design": "architecture, scalability, database design, microservices, trade-offs",
+            "Coding / Problem Solving": "algorithm challenges, code quality, debugging, complexity analysis",
+            "Behavioral": "STAR method, past projects, team conflicts, leadership, failure stories",
+        },
+        "eval_dimensions": ["Technical Knowledge", "Problem Solving", "Communication", "Confidence", "System Thinking"],
+        "interviewer_modes": {
+            "friendly": "Engineering Manager — team culture and technical breadth",
+            "technical": "Senior Engineer — deep technical probing, whiteboard coding",
+            "panel": "FAANG-style Loop — multi-stage technical + behavioral",
+            "stress": "Timed Algorithm Challenge — competitive programming under pressure",
+        },
+    },
+    "education": {
+        "label": "Education & Teaching",
+        "categories": {
+            "HR": "teaching philosophy, motivation, adaptability, professional development goals",
+            "Classroom Management": "discipline, inclusive education, engagement, handling difficult situations",
+            "Subject Knowledge": "curriculum, lesson planning, learning objectives, assessment design",
+            "Student Psychology": "learning disabilities, motivation theories, differentiated instruction",
+            "Teaching Demonstration": "lesson delivery, teaching aids, feedback strategies, interactive methods",
+        },
+        "eval_dimensions": ["Subject Mastery", "Pedagogical Skills", "Communication", "Confidence", "Student Empathy"],
+        "interviewer_modes": {
+            "friendly": "School Principal — values-centered, collaborative assessment",
+            "technical": "Academic Director — curriculum expertise and pedagogy focus",
+            "panel": "Board of Education Panel — formal multi-assessor interview",
+            "stress": "Live Teaching Observation — observed classroom simulation",
+        },
+    },
+    "design": {
+        "label": "Design & Architecture",
+        "categories": {
+            "HR": "creative journey, inspiration, collaboration style, handling criticism",
+            "Portfolio Review": "design process, decision rationale, iteration history, impact",
+            "Design Theory": "typography, color theory, UX principles, design systems, accessibility",
+            "Technical Proficiency": "Figma/AutoCAD/Adobe CC, prototyping, rendering, technical constraints",
+            "Client Communication": "brief interpretation, design presentations, stakeholder feedback",
+        },
+        "eval_dimensions": ["Design Thinking", "Technical Proficiency", "Communication", "Confidence", "Creativity"],
+        "interviewer_modes": {
+            "friendly": "Creative Director — portfolio-focused, encouraging discussion",
+            "technical": "Senior Design Architect — technical standards and process rigor",
+            "panel": "Design Agency Panel — multi-assessor portfolio defence",
+            "stress": "Live Design Challenge — real-time sketching and concept pitch",
+        },
+    },
+    "media": {
+        "label": "Media & Communication",
+        "categories": {
+            "HR": "passion for media, ethics, storytelling motivation, career goals",
+            "Journalism & Writing": "news values, story angles, fact-checking, editorial judgment",
+            "Digital & Social Media": "content strategy, platform algorithms, analytics, community management",
+            "Media Law & Ethics": "defamation, copyright, press freedom, ethical reporting",
+            "Practical Skills": "editing, production, live presentation, deadline management",
+        },
+        "eval_dimensions": ["Domain Knowledge", "Communication", "Confidence", "Creativity", "Media Ethics"],
+        "interviewer_modes": {
+            "friendly": "News Editor — story-focused, collegial conversation",
+            "technical": "Editorial Director — rigorous journalistic standards",
+            "panel": "Broadcast Selection Panel — multi-format media assessment",
+            "stress": "Live Breaking News Simulation — real-time news judgment",
+        },
+    },
+    "research": {
+        "label": "Research & Academia",
+        "categories": {
+            "HR": "research motivation, academic journey, collaboration, publication record",
+            "Research Methodology": "experimental design, sampling, validity, reliability, statistical analysis",
+            "Domain Expertise": "specialisation-specific theory, current debates, seminal papers",
+            "Academic Writing": "paper structure, literature review, citation standards, peer review",
+            "Grant & Ethics": "funding applications, IRB protocols, data management, intellectual property",
+        },
+        "eval_dimensions": ["Research Expertise", "Analytical Rigor", "Communication", "Confidence", "Academic Integrity"],
+        "interviewer_modes": {
+            "friendly": "Thesis Advisor — mentorship and research direction discussion",
+            "technical": "External Examiner — rigorous methodology and contribution assessment",
+            "panel": "University Hiring Panel — multi-assessor academic evaluation",
+            "stress": "Viva Voce Simulation — intense thesis defence, challenging committee",
+        },
+    },
+    "government": {
+        "label": "Civil Services & Public Administration",
+        "categories": {
+            "HR": "motivation for public service, integrity, empathy, leadership vision",
+            "General Studies": "polity, history, geography, economy, environment, science & technology",
+            "Policy & Governance": "policy formulation, welfare schemes, RTI, administrative reforms",
+            "Ethics & Integrity": "civil service values, conflict of interest, transparency, moral dilemmas",
+            "Current Affairs": "national/international events, governance challenges, policy debates",
+        },
+        "eval_dimensions": ["Administrative Knowledge", "Analytical Thinking", "Communication", "Confidence", "Integrity"],
+        "interviewer_modes": {
+            "friendly": "UPSC Coaching Simulator — supportive personality test prep",
+            "technical": "Board Member — rigorous GS and optional subject questioning",
+            "panel": "UPSC Personality Test Board — 5-member official board simulation",
+            "stress": "Rapid-Fire Current Affairs — high-pace current events challenge",
+        },
+    },
+    "psychology": {
+        "label": "Psychology & Mental Health",
+        "categories": {
+            "HR": "empathy, motivation for helping, self-awareness, resilience, supervision experience",
+            "Clinical Assessment": "psychological testing, mental status examination, case formulation, diagnostic criteria",
+            "Therapeutic Techniques": "CBT, DBT, psychodynamic approaches, crisis intervention, trauma-informed care",
+            "Ethics & Boundaries": "confidentiality, dual relationships, informed consent, cultural competence",
+            "Research & Evidence": "evidence-based practice, outcome measurement, research literacy, clinical guidelines",
+        },
+        "eval_dimensions": ["Clinical Knowledge", "Empathy", "Communication", "Confidence", "Ethical Reasoning"],
+        "interviewer_modes": {
+            "friendly": "Senior Psychologist — reflective, strengths-based conversation",
+            "technical": "Clinical Supervisor — rigorous case formulation and theory testing",
+            "panel": "Hospital Clinical Panel — multi-disciplinary formal assessment",
+            "stress": "Difficult Client Simulation — complex case under observation",
+        },
+    },
+    "hospitality": {
+        "label": "Hospitality & Tourism",
+        "categories": {
+            "HR": "passion for service, teamwork, resilience, cultural sensitivity, career goals",
+            "Hotel Operations": "front office, F&B, housekeeping, PMS systems, revenue management",
+            "Guest Relations": "complaint resolution, CRM, VIP protocols, upselling, service recovery",
+            "Food & Beverage": "menu knowledge, food safety (FSSAI/HACCP), beverage pairing, F&B costing",
+            "Tourism & Events": "destination knowledge, itinerary planning, MICE management, tour operations",
+        },
+        "eval_dimensions": ["Service Knowledge", "Customer Orientation", "Communication", "Confidence", "Problem Solving"],
+        "interviewer_modes": {
+            "friendly": "Hotel Manager — service-culture and personality assessment",
+            "technical": "GM/Director of Operations — operational expertise testing",
+            "panel": "Hospitality Group Panel — multi-property formal assessment",
+            "stress": "Difficult Guest Simulation — real-time complaint handling",
+        },
+    },
+    "agriculture": {
+        "label": "Agriculture & Life Sciences",
+        "categories": {
+            "HR": "passion for agriculture, field experience, sustainability commitment, career goals",
+            "Agronomy & Crops": "crop physiology, soil health, IPM, irrigation systems, seed technology",
+            "Agricultural Technology": "precision agriculture, drones, IoT sensors, GIS, farm management software",
+            "Research & Extension": "field trials, farmer advisory, government schemes, extension methods",
+            "Agri-Business": "supply chain, agricultural finance, export regulations, commodity markets",
+        },
+        "eval_dimensions": ["Domain Knowledge", "Problem Solving", "Communication", "Confidence", "Field Awareness"],
+        "interviewer_modes": {
+            "friendly": "Agricultural Officer — supportive, field-experience focused",
+            "technical": "Research Director — scientific methodology and experimental design",
+            "panel": "ICAR/Government Recruitment Panel — formal multi-domain assessment",
+            "stress": "Crisis Scenario — crop disease outbreak or market collapse",
+        },
+    },
+    "vocational": {
+        "label": "Vocational & Skilled Trades",
+        "categories": {
+            "HR": "trade motivation, safety culture, teamwork, career ambitions",
+            "Technical Skills": "domain-specific tools, equipment operation, maintenance procedures",
+            "Safety & Compliance": "PPE, IS/ISO safety standards, accident prevention, risk assessment",
+            "Practical Scenarios": "fault diagnosis, troubleshooting, on-site problem solving",
+            "Professional Growth": "certification roadmap, upskilling plans, industry regulations",
+        },
+        "eval_dimensions": ["Technical Skill", "Safety Awareness", "Communication", "Confidence", "Problem Solving"],
+        "interviewer_modes": {
+            "friendly": "Site Supervisor — practical, hands-on discussion",
+            "technical": "Quality Inspector — rigorous standards and compliance testing",
+            "panel": "Industry Hiring Committee — formal multi-assessor evaluation",
+            "stress": "Emergency Fault Scenario — real-time critical failure troubleshooting",
+        },
+    },
+    "general": {
+        "label": "Professional Career",
+        "categories": {
+            "HR": "background, motivation, teamwork, professional values, career goals",
+            "Domain Knowledge": "industry concepts, trends, professional standards, terminology",
+            "Problem Solving": "analytical thinking, decision making, case analysis, critical reasoning",
+            "Communication": "presentation skills, stakeholder management, written and verbal communication",
+            "Behavioral": "STAR method, past experiences, leadership situations, failure and growth",
+        },
+        "eval_dimensions": ["Domain Knowledge", "Problem Solving", "Communication", "Confidence", "Leadership"],
+        "interviewer_modes": {
+            "friendly": "HR Generalist — culture-fit and motivation assessment",
+            "technical": "Department Head — domain expertise and problem-solving focus",
+            "panel": "Cross-functional Panel — comprehensive multi-perspective evaluation",
+            "stress": "Pressure Interview — challenging follow-ups, rapid-fire questions",
+        },
+    },
+}
+
+# ── Interview domain vocabulary bank ──────────────────────────────────────
+
+INTERVIEW_VOCABULARY: dict[str, list[dict]] = {
+    "medical": [
+        {"word": "Differential Diagnosis", "meaning": "Systematic process of distinguishing a condition from others with similar presentation", "example": "The differential diagnosis for chest pain includes MI, PE, and aortic dissection.", "tip": "Use when explaining clinical reasoning — shows structured thinking."},
+        {"word": "Pathophysiology", "meaning": "Functional changes in the body associated with a disease or injury", "example": "The pathophysiology of type 2 diabetes involves insulin resistance and beta-cell dysfunction.", "tip": "Explain the 'why' behind symptoms to impress clinical interviewers."},
+        {"word": "Triage", "meaning": "Process of sorting patients by urgency of care needed", "example": "In triage, we follow the ABCDE approach: Airway, Breathing, Circulation.", "tip": "Show systematic emergency thinking — essential for clinical rounds."},
+        {"word": "Contraindication", "meaning": "A condition making a particular treatment inadvisable", "example": "Metformin is contraindicated in severe renal impairment.", "tip": "Always mention contraindications to show comprehensive clinical safety awareness."},
+        {"word": "Comorbidity", "meaning": "Coexistence of additional chronic conditions alongside a primary diagnosis", "example": "The patient has comorbid hypertension and diabetic nephropathy.", "tip": "Acknowledging comorbidities shows complex patient management thinking."},
+        {"word": "Prognosis", "meaning": "Predicted course and likely outcome of a disease", "example": "With early surgical intervention, the prognosis is excellent.", "tip": "Express with appropriate uncertainty: 'guarded,' 'favorable,' or 'poor.'"},
+        {"word": "Informed Consent", "meaning": "Patient's voluntary agreement to treatment after understanding risks and alternatives", "example": "Informed consent was obtained explaining the procedure and all potential complications.", "tip": "Critical for patient communication rounds — emphasise autonomy and transparency."},
+        {"word": "Evidence-Based Medicine", "meaning": "Integration of best research evidence with clinical expertise and patient values", "example": "Our management follows current NICE guidelines, consistent with evidence-based medicine.", "tip": "Show you value research over tradition — key for modern medical interviews."},
+    ],
+    "law": [
+        {"word": "Locus Standi", "meaning": "Legal standing — the right to bring a case before a court", "example": "The petitioner must establish locus standi before challenging this government policy.", "tip": "Always address standing before engaging on merits in litigation scenarios."},
+        {"word": "Mens Rea", "meaning": "Criminal intent — the mental element required for a criminal offence", "example": "The prosecution must prove both actus reus and mens rea to establish liability.", "tip": "Essential for criminal law rounds — always pair with actus reus."},
+        {"word": "Res Judicata", "meaning": "Doctrine preventing re-litigation of a matter already finally decided by a court", "example": "The principle of res judicata bars the petitioner from re-agitating this claim.", "tip": "Shows procedural mastery — key for civil litigation discussions."},
+        {"word": "Injunction", "meaning": "Court order requiring a party to do or refrain from doing a specific act", "example": "An interim injunction was granted restraining the defendant from publishing.", "tip": "Know the three-part test: prima facie case, balance of convenience, irreparable harm."},
+        {"word": "Estoppel", "meaning": "Principle preventing a party from contradicting a previous statement they made", "example": "Promissory estoppel prevents the company from retracting its contractual promise.", "tip": "Shows nuanced understanding of equity principles in contract and tort law."},
+        {"word": "Jurisdiction", "meaning": "Authority of a court to hear and decide a case", "example": "The High Court has jurisdiction under Article 226 to issue writs of mandamus.", "tip": "Always establish jurisdiction before proceeding with any legal argument."},
+        {"word": "Tortious Liability", "meaning": "Legal responsibility arising from a civil wrong (tort) independent of contract", "example": "The manufacturer bears tortious liability under strict liability for the defective product.", "tip": "Distinguish from contractual liability — tort requires no prior agreement."},
+        {"word": "Arbitration", "meaning": "Alternative dispute resolution where a neutral arbitrator makes a binding decision", "example": "The parties agreed to resolve the dispute through arbitration under the Arbitration Act 1996.", "tip": "Demonstrate knowledge of ADR advantages: speed, confidentiality, finality."},
+    ],
+    "finance": [
+        {"word": "EBITDA", "meaning": "Earnings Before Interest, Taxes, Depreciation and Amortisation — operating performance measure", "example": "The EBITDA margin improved from 18% to 23%, indicating operational efficiency gains.", "tip": "Use for valuation and cross-company comparisons — always contextualise with sector benchmarks."},
+        {"word": "Discounted Cash Flow (DCF)", "meaning": "Valuation estimating investment value by discounting future cash flows to present value", "example": "The DCF analysis yielded an intrinsic value of ₹450 per share vs market price of ₹380.", "tip": "Always state assumptions: WACC, terminal growth rate, projection period."},
+        {"word": "Working Capital", "meaning": "Difference between current assets and current liabilities — short-term financial health", "example": "A negative working capital cycle means the company is effectively funded by its suppliers.", "tip": "Show liquidity management understanding beyond just the balance sheet number."},
+        {"word": "Beta", "meaning": "Measure of a stock's volatility relative to the overall market", "example": "A beta of 1.5 indicates the stock is 50% more volatile than the benchmark index.", "tip": "Connect to CAPM: required return = risk-free rate + beta × market risk premium."},
+        {"word": "Covenant", "meaning": "Restrictions or obligations placed on borrowers by lenders in loan agreements", "example": "The loan covenant requires the borrower to maintain a debt/EBITDA ratio below 3x.", "tip": "Shows credit analysis depth — important for banking and private equity interviews."},
+        {"word": "Net Present Value (NPV)", "meaning": "Present value of all future cash flows net of initial investment — capital budgeting tool", "example": "The project has a positive NPV of ₹12 crore, making it value-accretive to the firm.", "tip": "Always state the discount rate used — demonstrates cost of capital awareness."},
+        {"word": "Leverage", "meaning": "Use of borrowed capital to amplify returns — also amplifies risk", "example": "High leverage ratios (Debt/EBITDA > 4x) signal elevated financial distress risk.", "tip": "Discuss both operating and financial leverage to show depth of understanding."},
+        {"word": "Amortisation", "meaning": "Gradual reduction of debt over time, or spreading intangible asset costs over useful life", "example": "Goodwill from the acquisition is being amortised over 10 years under local GAAP.", "tip": "Distinguish from depreciation: amortisation = intangibles; depreciation = tangible assets."},
+    ],
+    "management": [
+        {"word": "Value Proposition", "meaning": "Clear statement of why customers should choose your product over competitors", "example": "Our value proposition is 40% faster delivery at parity pricing through AI-optimised logistics.", "tip": "Answer three questions: What do we offer? Who is it for? What problem does it solve?"},
+        {"word": "Porter's Five Forces", "meaning": "Framework analysing industry competitiveness: rivalry, entrants, substitutes, buyer/supplier power", "example": "Porter's analysis reveals high buyer power in B2C e-commerce undermining margin potential.", "tip": "Walk through all five forces systematically in case interviews — don't skip any."},
+        {"word": "KPI", "meaning": "Key Performance Indicator — measurable value demonstrating achievement of key objectives", "example": "Our primary KPIs for growth are customer acquisition cost and LTV:CAC ratio.", "tip": "Connect KPIs to strategic objectives — shows business alignment thinking."},
+        {"word": "Burn Rate", "meaning": "Rate at which a company spends its cash reserves, typically measured monthly", "example": "With a monthly burn rate of ₹50L and 18 months of runway, profitability is critical.", "tip": "Critical metric for startups — shows financial discipline and planning capability."},
+        {"word": "OKR", "meaning": "Objectives and Key Results — goal-setting framework linking ambition to measurable outcomes", "example": "Q3 OKR — Objective: Lead North India; KR: Achieve 30% market share in Delhi-NCR.", "tip": "Demonstrates familiarity with modern performance management and goal alignment."},
+        {"word": "Go-to-Market (GTM) Strategy", "meaning": "Plan specifying how a company reaches target customers and achieves competitive advantage", "example": "Our GTM targets Tier 2 cities through hyperlocal delivery and vernacular-first UX.", "tip": "Always address channel, pricing, positioning, and launch sequence in case interviews."},
+        {"word": "SWOT Analysis", "meaning": "Framework evaluating Strengths, Weaknesses, Opportunities, and Threats", "example": "The SWOT revealed strong brand equity but dangerous overdependence on a single supplier.", "tip": "Go beyond listing — synthesise SWOT into strategic implications and recommendations."},
+        {"word": "Synergy", "meaning": "The combined value of merged entities exceeding the sum of their individual parts", "example": "The merger generates ₹200 crore in cost synergies through supply chain consolidation.", "tip": "Always quantify synergies in M&A case discussions — show ability to stress-test assumptions."},
+    ],
+    "engineering": [
+        {"word": "CAP Theorem", "meaning": "Distributed systems can guarantee only two of: Consistency, Availability, Partition Tolerance", "example": "We chose AP over CP, making our service eventually consistent but always available.", "tip": "Know real-world examples: Cassandra (AP), HBase (CP), ZooKeeper (CP)."},
+        {"word": "Idempotency", "meaning": "Property where repeated operations produce the same result as a single operation", "example": "Our payment API is idempotent — retrying with the same key never double-charges.", "tip": "Essential for API design and distributed systems — shows failure handling maturity."},
+        {"word": "Horizontal Scaling", "meaning": "Adding more machines to a system to handle increased load (scale out)", "example": "We horizontally scaled from 3 to 12 service instances to handle Black Friday traffic.", "tip": "Contrast with vertical scaling — explain why horizontal is preferred for modern systems."},
+        {"word": "Latency vs Throughput", "meaning": "Latency = time per request; Throughput = requests handled per unit time", "example": "Adding a Redis cache cut P99 latency from 800ms to 120ms while maintaining 10k RPS throughput.", "tip": "In system design, specify which you're optimising for and the inherent trade-offs."},
+        {"word": "Eventual Consistency", "meaning": "Distributed system model where nodes converge to consistent state over time, not instantly", "example": "Shopping cart updates use eventual consistency — inventory may lag by 500ms.", "tip": "Contrast with strong consistency — know when each is appropriate."},
+        {"word": "Microservices", "meaning": "Architecture decomposing applications into small, independently deployable services", "example": "We decomposed our monolith into 8 microservices, reducing deployment risk and team coupling.", "tip": "Always discuss trade-offs: operational complexity, distributed tracing, inter-service latency."},
+        {"word": "Time Complexity (Big-O)", "meaning": "Measure of how algorithm runtime grows relative to input size", "example": "Switching from O(n²) bubble sort to O(n log n) merge sort reduced processing time by 94% at scale.", "tip": "Always provide both time AND space complexity — and explain the trade-offs."},
+        {"word": "Load Balancing", "meaning": "Distributing incoming network traffic across multiple backend servers to ensure reliability", "example": "Our Layer 7 load balancer routes traffic using round-robin with session affinity.", "tip": "Know Layer 4 vs Layer 7 load balancing and when to use each."},
+    ],
+    "education": [
+        {"word": "Bloom's Taxonomy", "meaning": "Hierarchical framework for educational learning objectives from recall to creation", "example": "My lesson plan progresses from recall questions to synthesis tasks, following Bloom's hierarchy.", "tip": "Reference Bloom's when explaining how you differentiate assessment difficulty."},
+        {"word": "Differentiated Instruction", "meaning": "Teaching approach adjusting content, process, and product based on individual student needs", "example": "I use tiered assignments and flexible grouping for differentiated instruction.", "tip": "Demonstrates awareness of diverse learning needs — essential for modern classrooms."},
+        {"word": "Zone of Proximal Development", "meaning": "Vygotsky's concept: gap between what students can do alone vs with guided support", "example": "I scaffold tasks within the ZPD to challenge students just beyond independent capability.", "tip": "Connects naturally to peer learning, scaffolding, and collaborative activities."},
+        {"word": "Formative Assessment", "meaning": "Ongoing low-stakes evaluation used to monitor learning and provide real-time feedback", "example": "Exit tickets and think-pair-share are formative assessments I use every lesson.", "tip": "Distinguish from summative — formative informs teaching, summative grades performance."},
+        {"word": "Scaffolding", "meaning": "Temporary support provided to help students accomplish tasks beyond current independent ability", "example": "I use sentence starters and graphic organisers as scaffolds for English language learners.", "tip": "Always explain how you plan to gradually remove scaffolds as competence grows."},
+        {"word": "Growth Mindset", "meaning": "Carol Dweck's theory that abilities can be developed through dedication and effort", "example": "I use 'not yet' instead of 'wrong' to cultivate a growth mindset culture in my class.", "tip": "Reference Dweck's research — shows engagement with contemporary educational psychology."},
+        {"word": "Universal Design for Learning (UDL)", "meaning": "Framework providing multiple means of engagement, representation, and expression for all learners", "example": "I applied UDL principles by offering audio, visual, and kinesthetic learning options.", "tip": "Essential for inclusive education interviews — shows proactive accessibility planning."},
+        {"word": "Pedagogical Content Knowledge (PCK)", "meaning": "Integration of subject matter expertise with effective teaching methods for that specific content", "example": "My PCK lets me anticipate common algebra misconceptions and address them proactively.", "tip": "Coined by Shulman — demonstrates you understand both WHAT and HOW to teach."},
+    ],
+    "general": [
+        {"word": "Stakeholder Management", "meaning": "Process of identifying, analysing, and communicating with those affected by a project", "example": "Effective stakeholder management secured executive buy-in for our digital transformation.", "tip": "Show structure: identify stakeholders, assess influence/interest, tailor communication."},
+        {"word": "SMART Goals", "meaning": "Goals that are Specific, Measurable, Achievable, Relevant, and Time-bound", "example": "My SMART goal: increase team productivity 20% by Q3 through agile sprint implementation.", "tip": "Use this framework when discussing personal or team goal-setting in behavioral rounds."},
+        {"word": "ROI (Return on Investment)", "meaning": "Performance measure evaluating the efficiency or profitability of an investment", "example": "The training program delivered 3x ROI through reduced turnover and increased productivity.", "tip": "Always quantify ROI with numbers — concrete metrics make your answers compelling."},
+        {"word": "Emotional Intelligence (EI)", "meaning": "Ability to perceive, understand, manage, and use emotions effectively in oneself and others", "example": "High EI helped me de-escalate team conflicts and maintain productivity during organisational change.", "tip": "Use Goleman's framework: self-awareness, self-regulation, empathy, social skills."},
+        {"word": "Critical Path", "meaning": "Longest sequence of dependent tasks determining the minimum duration of a project", "example": "Identifying the critical path let us allocate resources to bottlenecks and deliver on time.", "tip": "Connects to resource allocation and risk management — shows project management maturity."},
+        {"word": "Agile Methodology", "meaning": "Iterative approach to project management emphasising flexibility and continuous improvement", "example": "Using agile sprints, we reduced time-to-market by 40% while maintaining quality standards.", "tip": "Know Agile vs Scrum vs Kanban differences and appropriate contexts for each."},
+        {"word": "Cross-functional Collaboration", "meaning": "Working across different departments or disciplines to achieve shared objectives", "example": "I led cross-functional collaboration between engineering, design, and marketing for our product launch.", "tip": "Emphasise facilitation skills — show you can bridge different professional languages."},
+        {"word": "Value Chain Analysis", "meaning": "Framework identifying activities within an organisation that create value for the customer", "example": "The value chain analysis revealed our procurement process as the key cost driver.", "tip": "Use Porter's Value Chain to show systematic thinking about competitive advantage."},
+    ],
+}
+
+
+def _career_to_interview_domain(career: str) -> str:
+    """Map a career role string to its interview domain."""
+    c = career.lower()
+    if any(k in c for k in ["physician", "surgeon", "doctor", "cardiolog", "neurolog", "pediatric", "dermatolog", "radiolog", "anesthes", "mbbs", "medical"]):
+        return "medical"
+    if any(k in c for k in ["nurs"]):
+        return "nursing"
+    if any(k in c for k in ["pharm"]):
+        return "pharmacy"
+    if any(k in c for k in ["dentist", "dental", "oral"]):
+        return "dental"
+    if any(k in c for k in ["lawyer", "advocate", "legal", "attorney", "counsel", "prosecutor", "ip attorney", "compliance officer"]):
+        return "law"
+    if any(k in c for k in ["accountant", "auditor", "tax", "investment bank", "portfolio manager", "actuary", "wealth manager", "ca ", "banker", "financial analyst"]):
+        return "finance"
+    if any(k in c for k in ["business analyst", "product manager", "marketing manager", "hr manager", "human resources", "operations manager", "entrepreneur", "consultant", "brand manager", "supply chain"]):
+        return "management"
+    if any(k in c for k in ["software", "developer", "engineer", "data scientist", "ml ", "ai /", "cloud", "devops", "cybersecur", "full stack", "data analyst", "embedded", "nlp"]):
+        return "engineering"
+    if any(k in c for k in ["teacher", "professor", "lecturer", "curriculum", "education consultant", "e-learning"]):
+        return "education"
+    if any(k in c for k in ["architect", "graphic designer", "ui/ux", "fashion designer", "interior designer", "product designer", "urban planner"]):
+        return "design"
+    if any(k in c for k in ["journalist", "content creator", "film director", "public relations", "social media manager", "media"]):
+        return "media"
+    if any(k in c for k in ["research scientist", "university professor", "r&d", "think tank"]):
+        return "research"
+    if any(k in c for k in ["psycholog"]):
+        return "psychology"
+    if any(k in c for k in ["hotel", "tourism", "event manager", "travel", "f&b", "hospitality"]):
+        return "hospitality"
+    if any(k in c for k in ["agricultural", "horticultur", "food technolog", "veterinar"]):
+        return "agriculture"
+    if any(k in c for k in ["technician", "mechanic", "welding", "electrician", "carpenter", "hvac", "civil tech"]):
+        return "vocational"
+    if any(k in c for k in ["ias", "ips", "civil services", "political analyst", "diplomat", "policy analyst", "ngo"]):
+        return "government"
+    return "general"
+
 
 # ── Domain detection helper ────────────────────────────────────────────────
 
@@ -1650,7 +2064,174 @@ def delete_achievement(
     return {"deleted": True, "remaining": len(updated)}
 
 
-# ── 4. Mock Interview ──────────────────────────────────────────────────────
+# ── 4. Interview: Config ──────────────────────────────────────────────────
+
+@router.get("/interview/config", response_model=InterviewConfigResponse)
+def get_interview_config(
+    career: str = Query(""),
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    """Return domain config for the given career (or auto-detect from profile)."""
+    if not career:
+        profile = db.query(StudentProfile).filter_by(user_id=current_user.id).first()
+        records  = db.query(SubjectRecord).filter_by(user_id=current_user.id).all()
+        subjects: set[str] = set()
+        if profile and profile.subjects:
+            for s in profile.subjects.split(","):
+                if s.strip(): subjects.add(s.strip())
+        for r in records: subjects.add(r.subject)
+        career = _best_role(list(subjects), profile)
+
+    domain = _career_to_interview_domain(career)
+    cfg    = INTERVIEW_DOMAIN_CONFIGS.get(domain, INTERVIEW_DOMAIN_CONFIGS["general"])
+    return InterviewConfigResponse(
+        domain=domain,
+        domain_label=cfg["label"],
+        career=career,
+        categories=cfg["categories"],
+        eval_dimensions=cfg["eval_dimensions"],
+        question_count=cfg.get("question_count", 8),
+        interviewer_modes=cfg.get("interviewer_modes", {}),
+    )
+
+
+# ── 4. Interview: Vocabulary ──────────────────────────────────────────────
+
+@router.get("/interview/vocabulary", response_model=VocabularyResponse)
+def get_interview_vocabulary(
+    career: str = Query(""),
+    domain: str = Query(""),
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    if not domain:
+        if career:
+            domain = _career_to_interview_domain(career)
+        else:
+            profile = db.query(StudentProfile).filter_by(user_id=current_user.id).first()
+            records = db.query(SubjectRecord).filter_by(user_id=current_user.id).all()
+            subjects: set[str] = set()
+            if profile and profile.subjects:
+                for s in profile.subjects.split(","):
+                    if s.strip(): subjects.add(s.strip())
+            for r in records: subjects.add(r.subject)
+            domain = _detect_domain(profile, subjects)
+
+    raw   = INTERVIEW_VOCABULARY.get(domain, INTERVIEW_VOCABULARY.get("general", []))
+    items = [VocabularyItem(**v) for v in raw]
+    return VocabularyResponse(domain=domain, career=career or domain, items=items)
+
+
+# ── 4. Interview: Scenario ────────────────────────────────────────────────
+
+@router.post("/interview/scenario", response_model=ScenarioResponse)
+def interview_scenario(
+    payload: ScenarioRequest,
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    client    = _get_client()
+    domain    = payload.domain or _career_to_interview_domain(payload.career)
+    cfg       = INTERVIEW_DOMAIN_CONFIGS.get(domain, INTERVIEW_DOMAIN_CONFIGS["general"])
+    user_msgs = [m for m in payload.history if m.role == "user"]
+
+    if payload.mode == "evaluate" and len(user_msgs) >= 3:
+        convo = "\n".join(f"{m.role.upper()}: {m.content}" for m in payload.history)
+        eval_prompt = f"""Evaluate this {payload.scenario_type} simulation for a {payload.career} role.
+
+TRANSCRIPT:
+{convo[:2500]}
+
+Score 0-100 and provide feedback. Respond ONLY with valid JSON:
+{{"score":<0-100>,"feedback":"<2-3 sentences>","tips":["tip1","tip2","tip3"]}}"""
+        data  = _groq_json(eval_prompt, max_tokens=400) or {}
+        return ScenarioResponse(
+            message=data.get("feedback", "Scenario complete. Review your performance."),
+            scenario_type=payload.scenario_type,
+            is_complete=True,
+            score=int(data.get("score", 65)),
+            feedback=data.get("feedback", ""),
+            tips=data.get("tips", []),
+        )
+
+    history_msgs = [{"role": m.role, "content": m.content} for m in payload.history]
+    stage = "Begin the scenario now." if payload.mode == "start" else "Continue the scenario."
+    sys_prompt = (
+        f"You are conducting a '{payload.scenario_type}' scenario simulation for a {payload.career} ({cfg['label']}) candidate. "
+        f"Make it realistic, domain-specific, and challenging. Stay strictly in-domain. "
+        f"Present the situation vividly and ask ONE key question or challenge. {stage}"
+    )
+    resp = client.chat.completions.create(
+        model=GROQ_MODEL,
+        messages=[{"role": "system", "content": sys_prompt}] + history_msgs,
+        temperature=0.65, max_tokens=280,
+    )
+    return ScenarioResponse(
+        message=resp.choices[0].message.content.strip(),
+        scenario_type=payload.scenario_type,
+        is_complete=False,
+    )
+
+
+# ── 4. Interview: Post-Session Report ────────────────────────────────────
+
+@router.post("/interview/report", response_model=InterviewReportResponse)
+def generate_interview_report(
+    payload: InterviewReportRequest,
+    current_user: User = Depends(get_current_user),
+    db: DBSession = Depends(get_db),
+):
+    domain = payload.domain or _career_to_interview_domain(payload.career)
+    cfg    = INTERVIEW_DOMAIN_CONFIGS.get(domain, INTERVIEW_DOMAIN_CONFIGS["general"])
+
+    avg_score = round(sum(payload.scores.values()) / max(1, len(payload.scores)))
+    consistency_bonus = 3 if len(payload.scores) >= 4 else 0
+    interview_iq = min(99, avg_score + consistency_bonus)
+
+    iq_labels = [
+        (90, "Elite Candidate"), (75, "Industry Ready"),
+        (60, "Professional"),   (40, "Developing"), (0, "Beginner"),
+    ]
+    iq_label = next(label for threshold, label in iq_labels if interview_iq >= threshold)
+
+    current_readiness = min(95, avg_score)
+    estimated_readiness = min(99, current_readiness + 12)
+    weeks = max(2, round((estimated_readiness - current_readiness) * 0.4))
+    timeline = f"{weeks}-{weeks+2} weeks of focused practice"
+
+    prompt = f"""Generate a post-interview report for a {payload.career} ({cfg['label']}) mock interview.
+Category: {payload.category}
+Scores: {payload.scores}
+Current strengths: {payload.strengths}
+Areas to improve: {payload.improvements}
+Overall score: {avg_score}/100
+
+Respond ONLY with valid JSON:
+{{
+  "strengths": ["s1","s2","s3"],
+  "weaknesses": ["w1","w2","w3"],
+  "recommended_resources": ["r1","r2","r3","r4"],
+  "next_practice_plan": ["step1","step2","step3","step4"]
+}}"""
+    data = _groq_json(prompt, max_tokens=700) or {}
+    return InterviewReportResponse(
+        overall_score=avg_score,
+        interview_iq=interview_iq,
+        iq_label=iq_label,
+        readiness_pct=current_readiness,
+        estimated_readiness_pct=estimated_readiness,
+        predicted_timeline=timeline,
+        strengths=data.get("strengths", payload.strengths),
+        weaknesses=data.get("weaknesses", payload.improvements),
+        recommended_resources=data.get("recommended_resources", []),
+        next_practice_plan=data.get("next_practice_plan", []),
+        domain=domain,
+        career=payload.career,
+    )
+
+
+# ── 4. Interview: Domain-Aware Mock Interview Chat ────────────────────────
 
 @router.post("/interview/chat", response_model=InterviewChatResponse)
 def interview_chat(
@@ -1658,69 +2239,102 @@ def interview_chat(
     current_user: User = Depends(get_current_user),
     db: DBSession = Depends(get_db),
 ):
-    client = _get_client()
-    total_q = 8
+    client  = _get_client()
+    domain  = payload.domain or _career_to_interview_domain(payload.role)
+    cfg     = INTERVIEW_DOMAIN_CONFIGS.get(domain, INTERVIEW_DOMAIN_CONFIGS["general"])
+    total_q = cfg.get("question_count", 8)
+    dims    = cfg["eval_dimensions"]
+
+    category_focus = cfg["categories"].get(payload.category, "general professional skills")
+    mode_desc      = cfg.get("interviewer_modes", {}).get(payload.interviewer_mode, "professional interviewer")
+
     user_messages = [m for m in payload.history if m.role == "user"]
     q_num = len(user_messages) + 1
 
     if payload.mode == "evaluate" or q_num > total_q:
         convo = "\n".join(f"{m.role.upper()}: {m.content}" for m in payload.history)
-        eval_prompt = f"""You are an expert technical interviewer evaluating a mock interview for a {payload.role} position.
+        dim_fields = "\n".join(f'  "{d.lower().replace(" ", "_")}_score": <0-100>,' for d in dims)
+
+        eval_prompt = f"""You are evaluating a {payload.category} round mock interview for a {payload.role} role.
+Domain: {cfg['label']}
+Candidate profile context: {payload.profile_context or 'Not provided.'}
 
 INTERVIEW TRANSCRIPT:
-{convo[:3500]}
+{convo[:4000]}
 
-Score the candidate (0-100) on each dimension and provide detailed feedback.
+Score STRICTLY on domain-specific dimensions for {payload.role}. Do NOT score on unrelated fields.
+Scoring dimensions: {', '.join(dims)}
+
 Respond ONLY with valid JSON:
 {{
-  "interview_score": <0-100>,
+{dim_fields}
+  "overall_interview_score": <0-100>,
   "communication_score": <0-100>,
   "confidence_score": <0-100>,
-  "technical_score": <0-100>,
-  "problem_solving_score": <0-100>,
-  "feedback": "<3-4 sentence overall assessment>",
-  "strengths": ["s1", "s2", "s3"],
-  "improvements": ["i1", "i2", "i3"],
-  "weak_areas": ["wa1", "wa2"],
-  "improvement_plan": ["step1", "step2", "step3"]
+  "feedback": "<4-5 sentence domain-specific assessment mentioning {payload.role}>",
+  "strengths": ["domain-specific strength 1", "strength 2", "strength 3"],
+  "improvements": ["specific improvement 1", "improvement 2", "improvement 3"],
+  "weak_areas": ["weak area 1", "weak area 2"],
+  "improvement_plan": ["actionable step 1", "step 2", "step 3"]
 }}"""
-        data = _groq_json(eval_prompt, max_tokens=800) or {}
-        iv_score = float(data.get("interview_score", 65))
-        _update_twin(current_user.id, db, interview_score=iv_score, event="interview")
+        data = _groq_json(eval_prompt, max_tokens=1000) or {}
+
+        iv_score = float(data.get("overall_interview_score", 65))
+        _update_twin(current_user.id, db, interview_score=iv_score, event=f"interview_{domain}")
+
+        scores: dict[str, int] = {}
+        for d in dims:
+            key = d.lower().replace(" ", "_") + "_score"
+            scores[d] = int(data.get(key, 65))
+        scores["Communication"] = int(data.get("communication_score", 70))
+        scores["Confidence"]    = int(data.get("confidence_score", 65))
+
+        # Compute IQ
+        avg = round(sum(scores.values()) / len(scores))
+        iq  = min(99, avg)
 
         return InterviewChatResponse(
-            message=f"Interview complete!\n\n{data.get('feedback', 'Great effort on your mock interview!')}",
+            message=data.get("feedback", f"Your {payload.category} interview for {payload.role} is complete! Review your scores below."),
             is_complete=True,
-            scores={
-                "interview":        int(data.get("interview_score", 65)),
-                "communication":    int(data.get("communication_score", 70)),
-                "confidence":       int(data.get("confidence_score", 65)),
-                "technical":        int(data.get("technical_score", 60)),
-                "problem_solving":  int(data.get("problem_solving_score", 60)),
-            },
+            scores=scores,
             feedback=data.get("feedback", ""),
             strengths=data.get("strengths", []),
             improvements=data.get("improvements", []),
+            weak_areas=data.get("weak_areas", []),
+            improvement_plan=data.get("improvement_plan", []),
             twin_updated=True,
+            domain=domain,
+            category=payload.category,
+            interview_iq=iq,
         )
 
+    # ── Generate next domain-specific question ────────────────────────────
     history_msgs = [{"role": m.role, "content": m.content} for m in payload.history]
+    profile_ctx  = f" Candidate background: {payload.profile_context}." if payload.profile_context else ""
+
     sys_prompt = (
-        f"You are a professional interviewer conducting a mock interview for a {payload.role} position. "
-        f"Ask {total_q} questions mixing technical, behavioral, HR, and situation-based questions. "
-        f"This is question {q_num} of {total_q}. Ask ONE clear question. No numbering. No feedback."
+        f"You are a {mode_desc} conducting the '{payload.category}' round for a {payload.role} position. "
+        f"Domain: {cfg['label']}. Focus area: {category_focus}.{profile_ctx} "
+        f"This is question {q_num} of {total_q}. "
+        f"CRITICAL RULES: "
+        f"(1) Ask ONE clear, focused {payload.category} question appropriate for a {payload.role} candidate. "
+        f"(2) The question MUST be relevant ONLY to {cfg['label']} and the {payload.category} round. "
+        f"(3) Never ask about unrelated fields or careers. "
+        f"(4) No numbering, no preamble, no feedback — just the question."
     )
     resp = client.chat.completions.create(
         model=GROQ_MODEL,
         messages=[{"role": "system", "content": sys_prompt}] + history_msgs,
         temperature=0.6,
-        max_tokens=200,
+        max_tokens=220,
     )
     return InterviewChatResponse(
         message=resp.choices[0].message.content.strip(),
         question_number=q_num,
         total_questions=total_q,
         is_complete=False,
+        domain=domain,
+        category=payload.category,
     )
 
 

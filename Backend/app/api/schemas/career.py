@@ -192,7 +192,11 @@ class InterviewMsg(BaseModel):
 class InterviewChatRequest(BaseModel):
     role: str
     history: List[InterviewMsg]
-    mode: str = "question"
+    mode: str = "question"          # "question" | "evaluate"
+    category: str = "HR"            # interview round / category
+    profile_context: str = ""       # brief profile summary for personalisation
+    interviewer_mode: str = "friendly"  # friendly | technical | panel | stress
+    domain: str = ""                # auto-detected if blank
 
 
 class InterviewChatResponse(BaseModel):
@@ -204,7 +208,86 @@ class InterviewChatResponse(BaseModel):
     feedback: Optional[str] = None
     strengths: List[str] = []
     improvements: List[str] = []
+    weak_areas: List[str] = []
+    improvement_plan: List[str] = []
     twin_updated: bool = False
+    domain: str = ""
+    category: str = ""
+    interview_iq: Optional[int] = None
+
+
+# ── Interview Vocabulary ───────────────────────────────────────────────────
+
+class VocabularyItem(BaseModel):
+    word: str
+    meaning: str
+    example: str
+    tip: str
+
+
+class VocabularyResponse(BaseModel):
+    domain: str
+    career: str
+    items: List[VocabularyItem]
+
+
+# ── Interview Scenario ─────────────────────────────────────────────────────
+
+class ScenarioRequest(BaseModel):
+    career: str
+    domain: str
+    scenario_type: str
+    history: List[InterviewMsg] = []
+    mode: str = "start"   # "start" | "continue" | "evaluate"
+
+
+class ScenarioResponse(BaseModel):
+    message: str
+    scenario_type: str
+    is_complete: bool = False
+    score: Optional[int] = None
+    feedback: Optional[str] = None
+    tips: List[str] = []
+
+
+# ── Interview Report ───────────────────────────────────────────────────────
+
+class InterviewReportRequest(BaseModel):
+    career: str
+    domain: str
+    category: str
+    scores: Dict[str, int]
+    feedback: str
+    strengths: List[str]
+    improvements: List[str]
+    session_duration: int = 15      # minutes
+
+
+class InterviewReportResponse(BaseModel):
+    overall_score: int
+    interview_iq: int
+    iq_label: str                   # Beginner / Developing / Professional / Industry Ready / Elite
+    readiness_pct: int
+    estimated_readiness_pct: int
+    predicted_timeline: str
+    strengths: List[str]
+    weaknesses: List[str]
+    recommended_resources: List[str]
+    next_practice_plan: List[str]
+    domain: str
+    career: str
+
+
+# ── Interview Config ───────────────────────────────────────────────────────
+
+class InterviewConfigResponse(BaseModel):
+    domain: str
+    domain_label: str
+    career: str
+    categories: Dict[str, str]      # category_name → focus_description
+    eval_dimensions: List[str]
+    question_count: int
+    interviewer_modes: Dict[str, str]  # mode_id → description
 
 
 # ── Skill Gap ────────────────────────────────────────────────────────────────

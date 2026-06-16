@@ -5,7 +5,7 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, AreaChart, Area, Legend,
 } from 'recharts';
 import BackButton from '../components/BackButton';
-import VoiceInterview from '../components/VoiceInterview';
+import InterviewEngine from '../components/InterviewEngine';
 import api from '../services/api';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -115,7 +115,7 @@ const TABS = [
   { id: 'overview',        label: 'Readiness',      icon: '🎯' },
   { id: 'resume',          label: 'Resume',         icon: '📄' },
   { id: 'linkedin',        label: 'LinkedIn',       icon: '💼' },
-  { id: 'interview',       label: 'Interview',      icon: '🎤' },
+  { id: 'interview',       label: 'Interview AI',   icon: '🎤' },
   { id: 'coding',          label: 'Practice',       icon: '💡' },
   { id: 'skillgap',        label: 'Skill Gap',      icon: '📊' },
   { id: 'recommendations', label: 'Careers',        icon: '🌟' },
@@ -1350,7 +1350,7 @@ function LinkedInSection() {
   );
 }
 
-// ── Section: Interview ────────────────────────────────────────────────────────
+// ── Section: Interview (replaced by InterviewEngine component) ───────────────
 
 function InterviewSection() {
   const [role, setRole] = useState('AI Engineer');
@@ -2106,7 +2106,7 @@ export default function CareerDevelopment() {
       case 'overview':        return <OverviewSection />;
       case 'resume':          return <ResumeUploadSection />;
       case 'linkedin':        return <LinkedInSection />;
-      case 'interview':       return <VoiceInterview />;
+      case 'interview':       return <InterviewEngine />;
       case 'coding':          return <CodingSection />;
       case 'skillgap':        return <SkillGapSection />;
       case 'recommendations': return <RecommendationsSection />;
