@@ -175,69 +175,743 @@ def _update_twin(
     return twin
 
 
-# ── Career keyword / role maps ─────────────────────────────────────────────
+# ── Domain detection: degree/course → domain ──────────────────────────────
+
+DEGREE_DOMAIN_MAP: list[tuple[str, str]] = [
+    # Medical & Healthcare (check most specific first)
+    ("bsc nursing", "nursing"), ("b.sc nursing", "nursing"), ("gnm", "nursing"),
+    ("m.sc nursing", "nursing"), ("msc nursing", "nursing"),
+    ("b.pharm", "pharmacy"), ("m.pharm", "pharmacy"), ("pharm", "pharmacy"),
+    ("bds", "dental"), ("mds", "dental"),
+    ("bams", "medical"), ("bhms", "medical"), ("bpt", "medical"),
+    ("mbbs", "medical"), (" md ", "medical"), (" ms ", "medical"), ("dnb", "medical"),
+    ("public health", "public_health"),
+    # Law
+    ("llb", "law"), ("llm", "law"), ("integrated law", "law"),
+    ("corporate law", "law"), ("criminal law", "law"), ("intellectual property law", "law"),
+    # Commerce & Finance
+    ("chartered accountancy", "finance"), ("company secretary", "finance"),
+    (" ca ", "finance"), ("cma", "finance"), ("banking", "finance"),
+    ("financial analysis", "finance"),
+    ("b.com", "commerce"), ("bcom", "commerce"), ("m.com", "commerce"), ("mcom", "commerce"),
+    # Management
+    ("executive mba", "management"), ("pgdm", "management"),
+    ("mba", "management"), ("bba", "management"),
+    ("marketing", "management"), ("human resources", "management"),
+    ("operations management", "management"), ("entrepreneurship", "management"),
+    # Engineering & IT (most specific first)
+    ("data science", "data_science"), ("artificial intelligence", "ai"),
+    ("cyber security", "cybersecurity"), ("cybersecurity", "cybersecurity"),
+    ("b.sc computer science", "it"), ("bsc computer science", "it"),
+    ("m.sc computer science", "it"), ("information technology", "it"),
+    ("bca", "it"), ("mca", "it"), ("software engineering", "it"),
+    ("b.tech", "engineering"), ("btech", "engineering"),
+    ("m.tech", "engineering"), ("mtech", "engineering"),
+    ("b.e.", "engineering"), (" be ", "engineering"),
+    ("diploma engineering", "engineering"), ("polytechnic", "engineering"),
+    # Science
+    ("biotechnology", "biotech"), ("microbiology", "science"),
+    ("environmental science", "science"), ("statistics", "statistics"),
+    ("mathematics", "science"), ("chemistry", "science"), ("physics", "science"),
+    ("b.sc", "science"), ("bsc", "science"), ("m.sc", "science"), ("msc", "science"),
+    # Arts & Humanities
+    ("psychology", "psychology"),
+    ("political science", "arts"), ("sociology", "arts"),
+    ("philosophy", "arts"), ("literature", "arts"), ("history", "arts"),
+    (" ba ", "arts"), (" ma ", "arts"),
+    # Education
+    ("b.ed", "education"), ("bed", "education"), ("m.ed", "education"),
+    ("med", "education"), ("teaching", "education"),
+    # Architecture & Design
+    ("b.arch", "architecture"), ("barch", "architecture"),
+    ("m.arch", "architecture"),
+    ("interior design", "design"), ("graphic design", "design"),
+    ("ui/ux", "design"), ("fashion design", "design"), ("product design", "design"),
+    # Agriculture
+    ("veterinary", "veterinary"),
+    ("horticulture", "agriculture"), ("forestry", "agriculture"),
+    ("agriculture", "agriculture"),
+    # Media & Communication
+    ("journalism", "media"), ("mass communication", "media"),
+    ("public relations", "media"), ("digital media", "media"), ("film", "media"),
+    # Hospitality
+    ("hotel management", "hospitality"), ("tourism", "hospitality"),
+    ("event management", "hospitality"),
+    # Vocational
+    ("iti", "vocational"), ("electrician", "vocational"),
+    ("mechanic", "vocational"), ("welding", "vocational"), ("carpentry", "vocational"),
+    # Research
+    ("phd", "research"), ("m.phil", "research"), ("research scholar", "research"),
+]
+
+# ── Domain → relevant careers ─────────────────────────────────────────────
+
+DOMAIN_CAREERS: dict[str, list[str]] = {
+    "medical": [
+        "General Physician", "Surgeon", "Medical Researcher",
+        "Cardiologist", "Neurologist", "Pediatrician", "Dermatologist",
+        "Radiologist", "Public Health Specialist", "Hospital Administrator",
+        "Medical Educator", "Anesthesiologist",
+    ],
+    "dental": [
+        "Dentist (General Practice)", "Oral Surgeon", "Orthodontist",
+        "Periodontist", "Dental Educator", "Public Dental Health Officer",
+    ],
+    "nursing": [
+        "Staff Nurse", "ICU / Critical Care Nurse", "Community Health Nurse",
+        "Nurse Educator", "Clinical Nurse Specialist", "Nurse Practitioner",
+    ],
+    "pharmacy": [
+        "Pharmacist", "Clinical Pharmacist", "Drug Safety Associate",
+        "Medical Writer", "Pharmaceutical Researcher", "Regulatory Affairs Specialist",
+    ],
+    "public_health": [
+        "Public Health Specialist", "Epidemiologist", "Health Policy Analyst",
+        "Community Health Officer", "Medical Researcher", "Health Educator",
+    ],
+    "law": [
+        "Advocate / Lawyer", "Corporate Lawyer", "Legal Consultant",
+        "Compliance Officer", "Legal Researcher", "Public Prosecutor",
+        "Intellectual Property Attorney", "Criminal Defense Attorney",
+    ],
+    "commerce": [
+        "Chartered Accountant (CA)", "Auditor", "Tax Consultant",
+        "Financial Analyst", "Banking Officer", "Stock Analyst",
+        "Cost Accountant", "Commerce Educator",
+    ],
+    "finance": [
+        "Chartered Accountant (CA)", "Investment Banker", "Financial Analyst",
+        "Auditor", "Tax Consultant", "Portfolio Manager", "Actuary",
+        "Risk Analyst", "Wealth Manager",
+    ],
+    "management": [
+        "Business Analyst", "Product Manager", "Marketing Manager",
+        "Human Resources Manager", "Operations Manager", "Entrepreneur",
+        "Strategy Consultant", "Supply Chain Manager", "Brand Manager",
+    ],
+    "engineering": [
+        "Software Engineer", "AI / ML Engineer", "Data Scientist",
+        "Cloud Architect", "DevOps Engineer", "Cybersecurity Analyst",
+        "Embedded Systems Engineer", "Research Engineer", "Data Analyst",
+    ],
+    "it": [
+        "Software Engineer", "Full Stack Developer", "Data Analyst",
+        "IT Consultant", "Web Developer", "Database Administrator",
+        "AI / ML Engineer", "Systems Analyst",
+    ],
+    "data_science": [
+        "Data Scientist", "ML Engineer", "AI Researcher",
+        "Data Analyst", "Business Intelligence Analyst", "Data Engineer",
+        "AI / ML Engineer",
+    ],
+    "ai": [
+        "AI / ML Engineer", "NLP Engineer", "Computer Vision Engineer",
+        "AI Researcher", "Data Scientist", "ML Engineer",
+    ],
+    "cybersecurity": [
+        "Cybersecurity Analyst", "Ethical Hacker / Penetration Tester",
+        "Security Operations Engineer", "Cloud Security Architect",
+        "Digital Forensics Analyst", "IT Security Consultant",
+    ],
+    "science": [
+        "Research Scientist", "Laboratory Technician", "Biotechnologist",
+        "Environmental Scientist", "Science Educator", "Forensic Scientist",
+        "Biostatistician", "Geologist",
+    ],
+    "biotech": [
+        "Biotechnologist", "Molecular Biologist", "Genetic Researcher",
+        "Pharmaceutical Researcher", "Clinical Research Associate",
+        "Bioinformatics Analyst", "Biostatistician",
+    ],
+    "statistics": [
+        "Statistician", "Data Scientist", "Actuary", "Biostatistician",
+        "Market Research Analyst", "Data Analyst", "Quality Control Analyst",
+    ],
+    "arts": [
+        "Content Writer", "Journalist", "Civil Services Officer (IAS/IPS)",
+        "Social Worker", "Diplomat / Foreign Service",
+        "Political Analyst", "Teacher / Lecturer", "NGO Program Manager",
+    ],
+    "psychology": [
+        "Clinical Psychologist", "Counseling Psychologist", "Educational Psychologist",
+        "Organizational Psychologist", "School Counselor",
+        "Mental Health Researcher", "HR Specialist",
+    ],
+    "education": [
+        "School Teacher", "University Professor / Lecturer",
+        "Curriculum Developer", "Education Consultant",
+        "Educational Psychologist", "E-Learning Designer",
+    ],
+    "architecture": [
+        "Architect", "Urban Planner", "Landscape Architect",
+        "Interior Designer", "Construction Manager", "BIM Specialist",
+    ],
+    "design": [
+        "Graphic Designer", "UI/UX Designer", "Product Designer",
+        "Brand Identity Designer", "Motion Graphics Artist",
+        "Fashion Designer", "Industrial Designer",
+    ],
+    "agriculture": [
+        "Agricultural Scientist", "Horticulturist", "Agricultural Extension Officer",
+        "Farm Manager", "Agri-Business Manager", "Food Technologist",
+    ],
+    "veterinary": [
+        "Veterinarian (Small Animal)", "Veterinarian (Large Animal)",
+        "Wildlife Veterinarian", "Veterinary Researcher", "Animal Health Inspector",
+    ],
+    "media": [
+        "Journalist", "Content Creator / Influencer", "Film Director",
+        "Public Relations Specialist", "Social Media Manager",
+        "Documentary Filmmaker", "Media Analyst",
+    ],
+    "hospitality": [
+        "Hotel Manager", "Tourism Manager", "Event Manager",
+        "F&B Manager", "Travel Consultant", "Hospitality Educator",
+    ],
+    "vocational": [
+        "Electrical Technician", "Automotive Mechanic", "Welding Technician",
+        "Civil Technician", "Carpenter / Woodworker", "HVAC Technician",
+        "Field Service Engineer",
+    ],
+    "research": [
+        "Research Scientist", "University Professor / Lecturer",
+        "Research Analyst", "Policy Researcher", "Academic Writer",
+        "R&D Specialist", "Think Tank Analyst",
+    ],
+}
+
+# ── Comprehensive multi-domain career keyword / role maps ─────────────────
 
 CAREER_SKILLS: dict[str, list[str]] = {
-    "AI Engineer":       ["machine learning", "deep learning", "neural network", "tensorflow", "pytorch", "python", "nlp", "computer vision", "transformers"],
-    "Data Scientist":    ["statistics", "data analysis", "machine learning", "python", "mathematics", "visualization", "sql", "pandas", "numpy"],
-    "ML Engineer":       ["machine learning", "mlops", "python", "docker", "cloud", "kubernetes", "model deployment", "feature engineering"],
-    "Software Developer":["computer science", "algorithms", "data structures", "programming", "software engineering", "git", "testing"],
-    "Research Engineer": ["mathematics", "physics", "research", "machine learning", "algorithms", "optimization"],
-    "Data Analyst":      ["statistics", "data analysis", "excel", "sql", "visualization", "business intelligence", "tableau"],
-    "Backend Developer": ["python", "java", "node.js", "api", "database", "sql", "rest", "microservices"],
-    "DevOps Engineer":   ["docker", "kubernetes", "ci/cd", "cloud", "linux", "networking", "terraform"],
+    # ── Medical ──
+    "General Physician":         ["mbbs", "medicine", "clinical", "diagnosis", "patient care", "anatomy", "physiology", "treatment", "general practice", "pharmacology"],
+    "Surgeon":                   ["mbbs", "surgery", "anatomy", "operative", "clinical", "medical", "ms", "dnb", "surgical", "theatre"],
+    "Medical Researcher":        ["mbbs", "research", "clinical trials", "pathology", "pharmacology", "medical", "statistics", "laboratory", "md", "publication"],
+    "Cardiologist":              ["mbbs", "cardiology", "heart", "anatomy", "physiology", "clinical", "ecg", "cardio", "cardiac"],
+    "Neurologist":               ["mbbs", "neurology", "brain", "anatomy", "clinical", "nervous system", "neuro"],
+    "Pediatrician":              ["mbbs", "pediatrics", "child health", "clinical", "medicine", "pediatric", "neonatology"],
+    "Dermatologist":             ["mbbs", "dermatology", "skin", "clinical", "medicine", "cosmetic"],
+    "Radiologist":               ["mbbs", "radiology", "imaging", "x-ray", "mri", "ct scan", "clinical", "ultrasound"],
+    "Public Health Specialist":  ["public health", "epidemiology", "mbbs", "community health", "medicine", "health policy", "preventive", "biostatistics"],
+    "Hospital Administrator":    ["healthcare management", "hospital", "administration", "health management", "mbbs", "healthcare", "operations"],
+    "Medical Educator":          ["mbbs", "teaching", "medical education", "anatomy", "clinical", "education", "curriculum"],
+    "Anesthesiologist":          ["mbbs", "anesthesia", "surgery", "clinical", "critical care", "md", "pharmacology"],
+    # ── Dental ──
+    "Dentist (General Practice)": ["bds", "dentistry", "oral health", "dental", "teeth", "clinical", "prosthodontics"],
+    "Oral Surgeon":              ["bds", "oral surgery", "dental", "surgery", "mds", "jaw", "implant"],
+    "Orthodontist":              ["bds", "orthodontics", "braces", "dental", "oral health", "alignment"],
+    # ── Nursing ──
+    "Staff Nurse":               ["nursing", "patient care", "bsc nursing", "gnm", "clinical care", "medication", "ward", "vitals"],
+    "ICU / Critical Care Nurse": ["icu", "critical care", "nursing", "bsc nursing", "gnm", "patient monitoring", "ventilator", "hemodynamics"],
+    "Community Health Nurse":    ["community health", "nursing", "public health", "gnm", "bsc nursing", "primary care", "immunization"],
+    "Nurse Educator":            ["nursing", "education", "teaching", "bsc nursing", "gnm", "clinical training", "curriculum"],
+    "Clinical Nurse Specialist": ["nursing", "clinical", "specialist", "bsc nursing", "m.sc nursing", "advanced practice", "protocol"],
+    # ── Pharmacy ──
+    "Pharmacist":                ["pharmacy", "drugs", "medications", "b.pharm", "pharmacology", "dispensing", "drug store", "m.pharm"],
+    "Clinical Pharmacist":       ["clinical pharmacy", "b.pharm", "m.pharm", "pharmacology", "drug therapy", "clinical", "rounds"],
+    "Drug Safety Associate":     ["pharmacovigilance", "b.pharm", "m.pharm", "drug safety", "pharmaceutical", "adverse events", "reporting"],
+    "Medical Writer":            ["medical writing", "pharmacy", "m.pharm", "clinical", "pharmacology", "documentation", "regulatory"],
+    "Pharmaceutical Researcher": ["pharmaceutical research", "pharmacology", "b.pharm", "m.pharm", "drug development", "clinical trials", "synthesis"],
+    "Regulatory Affairs Specialist": ["regulatory", "b.pharm", "m.pharm", "pharmaceutical", "compliance", "drug approval", "cdsco", "fda"],
+    # ── Law ──
+    "Advocate / Lawyer":         ["law", "legal", "llb", "litigation", "court", "legal reasoning", "advocacy", "pleading"],
+    "Corporate Lawyer":          ["corporate law", "llb", "contracts", "mergers", "acquisitions", "business law", "llm", "company law"],
+    "Legal Consultant":          ["llb", "legal", "consulting", "legal advice", "compliance", "advisory", "contract review"],
+    "Compliance Officer":        ["compliance", "llb", "regulatory", "legal", "corporate governance", "risk", "audit"],
+    "Legal Researcher":          ["legal research", "llb", "llm", "law", "jurisprudence", "academic", "case analysis"],
+    "Public Prosecutor":         ["criminal law", "llb", "prosecution", "court", "criminal procedure", "litigation", "fir"],
+    "Intellectual Property Attorney": ["intellectual property", "llb", "patents", "trademarks", "ip law", "copyright", "llm"],
+    "Criminal Defense Attorney": ["criminal law", "llb", "defense", "court", "litigation", "criminal procedure", "bail"],
+    # ── Commerce & Finance ──
+    "Chartered Accountant (CA)": ["ca", "accounting", "finance", "taxation", "auditing", "financial statements", "b.com", "gst", "icai"],
+    "Auditor":                   ["auditing", "accounting", "finance", "bcom", "ca", "financial statements", "audit", "internal audit"],
+    "Tax Consultant":            ["taxation", "tax", "ca", "bcom", "finance", "gst", "income tax", "tds", "tax planning"],
+    "Financial Analyst":         ["financial analysis", "bcom", "mba finance", "investment", "markets", "valuation", "cfa", "excel", "modelling"],
+    "Investment Banker":         ["investment banking", "finance", "mba", "capital markets", "valuation", "corporate finance", "cfa", "deal"],
+    "Actuary":                   ["actuarial", "statistics", "mathematics", "risk", "insurance", "finance", "mortality"],
+    "Portfolio Manager":         ["portfolio", "investment", "finance", "cfa", "equity", "mutual funds", "wealth", "asset management"],
+    "Banking Officer":           ["banking", "bcom", "finance", "loans", "credit", "bank", "financial services", "retail banking"],
+    "Stock Analyst":             ["equity research", "bcom", "mba finance", "stock market", "valuation", "financial modelling", "cfa"],
+    "Cost Accountant":           ["cost accounting", "cma", "bcom", "management accounting", "costing", "budgeting"],
+    # ── Management ──
+    "Business Analyst":          ["business analysis", "bba", "mba", "strategy", "requirements", "process improvement", "data", "stakeholders"],
+    "Product Manager":           ["product management", "mba", "strategy", "agile", "market research", "roadmap", "user research"],
+    "Marketing Manager":         ["marketing", "mba", "digital marketing", "bba", "brand management", "advertising", "seo", "campaigns"],
+    "Human Resources Manager":   ["human resources", "hr", "mba", "recruitment", "talent management", "payroll", "labour law"],
+    "Operations Manager":        ["operations", "supply chain", "mba", "bba", "process management", "logistics", "lean", "six sigma"],
+    "Entrepreneur":              ["entrepreneurship", "startup", "business", "mba", "innovation", "product", "funding", "bba"],
+    "Strategy Consultant":       ["strategy", "consulting", "mba", "business analysis", "market research", "management", "frameworks"],
+    "Supply Chain Manager":      ["supply chain", "logistics", "mba", "operations", "procurement", "inventory", "bba"],
+    "Brand Manager":             ["brand management", "marketing", "mba", "advertising", "consumer insights", "bba", "campaigns"],
+    # ── Engineering & IT ──
+    "Software Engineer":         ["computer science", "programming", "software", "algorithms", "btech", "bca", "coding", "development", "oop"],
+    "AI / ML Engineer":          ["machine learning", "deep learning", "ai", "neural network", "tensorflow", "pytorch", "python", "btech", "data science"],
+    "ML Engineer":               ["machine learning", "mlops", "python", "docker", "cloud", "kubernetes", "model deployment", "feature engineering"],
+    "Data Scientist":            ["data science", "statistics", "python", "machine learning", "analytics", "data analysis", "pandas", "numpy", "sql"],
+    "Cloud Architect":           ["cloud", "aws", "azure", "btech", "computer science", "infrastructure", "devops", "gcp", "networking"],
+    "DevOps Engineer":           ["devops", "docker", "kubernetes", "ci/cd", "btech", "linux", "automation", "terraform", "jenkins"],
+    "Cybersecurity Analyst":     ["cybersecurity", "security", "network", "ethical hacking", "btech", "penetration testing", "soc", "siem"],
+    "Full Stack Developer":      ["btech", "bca", "web development", "react", "node.js", "database", "api", "programming", "javascript"],
+    "Data Analyst":              ["data analysis", "sql", "excel", "visualization", "statistics", "btech", "bca", "bcom", "python", "tableau"],
+    "Embedded Systems Engineer": ["embedded", "c programming", "microcontroller", "iot", "btech", "electronics", "firmware", "rtos"],
+    "Research Engineer":         ["mathematics", "physics", "research", "machine learning", "algorithms", "optimization", "btech", "mtech"],
+    "NLP Engineer":              ["nlp", "natural language processing", "python", "transformers", "bert", "ai", "text analysis", "btech"],
+    "Computer Vision Engineer":  ["computer vision", "image processing", "opencv", "deep learning", "python", "btech", "cnn"],
+    "Ethical Hacker / Penetration Tester": ["ethical hacking", "penetration testing", "cybersecurity", "btech", "kali linux", "owasp", "ceh"],
+    "Digital Forensics Analyst": ["digital forensics", "cybersecurity", "btech", "incident response", "evidence", "malware analysis"],
+    # ── Science ──
+    "Research Scientist":        ["bsc", "msc", "research", "laboratory", "scientific method", "phd", "experiments", "publications"],
+    "Biotechnologist":           ["biotechnology", "bsc", "msc", "molecular biology", "genetics", "laboratory", "biotech", "pcr"],
+    "Environmental Scientist":   ["environmental science", "bsc", "ecology", "conservation", "pollution", "sustainability", "gis"],
+    "Forensic Scientist":        ["forensic", "bsc", "chemistry", "biology", "criminal investigation", "laboratory", "toxicology"],
+    "Biostatistician":           ["statistics", "bsc", "msc", "biostatistics", "clinical trials", "data analysis", "public health", "r"],
+    "Molecular Biologist":       ["molecular biology", "bsc", "msc", "genetics", "dna", "pcr", "sequencing", "laboratory"],
+    "Bioinformatics Analyst":    ["bioinformatics", "bsc", "msc", "computational biology", "python", "genomics", "data analysis"],
+    # ── Psychology ──
+    "Clinical Psychologist":     ["psychology", "clinical", "counseling", "therapy", "msc psychology", "ma psychology", "assessment", "diagnosis"],
+    "Counseling Psychologist":   ["counseling", "psychology", "mental health", "therapy", "ba psychology", "ma psychology", "listening"],
+    "Organizational Psychologist": ["organizational psychology", "hr", "mba", "psychology", "workplace", "industrial psychology"],
+    "Educational Psychologist":  ["educational psychology", "bed", "psychology", "learning disabilities", "school", "assessment"],
+    # ── Education ──
+    "School Teacher":            ["bed", "teaching", "education", "classroom", "curriculum", "pedagogy", "subject expertise", "ctet"],
+    "University Professor / Lecturer": ["phd", "research", "teaching", "msc", "academic", "university", "publication", "bed", "med", "net"],
+    "Curriculum Developer":      ["curriculum", "bed", "med", "education", "instructional design", "content development", "e-learning"],
+    "Education Consultant":      ["education", "bed", "med", "consulting", "school management", "policy", "learning", "leadership"],
+    "E-Learning Designer":       ["e-learning", "instructional design", "education", "bed", "lms", "articulate", "moodle", "content"],
+    # ── Architecture & Design ──
+    "Architect":                 ["architecture", "barch", "design", "construction", "urban planning", "autocad", "revit", "building"],
+    "Urban Planner":             ["urban planning", "barch", "city planning", "gis", "infrastructure", "zoning", "development"],
+    "Interior Designer":         ["interior design", "barch", "space planning", "furniture", "design", "bdes", "3d visualization"],
+    "Graphic Designer":          ["graphic design", "visual design", "adobe", "illustration", "typography", "branding", "bdes", "bfa"],
+    "UI/UX Designer":            ["ui/ux", "user experience", "design", "prototyping", "figma", "bdes", "interaction design", "usability"],
+    "Fashion Designer":          ["fashion design", "textiles", "bdes", "garment", "styling", "trend", "pattern making", "fashion"],
+    "Product Designer":          ["product design", "industrial design", "bdes", "prototyping", "user research", "cad", "materials"],
+    # ── Agriculture ──
+    "Agricultural Scientist":    ["agriculture", "bsc agriculture", "agronomy", "soil science", "crops", "farming", "horticulture", "icar"],
+    "Horticulturist":            ["horticulture", "bsc agriculture", "plants", "cultivation", "nursery", "garden", "floriculture"],
+    "Food Technologist":         ["food technology", "agriculture", "bsc agriculture", "food science", "processing", "fssai", "quality"],
+    "Agricultural Extension Officer": ["agriculture", "bsc agriculture", "extension", "farming", "rural development", "community"],
+    "Veterinarian (Small Animal)": ["veterinary", "bvsc", "animal", "clinical", "medicine", "surgery", "pets"],
+    "Veterinarian (Large Animal)": ["veterinary", "bvsc", "animal", "livestock", "cattle", "farm", "surgery"],
+    # ── Media & Communication ──
+    "Journalist":                ["journalism", "mass communication", "writing", "reporting", "media", "news", "editing", "bjmc"],
+    "Content Creator / Influencer": ["content", "digital media", "social media", "journalism", "writing", "video", "youtube", "instagram"],
+    "Film Director":             ["film", "media", "direction", "storytelling", "mass communication", "cinema", "screenplay"],
+    "Public Relations Specialist": ["public relations", "pr", "journalism", "communication", "media", "corporate communication", "crisis"],
+    "Social Media Manager":      ["social media", "digital media", "content", "marketing", "analytics", "instagram", "facebook"],
+    # ── Hospitality ──
+    "Hotel Manager":             ["hotel management", "hospitality", "tourism", "food and beverage", "front office", "revenue management"],
+    "Event Manager":             ["event management", "hospitality", "planning", "coordination", "logistics", "vendor management"],
+    "Travel Consultant":         ["tourism", "travel", "hospitality", "geography", "tour planning", "ticketing", "itinerary"],
+    "F&B Manager":               ["food and beverage", "hotel management", "hospitality", "culinary", "restaurant", "menu planning"],
+    # ── Vocational ──
+    "Electrical Technician":     ["iti", "electrical", "electrician", "wiring", "circuits", "electronics", "panel board"],
+    "Automotive Mechanic":       ["iti", "mechanic", "automobile", "engines", "repair", "vehicles", "diagnostics"],
+    "Welding Technician":        ["iti", "welding", "fabrication", "metal", "manufacturing", "mig", "tig"],
+    "Civil Technician":          ["iti", "civil", "construction", "surveying", "autocad", "building", "structural"],
+    "HVAC Technician":           ["iti", "hvac", "air conditioning", "refrigeration", "cooling", "installation"],
+    # ── Government & Arts ──
+    "Civil Services Officer (IAS/IPS)": ["upsc", "civil services", "public administration", "ba", "ma", "government", "policy", "law", "ias"],
+    "Political Analyst":         ["political science", "ba", "ma", "policy", "governance", "research", "elections"],
+    "Social Worker":             ["social work", "ba", "ma", "community", "sociology", "welfare", "ngo"],
+    "NGO Program Manager":       ["social work", "ngo", "development", "community", "ba", "ma", "social science", "fundraising"],
+    "Diplomat / Foreign Service": ["foreign service", "ba", "ma", "international relations", "languages", "upsc", "ifs"],
+    # ── Research & Academia ──
+    "Research Scientist":        ["phd", "mphil", "research", "publication", "academic", "thesis", "university", "grants"],
+    "University Professor / Lecturer": ["phd", "net", "jrf", "teaching", "university", "research", "publication", "academic"],
+    "R&D Specialist":            ["research", "development", "phd", "innovation", "laboratory", "mtech", "msc", "patents"],
+    "Think Tank Analyst":        ["research", "policy", "ba", "ma", "phd", "analysis", "writing", "economics"],
+    # ── HR / Psychology cross ──
+    "HR Specialist":             ["hr", "mba", "psychology", "recruitment", "training", "employee relations", "bba", "payroll"],
 }
 
 CAREER_REQUIRED_SKILLS: dict[str, list[str]] = {
-    "AI Engineer":        ["Python", "Machine Learning", "Deep Learning", "TensorFlow/PyTorch", "Mathematics", "MLOps", "Cloud Deployment", "System Design"],
-    "Data Scientist":     ["Python", "Statistics", "Machine Learning", "SQL", "Data Visualization", "Feature Engineering", "Communication"],
-    "ML Engineer":        ["Python", "Machine Learning", "MLOps", "Docker", "Cloud Platform", "CI/CD", "System Design"],
-    "Software Developer": ["Programming Language", "Data Structures", "Algorithms", "Version Control", "Testing", "Databases"],
-    "Research Engineer":  ["Mathematics", "Research Methodology", "Machine Learning", "Paper Writing", "Programming", "Problem Solving"],
-    "Data Analyst":       ["SQL", "Python/R", "Data Visualization", "Statistics", "Excel", "Business Intelligence", "Communication"],
-    "Backend Developer":  ["Programming Language", "REST APIs", "Databases", "System Design", "Testing", "Microservices"],
-    "DevOps Engineer":    ["Linux", "Docker", "Kubernetes", "CI/CD", "Cloud Platform", "Networking", "Infrastructure as Code"],
+    # Medical
+    "General Physician":         ["Clinical Medicine", "Diagnosis & Treatment", "Patient Communication", "Pharmacology", "Medical Records"],
+    "Surgeon":                   ["Surgical Techniques", "Anatomy", "Operative Care", "Pre/Post-op Management", "Clinical Decision Making"],
+    "Medical Researcher":        ["Research Methodology", "Clinical Trials", "Biostatistics", "Scientific Writing", "Research Ethics"],
+    "Cardiologist":              ["Cardiology", "ECG Interpretation", "Cardiac Imaging", "Clinical Medicine", "Patient Management"],
+    "Neurologist":               ["Neuroscience", "Clinical Neurology", "Brain Imaging", "Patient Assessment", "Medical Management"],
+    "Pediatrician":              ["Pediatrics", "Child Development", "Clinical Medicine", "Vaccination Protocols", "Family Communication"],
+    "Dermatologist":             ["Dermatology", "Skin Pathology", "Clinical Assessment", "Procedural Skills", "Patient Education"],
+    "Radiologist":               ["Medical Imaging", "Radiology", "Anatomy", "Report Writing", "Clinical Correlation"],
+    "Public Health Specialist":  ["Epidemiology", "Health Policy", "Biostatistics", "Community Health", "Research Methods"],
+    "Hospital Administrator":    ["Healthcare Management", "Leadership", "Finance", "Operations", "Regulatory Compliance"],
+    "Medical Educator":          ["Teaching Skills", "Curriculum Development", "Clinical Expertise", "Assessment Design", "Mentorship"],
+    "Anesthesiologist":          ["Anesthesia Techniques", "Critical Care", "Pharmacology", "Patient Monitoring", "Emergency Medicine"],
+    # Dental
+    "Dentist (General Practice)": ["Clinical Dentistry", "Dental Procedures", "Patient Communication", "Radiology", "Infection Control"],
+    "Oral Surgeon":              ["Oral Surgery", "Anesthesia", "Implantology", "Post-op Care", "Clinical Dentistry"],
+    "Orthodontist":              ["Orthodontic Techniques", "Treatment Planning", "Clinical Dentistry", "Radiography", "Patient Management"],
+    # Nursing
+    "Staff Nurse":               ["Patient Care", "Medication Administration", "Vital Signs Monitoring", "Wound Care", "Communication"],
+    "ICU / Critical Care Nurse": ["Critical Care", "Ventilator Management", "Hemodynamic Monitoring", "Emergency Procedures", "Patient Assessment"],
+    "Community Health Nurse":    ["Community Health", "Health Education", "Primary Care", "Family Planning", "Disease Prevention"],
+    "Nurse Educator":            ["Teaching", "Curriculum Design", "Clinical Supervision", "Assessment", "Nursing Practice"],
+    "Clinical Nurse Specialist": ["Advanced Clinical Practice", "Research", "Nursing Protocols", "Leadership", "Specialized Care"],
+    # Pharmacy
+    "Pharmacist":                ["Drug Knowledge", "Dispensing", "Patient Counseling", "Drug Interactions", "Regulatory Compliance"],
+    "Clinical Pharmacist":       ["Clinical Pharmacology", "Drug Therapy Management", "Patient Counseling", "Evidence-Based Practice", "Rounds"],
+    "Drug Safety Associate":     ["Pharmacovigilance", "Adverse Event Reporting", "Regulatory Requirements", "Medical Writing", "Data Analysis"],
+    "Medical Writer":            ["Medical Writing", "Scientific Communication", "Regulatory Documents", "Research Interpretation", "Editing"],
+    "Pharmaceutical Researcher": ["Drug Discovery", "Laboratory Skills", "Clinical Trials", "Data Analysis", "Scientific Writing"],
+    "Regulatory Affairs Specialist": ["Regulatory Guidelines", "Drug Approval Process", "Documentation", "Quality Assurance", "Compliance"],
+    # Law
+    "Advocate / Lawyer":         ["Legal Research", "Drafting", "Litigation", "Client Communication", "Court Procedure"],
+    "Corporate Lawyer":          ["Corporate Law", "Contract Drafting", "M&A", "Company Law", "Due Diligence"],
+    "Legal Consultant":          ["Legal Analysis", "Advisory", "Risk Assessment", "Contract Review", "Regulatory Knowledge"],
+    "Compliance Officer":        ["Regulatory Compliance", "Risk Management", "Policy Development", "Auditing", "Reporting"],
+    "Legal Researcher":          ["Legal Research", "Case Analysis", "Academic Writing", "Jurisprudence", "Documentation"],
+    "Public Prosecutor":         ["Criminal Law", "Litigation", "Evidence Evaluation", "Court Advocacy", "Legal Research"],
+    "Intellectual Property Attorney": ["IP Law", "Patent Drafting", "Trademark Registration", "Copyright Law", "IP Strategy"],
+    "Criminal Defense Attorney": ["Criminal Law", "Evidence Analysis", "Litigation", "Client Relations", "Trial Advocacy"],
+    # Commerce & Finance
+    "Chartered Accountant (CA)": ["Financial Accounting", "Taxation", "Auditing", "Corporate Law", "Financial Reporting"],
+    "Auditor":                   ["Audit Procedures", "Financial Analysis", "Risk Assessment", "Accounting Standards", "Reporting"],
+    "Tax Consultant":            ["Taxation", "GST", "Income Tax", "Tax Planning", "Compliance"],
+    "Financial Analyst":         ["Financial Modelling", "Valuation", "Excel", "Investment Analysis", "Reporting"],
+    "Investment Banker":         ["Valuation", "Capital Markets", "Financial Modelling", "Deal Structuring", "Relationship Management"],
+    "Actuary":                   ["Actuarial Mathematics", "Statistics", "Risk Analysis", "Financial Modelling", "Insurance"],
+    "Portfolio Manager":         ["Investment Analysis", "Portfolio Construction", "Risk Management", "Market Analysis", "CFA"],
+    "Banking Officer":           ["Banking Products", "Credit Analysis", "Customer Service", "Regulatory Compliance", "Financial Planning"],
+    "Stock Analyst":             ["Equity Research", "Financial Modelling", "Valuation", "Report Writing", "Market Analysis"],
+    "Cost Accountant":           ["Cost Accounting", "Management Accounting", "Budgeting", "Variance Analysis", "Costing Techniques"],
+    # Management
+    "Business Analyst":          ["Requirements Analysis", "Process Mapping", "Data Analysis", "Stakeholder Management", "Problem Solving"],
+    "Product Manager":           ["Product Strategy", "Roadmapping", "Agile", "User Research", "Data Analysis"],
+    "Marketing Manager":         ["Digital Marketing", "Brand Management", "Campaign Planning", "Analytics", "Communication"],
+    "Human Resources Manager":   ["Talent Acquisition", "Employee Relations", "Payroll", "Training & Development", "Labour Law"],
+    "Operations Manager":        ["Process Optimization", "Supply Chain", "Budgeting", "Team Leadership", "Performance Metrics"],
+    "Entrepreneur":              ["Business Planning", "Fundraising", "Team Building", "Market Research", "Financial Management"],
+    "Strategy Consultant":       ["Strategic Analysis", "Frameworks", "Client Management", "Research", "Presentation Skills"],
+    "Supply Chain Manager":      ["Supply Chain Planning", "Logistics", "Procurement", "Inventory Management", "ERP Systems"],
+    "Brand Manager":             ["Brand Strategy", "Market Research", "Campaign Management", "Consumer Insights", "Analytics"],
+    # Engineering & IT
+    "Software Engineer":         ["Programming", "Data Structures & Algorithms", "System Design", "Version Control", "Testing"],
+    "AI / ML Engineer":          ["Python", "Machine Learning", "Deep Learning", "MLOps", "Mathematics", "Model Deployment"],
+    "ML Engineer":               ["Python", "Machine Learning", "MLOps", "Docker", "Cloud Platform", "CI/CD"],
+    "Data Scientist":            ["Python/R", "Statistics", "Machine Learning", "SQL", "Data Visualization", "Feature Engineering"],
+    "Cloud Architect":           ["Cloud Platforms (AWS/Azure/GCP)", "System Design", "Networking", "Security", "Infrastructure"],
+    "DevOps Engineer":           ["Linux", "Docker", "Kubernetes", "CI/CD", "Cloud", "Monitoring"],
+    "Cybersecurity Analyst":     ["Network Security", "Penetration Testing", "SIEM Tools", "Vulnerability Assessment", "Security Protocols"],
+    "Full Stack Developer":      ["Frontend (React/Vue)", "Backend (Node/Django)", "Database", "APIs", "Version Control"],
+    "Data Analyst":              ["SQL", "Python/R", "Excel", "Data Visualization", "Statistical Analysis"],
+    "Embedded Systems Engineer": ["C/C++", "Microcontrollers", "RTOS", "Hardware Interfacing", "Debugging"],
+    "Research Engineer":         ["Mathematics", "Research Methodology", "ML/AI", "Paper Writing", "Programming"],
+    # Science
+    "Research Scientist":        ["Scientific Methodology", "Data Analysis", "Lab Techniques", "Scientific Writing", "Critical Thinking"],
+    "Biotechnologist":           ["Molecular Biology", "Genetic Engineering", "Lab Skills", "Bioinformatics", "Research Methods"],
+    "Environmental Scientist":   ["Environmental Analysis", "Field Research", "GIS", "Report Writing", "Sustainability"],
+    "Biostatistician":           ["Biostatistics", "Clinical Trial Design", "R/SAS", "Data Analysis", "Report Writing"],
+    "Forensic Scientist":        ["Forensic Analysis", "Chain of Custody", "Lab Skills", "Report Writing", "Criminal Procedure"],
+    # Psychology
+    "Clinical Psychologist":     ["Psychological Assessment", "Therapeutic Techniques", "Case Formulation", "Ethics", "Documentation"],
+    "Counseling Psychologist":   ["Counseling Skills", "Active Listening", "Psychological Assessment", "Mental Health", "Client Relations"],
+    "Organizational Psychologist": ["IO Psychology", "HR Analytics", "Workplace Wellbeing", "Assessment Tools", "Consulting"],
+    "Educational Psychologist":  ["Learning Assessment", "Child Development", "Intervention Strategies", "Report Writing", "School Collaboration"],
+    # Education
+    "School Teacher":            ["Subject Expertise", "Lesson Planning", "Classroom Management", "Assessment Design", "Communication"],
+    "University Professor / Lecturer": ["Research", "Academic Writing", "Teaching", "Mentorship", "Subject Expertise"],
+    "Curriculum Developer":      ["Curriculum Design", "Instructional Design", "Content Development", "Assessment", "Learning Objectives"],
+    "Education Consultant":      ["Education Policy", "School Management", "Leadership", "Communication", "Problem Solving"],
+    "E-Learning Designer":       ["Instructional Design", "LMS Platforms", "Multimedia Production", "Content Writing", "Assessment Design"],
+    # Architecture & Design
+    "Architect":                 ["AutoCAD", "Design Principles", "Construction Knowledge", "3D Modelling", "Project Management"],
+    "Urban Planner":             ["Urban Design", "GIS", "Policy Analysis", "Community Engagement", "Spatial Planning"],
+    "Interior Designer":         ["Space Planning", "3D Visualization", "Material Knowledge", "Client Management", "Design Software"],
+    "Graphic Designer":          ["Adobe Creative Suite", "Typography", "Visual Communication", "Brand Design", "Illustration"],
+    "UI/UX Designer":            ["Figma/Sketch", "User Research", "Prototyping", "Interaction Design", "Usability Testing"],
+    "Fashion Designer":          ["Fashion Illustration", "Textile Knowledge", "Garment Construction", "Trend Analysis", "Portfolio"],
+    "Product Designer":          ["CAD Software", "User Research", "Prototyping", "Materials Knowledge", "Design Thinking"],
+    # Agriculture
+    "Agricultural Scientist":    ["Agronomy", "Soil Science", "Crop Management", "Research Methods", "Data Analysis"],
+    "Food Technologist":         ["Food Science", "Quality Control", "Food Processing", "Regulatory Compliance", "Lab Skills"],
+    "Horticulturist":            ["Plant Science", "Pest Management", "Nursery Management", "Crop Cultivation", "Soil Knowledge"],
+    "Agricultural Extension Officer": ["Extension Education", "Farming Techniques", "Communication", "Rural Development", "Report Writing"],
+    "Veterinarian (Small Animal)": ["Clinical Veterinary Medicine", "Surgery", "Pharmacology", "Diagnostics", "Client Communication"],
+    # Media
+    "Journalist":                ["Writing & Editing", "Research", "Interview Skills", "Media Ethics", "Digital Media"],
+    "Content Creator / Influencer": ["Content Strategy", "Social Media", "Video Production", "SEO", "Analytics"],
+    "Film Director":             ["Direction", "Scriptwriting", "Cinematography", "Editing", "Production Management"],
+    "Public Relations Specialist": ["PR Strategy", "Media Relations", "Crisis Communication", "Writing", "Digital PR"],
+    # Hospitality
+    "Hotel Manager":             ["Hotel Operations", "Guest Relations", "Revenue Management", "Team Leadership", "F&B Knowledge"],
+    "Event Manager":             ["Event Planning", "Vendor Management", "Budgeting", "Logistics", "Communication"],
+    "Travel Consultant":         ["Geography", "Travel Products", "Customer Service", "Booking Systems", "Itinerary Planning"],
+    # Vocational
+    "Electrical Technician":     ["Electrical Wiring", "Circuit Analysis", "Safety Protocols", "Equipment Maintenance", "Troubleshooting"],
+    "Automotive Mechanic":       ["Engine Repair", "Diagnostics", "Electrical Systems", "Vehicle Maintenance", "Safety"],
+    "Welding Technician":        ["Welding Techniques", "Metal Fabrication", "Safety Protocols", "Blueprint Reading", "Quality Inspection"],
+    # Government & Arts
+    "Civil Services Officer (IAS/IPS)": ["Public Administration", "Policy Analysis", "Communication", "Leadership", "General Knowledge"],
+    "Political Analyst":         ["Political Theory", "Policy Research", "Communication", "Data Analysis", "Writing"],
+    "Social Worker":             ["Community Development", "Counseling", "Report Writing", "Empathy", "Program Management"],
+    "NGO Program Manager":       ["Program Management", "Fundraising", "Community Development", "Reporting", "Stakeholder Engagement"],
+    # Research
+    "Research Scientist":        ["Research Methodology", "Data Analysis", "Lab Techniques", "Scientific Writing", "Critical Thinking"],
+    "R&D Specialist":            ["Research Planning", "Innovation Management", "Lab Skills", "Patent Writing", "Cross-functional Collaboration"],
+    "HR Specialist":             ["Talent Acquisition", "Payroll", "Employee Relations", "HRIS", "Training & Development"],
 }
 
 CAREER_CERTIFICATIONS: dict[str, list[str]] = {
-    "AI Engineer":       ["TensorFlow Developer", "AWS ML Specialty", "Google Cloud ML Engineer", "Deep Learning Specialization"],
-    "Data Scientist":    ["Google Data Analytics", "IBM Data Science", "Databricks Associate", "SAS Certified"],
-    "ML Engineer":       ["AWS ML Specialty", "Google Cloud ML Engineer", "MLflow Certified", "Kubeflow"],
-    "Software Developer":["AWS Solutions Architect", "Google Associate Cloud", "Kubernetes CKA", "Oracle Java"],
-    "Data Analyst":      ["Google Data Analytics", "Microsoft Power BI", "Tableau Desktop", "IBM Data Analyst"],
-    "Backend Developer": ["AWS Developer", "MongoDB Associate", "PostgreSQL Associate", "Node.js Certified"],
-    "DevOps Engineer":   ["AWS DevOps Pro", "CKA", "HashiCorp Terraform", "GitLab Certified"],
+    "General Physician": ["USMLE / PLAB", "BLS / ACLS", "FMGE (MCI Screening)", "Fellowship Programs"],
+    "Surgeon": ["MRCS", "MS Surgery Board Cert", "ATLS", "Laparoscopic Surgery Cert"],
+    "Medical Researcher": ["GCP Certification", "ACRP Clinical Research", "Biostatistics Cert", "Research Ethics"],
+    "Cardiologist": ["MRCP", "Cardiology Board Cert", "ACLS", "Echocardiography Cert"],
+    "Neurologist": ["Neurology Board Cert", "MRCP", "EEG Certification", "ACLS"],
+    "Pediatrician": ["Pediatrics Board Cert", "NRP", "PALS", "Neonatology Cert"],
+    "Radiologist": ["Radiology Board Cert", "PET-CT Certification", "Interventional Radiology Cert"],
+    "Public Health Specialist": ["CHES", "MPH Degree", "WHO Health Promotion Cert", "Epidemiology Cert"],
+    "Hospital Administrator": ["FACHE", "PMP", "LEAN Healthcare Cert", "CPHIMS"],
+    "Dentist (General Practice)": ["BDS Registration", "BLS", "Implantology Cert", "Endodontics Cert"],
+    "Staff Nurse": ["RN License", "BLS", "Infection Control Cert", "IV Therapy Cert"],
+    "ICU / Critical Care Nurse": ["CCRN", "BLS/ACLS", "Ventilator Management Cert", "PCCN"],
+    "Community Health Nurse": ["PHN Certificate", "BLS", "Family Planning Cert", "ASHA Training"],
+    "Pharmacist": ["Pharmacy Council Registration", "BCPS", "Pharm.D", "MTM Certification"],
+    "Clinical Pharmacist": ["BCPS", "PharmD", "Clinical Pharmacology Cert"],
+    "Drug Safety Associate": ["DIA Pharmacovigilance Cert", "RAPS Regulatory Affairs", "GVP Cert"],
+    "Medical Writer": ["AMWA Certification", "RAC (RAPS)", "Medical Writing Cert"],
+    "Pharmaceutical Researcher": ["GLP Certification", "GCP Cert", "Clinical Research Cert"],
+    "Regulatory Affairs Specialist": ["RAC (RAPS)", "ISO 13485", "CDSCO Regulatory Cert"],
+    "Advocate / Lawyer": ["Bar Council Enrollment", "Mediation Cert", "Criminal Trial Advocacy"],
+    "Corporate Lawyer": ["Company Law Cert", "SEBI Registration", "Bar Council Enrollment", "M&A Cert"],
+    "Compliance Officer": ["Certified Compliance Professional (CCP)", "CAMS", "ISO 37301 Lead Implementer"],
+    "Intellectual Property Attorney": ["Patent Agent Exam", "Trademark Agent Registration", "IP Law Cert"],
+    "Chartered Accountant (CA)": ["ICAI CA Final", "DISA", "Certificate in Ind AS", "USFPA"],
+    "Auditor": ["CIA", "CPA", "CISA", "ACCA"],
+    "Tax Consultant": ["GST Practitioner Cert", "CA Inter", "CPA", "Tax Audit Cert"],
+    "Financial Analyst": ["CFA Level 1/2/3", "FRM", "Bloomberg Market Concepts", "CPA"],
+    "Investment Banker": ["CFA", "FRM", "CISI", "NISM Equity Derivatives"],
+    "Actuary": ["IAI Exams", "IFoA Exams", "SoA/CAS Exams"],
+    "Portfolio Manager": ["CFA", "NISM Series-V-A", "FRM", "Bloomberg Cert"],
+    "Business Analyst": ["CBAP", "PMI-PBA", "Agile BA Cert", "Six Sigma Green Belt"],
+    "Product Manager": ["AIPMM CPM", "Certified Scrum PO", "Google PM Cert", "PMP"],
+    "Marketing Manager": ["Google Digital Marketing", "HubSpot Marketing", "Meta Blueprint", "CIMM"],
+    "Human Resources Manager": ["SHRM-CP", "PHR", "CIPD", "HR Analytics Cert"],
+    "Operations Manager": ["Six Sigma Black Belt", "PMP", "APICS CPIM", "Lean Cert"],
+    "Software Engineer": ["AWS Developer", "Google Cloud Associate", "Oracle Java", "Microsoft Azure"],
+    "AI / ML Engineer": ["TensorFlow Developer Cert", "AWS ML Specialty", "Deep Learning Specialization", "Google ML Cert"],
+    "ML Engineer": ["AWS ML Specialty", "Google Cloud ML", "MLflow Certified", "Kubeflow"],
+    "Data Scientist": ["IBM Data Science", "Google Data Analytics", "Databricks Associate", "Kaggle Cert"],
+    "Cloud Architect": ["AWS Solutions Architect", "Google Cloud Professional Architect", "Azure Solutions Architect"],
+    "DevOps Engineer": ["CKA", "AWS DevOps Pro", "HashiCorp Terraform", "GitLab CI/CD"],
+    "Cybersecurity Analyst": ["CompTIA Security+", "CEH", "CISSP", "OSCP"],
+    "Data Analyst": ["Google Data Analytics", "Microsoft Power BI", "Tableau Desktop Specialist", "SQL Cert"],
+    "Research Scientist": ["GCP Cert", "Lab Safety Cert", "Research Ethics Cert", "Domain-specific Cert"],
+    "Biotechnologist": ["GLP Cert", "Bioinformatics Cert", "Flow Cytometry Cert", "PCR Specialist"],
+    "Environmental Scientist": ["ISO 14001 Lead Auditor", "GIS Certification (ESRI)", "NEBOSH Cert"],
+    "Biostatistician": ["SAS Certified", "R Programming Cert", "Biostatistics Cert"],
+    "School Teacher": ["B.Ed Degree", "TET / CTET", "CBSE Training Cert", "Google Educator"],
+    "University Professor / Lecturer": ["NET / JRF", "PhD Degree", "Faculty Development Program"],
+    "Curriculum Developer": ["Instructional Design Cert", "eLearning Authoring Cert", "Google Educator"],
+    "Architect": ["Council of Architecture (COA) Registration", "LEED Green Associate", "AutoCAD Certified"],
+    "UI/UX Designer": ["Google UX Design Cert", "Adobe XD Cert", "Figma Advanced Cert", "IDF Cert"],
+    "Graphic Designer": ["Adobe Certified Expert", "Canva Cert", "CorelDRAW Cert"],
+    "Agricultural Scientist": ["ICAR-NET", "ASRB ARS Exam", "Plant Protection Cert"],
+    "Food Technologist": ["FSSAI Cert", "HACCP Cert", "ISO 22000 Lead Auditor"],
+    "Veterinarian (Small Animal)": ["VCI Registration", "NAVLE", "Surgery Specialization Cert"],
+    "Journalist": ["Press Council Accreditation", "NCTJ Diploma", "Digital Journalism Cert"],
+    "Hotel Manager": ["IHM Diploma", "Revenue Management Cert", "Food Safety Supervisor Cert"],
+    "Event Manager": ["CSEP", "CMP", "Event Management Cert"],
+    "Electrical Technician": ["ITI Certificate", "Wireman License", "CPRI Cert"],
+    "Automotive Mechanic": ["ITI Mechanic Cert", "ASE Certification", "EV Mechanic Cert"],
+    "Welding Technician": ["ASME Welding Cert", "AWS CWI", "ISO 9606 Welding Cert"],
+    "Civil Services Officer (IAS/IPS)": ["UPSC Civil Services", "State PCS", "LBSNAA Training"],
+    "Clinical Psychologist": ["RCI License", "AMHCA Cert", "CBT Certification"],
+    "Counseling Psychologist": ["Counseling Cert", "RCI License", "Mental Health First Aid"],
+    "Research Scientist": ["Domain Specialization Cert", "GCP Cert", "Data Analysis Cert"],
 }
 
 CAREER_PROJECTS: dict[str, list[str]] = {
-    "AI Engineer":       ["Image Classification System", "NLP Chatbot", "Object Detection Pipeline", "Recommendation Engine"],
-    "Data Scientist":    ["EDA + Dashboard", "Predictive Model Deployment", "Customer Segmentation", "A/B Test Analysis"],
-    "ML Engineer":       ["ML Pipeline with MLflow", "Model Serving API", "Feature Store", "AutoML System"],
-    "Software Developer":["REST API Project", "CRUD Application", "CLI Tool", "Open Source Contribution"],
-    "Data Analyst":      ["Interactive Dashboard", "KPI Report Automation", "SQL Analysis Project", "Business Intelligence Report"],
-    "Backend Developer": ["Microservices App", "REST API with Auth", "Database Design Project", "API Rate Limiter"],
-    "DevOps Engineer":   ["CI/CD Pipeline", "Kubernetes Deployment", "Infrastructure as Code", "Monitoring Stack"],
+    "General Physician": ["Clinical Case Portfolio", "Community Health Camp", "Patient Education Module"],
+    "Surgeon": ["Surgical Case Log", "Operative Techniques Portfolio", "Case Presentation at Conference"],
+    "Medical Researcher": ["Clinical Trial Protocol", "Systematic Review Publication", "Epidemiological Study"],
+    "Public Health Specialist": ["Community Health Survey", "Disease Surveillance Report", "Health Policy Brief"],
+    "Hospital Administrator": ["Hospital Process Improvement", "Budget Management Report", "Accreditation Prep Report"],
+    "Staff Nurse": ["Patient Care Protocol Manual", "Infection Control Audit", "Nursing Case Portfolio"],
+    "ICU / Critical Care Nurse": ["Critical Care Protocol Review", "Patient Safety Audit", "ICU Data Study"],
+    "Pharmacist": ["Drug Interaction Database", "Formulary Review", "Medication Counseling Record"],
+    "Drug Safety Associate": ["Pharmacovigilance Case Studies", "SAE Report Portfolio", "Signal Detection Report"],
+    "Pharmaceutical Researcher": ["Drug Synthesis Report", "Preclinical Study Report", "Research Publication"],
+    "Advocate / Lawyer": ["Legal Case Brief Portfolio", "Moot Court Participation", "Contract Drafting Portfolio"],
+    "Corporate Lawyer": ["M&A Due Diligence Report", "Corporate Governance Manual", "Company Law Audit"],
+    "Compliance Officer": ["Regulatory Compliance Framework", "AML Policy Document", "Risk Assessment Report"],
+    "Chartered Accountant (CA)": ["Financial Audit Report", "Tax Compliance Project", "Articleship Case Studies"],
+    "Financial Analyst": ["Financial Model (DCF/LBO)", "Equity Research Report", "Investment Thesis"],
+    "Investment Banker": ["Pitch Deck / CIM", "Valuation Model", "M&A Case Study"],
+    "Auditor": ["Internal Audit Report", "Risk Assessment Study", "Statutory Audit Case"],
+    "Business Analyst": ["Business Process Mapping", "Requirements Specification Doc", "Case Study Analysis"],
+    "Product Manager": ["Product Roadmap", "PRD Document", "User Research Report", "A/B Testing Analysis"],
+    "Marketing Manager": ["Digital Campaign Project", "Brand Strategy Deck", "Market Research Report"],
+    "Human Resources Manager": ["HR Policy Manual", "Recruitment Campaign", "Employee Engagement Survey"],
+    "Software Engineer": ["REST API Project", "CRUD Application", "Open Source Contribution"],
+    "AI / ML Engineer": ["ML Model Deployment", "NLP Chatbot", "Computer Vision Project", "Kaggle Competition"],
+    "Data Scientist": ["EDA + Dashboard", "Predictive Model", "Customer Segmentation Project"],
+    "Cloud Architect": ["Multi-Tier Cloud Architecture", "Infrastructure as Code", "Cloud Cost Optimization"],
+    "DevOps Engineer": ["CI/CD Pipeline", "Kubernetes Cluster Setup", "Monitoring Stack"],
+    "Cybersecurity Analyst": ["Penetration Test Report", "Vulnerability Assessment", "SIEM Implementation"],
+    "Data Analyst": ["Interactive Dashboard (Power BI/Tableau)", "SQL Analysis Report", "BI Project"],
+    "Research Scientist": ["Research Paper Publication", "Lab Experiment Documentation", "Thesis Project"],
+    "Biotechnologist": ["Gene Expression Analysis", "PCR Protocol Project", "Bioinformatics Pipeline"],
+    "Environmental Scientist": ["Environmental Impact Assessment", "GIS Mapping Project", "Sustainability Report"],
+    "School Teacher": ["Lesson Plan Portfolio", "Student Assessment Project", "Classroom Innovation"],
+    "University Professor / Lecturer": ["Research Publication", "Course Design Portfolio", "Grant Proposal"],
+    "Curriculum Developer": ["Curriculum Design Document", "eLearning Module", "Assessment Framework"],
+    "Architect": ["Building Design Portfolio", "3D Model Project", "Urban Design Proposal"],
+    "UI/UX Designer": ["Mobile App UX Case Study", "Website Redesign", "Design System"],
+    "Graphic Designer": ["Brand Identity Project", "Logo Portfolio", "Poster Campaign"],
+    "Agricultural Scientist": ["Crop Yield Analysis", "Soil Testing Report", "Pest Management Study"],
+    "Food Technologist": ["FSSAI Compliance Report", "New Product Development", "Quality Audit Report"],
+    "Journalist": ["News Article Portfolio", "Investigative Report", "Feature Story"],
+    "Hotel Manager": ["Revenue Optimization Report", "Guest Satisfaction Survey", "Hotel Operations Manual"],
+    "Event Manager": ["Event Portfolio", "Budget Management Report", "Vendor Management Case Study"],
+    "Electrical Technician": ["Electrical Installation Project", "Wiring Diagram Portfolio", "Safety Audit"],
+    "Automotive Mechanic": ["Vehicle Diagnosis Portfolio", "Engine Overhaul Report", "EV Servicing Log"],
+    "Welding Technician": ["Welding Certification Portfolio", "Metal Fabrication Project", "Quality Inspection Log"],
+    "Civil Services Officer (IAS/IPS)": ["Policy Analysis Essay", "Case Study Reports", "Essay Competition Portfolio"],
+    "Clinical Psychologist": ["Case Formulation Portfolio", "Assessment Report Portfolio", "Research Paper"],
+    "Counseling Psychologist": ["Client Case Studies", "Group Therapy Design", "Counseling Portfolio"],
 }
+
+# ── Domain detection helper ────────────────────────────────────────────────
+
+def _detect_domain(profile: Optional[StudentProfile], user_subjects: set[str]) -> str:
+    """Detect learner's domain from degree/course, goals, and subjects."""
+    context = " " + " ".join(user_subjects).lower() + " "
+    if profile:
+        context += f" {(profile.course or '').lower()} {(profile.academic_goals or '').lower()} "
+
+    for keyword, domain in DEGREE_DOMAIN_MAP:
+        if keyword in context:
+            return domain
+    return "general"
+
+
+def _get_domain_careers(domain: str, context: str) -> list[str]:
+    """Return relevant careers for the domain, with cross-domain additions."""
+    careers = list(DOMAIN_CAREERS.get(domain, []))
+
+    # Cross-domain additions based on detected skills/keywords
+    if any(kw in context for kw in ["data", "analytics", "statistics", "python", "sql"]):
+        for c in ["Data Analyst", "Data Scientist", "Biostatistician"]:
+            if c not in careers and c in CAREER_SKILLS:
+                careers.append(c)
+
+    if any(kw in context for kw in ["research", "publication", "phd", "mphil"]):
+        for c in ["Research Scientist", "University Professor / Lecturer"]:
+            if c not in careers and c in CAREER_SKILLS:
+                careers.append(c)
+
+    if any(kw in context for kw in ["management", "leadership", "hr", "administration"]):
+        for c in ["Operations Manager", "Human Resources Manager"]:
+            if c not in careers and c in CAREER_SKILLS:
+                careers.append(c)
+
+    if not careers:
+        # General fallback — pick roles with most keyword overlap
+        careers = list(CAREER_SKILLS.keys())[:12]
+
+    return careers
 
 
 def _best_role(subjects: List[str], profile: Optional[StudentProfile]) -> str:
+    """Return the single best-matching career for this learner."""
     context = " ".join(subjects).lower()
     if profile:
-        context += f" {profile.course} {profile.academic_goals}".lower()
-    best_role, best_score = "Software Developer", 0
-    for role, keywords in CAREER_SKILLS.items():
+        context += f" {(profile.course or '').lower()} {(profile.academic_goals or '').lower()}"
+
+    domain = _detect_domain(profile, set(subjects))
+    candidates = _get_domain_careers(domain, context)
+
+    best_role = candidates[0] if candidates else "Software Engineer"
+    best_score = -1
+    for role in candidates:
+        keywords = CAREER_SKILLS.get(role, [])
+        if not keywords:
+            continue
         score = sum(1 for kw in keywords if kw in context)
         if score > best_score:
             best_score, best_role = score, role
     return best_role
 
 
+def _compute_career_score(
+    role: str,
+    context: str,
+    course: str,
+    goals: str,
+    resume_skills: list[str],
+    certifications: list[str],
+    avg_score: float,
+    avg_study: float,
+) -> tuple[int, list[str], list[str], str]:
+    """
+    Domain-aware career compatibility.
+    Formula: 40% Skill Match + 25% Education Match + 20% Experience +
+             10% Certification Match + 5% Goals Match
+    """
+    keywords = CAREER_SKILLS.get(role, [])
+    if not keywords:
+        return 0, [], [], f"No keyword data available for {role}."
+
+    full_ctx = (context + " " + " ".join(resume_skills)).lower()
+    course_l = course.lower()
+    goals_l  = goals.lower()
+    cert_l   = " ".join(certifications).lower()
+
+    # 40% — Skill Match (subjects + resume skills vs role keywords)
+    matched_kw = [kw for kw in keywords if kw in full_ctx]
+    skill_pct  = (len(matched_kw) / len(keywords)) * 100
+
+    # 25% — Education Match (degree keywords vs role keywords)
+    edu_matches = sum(1 for kw in keywords if kw in course_l)
+    edu_pct     = min(100.0, (edu_matches / max(1, min(4, len(keywords)))) * 100)
+
+    # 20% — Experience Match (proxy: academic score × study hours factor)
+    exp_pct = min(100.0, avg_score * 0.65 + min(avg_study / 6, 1) * 35)
+
+    # 10% — Certification Match
+    cert_matches = sum(1 for kw in keywords if kw in cert_l)
+    cert_pct     = min(100.0, cert_matches * 30.0)
+
+    # 5% — Goals Match
+    goal_matches = sum(1 for kw in keywords if kw in goals_l)
+    goals_pct    = min(100.0, goal_matches * 25.0)
+
+    total = int(
+        skill_pct * 0.40 +
+        edu_pct   * 0.25 +
+        exp_pct   * 0.20 +
+        cert_pct  * 0.10 +
+        goals_pct * 0.05
+    )
+    total = max(5, min(99, total))
+
+    # Human-readable reasoning
+    if matched_kw:
+        reasoning = (
+            f"Your {course or 'academic'} background with matched skills "
+            f"({', '.join(matched_kw[:2])}) aligns well with {role}."
+        )
+    elif edu_matches:
+        reasoning = f"Your {course} programme provides relevant foundational knowledge for {role}."
+    elif avg_score > 70:
+        reasoning = f"Strong academic performance ({avg_score:.0f}%) indicates capacity to grow into {role}."
+    else:
+        reasoning = f"With targeted upskilling you can transition into {role} from your current profile."
+
+    required = CAREER_REQUIRED_SKILLS.get(role, [])
+    missing  = [r for r in required if r.lower() not in full_ctx][:5]
+    return total, [m.title() for m in matched_kw[:4]], missing, reasoning
+
+
 def _match_score(user_context: str, role: str) -> tuple[int, list[str], list[str]]:
+    """Legacy helper kept for skill-gap and roadmap endpoints."""
     keywords = CAREER_SKILLS.get(role, [])
     required = CAREER_REQUIRED_SKILLS.get(role, [])
-    matched = [kw for kw in keywords if kw in user_context.lower()]
-    missing = [r for r in required if r.lower() not in user_context.lower()]
-    pct = round(len(matched) / len(keywords) * 100) if keywords else 0
+    matched  = [kw for kw in keywords if kw in user_context.lower()]
+    missing  = [r for r in required if r.lower() not in user_context.lower()]
+    pct      = round(len(matched) / len(keywords) * 100) if keywords else 0
     return pct, [m.title() for m in matched], missing[:5]
 
 
@@ -1187,7 +1861,7 @@ Respond ONLY with valid JSON array (5 steps):
     )
 
 
-# ── 7. Career Recommendations ─────────────────────────────────────────────
+# ── 7. Career Recommendations (domain-aware) ──────────────────────────────
 
 @router.get("/recommendations", response_model=CareerRecommendationsResponse)
 def get_career_recommendations(
@@ -1197,49 +1871,88 @@ def get_career_recommendations(
     profile = db.query(StudentProfile).filter_by(user_id=current_user.id).first()
     records = db.query(SubjectRecord).filter_by(user_id=current_user.id).all()
     entries = db.query(LearningData).filter_by(user_id=current_user.id).all()
+    twin    = db.query(CareerTwin).filter_by(user_id=current_user.id).first()
 
+    # Gather all learner context
     user_subjects: set[str] = set()
     if profile and profile.subjects:
         for s in profile.subjects.split(","):
             if s.strip(): user_subjects.add(s.strip())
-    for r in records: user_subjects.add(r.subject)
+    for r in records:
+        user_subjects.add(r.subject)
 
-    context   = " ".join(user_subjects).lower()
-    if profile: context += f" {profile.course} {profile.academic_goals}".lower()
+    resume_skills: list[str] = []
+    certifications: list[str] = []
+    if twin:
+        if twin.skills_json:
+            resume_skills = json.loads(twin.skills_json or "[]")
+        if twin.certifications_json:
+            certifications = json.loads(twin.certifications_json or "[]")
+
+    course    = (profile.course if profile else "") or ""
+    goals     = (profile.academic_goals if profile else "") or ""
+    context   = " ".join(user_subjects).lower() + " " + course.lower() + " " + goals.lower()
     avg_score = _safe_avg([r.score for r in records]) if records else 50.0
     avg_study = _safe_avg([e.study_hours for e in entries]) if entries else 0.0
 
-    recs: list[CareerRecommendation] = []
-    for role, required in CAREER_REQUIRED_SKILLS.items():
-        pct, matched, missing = _match_score(context, role)
-        boosted = min(100, int(pct * 0.6 + avg_score * 0.3 + min(avg_study / 6, 1) * 10))
-        recs.append(CareerRecommendation(
-            role=role, compatibility=boosted,
-            reasoning=f"Your profile shows {len(matched)} keyword matches for {role}.",
-            required_skills=required[:5], key_matches=matched[:4],
-        ))
-    recs.sort(key=lambda r: r.compatibility, reverse=True)
-    top = recs[0].role if recs else "Software Developer"
+    # Detect the learner's domain and get relevant careers
+    domain    = _detect_domain(profile, user_subjects)
+    candidates = _get_domain_careers(domain, context)
 
+    # Score every candidate role using the 5-factor formula
+    recs: list[CareerRecommendation] = []
+    for role in candidates:
+        if role not in CAREER_REQUIRED_SKILLS:
+            continue
+        score, matched, missing, reasoning = _compute_career_score(
+            role, context, course, goals,
+            resume_skills, certifications, avg_score, avg_study,
+        )
+        recs.append(CareerRecommendation(
+            role=role,
+            compatibility=score,
+            reasoning=reasoning,
+            required_skills=CAREER_REQUIRED_SKILLS.get(role, [])[:5],
+            key_matches=matched,
+        ))
+
+    recs.sort(key=lambda r: r.compatibility, reverse=True)
+    top = recs[0].role if recs else (candidates[0] if candidates else "Research Scientist")
+
+    # Domain-aware Twin Insight via LLM
+    domain_label = domain.replace("_", " ").title()
+    subjects_str = ", ".join(list(user_subjects)[:6]) or "various subjects"
+    insight_prompt = (
+        f"Learner domain: {domain_label}. "
+        f"Degree/Course: {course or 'Not specified'}. "
+        f"Subjects/Skills: {subjects_str}. "
+        f"Academic score: {avg_score:.0f}%. "
+        f"Top career match: {top}. "
+        "Write ONE compelling, domain-specific sentence (max 35 words) from Digital Twin perspective "
+        "predicting this learner's career trajectory. Be specific to their field, not generic tech."
+    )
     try:
         client = _get_client()
         resp = client.chat.completions.create(
             model=GROQ_MODEL,
-            messages=[{"role": "user", "content": (
-                f"Student: {profile.course if profile else 'General'}, subjects: {', '.join(list(user_subjects)[:5]) if user_subjects else 'various'}. "
-                f"Avg score: {avg_score:.0f}%. Top career match: {top}. "
-                "Write one compelling sentence (max 30 words) predicting their career from Digital Twin perspective."
-            )}],
-            temperature=0.5, max_tokens=80,
+            messages=[{"role": "user", "content": insight_prompt}],
+            temperature=0.5, max_tokens=90,
         )
         twin_insight = resp.choices[0].message.content.strip().strip('"')
     except Exception:
-        twin_insight = f"Your learning trajectory strongly points toward a {top} career path."
+        twin_insight = (
+            f"Your {course or domain_label} background and {subjects_str[:40]} "
+            f"strongly align with a future in {top}."
+        )
 
-    return CareerRecommendationsResponse(recommendations=recs[:6], top_match=top, twin_insight=twin_insight)
+    return CareerRecommendationsResponse(
+        recommendations=recs[:6],
+        top_match=top,
+        twin_insight=twin_insight,
+    )
 
 
-# ── 8. Job Matching ───────────────────────────────────────────────────────
+# ── 8. Job Matching (domain-aware) ───────────────────────────────────────
 
 @router.get("/job-matching", response_model=JobMatchResponse)
 def get_job_matching(
@@ -1255,32 +1968,55 @@ def get_job_matching(
     if profile and profile.subjects:
         for s in profile.subjects.split(","):
             if s.strip(): user_subjects.add(s.strip())
-    for r in records: user_subjects.add(r.subject)
+    for r in records:
+        user_subjects.add(r.subject)
 
-    context   = " ".join(user_subjects).lower()
-    if profile: context += f" {profile.course} {profile.academic_goals}".lower()
+    resume_skills: list[str] = []
+    certifications: list[str] = []
+    if twin:
+        resume_skills  = json.loads(twin.skills_json or "[]")
+        certifications = json.loads(twin.certifications_json or "[]")
+
+    course    = (profile.course if profile else "") or ""
+    goals     = (profile.academic_goals if profile else "") or ""
+    context   = " ".join(user_subjects).lower() + " " + course.lower() + " " + goals.lower()
     avg_score = _safe_avg([r.score for r in records]) if records else 50.0
+    avg_study = _safe_avg([e.study_hours for e in entries]) if entries else 0.0
 
-    resume_r   = int(twin.resume_score    if twin else 0)
-    interview_r= int(twin.interview_score if twin else 0)
+    resume_r    = int(twin.resume_score    if twin else 0)
+    interview_r = int(twin.interview_score if twin else 0)
+
+    # Use domain-aware career list
+    domain     = _detect_domain(profile, user_subjects)
+    candidates = _get_domain_careers(domain, context)
 
     matches: list[JobMatchEntry] = []
-    for role in CAREER_REQUIRED_SKILLS:
-        pct, matched, missing = _match_score(context, role)
-        final     = min(99, int(pct * 0.60 + avg_score * 0.25 + 15))
-        gap_pct   = 100 - final
-        res_ready = min(99, resume_r + 5)
-        int_ready = min(99, interview_r + 5)
+    for role in candidates:
+        if role not in CAREER_REQUIRED_SKILLS:
+            continue
+        score, matched, missing, reasoning = _compute_career_score(
+            role, context, course, goals,
+            resume_skills, certifications, avg_score, avg_study,
+        )
+        gap_pct    = max(1, 100 - score)
+        res_ready  = min(99, resume_r + 5)
+        int_ready  = min(99, interview_r + 5)
         matches.append(JobMatchEntry(
-            role=role, match_percent=final, skill_gap_percent=gap_pct,
-            resume_readiness=res_ready, interview_readiness=int_ready,
-            reasoning=f"Matched {len(matched)} of {len(CAREER_SKILLS.get(role, []))} keywords.",
-            key_skills_matched=matched[:4], missing_skills=missing[:3],
+            role=role,
+            match_percent=score,
+            skill_gap_percent=gap_pct,
+            resume_readiness=res_ready,
+            interview_readiness=int_ready,
+            reasoning=reasoning,
+            key_skills_matched=matched[:4],
+            missing_skills=missing[:3],
             recommended_certifications=CAREER_CERTIFICATIONS.get(role, [])[:2],
             portfolio_projects=CAREER_PROJECTS.get(role, [])[:2],
         ))
+
     matches.sort(key=lambda m: m.match_percent, reverse=True)
-    return JobMatchResponse(matches=matches, top_role=matches[0].role if matches else "Software Developer")
+    top = matches[0].role if matches else (candidates[0] if candidates else "Research Scientist")
+    return JobMatchResponse(matches=matches, top_role=top)
 
 
 # ── 9. Career Roadmap ─────────────────────────────────────────────────────
