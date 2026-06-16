@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTheme, THEMES, type ThemeMeta } from '../contexts/ThemeContext';
+import { useParticles, PARTICLE_STYLES, THEME_DEFAULT_PARTICLE, type ParticleStyle } from '../contexts/ParticleContext';
 
 // ── Mini theme card inside the picker panel ───────────────────────────────────
 
@@ -62,10 +63,57 @@ function PickerCard({ theme, active, onClick }:
   );
 }
 
-// ── Main ThemeToggle ──────────────────────────────────────────────────────────
+// ── Particle Style Button ─────────────────────────────────────────────────────
+
+function ParticleBtn({ ps, active, onClick }: {
+  ps: typeof PARTICLE_STYLES[number];
+  active: boolean;
+  onClick: () => void;
+}) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      title={ps.description}
+      style={{
+        flex: '1 1 auto',
+        minWidth: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '0.2rem',
+        padding: '0.45rem 0.3rem',
+        background: active ? 'rgba(255,255,255,0.1)' : hov ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)',
+        border: `1px solid ${active ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.06)'}`,
+        borderRadius: 10,
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+        boxShadow: active ? '0 0 12px rgba(0,212,255,0.15)' : 'none',
+      }}
+    >
+      <span style={{ fontSize: '0.9rem' }}>{ps.icon}</span>
+      <span style={{
+        fontSize: '0.58rem',
+        fontWeight: active ? 700 : 500,
+        color: active ? '#e2e8f0' : '#64748b',
+        textAlign: 'center',
+        lineHeight: 1.25,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        maxWidth: '100%',
+      }}>
+        {ps.name}
+      </span>
+    </button>
+  );
+}
 
 export default function ThemeToggle() {
   const { themeId, setTheme, themeMeta } = useTheme();
+  const { particleStyle, setParticleStyle } = useParticles();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -143,17 +191,51 @@ export default function ThemeToggle() {
             ))}
           </div>
 
+          {/* Particle Style Picker */}
+          <div style={{ marginTop: '0.85rem' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              marginBottom: '0.45rem',
+            }}>
+              <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#64748b', letterSpacing: '0.06em' }}>
+                ✦ PARTICLE STYLE
+              </span>
+              {particleStyle !== THEME_DEFAULT_PARTICLE[themeId] && (
+                <button
+                  onClick={() => setParticleStyle(THEME_DEFAULT_PARTICLE[themeId] as ParticleStyle)}
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    fontSize: '0.58rem', color: '#475569',
+                    padding: '1px 5px', borderRadius: 4,
+                  }}
+                >
+                  reset
+                </button>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: '0.3rem' }}>
+              {PARTICLE_STYLES.map(ps => (
+                <ParticleBtn
+                  key={ps.id}
+                  ps={ps}
+                  active={particleStyle === ps.id}
+                  onClick={() => setParticleStyle(ps.id)}
+                />
+              ))}
+            </div>
+            <div style={{ marginTop: '0.35rem', fontSize: '0.58rem', color: '#334155', textAlign: 'center' }}>
+              {PARTICLE_STYLES.find(p => p.id === particleStyle)?.description}
+            </div>
+          </div>
+
           {/* Footer */}
           <div style={{
-            marginTop: '0.85rem', padding: '0.55rem 0.8rem',
+            marginTop: '0.75rem', padding: '0.55rem 0.8rem',
             background: 'rgba(255,255,255,0.03)',
             border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: 10, fontSize: '0.62rem', color: '#475569',
           }}>
-            💡 Full theme controls & personalization score in{' '}
-            <a href="/profile" onClick={() => setOpen(false)} style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>
-              Settings
-            </a>
+            💡 Particle style is saved per theme — switch themes to see defaults
           </div>
         </div>
       )}

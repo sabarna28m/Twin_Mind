@@ -116,7 +116,7 @@ const TABS = [
   { id: 'resume',          label: 'Resume',         icon: '📄' },
   { id: 'linkedin',        label: 'LinkedIn',       icon: '💼' },
   { id: 'interview',       label: 'Interview',      icon: '🎤' },
-  { id: 'coding',          label: 'Coding',         icon: '💻' },
+  { id: 'coding',          label: 'Practice',       icon: '💡' },
   { id: 'skillgap',        label: 'Skill Gap',      icon: '📊' },
   { id: 'recommendations', label: 'Careers',        icon: '🌟' },
   { id: 'jobmatch',        label: 'Job Match',      icon: '🔍' },
@@ -125,18 +125,56 @@ const TABS = [
   { id: 'resources',       label: 'Resources',      icon: '📚' },
 ];
 
-const CAREER_OPTIONS = ['AI Engineer','Data Scientist','ML Engineer','Software Developer','Research Engineer','Data Analyst','Backend Developer','DevOps Engineer'];
+const CAREER_OPTIONS = [
+  // Technology & Engineering
+  'AI / ML Engineer', 'Data Scientist', 'Software Developer', 'Backend Developer',
+  'DevOps Engineer', 'Cybersecurity Analyst', 'Cloud Architect', 'Data Analyst',
+  'UI/UX Designer', 'Embedded Systems Engineer', 'Research Engineer',
+  // Medical & Healthcare
+  'Doctor (General Physician)', 'Surgeon', 'Medical Researcher',
+  'Nurse Practitioner', 'Pharmacist', 'Public Health Specialist',
+  'Clinical Research Associate', 'Healthcare Administrator', 'Dentist',
+  // Law & Legal
+  'Corporate Lawyer', 'Criminal Defense Attorney', 'Legal Consultant',
+  'Compliance Officer', 'Intellectual Property Attorney',
+  // Management & Business
+  'Product Manager', 'Business Analyst', 'Marketing Manager',
+  'Human Resources Manager', 'Operations Manager', 'Entrepreneur',
+  'Strategy Consultant', 'Supply Chain Manager',
+  // Finance & Commerce
+  'Chartered Accountant (CA)', 'Investment Banker', 'Financial Analyst',
+  'Auditor', 'Tax Consultant', 'Actuary', 'Portfolio Manager',
+  // Education & Research
+  'University Professor', 'Research Scientist', 'School Teacher',
+  'Curriculum Developer', 'Education Consultant',
+  // Design & Media
+  'Graphic Designer', 'Film Director / Editor', 'Journalist',
+  'Content Creator', 'Public Relations Specialist',
+  // Architecture & Environment
+  'Architect', 'Interior Designer', 'Urban Planner', 'Environmental Scientist',
+  // Agriculture & Life Sciences
+  'Agricultural Scientist', 'Horticulturist', 'Veterinary Doctor',
+  // Vocational & Skilled Trades
+  'Electrical Technician', 'Automotive Mechanic', 'Welding Technician', 'Civil Technician',
+  // Government & Public Service
+  'IAS / IPS Officer', 'Government Policy Analyst', 'Defence Officer',
+  // Others
+  'Freelancer / Independent Consultant', 'Social Entrepreneur', 'NGO Program Manager',
+];
 
 const RESOURCES = [
-  { name:'LinkedIn',    url:'https://linkedin.com',      icon:'💼', color:'#0077b5', desc:'Professional networking and job search.',       tip:'Update profile weekly; connect with 5 new people daily.' },
-  { name:'LeetCode',    url:'https://leetcode.com',      icon:'⚡', color:'#f89f1b', desc:'3000+ coding interview problems.',              tip:'Solve 1 problem daily. Focus on patterns, not memorization.' },
-  { name:'GitHub',      url:'https://github.com',        icon:'🐙', color:'#f0f6fc', desc:'Host projects and contribute to open source.',  tip:'Maintain green contribution graph. Pin your best 6 projects.' },
-  { name:'Kaggle',      url:'https://kaggle.com',        icon:'🔬', color:'#20beff', desc:'ML competitions and real-world datasets.',      tip:'Aim for top 10% in competitions to boost your profile.' },
-  { name:'HackerRank',  url:'https://hackerrank.com',    icon:'🟢', color:'#00ea64', desc:'Coding challenges and skill certifications.',   tip:'Earn 5-star certificates to show employers verified skills.' },
-  { name:'Codeforces',  url:'https://codeforces.com',    icon:'🏆', color:'#1c86ee', desc:'Competitive programming contests.',             tip:'Participate in rated contests to reach Specialist+ rating.' },
-  { name:'Coursera',    url:'https://coursera.org',      icon:'🎓', color:'#0056d2', desc:'University courses from top institutions.',     tip:'Complete specializations for structured learning paths.' },
-  { name:'edX',         url:'https://edx.org',           icon:'📖', color:'#02262b', desc:'Professional certs from MIT, Harvard, and more.',tip:'Enroll in MicroMasters programs for deep expertise.' },
-  { name:'Udemy',       url:'https://udemy.com',         icon:'🎯', color:'#a435f0', desc:'Practical skill courses at low cost.',          tip:'Buy on sale (~$15). Focus on project-based courses.' },
+  { name:'LinkedIn',       url:'https://linkedin.com',                   icon:'💼', color:'#0077b5', desc:'Professional networking, job search, and career building across every field.',   tip:'Update your profile weekly. Connect with 5 professionals in your domain daily.' },
+  { name:'Coursera',       url:'https://coursera.org',                   icon:'🎓', color:'#0056d2', desc:'University courses & certificates from top global institutions in any discipline.', tip:'Complete specializations for structured, globally recognized learning paths.' },
+  { name:'edX',            url:'https://edx.org',                        icon:'📖', color:'#5c3e94', desc:'Professional certificates from MIT, Harvard & world-class universities.',           tip:'Enroll in MicroMasters programs for deep expertise recognized by top employers.' },
+  { name:'NPTEL',          url:'https://nptel.ac.in',                    icon:'🏛️', color:'#f59e0b', desc:'Free courses from IITs and IIMs across technical and professional domains.',       tip:'Earn NPTEL-certified scores — valuable for government and PSU job applications.' },
+  { name:'Khan Academy',   url:'https://khanacademy.org',                icon:'📚', color:'#14bf96', desc:'Free, world-class education across maths, science, humanities, and economics.',    tip:'Use to strengthen fundamentals in any subject — from algebra to legal reasoning.' },
+  { name:'Google Scholar', url:'https://scholar.google.com',             icon:'🔍', color:'#4285f4', desc:'Search millions of scholarly articles, theses, patents, and research papers.',     tip:'Set keyword alerts for new research in your field. Essential for PhD learners.' },
+  { name:'PubMed',         url:'https://pubmed.ncbi.nlm.nih.gov',        icon:'🔬', color:'#336699', desc:'35M+ medical, nursing, and biomedical research articles and clinical trials.',      tip:'Essential for healthcare learners exploring evidence-based clinical practice.' },
+  { name:'Internshala',    url:'https://internshala.com',                icon:'💡', color:'#00b4d8', desc:'Internships, training programs, and fresher jobs across all disciplines in India.', tip:'Apply early — competitive positions fill within hours of being posted.' },
+  { name:'Udemy',          url:'https://udemy.com',                      icon:'🎯', color:'#a435f0', desc:'Practical, hands-on skill courses across every profession and domain.',             tip:'Buy on sale for ~$15. Prioritize project-based courses with real deliverables.' },
+  { name:'GitHub',         url:'https://github.com',                     icon:'🐙', color:'#e2e8f0', desc:'Host technical projects, collaborate, and build a visible public portfolio.',       tip:'Maintain a consistent contribution graph. Pin your 6 best projects.' },
+  { name:'LeetCode',       url:'https://leetcode.com',                   icon:'⚡', color:'#f89f1b', desc:'3000+ coding interview problems for tech and software engineering roles.',          tip:'Solve 1 problem daily. Focus on problem patterns, not memorization.' },
+  { name:'Kaggle',         url:'https://kaggle.com',                     icon:'📊', color:'#20beff', desc:'ML competitions, real-world datasets, and data science community notebooks.',       tip:'Compete in active challenges to build a strong data science and AI portfolio.' },
 ];
 
 // ── Shared primitives ────────────────────────────────────────────────────────
@@ -1361,8 +1399,8 @@ function InterviewSection() {
       <div style={{ fontSize:'3rem', marginBottom:'1rem' }}>🎤</div>
       <div style={{ color:TEXT, fontWeight:700, fontSize:'1.2rem', marginBottom:'0.5rem' }}>AI Mock Interview</div>
       <div style={{ color:MUTED, fontSize:'0.85rem', lineHeight:1.6, marginBottom:'1.5rem' }}>
-        8 questions mixing Technical, Behavioral, HR, and Situational rounds.<br/>
-        Get scored on Communication, Confidence, Technical Depth, and Problem Solving.
+        8 questions mixing Domain Knowledge, Behavioral, HR, and Situational rounds.<br/>
+        Scored on Communication, Confidence, Domain Depth, and Problem Solving.
       </div>
       <select value={role} onChange={e=>setRole(e.target.value)}
         style={{ width:'100%', background:'#0d1117', border:BORDER, borderRadius:10, padding:'0.65rem 1rem', color:TEXT, fontSize:'0.9rem', marginBottom:'1rem' }}>
@@ -1619,7 +1657,7 @@ function CodingSection() {
 // ── Section: Skill Gap ────────────────────────────────────────────────────────
 
 function SkillGapSection() {
-  const [target, setTarget] = useState('AI Engineer');
+  const [target, setTarget] = useState('AI / ML Engineer');
   const [result, setResult] = useState<SkillGap|null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -1633,7 +1671,7 @@ function SkillGapSection() {
     <div style={{ display:'flex', flexDirection:'column', gap:'1.5rem' }}>
       <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.25rem', display:'flex', gap:'1rem', alignItems:'flex-end', flexWrap:'wrap' }}>
         <div style={{ flex:1 }}>
-          <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:5 }}>Target Career</div>
+          <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:5 }}>Target Career / Role</div>
           <select value={target} onChange={e=>setTarget(e.target.value)}
             style={{ width:'100%', background:'#0d1117', border:BORDER, borderRadius:10, padding:'0.65rem 1rem', color:TEXT, fontSize:'0.88rem' }}>
             {CAREER_OPTIONS.map(o=><option key={o} value={o}>{o}</option>)}
@@ -1712,7 +1750,7 @@ function RecommendationsSection() {
     api.get<CareerRecs>('/career/recommendations').then(r=>setData(r.data)).catch(()=>{}).finally(()=>setLoading(false));
   }, []);
   if (loading) return <Loader />;
-  if (!data) return <div style={{ padding:'2rem', color:MUTED }}>No data. Add subjects and check-ins first.</div>;
+  if (!data) return <div style={{ padding:'2rem', color:MUTED }}>No data yet. Complete your profile, add subjects/topics, and do daily check-ins to unlock AI career recommendations.</div>;
   const COLORS = [CYAN,INDIGO,PURPLE,GREEN,AMBER,PINK];
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.5rem' }}>
@@ -1829,7 +1867,7 @@ function JobMatchSection() {
 // ── Section: Roadmap ──────────────────────────────────────────────────────────
 
 function RoadmapSection() {
-  const [target, setTarget] = useState('AI Engineer');
+  const [target, setTarget] = useState('AI / ML Engineer');
   const [data, setData] = useState<Roadmap|null>(null);
   const [loading, setLoading] = useState(false);
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -2099,9 +2137,9 @@ export default function CareerDevelopment() {
         <div>
           <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
             <span style={{ fontSize:'1.3rem' }}>🚀</span>
-            <span style={{ fontWeight:800, fontSize:'1.15rem', color:TEXT }}>Career Development Mode</span>
+            <span style={{ fontWeight:800, fontSize:'1.15rem', color:TEXT }}>Career Intelligence Hub</span>
           </div>
-          <div style={{ color:MUTED, fontSize:'0.72rem' }}>AI-powered career intelligence hub</div>
+          <div style={{ color:MUTED, fontSize:'0.72rem' }}>AI-powered career guidance for every learner & professional</div>
         </div>
         <div style={{ marginLeft:'auto' }}>
           <Link to="/" style={{ color:MUTED, fontSize:'0.8rem', textDecoration:'none' }}>← Dashboard</Link>

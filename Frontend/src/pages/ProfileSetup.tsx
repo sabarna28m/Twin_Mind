@@ -62,9 +62,47 @@ const GUIDE_ITEMS = [
 ];
 
 const COURSE_SUGGESTIONS = [
-  'School', 'B.Tech', 'B.E.', 'B.Sc', 'B.Com', 'B.A.', 'BCA', 'BBA',
-  'MBA', 'MCA', 'M.Tech', 'M.Sc', 'M.Com', 'M.A.',
-  'PhD', 'Diploma', 'NPTEL', 'Certification Course', 'Self Learning',
+  // Engineering & Technology
+  'B.Tech', 'M.Tech', 'B.E.', 'Diploma Engineering', 'Polytechnic',
+  'BCA', 'MCA', 'B.Sc Computer Science', 'M.Sc Computer Science',
+  'Data Science', 'Artificial Intelligence', 'Cyber Security',
+  'Software Engineering', 'Information Technology',
+  // Medical & Healthcare
+  'MBBS', 'BDS', 'BAMS', 'BHMS', 'BPT', 'B.Sc Nursing', 'GNM Nursing',
+  'M.Sc Nursing', 'MD', 'MS', 'DNB', 'B.Pharm', 'M.Pharm', 'Public Health',
+  // Management & Business
+  'BBA', 'MBA', 'Executive MBA', 'PGDM',
+  'Finance', 'Marketing', 'Human Resources', 'Operations Management', 'Entrepreneurship',
+  // Law
+  'LLB', 'LLM', 'Integrated Law', 'Corporate Law', 'Criminal Law',
+  'Constitutional Law', 'Intellectual Property Law',
+  // Commerce & Finance
+  'B.Com', 'M.Com', 'Chartered Accountancy (CA)', 'Company Secretary (CS)',
+  'CMA', 'Banking & Finance', 'Financial Analysis',
+  // Arts & Humanities
+  'BA', 'MA', 'Literature', 'History', 'Political Science',
+  'Sociology', 'Psychology', 'Philosophy', 'Languages',
+  // Science
+  'B.Sc', 'M.Sc', 'Physics', 'Chemistry', 'Mathematics', 'Statistics',
+  'Biotechnology', 'Microbiology', 'Environmental Science',
+  // Education
+  'B.Ed', 'M.Ed', 'Teaching', 'Educational Leadership',
+  // Architecture & Design
+  'B.Arch', 'M.Arch', 'Interior Design', 'Graphic Design',
+  'Product Design', 'UI/UX Design', 'Fashion Design',
+  // Agriculture & Allied Sciences
+  'B.Sc Agriculture', 'Agricultural Engineering', 'Horticulture', 'Forestry', 'Veterinary Science',
+  // Media & Communication
+  'Journalism', 'Mass Communication', 'Public Relations', 'Digital Media', 'Film Studies',
+  // Hospitality & Tourism
+  'Hotel Management', 'Tourism Management', 'Event Management',
+  // Vocational & Skill-Based
+  'ITI', 'Electrician', 'Mechanic', 'Welding', 'Carpentry',
+  // Research & Academia
+  'M.Phil', 'PhD', 'Research Scholar',
+  // Others
+  'School', 'Open Schooling', 'Distance Education',
+  'Professional Certification', 'Bootcamp', 'Self Learning',
 ];
 
 export default function ProfileSetup() {
@@ -173,9 +211,9 @@ export default function ProfileSetup() {
       <div style={s.card}>
         <div style={s.header}>
           <h1 style={s.logo}>TwinMind</h1>
-          <h2 style={s.title}>{isEditing ? 'Update your profile' : 'Set up your student profile'}</h2>
+          <h2 style={s.title}>{isEditing ? 'Update your profile' : 'Set up your learner profile'}</h2>
           {!isEditing && (
-            <p style={s.subtitle}>Tell us about yourself so TwinMind can personalise your experience.</p>
+            <p style={s.subtitle}>Tell us about your background so TwinMind can personalise your learning journey.</p>
           )}
         </div>
 
@@ -204,7 +242,7 @@ export default function ProfileSetup() {
               value={course}
               onChange={e => setCourse(e.target.value)}
               style={s.input}
-              placeholder="e.g. B.Tech, MBA, PhD, Self Learning…"
+              placeholder="e.g. MBBS, B.Tech, LLB, MBA, CA, B.Sc, ITI, Self Learning…"
               list="course-suggestions"
               required
             />
@@ -262,20 +300,20 @@ export default function ProfileSetup() {
 
           {/* Academic Goals */}
           <label style={s.label}>
-            Academic Goals
+            Goals & Aspirations
             <textarea
               value={academicGoals}
               onChange={e => setAcademicGoals(e.target.value)}
               style={s.textarea}
-              placeholder="e.g. Improve my GPA, prepare for internship applications, master data structures…"
+              placeholder="e.g. Pass MBBS finals, crack CA exams, get a software internship, build a startup, clear UPSC…"
               rows={3}
             />
           </label>
 
           {/* Subjects */}
           <div>
-            <p style={s.prefLabel}>Subjects / Modules</p>
-            <p style={s.prefHint}>Type a subject name and press Enter to add it</p>
+            <p style={s.prefLabel}>Subjects / Topics / Skills</p>
+            <p style={s.prefHint}>Type a subject, topic, or skill and press Enter to add</p>
             <div style={s.tagBox} onClick={() => (document.getElementById('subject-input') as HTMLInputElement)?.focus()}>
               {subjects.map(sub => (
                 <span key={sub} style={s.tag}>
@@ -295,7 +333,7 @@ export default function ProfileSetup() {
                 onChange={e => setSubjectInput(e.target.value)}
                 onKeyDown={handleSubjectKeyDown}
                 onBlur={addSubject}
-                placeholder={subjects.length === 0 ? 'e.g. Mathematics, Physics…' : 'Add another…'}
+                placeholder={subjects.length === 0 ? 'e.g. Anatomy, Contract Law, Financial Modelling, Python…' : 'Add another…'}
                 style={s.tagInput}
               />
             </div>

@@ -20,8 +20,32 @@ interface InterviewChatResp {
 type VoiceStatus = 'idle' | 'listening' | 'thinking' | 'speaking' | 'paused' | 'complete';
 
 const CAREER_OPTIONS = [
-  'AI Engineer','Data Scientist','ML Engineer','Software Developer',
-  'Research Engineer','Data Analyst','Backend Developer','DevOps Engineer',
+  // Technology & Engineering
+  'AI / ML Engineer', 'Data Scientist', 'Software Developer', 'Backend Developer',
+  'DevOps Engineer', 'Cybersecurity Analyst', 'Cloud Architect', 'Data Analyst',
+  'UI/UX Designer', 'Research Engineer',
+  // Medical & Healthcare
+  'Doctor (General Physician)', 'Surgeon', 'Medical Researcher',
+  'Nurse Practitioner', 'Pharmacist', 'Public Health Specialist',
+  'Clinical Research Associate', 'Healthcare Administrator',
+  // Law & Legal
+  'Corporate Lawyer', 'Criminal Defense Attorney', 'Legal Consultant',
+  'Compliance Officer', 'Intellectual Property Attorney',
+  // Management & Business
+  'Product Manager', 'Business Analyst', 'Marketing Manager',
+  'Human Resources Manager', 'Operations Manager', 'Entrepreneur',
+  'Strategy Consultant',
+  // Finance & Commerce
+  'Chartered Accountant (CA)', 'Investment Banker', 'Financial Analyst',
+  'Auditor', 'Tax Consultant', 'Actuary',
+  // Education & Research
+  'University Professor', 'Research Scientist', 'School Teacher',
+  // Design & Media
+  'Graphic Designer', 'Journalist', 'Content Creator',
+  // Government & Public Service
+  'IAS / IPS Officer', 'Government Policy Analyst', 'Defence Officer',
+  // Others
+  'Freelancer / Independent Consultant', 'Social Entrepreneur',
 ];
 
 const LANGUAGES = [

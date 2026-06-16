@@ -35,6 +35,8 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
 }
 import TwinMindCopilot from './components/TwinMindCopilot';
 import ThemeEngine from './components/ThemeEngine';
+import ParticleEngine from './components/ParticleEngine';
+import { ParticleProvider } from './contexts/ParticleContext';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -68,10 +70,12 @@ export default function App() {
     <ErrorBoundary>
     <MaybeGoogleProvider>
     <ThemeProvider>
+    <ParticleProvider>
     <LanguageProvider>
     <BrowserRouter>
       <AuthProvider>
         <ThemeEngine />
+        <ParticleEngine />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -260,6 +264,7 @@ export default function App() {
       </AuthProvider>
     </BrowserRouter>
     </LanguageProvider>
+    </ParticleProvider>
     </ThemeProvider>
     </MaybeGoogleProvider>
     </ErrorBoundary>
