@@ -36,7 +36,7 @@
           var V=['galaxy-nexus','sakura-dream','inferno','arctic-aurora','nature-pulse','cyberpunk-neo','ocean-intelligence','neural-brain'];
           var M={cosmos:'galaxy-nexus',sakura:'sakura-dream',ember:'inferno',arctic:'arctic-aurora',forest:'nature-pulse','neon-cyberpunk':'cyberpunk-neo',dark:'galaxy-nexus',light:'arctic-aurora'};
           var s=localStorage.getItem('twinmind-theme');
-          var t=V.indexOf(s)!==-1?s:M[s]||(M[localStorage.getItem('theme')]||'nature-pulse');
+          var t=V.indexOf(s)!==-1?s:M[s]||(M[localStorage.getItem('theme')]||'galaxy-nexus');
           document.documentElement.setAttribute('data-theme',t);
         }catch(e){}
       })();
