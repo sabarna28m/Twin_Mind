@@ -4,6 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
+import { useTheme, THEMES } from '../contexts/ThemeContext';
 import api from '../services/api';
 import { BACKEND_URL } from '../lib/config';
 
@@ -13,6 +14,7 @@ interface CalStatus { configured: boolean; connected: boolean }
 
 export default function Profile() {
   const { user, token, refreshUser } = useAuth();
+  const { themeId, setTheme, themeMeta } = useTheme();
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -363,6 +365,100 @@ export default function Profile() {
               </button>
             </div>
           )}
+        </section>
+
+        {/* ── Appearance & Theme ── */}
+        <section style={s.panel}>
+          <h2 style={{ ...s.panelTitle, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            🎨 Appearance &amp; Theme
+          </h2>
+          <p style={{ color: 'var(--text)', fontSize: '0.85rem', marginBottom: '1.1rem', lineHeight: 1.6 }}>
+            Choose a visual theme that transforms the entire TwinMind experience.
+          </p>
+
+          {/* Theme grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem', marginBottom: '1rem' }}>
+            {THEMES.map(t => {
+              const active = themeId === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTheme(t.id)}
+                  style={{
+                    background: active ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${active ? 'rgba(255,255,255,0.25)' : 'var(--border)'}`,
+                    borderRadius: 14,
+                    padding: '0.85rem',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.2s',
+                    position: 'relative',
+                    boxShadow: active ? `0 0 0 2px rgba(var(--primary-rgb),0.4), 0 4px 20px rgba(var(--primary-rgb),0.15)` : 'none',
+                  }}
+                >
+                  {/* Active checkmark */}
+                  {active && (
+                    <div style={{
+                      position: 'absolute', top: 8, right: 8,
+                      width: 20, height: 20, borderRadius: '50%',
+                      background: 'var(--primary)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '0.7rem', color: '#fff', fontWeight: 900,
+                      boxShadow: '0 0 8px rgba(var(--primary-rgb),0.6)',
+                    }}>✓</div>
+                  )}
+
+                  {/* Colour swatches */}
+                  <div style={{ display: 'flex', gap: 4, marginBottom: '0.55rem' }}>
+                    {t.swatches.map((c, i) => (
+                      <div key={i} style={{
+                        flex: 1, height: 20, borderRadius: 6,
+                        background: c,
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        boxShadow: active && i > 0 ? `0 0 8px ${c}88` : 'none',
+                        transition: 'box-shadow 0.2s',
+                      }} />
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: 3 }}>
+                    <span style={{ fontSize: '1.1rem' }}>{t.icon}</span>
+                    <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-h)' }}>{t.name}</span>
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text)', lineHeight: 1.5 }}>{t.description}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Personalization score card */}
+          <div style={{
+            padding: '0.9rem 1rem',
+            background: 'var(--accent-bg)',
+            border: '1px solid var(--accent-border)',
+            borderRadius: 12,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '1rem',
+          }}>
+            <div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                Theme Personalization Score
+              </div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text)', marginTop: 3 }}>
+                {themeId === 'cosmos'
+                  ? 'Try a custom theme to unlock your personalization score!'
+                  : `✓ ${themeMeta.name} — looking premium!`}
+              </div>
+            </div>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--accent)', lineHeight: 1 }}>
+                {themeId === 'cosmos' ? '40' : '95'}
+              </div>
+              <div style={{ fontSize: '0.62rem', color: 'var(--text)', marginTop: 1 }}>/ 100</div>
+            </div>
+          </div>
         </section>
       </main>
     </div>
