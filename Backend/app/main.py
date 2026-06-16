@@ -30,6 +30,7 @@ from app.models import comm_twin  # noqa: F401
 from app.models import smart_note  # noqa: F401
 from app.models import note_history  # noqa: F401
 from app.models import note_version  # noqa: F401
+from app.models import skill_tree  # noqa: F401
 from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes, notifications as notif_routes, quiz as quiz_routes, gamification as gamif_routes, battles as battle_routes, calendar as calendar_routes, smart_plan as smart_plan_routes
 from app.api.routes import websocket as ws_routes
 from app.api.routes import videos as video_routes
@@ -39,6 +40,7 @@ from app.api.routes import test_image as test_image_routes
 from app.api.routes import career as career_routes
 from app.api.routes import comm_twin as comm_routes
 from app.api.routes import smart_notes as smart_notes_routes
+from app.api.routes import skill_tree as skill_tree_routes
 from app.ml.predictor import get_model  # warm up model at startup
 
 Base.metadata.create_all(bind=engine)
@@ -228,6 +230,39 @@ with engine.connect() as _conn:
         "ALTER TABLE notifications ADD COLUMN emoji VARCHAR(10)",
         "ALTER TABLE notifications ADD COLUMN title VARCHAR(200)",
         "ALTER TABLE notifications ADD COLUMN action_url VARCHAR(300)",
+        (
+            "CREATE TABLE IF NOT EXISTS skill_node_progress ("
+            "id INTEGER PRIMARY KEY, "
+            "user_id INTEGER NOT NULL REFERENCES users(id), "
+            "node_id VARCHAR(80) NOT NULL, "
+            "status VARCHAR(20) NOT NULL DEFAULT 'locked', "
+            "completion_pct REAL NOT NULL DEFAULT 0.0, "
+            "xp_earned INTEGER NOT NULL DEFAULT 0, "
+            "lessons_completed INTEGER NOT NULL DEFAULT 0, "
+            "quizzes_completed INTEGER NOT NULL DEFAULT 0, "
+            "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "UNIQUE(user_id, node_id))"
+        ),
+        "CREATE INDEX IF NOT EXISTS ix_snp_user ON skill_node_progress(user_id)",
+        (
+            "CREATE TABLE IF NOT EXISTS xp_transactions ("
+            "id INTEGER PRIMARY KEY, "
+            "user_id INTEGER NOT NULL REFERENCES users(id), "
+            "node_id VARCHAR(80), "
+            "activity_type VARCHAR(30) NOT NULL, "
+            "xp_amount INTEGER NOT NULL, "
+            "created_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
+        ),
+        "CREATE INDEX IF NOT EXISTS ix_xpt_user ON xp_transactions(user_id)",
+        (
+            "CREATE TABLE IF NOT EXISTS skill_tree_achievements ("
+            "id INTEGER PRIMARY KEY, "
+            "user_id INTEGER NOT NULL REFERENCES users(id), "
+            "achievement_id VARCHAR(60) NOT NULL, "
+            "earned_at DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "UNIQUE(user_id, achievement_id))"
+        ),
+        "CREATE INDEX IF NOT EXISTS ix_sta_user ON skill_tree_achievements(user_id)",
     ]:
         try:
             _conn.execute(text(_sql))
@@ -274,6 +309,7 @@ app.include_router(test_image_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(career_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(comm_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(smart_notes_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(skill_tree_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(ws_routes.router)
 
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"

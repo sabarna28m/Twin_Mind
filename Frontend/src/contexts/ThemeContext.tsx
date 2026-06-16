@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useLayoutEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 export type ThemeId =
@@ -142,7 +142,7 @@ function getInitialTheme(): ThemeId {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [themeId, setThemeId] = useState<ThemeId>(getInitialTheme);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     document.documentElement.setAttribute('data-theme', themeId);
     localStorage.setItem('twinmind-theme', themeId);
     const meta = THEMES.find(t => t.id === themeId)!;

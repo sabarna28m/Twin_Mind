@@ -9,11 +9,11 @@ import api from '../services/api';
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
-interface CTwinPrediction { days:number; overall_score:number; fluency:number; confidence:number; vocabulary:number; interview_readiness:number; level_label:string; forecast:string }
+interface CTwinPrediction { days:number; overall_score:number; fluency:number; confidence:number; vocabulary:number; level_label:string; forecast:string }
 interface CommTwinData {
   overall_score:number; fluency_score:number; pronunciation_score:number;
   vocabulary_score:number; grammar_score:number; confidence_score:number;
-  interview_comm_score:number; sessions_count:number; words_reviewed:number;
+  sessions_count:number; words_reviewed:number;
   level_label:string; weekly_growth:number; monthly_growth:number;
   predictions:Record<string,CTwinPrediction>; score_history:Array<Record<string,number|string>>;
   recent_activities:Array<Record<string,unknown>>; twin_insight:string; last_updated:string|null;
@@ -41,8 +41,6 @@ interface SpeakingTask { task_id:string; task_type:string; prompt:string; sub_pr
 interface VocabWord { word:string; meaning:string; synonyms:string[]; antonyms:string[]; example_sentence:string; interview_usage:string; professional_usage:string; difficulty:string }
 interface DailyVocab { words:VocabWord[]; date:string; level:string; theme:string }
 interface GrammarResult { original_text:string; corrected_text:string; errors:GrammarError[]; score:number; grade:string; summary:string; twin_updated:boolean }
-interface InterviewQuestion { question:string; question_type:string; tips:string[] }
-interface InterviewCommResult { communication_score:number; confidence_score:number; clarity_score:number; grammar_score:number; professionalism_score:number; overall_score:number; feedback:string; strengths:string[]; improvements:string[]; model_answer_hint:string; twin_updated:boolean }
 interface CoachActivity { order:number; activity:string; duration:string; focus_area:string; description:string }
 interface CoachData { level:string; daily_plan:CoachActivity[]; focus_today:string; motivational_message:string; weekly_goal:string; badge_to_earn:string }
 
@@ -70,7 +68,6 @@ const TABS = [
   { id:'tasks',     label:'Tasks',      icon:'🎙️'  },
   { id:'grammar',   label:'Grammar',    icon:'✏️'  },
   { id:'vocab',     label:'Vocab',      icon:'📚'  },
-  { id:'interview', label:'Interview',  icon:'🎤' },
   { id:'analytics', label:'Analytics',  icon:'📊' },
   { id:'coach',     label:'AI Coach',   icon:'🏆' },
 ];
@@ -344,13 +341,12 @@ function TwinSection() {
             <div style={{ textAlign:'center' }}><div style={{ fontSize:'0.7rem',color:MUTED }}>Weekly Growth</div><div style={{ fontWeight:800,color:GREEN,fontSize:'1.1rem' }}>+{data.weekly_growth}</div></div>
             <div style={{ textAlign:'center' }}><div style={{ fontSize:'0.7rem',color:MUTED }}>Monthly Growth</div><div style={{ fontWeight:800,color:CYAN,fontSize:'1.1rem' }}>+{data.monthly_growth}</div></div>
           </div>
-          <div style={{ display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:'0.4rem' }}>
-            <ScCard label="Fluency"       value={data.fluency_score}        color={sc(data.fluency_score)}        icon="🌊" />
-            <ScCard label="Pronunciation" value={data.pronunciation_score}   color={sc(data.pronunciation_score)}  icon="🔊" />
-            <ScCard label="Vocabulary"    value={data.vocabulary_score}      color={sc(data.vocabulary_score)}     icon="📚" />
-            <ScCard label="Grammar"       value={data.grammar_score}         color={sc(data.grammar_score)}        icon="✏️"  />
-            <ScCard label="Confidence"    value={data.confidence_score}      color={sc(data.confidence_score)}     icon="💪" />
-            <ScCard label="Interview"     value={data.interview_comm_score}  color={sc(data.interview_comm_score)} icon="🎤" />
+          <div style={{ display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'0.5rem' }}>
+            <ScCard label="Fluency"       value={data.fluency_score}       color={sc(data.fluency_score)}       icon="🌊" />
+            <ScCard label="Pronunciation" value={data.pronunciation_score}  color={sc(data.pronunciation_score)} icon="🔊" />
+            <ScCard label="Vocabulary"    value={data.vocabulary_score}     color={sc(data.vocabulary_score)}    icon="📚" />
+            <ScCard label="Grammar"       value={data.grammar_score}        color={sc(data.grammar_score)}       icon="✏️"  />
+            <ScCard label="Confidence"    value={data.confidence_score}     color={sc(data.confidence_score)}    icon="💪" />
           </div>
         </div>
       </div>
@@ -369,7 +365,7 @@ function TwinSection() {
               <Tag text={p.level_label} color={color} />
               <div style={{ color:MUTED,fontSize:'0.78rem',marginTop:'0.6rem',lineHeight:1.5 }}>{p.forecast}</div>
               <div style={{ display:'flex',flexDirection:'column',gap:4,marginTop:'0.65rem' }}>
-                {[{l:'Fluency',v:p.fluency},{l:'Confidence',v:p.confidence},{l:'Interview',v:p.interview_readiness}].map(({l,v})=>(
+                {[{l:'Fluency',v:p.fluency},{l:'Confidence',v:p.confidence},{l:'Vocabulary',v:p.vocabulary}].map(({l,v})=>(
                   <div key={l} style={{ display:'flex',justifyContent:'space-between',alignItems:'center',gap:8 }}>
                     <span style={{ fontSize:'0.7rem',color:MUTED,width:70,flexShrink:0 }}>{l}</span>
                     <div style={{ flex:1 }}><Bar value={v} color={color} height={4} /></div>
@@ -410,7 +406,7 @@ function TwinSection() {
           <div style={{ color:TEXT,fontWeight:700,marginBottom:'0.85rem' }}>Recent Activity</div>
           {data.recent_activities.slice(0,5).map((a,i) => (
             <div key={i} style={{ display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.5rem 0',borderBottom:i<4?'1px solid rgba(255,255,255,0.05)':'none' }}>
-              <span style={{ fontSize:'1rem' }}>{String(a.type)==='image_challenge'?'🖼️':String(a.type)==='interview'?'🎤':String(a.type)==='vocabulary'?'📚':String(a.type)==='grammar_correction'?'✏️':'🎙️'}</span>
+              <span style={{ fontSize:'1rem' }}>{String(a.type)==='image_challenge'?'🖼️':String(a.type)==='vocabulary'?'📚':String(a.type)==='grammar_correction'?'✏️':'🎙️'}</span>
               <div style={{ flex:1 }}>
                 <div style={{ color:TEXT,fontSize:'0.8rem',fontWeight:600,textTransform:'capitalize' }}>{String(a.type).replace('_',' ')}</div>
                 <div style={{ color:DIM,fontSize:'0.73rem' }}>{String(a.snippet||'')} · {String(a.date||'')}</div>
@@ -426,7 +422,7 @@ function TwinSection() {
           <span style={{ fontSize:'1.5rem' }}>💡</span>
           <div>
             <div style={{ color:AMBER,fontWeight:700,marginBottom:4 }}>Your Communication Twin is waiting to learn</div>
-            <div style={{ color:MUTED,fontSize:'0.83rem',lineHeight:1.6 }}>Complete a speaking task, image challenge, or interview practice. Every activity evolves your twin and builds a personalized improvement profile.</div>
+            <div style={{ color:MUTED,fontSize:'0.83rem',lineHeight:1.6 }}>Complete a speaking task, image challenge, grammar check, or vocabulary drill. Every activity evolves your twin and builds a personalized improvement profile.</div>
           </div>
         </div>
       )}
@@ -800,7 +796,7 @@ function VocabSection() {
                 {/* Usage tips */}
                 <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem' }}>
                   <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:10,padding:'0.75rem' }}>
-                    <div style={{ fontSize:'0.68rem',color:AMBER,fontWeight:700,marginBottom:3 }}>INTERVIEW USAGE</div>
+                    <div style={{ fontSize:'0.68rem',color:AMBER,fontWeight:700,marginBottom:3 }}>SPEAKING USAGE</div>
                     <div style={{ color:MUTED,fontSize:'0.8rem',lineHeight:1.55 }}>{w.interview_usage}</div>
                   </div>
                   <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:10,padding:'0.75rem' }}>
@@ -817,115 +813,6 @@ function VocabSection() {
   );
 }
 
-// ── Section: Interview Communication ─────────────────────────────────────
-
-function InterviewSection() {
-  const TYPES = [{id:'hr',label:'HR',icon:'👥'},{id:'technical',label:'Technical',icon:'💻'},{id:'behavioral',label:'Behavioral',icon:'🧭'}];
-  const [qType, setQType] = useState('hr');
-  const [question, setQuestion] = useState<InterviewQuestion|null>(null);
-  const [result, setResult] = useState<InterviewCommResult|null>(null);
-  const [loading, setLoading] = useState(false);
-  const [analyzing, setAnalyzing] = useState(false);
-
-  async function getQuestion() {
-    setLoading(true); setResult(null); setQuestion(null);
-    try { const r=await api.get<InterviewQuestion>(`/comm/interview/question?question_type=${qType}`); setQuestion(r.data); }
-    finally { setLoading(false); }
-  }
-  async function evaluate(transcript: string) {
-    if (!question||!transcript.trim()) return;
-    setAnalyzing(true); setResult(null);
-    try {
-      const r=await api.post<InterviewCommResult>('/comm/interview/evaluate',{transcript,question:question.question,question_type:qType});
-      setResult(r.data);
-    } finally { setAnalyzing(false); }
-  }
-
-  const sc=(v:number)=>v>=75?GREEN:v>=55?CYAN:v>=35?AMBER:RED;
-
-  return (
-    <div style={{ display:'flex',flexDirection:'column',gap:'1.5rem' }}>
-      {/* Type selector */}
-      <div style={{ display:'flex',gap:'0.6rem' }}>
-        {TYPES.map(t=>(
-          <button key={t.id} onClick={()=>setQType(t.id)}
-            style={{ flex:1,padding:'0.65rem',borderRadius:12,border:`1px solid ${qType===t.id?PURPLE:'rgba(255,255,255,0.08)'}`,background:qType===t.id?`${PURPLE}18`:'transparent',color:qType===t.id?TEXT:MUTED,cursor:'pointer',fontSize:'0.83rem',fontWeight:qType===t.id?700:400,display:'flex',alignItems:'center',justifyContent:'center',gap:6 }}>
-            <span>{t.icon}</span>{t.label}
-          </button>
-        ))}
-      </div>
-      <button onClick={getQuestion} disabled={loading}
-        style={{ padding:'0.65rem',background:`linear-gradient(135deg,${PURPLE},${INDIGO})`,border:'none',borderRadius:10,color:'#fff',fontWeight:700,cursor:'pointer' }}>
-        {loading?'Loading…':'Get Interview Question'}
-      </button>
-
-      {question && (
-        <div style={{ display:'flex',flexDirection:'column',gap:'1.1rem' }}>
-          <div style={{ background:CARD,border:BORDER,borderRadius:16,padding:'1.25rem' }}>
-            <div style={{ color:PURPLE,fontWeight:700,fontSize:'0.78rem',textTransform:'uppercase',letterSpacing:1,marginBottom:6 }}>Interview Question</div>
-            <div style={{ color:TEXT,fontWeight:700,fontSize:'1.05rem',marginBottom:'0.85rem' }}>{question.question}</div>
-            <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:9,padding:'0.7rem' }}>
-              <div style={{ fontSize:'0.7rem',color:CYAN,marginBottom:4 }}>TIPS</div>
-              {question.tips.map((t,i)=><div key={i} style={{ color:MUTED,fontSize:'0.78rem',marginBottom:2 }}>• {t}</div>)}
-            </div>
-          </div>
-          <div style={{ background:CARD,border:BORDER,borderRadius:16,padding:'1.25rem' }}>
-            <div style={{ color:TEXT,fontWeight:700,marginBottom:'0.5rem' }}>Your Answer</div>
-            <div style={{ color:MUTED,fontSize:'0.8rem',marginBottom:'0.85rem' }}>This evaluates HOW you communicate — not just what you say. Focus on clarity, confidence, and structure.</div>
-            <VoiceRecorder onTranscript={evaluate} placeholder="Answer the interview question…" />
-          </div>
-        </div>
-      )}
-
-      {analyzing && <Loader text="Evaluating communication quality…" />}
-
-      {result && (
-        <div style={{ display:'flex',flexDirection:'column',gap:'1.1rem' }}>
-          {/* Scores */}
-          <div style={{ display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'0.65rem' }}>
-            {[
-              {label:'Communication', v:result.communication_score},
-              {label:'Confidence',    v:result.confidence_score    },
-              {label:'Clarity',       v:result.clarity_score       },
-              {label:'Grammar',       v:result.grammar_score       },
-              {label:'Professionalism',v:result.professionalism_score},
-            ].map(({label,v})=>(
-              <div key={label} style={{ background:CARD,border:`1px solid ${sc(v)}25`,borderRadius:12,padding:'0.7rem',textAlign:'center' }}>
-                <div style={{ fontSize:'0.63rem',color:MUTED,marginBottom:2 }}>{label}</div>
-                <div style={{ fontSize:'1.4rem',fontWeight:800,color:sc(v) }}>{v}</div>
-                <Bar value={v} color={sc(v)} height={3} />
-              </div>
-            ))}
-          </div>
-          <div style={{ background:CARD,border:`1px solid ${sc(result.overall_score)}30`,borderRadius:14,padding:'1.1rem' }}>
-            <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6 }}>
-              <span style={{ color:TEXT,fontWeight:700 }}>Overall Communication Score</span>
-              <span style={{ fontSize:'1.5rem',fontWeight:900,color:sc(result.overall_score) }}>{result.overall_score}/100</span>
-            </div>
-            <div style={{ color:MUTED,fontSize:'0.85rem',lineHeight:1.6,marginBottom:'0.85rem' }}>{result.feedback}</div>
-            <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem' }}>
-              <div>
-                <div style={{ color:GREEN,fontWeight:700,fontSize:'0.77rem',marginBottom:5 }}>✓ Strengths</div>
-                {result.strengths.map((s,i)=><div key={i} style={{ color:MUTED,fontSize:'0.79rem',marginBottom:3 }}>• {s}</div>)}
-              </div>
-              <div>
-                <div style={{ color:AMBER,fontWeight:700,fontSize:'0.77rem',marginBottom:5 }}>⚠ Improve</div>
-                {result.improvements.map((imp,i)=><div key={i} style={{ color:MUTED,fontSize:'0.79rem',marginBottom:3 }}>• {imp}</div>)}
-              </div>
-            </div>
-          </div>
-          {result.model_answer_hint && (
-            <div style={{ background:`${CYAN}0a`,border:`1px solid ${CYAN}25`,borderRadius:12,padding:'0.85rem' }}>
-              <div style={{ color:CYAN,fontWeight:700,fontSize:'0.78rem',marginBottom:4 }}>💡 Communication Structure Hint</div>
-              <div style={{ color:MUTED,fontSize:'0.82rem',lineHeight:1.6 }}>{result.model_answer_hint}</div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ── Section: Analytics ────────────────────────────────────────────────────
 
 function AnalyticsSection() {
@@ -938,12 +825,11 @@ function AnalyticsSection() {
   if (!data) return null;
 
   const radarData = [
-    {skill:'Fluency',       score:data.fluency_score,        target:100},
-    {skill:'Pronunciation', score:data.pronunciation_score,  target:100},
-    {skill:'Vocabulary',    score:data.vocabulary_score,     target:100},
-    {skill:'Grammar',       score:data.grammar_score,        target:100},
-    {skill:'Confidence',    score:data.confidence_score,     target:100},
-    {skill:'Interview',     score:data.interview_comm_score, target:100},
+    {skill:'Fluency',       score:data.fluency_score,       target:100},
+    {skill:'Pronunciation', score:data.pronunciation_score, target:100},
+    {skill:'Vocabulary',    score:data.vocabulary_score,    target:100},
+    {skill:'Grammar',       score:data.grammar_score,       target:100},
+    {skill:'Confidence',    score:data.confidence_score,    target:100},
   ];
   const noHistory = data.score_history.length < 2;
 
@@ -1112,7 +998,7 @@ export default function CommTwin() {
   }, [activeTab]);
 
   return (
-    <div style={{ minHeight:'100svh',background:BG,color:TEXT,fontFamily:'system-ui,-apple-system,sans-serif' }}>
+    <div style={{ minHeight:'100svh',background:'transparent',color:TEXT,fontFamily:'system-ui,-apple-system,sans-serif' }}>
       <style>{`
         @keyframes spin  { to { transform:rotate(360deg); } }
         @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.3;} }

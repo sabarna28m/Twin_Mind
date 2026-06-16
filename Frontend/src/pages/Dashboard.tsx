@@ -141,11 +141,11 @@ function StudyChart({ data }: { data: { date: string; hours: number; label: stri
                 ...ch.bar,
                 height: `${barH}px`,
                 background: isToday
-                  ? 'linear-gradient(180deg,#6366f1,#8b5cf6)'
+                  ? 'var(--grad-primary)'
                   : d.hours > 0
-                    ? 'linear-gradient(180deg,rgba(99,102,241,0.65),rgba(139,92,246,0.45))'
+                    ? 'linear-gradient(180deg,rgba(var(--primary-rgb),0.65),rgba(var(--primary-rgb),0.35))'
                     : 'var(--border)',
-                boxShadow: isToday ? '0 0 14px rgba(99,102,241,0.55)' : 'none',
+                boxShadow: isToday ? `0 0 14px rgba(var(--primary-rgb),0.55)` : 'none',
               }} />
             </div>
             <span style={{
@@ -213,6 +213,7 @@ const QA_DEFS = [
   { labelKey: 'qa_career',      descKey: 'qa_desc_career',    icon: '🚀', grad: 'linear-gradient(135deg,#6366f1,#00D4FF)', to: '/career'      },
   { labelKey: 'qa_comm_twin',  descKey: 'qa_desc_comm_twin', icon: '🗣️', grad: 'linear-gradient(135deg,#14b8a6,#00D4FF)', to: '/comm-twin'   },
   { labelKey: 'qa_smart_notes', descKey: 'qa_desc_smart_notes', icon: '🧠', grad: 'linear-gradient(135deg,#6366f1,#8b5cf6,#00D4FF)', to: '/notes' },
+  { labelKey: 'qa_skill_tree', descKey: 'qa_desc_skill_tree', icon: '🌳', grad: 'linear-gradient(135deg,#f59e0b,#7c3aed)', to: '/skill-tree' },
 ];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }
@@ -997,17 +998,17 @@ const s: Record<string, React.CSSProperties> = {
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1.1rem' },
   statCard: {
     display: 'flex', alignItems: 'center', gap: '1.1rem', padding: '1.4rem',
-    background: 'rgba(10, 16, 32, 0.8)',
-    border: '1px solid rgba(255,255,255,0.07)',
-    borderRadius: '18px',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
-    backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--card-border)',
+    borderRadius: 'var(--card-radius)',
+    boxShadow: 'var(--card-shadow)',
+    backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))',
   },
   statIconWrap: { width: '50px', height: '50px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 6px 20px rgba(0,0,0,0.45)' },
   statIcon:  { fontSize: '1.3rem' },
   statValue: {
     fontSize: '1.95rem', fontWeight: 900, lineHeight: 1.05, marginBottom: '0.18rem',
-    background: 'linear-gradient(135deg, #00D4FF 0%, #7C3AED 100%)',
+    background: 'var(--grad-primary)',
     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
   },
   statLabel: { fontSize: '0.68rem', color: 'rgba(148,163,184,0.65)', fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase' as const },
@@ -1017,16 +1018,16 @@ const s: Record<string, React.CSSProperties> = {
 
   /* Panels */
   panel: {
-    background: 'rgba(10, 16, 32, 0.75)',
-    border: '1px solid rgba(255,255,255,0.07)',
-    borderRadius: '18px',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--card-border)',
+    borderRadius: 'var(--card-radius)',
     padding: '1.6rem',
-    backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 4px 32px rgba(0,0,0,0.25)',
+    backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))',
+    boxShadow: 'var(--card-shadow)',
   },
   panelHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.9rem' },
   panelTitle: { fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-h)', margin: 0, letterSpacing: '-0.2px' },
-  panelCta: { fontSize: '0.75rem', color: '#00D4FF', textDecoration: 'none', fontWeight: 700, opacity: 0.85, transition: 'opacity 0.2s' },
+  panelCta: { fontSize: '0.75rem', color: 'var(--section-accent)', textDecoration: 'none', fontWeight: 700, opacity: 0.85, transition: 'opacity 0.2s' },
 
   /* Chart footer */
   chartFooter: { display: 'flex', gap: '1rem', marginTop: '0.85rem', paddingTop: '0.7rem', borderTop: '1px solid rgba(255,255,255,0.06)' },
@@ -1060,10 +1061,10 @@ const s: Record<string, React.CSSProperties> = {
   planFade:        { fontSize: '0.78rem', color: 'var(--text)', margin: '0.2rem 0 0', opacity: 0.4 },
   viewPlanBtn:     {
     padding: '0.52rem 1.3rem',
-    background: 'linear-gradient(135deg, #00D4FF, #7C3AED)',
-    color: '#fff', border: 'none', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700,
+    background: 'var(--grad-primary)',
+    color: '#fff', border: 'none', borderRadius: 'var(--btn-radius)', fontSize: '0.8rem', fontWeight: 700,
     cursor: 'pointer', fontFamily: 'inherit',
-    boxShadow: '0 4px 20px rgba(0,212,255,0.32)',
+    boxShadow: 'var(--btn-shadow)',
     transition: 'box-shadow 0.2s, transform 0.18s',
   },
 
@@ -1075,12 +1076,12 @@ const s: Record<string, React.CSSProperties> = {
     zIndex: 100, padding: '1rem',
   },
   modalBox: {
-    background: 'rgba(10, 16, 32, 0.97)',
-    border: '1px solid rgba(0,212,255,0.18)',
-    borderRadius: '20px', width: '100%', maxWidth: '780px',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--card-border)',
+    borderRadius: 'var(--card-radius)', width: '100%', maxWidth: '780px',
     maxHeight: '85vh', display: 'flex', flexDirection: 'column',
-    boxShadow: '0 24px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(0,212,255,0.06)',
-    backdropFilter: 'blur(20px)',
+    boxShadow: 'var(--card-hover-shadow)',
+    backdropFilter: 'blur(var(--glass-blur))',
   },
   modalHeader: {
     display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',

@@ -64,6 +64,7 @@ import AIFocusDetector from './pages/AIFocusDetector';
 import CareerDevelopment from './pages/CareerDevelopment';
 import CommTwin from './pages/CommTwin';
 import SmartNotes from './pages/SmartNotes';
+import SkillTree from './pages/SkillTree';
 
 export default function App() {
   return (
@@ -254,6 +255,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <CommTwin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/skill-tree"
+            element={
+              <ProtectedRoute>
+                <SkillTree />
               </ProtectedRoute>
             }
           />

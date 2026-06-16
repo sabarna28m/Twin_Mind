@@ -57,6 +57,7 @@ const T: Record<LangCode, Translations> = {
     qa_ai_focus: 'AI Focus', qa_desc_ai_focus: 'Eye Track',
     qa_career: 'Career', qa_desc_career: 'Career AI', qa_comm_twin: 'Comm Twin', qa_desc_comm_twin: 'Speak AI',
     qa_smart_notes: 'Smart Notes', qa_desc_smart_notes: 'Knowledge Memory',
+    qa_skill_tree: 'Skill Tree', qa_desc_skill_tree: 'RPG Mastery',
     /* study plan */
     my_study_plan: 'My Study Plan', generate_new: 'Generate new →', view_full_plan: 'View Full Plan',
     no_plan_title: 'No saved study plan yet',

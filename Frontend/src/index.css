@@ -1444,3 +1444,466 @@ html[data-theme="neural-brain"] select.form-select option:checked { background-c
   0%   { top:-2px; }
   100% { top:100%; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   IMMERSIVE THEME PERSONALITY SYSTEM v2
+   Per-theme visual DNA: cards, buttons, charts, glows, animations.
+   These selectors have equal specificity to the blocks above — because
+   they appear LAST in the file, they win for every new property declared
+   here. Existing properties (--primary, --glass-bg, etc.) defined above
+   are NOT redeclared here, so there is no conflict.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Default personality tokens ─────────────────────────────────────── */
+:root {
+  --card-bg:           rgba(4,8,24,0.76);
+  --card-border:       rgba(0,212,255,0.14);
+  --card-radius:       16px;
+  --card-shadow:       0 8px 40px rgba(0,0,0,0.6),0 0 0 1px rgba(0,212,255,0.07);
+  --card-hover-border: rgba(0,212,255,0.4);
+  --card-hover-shadow: 0 0 0 1px rgba(0,212,255,0.4),0 20px 60px rgba(0,212,255,0.15),0 8px 24px rgba(0,0,0,0.6);
+  --btn-radius:        12px;
+  --btn-shadow:        0 4px 24px rgba(0,212,255,0.38);
+  --btn-hover-shadow:  0 8px 40px rgba(0,212,255,0.6),0 0 20px rgba(124,58,237,0.3);
+  --glow-strong:       0 0 60px rgba(0,212,255,0.4),0 0 120px rgba(0,212,255,0.15);
+  --glow-text:         0 0 20px rgba(0,212,255,0.8),0 0 40px rgba(0,212,255,0.3);
+  --glow-icon:         drop-shadow(0 0 8px rgba(0,212,255,0.8));
+  --chart-1:#00D4FF; --chart-2:#7C3AED; --chart-3:#10B981; --chart-4:#F59E0B; --chart-5:#EF4444;
+  --chart-grid:        rgba(255,255,255,0.05);
+  --chart-tooltip-bg:  rgba(4,8,24,0.95);
+  --input-bg:          rgba(4,8,24,0.6);
+  --input-border:      rgba(0,212,255,0.18);
+  --input-radius:      12px;
+  --input-focus-glow:  0 0 0 3px rgba(0,212,255,0.18),0 0 20px rgba(0,212,255,0.1);
+  --avatar-glow:       0 0 40px rgba(0,212,255,0.45),0 0 80px rgba(124,58,237,0.25);
+  --dur-fast:          0.15s;
+  --dur-base:          0.30s;
+  --dur-slow:          0.80s;
+  --ease-spring:       cubic-bezier(0.16,1,0.3,1);
+  --section-accent:    #00D4FF;
+  --section-accent-rgb:0,212,255;
+  --badge-bg:          rgba(0,212,255,0.1);
+  --badge-border:      rgba(0,212,255,0.32);
+  --badge-color:       #00D4FF;
+  --scroll-thumb:      rgba(0,212,255,0.18);
+}
+
+/* ── 🌌 Galaxy Nexus ── */
+html[data-theme="galaxy-nexus"],html[data-theme="cosmos"] {
+  --card-bg:rgba(0,8,30,0.78); --card-border:rgba(0,212,255,0.18); --card-radius:16px;
+  --card-shadow:0 8px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(0,212,255,0.09),0 0 30px rgba(0,212,255,0.05);
+  --card-hover-border:rgba(0,212,255,0.46); --card-hover-shadow:0 0 0 1px rgba(0,212,255,0.46),0 20px 60px rgba(0,212,255,0.18),0 8px 24px rgba(0,0,0,0.65);
+  --btn-radius:12px; --btn-shadow:0 4px 24px rgba(0,212,255,0.42); --btn-hover-shadow:0 8px 40px rgba(0,212,255,0.65),0 0 25px rgba(124,58,237,0.35);
+  --glow-strong:0 0 60px rgba(0,212,255,0.42),0 0 120px rgba(0,212,255,0.18);
+  --glow-text:0 0 20px rgba(0,212,255,0.85),0 0 40px rgba(0,212,255,0.35);
+  --glow-icon:drop-shadow(0 0 8px rgba(0,212,255,0.9));
+  --chart-1:#00D4FF; --chart-2:#7C3AED; --chart-3:#4F46E5; --chart-4:#06B6D4; --chart-5:#8B5CF6;
+  --chart-grid:rgba(0,212,255,0.09); --chart-tooltip-bg:rgba(0,4,20,0.96);
+  --input-bg:rgba(0,6,22,0.65); --input-border:rgba(0,212,255,0.22); --input-radius:12px;
+  --input-focus-glow:0 0 0 3px rgba(0,212,255,0.22),0 0 20px rgba(0,212,255,0.12);
+  --avatar-glow:0 0 50px rgba(0,212,255,0.5),0 0 100px rgba(124,58,237,0.3);
+  --dur-fast:0.12s; --dur-base:0.28s; --dur-slow:0.75s;
+  --section-accent:#00D4FF; --section-accent-rgb:0,212,255;
+  --badge-bg:rgba(0,212,255,0.1); --badge-border:rgba(0,212,255,0.32); --badge-color:#00D4FF;
+  --scroll-thumb:rgba(0,212,255,0.22);
+}
+
+/* ── 🌸 Sakura Dream ── */
+html[data-theme="sakura-dream"],html[data-theme="sakura"] {
+  --card-bg:rgba(30,4,18,0.76); --card-border:rgba(255,107,157,0.2); --card-radius:24px;
+  --card-shadow:0 8px 40px rgba(0,0,0,0.55),0 0 0 1px rgba(255,107,157,0.08),0 0 50px rgba(255,107,157,0.04);
+  --card-hover-border:rgba(255,107,157,0.46); --card-hover-shadow:0 0 0 1px rgba(255,107,157,0.44),0 20px 60px rgba(255,107,157,0.16),0 8px 24px rgba(0,0,0,0.55);
+  --btn-radius:20px; --btn-shadow:0 4px 28px rgba(255,107,157,0.4); --btn-hover-shadow:0 8px 48px rgba(255,107,157,0.6),0 0 28px rgba(147,51,234,0.32);
+  --glow-strong:0 0 60px rgba(255,107,157,0.38),0 0 120px rgba(255,107,157,0.15);
+  --glow-text:0 0 20px rgba(255,107,157,0.78),0 0 50px rgba(255,107,157,0.28);
+  --glow-icon:drop-shadow(0 0 8px rgba(255,107,157,0.9));
+  --chart-1:#FF6B9D; --chart-2:#FF9EC6; --chart-3:#9333EA; --chart-4:#C084FC; --chart-5:#FCA5A5;
+  --chart-grid:rgba(255,107,157,0.09); --chart-tooltip-bg:rgba(18,2,10,0.96);
+  --input-bg:rgba(24,3,14,0.65); --input-border:rgba(255,107,157,0.25); --input-radius:20px;
+  --input-focus-glow:0 0 0 3px rgba(255,107,157,0.22),0 0 20px rgba(255,107,157,0.12);
+  --avatar-glow:0 0 50px rgba(255,107,157,0.45),0 0 100px rgba(147,51,234,0.28);
+  --dur-fast:0.22s; --dur-base:0.45s; --dur-slow:1.1s; --ease-spring:cubic-bezier(0.4,0,0.2,1);
+  --section-accent:#FF6B9D; --section-accent-rgb:255,107,157;
+  --badge-bg:rgba(255,107,157,0.1); --badge-border:rgba(255,107,157,0.32); --badge-color:#FF6B9D;
+  --scroll-thumb:rgba(255,107,157,0.22);
+}
+
+/* ── 🔥 Inferno ── */
+html[data-theme="inferno"],html[data-theme="ember"] {
+  --card-bg:rgba(12,2,0,0.86); --card-border:rgba(255,69,0,0.28); --card-radius:10px;
+  --card-shadow:0 8px 40px rgba(0,0,0,0.82),0 0 0 1px rgba(255,69,0,0.14),0 0 30px rgba(255,69,0,0.06);
+  --card-hover-border:rgba(255,69,0,0.58); --card-hover-shadow:0 0 0 1px rgba(255,69,0,0.58),0 20px 60px rgba(255,69,0,0.22),0 8px 24px rgba(0,0,0,0.82);
+  --btn-radius:8px; --btn-shadow:0 4px 28px rgba(255,69,0,0.56); --btn-hover-shadow:0 8px 48px rgba(255,69,0,0.76),0 0 30px rgba(255,140,0,0.46);
+  --glow-strong:0 0 60px rgba(255,69,0,0.56),0 0 120px rgba(255,69,0,0.24);
+  --glow-text:0 0 20px rgba(255,100,0,0.96),0 0 50px rgba(255,100,0,0.42);
+  --glow-icon:drop-shadow(0 0 8px rgba(255,80,0,1));
+  --chart-1:#FF4500; --chart-2:#FF8C00; --chart-3:#FFD700; --chart-4:#DC2626; --chart-5:#FB923C;
+  --chart-grid:rgba(255,69,0,0.1); --chart-tooltip-bg:rgba(8,1,0,0.97);
+  --input-bg:rgba(10,2,0,0.72); --input-border:rgba(255,69,0,0.3); --input-radius:8px;
+  --input-focus-glow:0 0 0 3px rgba(255,69,0,0.28),0 0 20px rgba(255,69,0,0.18);
+  --avatar-glow:0 0 50px rgba(255,69,0,0.62),0 0 100px rgba(220,38,38,0.36);
+  --dur-fast:0.08s; --dur-base:0.16s; --dur-slow:0.4s; --ease-spring:cubic-bezier(0.25,0.46,0.45,0.94);
+  --section-accent:#FF4500; --section-accent-rgb:255,69,0;
+  --badge-bg:rgba(255,69,0,0.12); --badge-border:rgba(255,69,0,0.38); --badge-color:#FF6030;
+  --scroll-thumb:rgba(255,69,0,0.28);
+}
+
+/* ── ❄️ Arctic Aurora ── */
+html[data-theme="arctic-aurora"],html[data-theme="arctic"] {
+  --card-bg:rgba(0,6,18,0.78); --card-border:rgba(0,255,204,0.2); --card-radius:18px;
+  --card-shadow:0 8px 40px rgba(0,0,0,0.65),0 0 0 1px rgba(0,255,204,0.1),0 0 50px rgba(0,255,204,0.04);
+  --card-hover-border:rgba(0,255,204,0.46); --card-hover-shadow:0 0 0 1px rgba(0,255,204,0.44),0 20px 60px rgba(0,255,204,0.16),0 8px 24px rgba(0,0,0,0.65);
+  --btn-radius:14px; --btn-shadow:0 4px 28px rgba(0,255,204,0.38); --btn-hover-shadow:0 8px 48px rgba(0,255,204,0.56),0 0 25px rgba(14,165,233,0.36);
+  --glow-strong:0 0 60px rgba(0,255,204,0.38),0 0 120px rgba(0,255,204,0.15);
+  --glow-text:0 0 20px rgba(0,255,204,0.86),0 0 50px rgba(0,255,204,0.32);
+  --glow-icon:drop-shadow(0 0 8px rgba(0,255,204,0.9));
+  --chart-1:#00FFCC; --chart-2:#0EA5E9; --chart-3:#7C3AED; --chart-4:#22D3EE; --chart-5:#7DD3FC;
+  --chart-grid:rgba(0,255,204,0.09); --chart-tooltip-bg:rgba(0,4,14,0.97);
+  --input-bg:rgba(0,5,14,0.65); --input-border:rgba(0,255,204,0.25); --input-radius:14px;
+  --input-focus-glow:0 0 0 3px rgba(0,255,204,0.22),0 0 20px rgba(0,255,204,0.12);
+  --avatar-glow:0 0 50px rgba(0,255,204,0.42),0 0 100px rgba(14,165,233,0.28);
+  --dur-fast:0.18s; --dur-base:0.38s; --dur-slow:0.95s;
+  --section-accent:#00FFCC; --section-accent-rgb:0,255,204;
+  --badge-bg:rgba(0,255,204,0.1); --badge-border:rgba(0,255,204,0.32); --badge-color:#00FFCC;
+  --scroll-thumb:rgba(0,255,204,0.22);
+}
+
+/* ── 🌲 Nature Pulse ── */
+html[data-theme="nature-pulse"],html[data-theme="forest"] {
+  --card-bg:rgba(1,8,2,0.82); --card-border:rgba(16,185,129,0.2); --card-radius:20px;
+  --card-shadow:0 8px 40px rgba(0,0,0,0.65),0 0 0 1px rgba(16,185,129,0.09),0 0 50px rgba(16,185,129,0.04);
+  --card-hover-border:rgba(16,185,129,0.44); --card-hover-shadow:0 0 0 1px rgba(16,185,129,0.44),0 20px 60px rgba(16,185,129,0.15),0 8px 24px rgba(0,0,0,0.65);
+  --btn-radius:16px; --btn-shadow:0 4px 28px rgba(16,185,129,0.38); --btn-hover-shadow:0 8px 48px rgba(16,185,129,0.56),0 0 25px rgba(5,150,105,0.36);
+  --glow-strong:0 0 60px rgba(16,185,129,0.38),0 0 120px rgba(16,185,129,0.15);
+  --glow-text:0 0 20px rgba(16,185,129,0.86),0 0 50px rgba(16,185,129,0.32);
+  --glow-icon:drop-shadow(0 0 8px rgba(16,185,129,0.9));
+  --chart-1:#10B981; --chart-2:#22C55E; --chart-3:#86EFAC; --chart-4:#059669; --chart-5:#34D399;
+  --chart-grid:rgba(16,185,129,0.09); --chart-tooltip-bg:rgba(1,5,2,0.97);
+  --input-bg:rgba(1,6,2,0.65); --input-border:rgba(16,185,129,0.25); --input-radius:16px;
+  --input-focus-glow:0 0 0 3px rgba(16,185,129,0.22),0 0 20px rgba(16,185,129,0.12);
+  --avatar-glow:0 0 50px rgba(16,185,129,0.42),0 0 100px rgba(5,150,105,0.28);
+  --dur-fast:0.2s; --dur-base:0.42s; --dur-slow:1.05s; --ease-spring:cubic-bezier(0.4,0,0.2,1);
+  --section-accent:#10B981; --section-accent-rgb:16,185,129;
+  --badge-bg:rgba(16,185,129,0.1); --badge-border:rgba(16,185,129,0.32); --badge-color:#10B981;
+  --scroll-thumb:rgba(16,185,129,0.22);
+}
+
+/* ── 🤖 Cyberpunk Neo ── */
+html[data-theme="cyberpunk-neo"],html[data-theme="neon-cyberpunk"] {
+  --card-bg:rgba(0,0,0,0.94); --card-border:rgba(0,255,65,0.35); --card-radius:4px;
+  --card-shadow:0 0 0 1px rgba(0,255,65,0.18),0 8px 32px rgba(0,0,0,0.96),0 0 40px rgba(0,255,65,0.06);
+  --card-hover-border:rgba(0,255,65,0.72); --card-hover-shadow:0 0 0 1px rgba(0,255,65,0.72),0 0 30px rgba(0,255,65,0.22),0 8px 24px rgba(0,0,0,0.96),0 0 60px rgba(255,0,255,0.09);
+  --btn-radius:2px; --btn-shadow:0 0 20px rgba(0,255,65,0.56),0 4px 24px rgba(0,0,0,0.86); --btn-hover-shadow:0 0 40px rgba(0,255,65,0.86),0 0 20px rgba(255,0,255,0.46),0 8px 40px rgba(0,0,0,0.96);
+  --glow-strong:0 0 60px rgba(0,255,65,0.66),0 0 120px rgba(0,255,65,0.3),0 0 200px rgba(255,0,255,0.1);
+  --glow-text:0 0 20px rgba(0,255,65,1),0 0 40px rgba(0,255,65,0.56);
+  --glow-icon:drop-shadow(0 0 8px rgba(0,255,65,1)) drop-shadow(0 0 16px rgba(0,255,65,0.6));
+  --chart-1:#00FF41; --chart-2:#FF00FF; --chart-3:#00FFFF; --chart-4:#FFFF00; --chart-5:#FF0080;
+  --chart-grid:rgba(0,255,65,0.12); --chart-tooltip-bg:rgba(0,0,0,0.99);
+  --input-bg:rgba(0,0,0,0.88); --input-border:rgba(0,255,65,0.42); --input-radius:2px;
+  --input-focus-glow:0 0 0 2px rgba(0,255,65,0.56),0 0 20px rgba(0,255,65,0.26);
+  --avatar-glow:0 0 50px rgba(0,255,65,0.66),0 0 100px rgba(255,0,255,0.36);
+  --dur-fast:0.05s; --dur-base:0.1s; --dur-slow:0.3s; --ease-spring:steps(2,end);
+  --section-accent:#00FF41; --section-accent-rgb:0,255,65;
+  --badge-bg:rgba(0,255,65,0.1); --badge-border:rgba(0,255,65,0.46); --badge-color:#00FF41;
+  --scroll-thumb:rgba(0,255,65,0.26);
+}
+
+/* ── 🌊 Ocean Intelligence ── */
+html[data-theme="ocean-intelligence"] {
+  --card-bg:rgba(0,5,18,0.82); --card-border:rgba(0,206,209,0.2); --card-radius:20px;
+  --card-shadow:0 8px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(0,206,209,0.1),0 0 50px rgba(0,206,209,0.04);
+  --card-hover-border:rgba(0,206,209,0.46); --card-hover-shadow:0 0 0 1px rgba(0,206,209,0.46),0 20px 60px rgba(0,206,209,0.16),0 8px 24px rgba(0,0,0,0.7);
+  --btn-radius:16px; --btn-shadow:0 4px 28px rgba(0,206,209,0.42); --btn-hover-shadow:0 8px 48px rgba(0,206,209,0.62),0 0 25px rgba(8,145,178,0.4);
+  --glow-strong:0 0 60px rgba(0,206,209,0.42),0 0 120px rgba(0,206,209,0.18);
+  --glow-text:0 0 20px rgba(0,206,209,0.86),0 0 50px rgba(0,206,209,0.32);
+  --glow-icon:drop-shadow(0 0 8px rgba(0,206,209,0.9));
+  --chart-1:#00CED1; --chart-2:#006994; --chart-3:#0891B2; --chart-4:#22D3EE; --chart-5:#40E0D0;
+  --chart-grid:rgba(0,206,209,0.09); --chart-tooltip-bg:rgba(0,3,14,0.97);
+  --input-bg:rgba(0,4,15,0.68); --input-border:rgba(0,206,209,0.25); --input-radius:16px;
+  --input-focus-glow:0 0 0 3px rgba(0,206,209,0.22),0 0 20px rgba(0,206,209,0.12);
+  --avatar-glow:0 0 50px rgba(0,206,209,0.46),0 0 100px rgba(8,145,178,0.3);
+  --dur-fast:0.2s; --dur-base:0.45s; --dur-slow:1.1s; --ease-spring:cubic-bezier(0.4,0,0,1);
+  --section-accent:#00CED1; --section-accent-rgb:0,206,209;
+  --badge-bg:rgba(0,206,209,0.1); --badge-border:rgba(0,206,209,0.32); --badge-color:#00CED1;
+  --scroll-thumb:rgba(0,206,209,0.22);
+}
+
+/* ── 🧠 Neural Brain ── */
+html[data-theme="neural-brain"] {
+  --card-bg:rgba(2,2,14,0.86); --card-border:rgba(139,92,246,0.24); --card-radius:16px;
+  --card-shadow:0 8px 40px rgba(0,0,0,0.74),0 0 0 1px rgba(139,92,246,0.12),0 0 40px rgba(139,92,246,0.06);
+  --card-hover-border:rgba(139,92,246,0.52); --card-hover-shadow:0 0 0 1px rgba(139,92,246,0.52),0 20px 60px rgba(139,92,246,0.2),0 8px 24px rgba(0,0,0,0.74);
+  --btn-radius:12px; --btn-shadow:0 4px 28px rgba(139,92,246,0.48); --btn-hover-shadow:0 8px 48px rgba(139,92,246,0.7),0 0 25px rgba(0,212,255,0.34);
+  --glow-strong:0 0 60px rgba(139,92,246,0.48),0 0 120px rgba(139,92,246,0.24),0 0 200px rgba(0,212,255,0.08);
+  --glow-text:0 0 20px rgba(139,92,246,0.9),0 0 50px rgba(0,212,255,0.32);
+  --glow-icon:drop-shadow(0 0 8px rgba(139,92,246,1)) drop-shadow(0 0 16px rgba(0,212,255,0.4));
+  --chart-1:#8B5CF6; --chart-2:#00D4FF; --chart-3:#10B981; --chart-4:#A78BFA; --chart-5:#7C3AED;
+  --chart-grid:rgba(139,92,246,0.1); --chart-tooltip-bg:rgba(2,2,12,0.98);
+  --input-bg:rgba(2,2,12,0.72); --input-border:rgba(139,92,246,0.28); --input-radius:12px;
+  --input-focus-glow:0 0 0 3px rgba(139,92,246,0.25),0 0 20px rgba(139,92,246,0.16);
+  --avatar-glow:0 0 50px rgba(139,92,246,0.54),0 0 100px rgba(0,212,255,0.3);
+  --dur-fast:0.15s; --dur-base:0.35s; --dur-slow:0.85s; --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+  --section-accent:#8B5CF6; --section-accent-rgb:139,92,246;
+  --badge-bg:rgba(139,92,246,0.1); --badge-border:rgba(139,92,246,0.36); --badge-color:#A78BFA;
+  --scroll-thumb:rgba(139,92,246,0.26);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   THEME-AWARE UTILITY CLASSES
+   Drop these class names onto any element to get full theme adaptation.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Card surfaces ───────────────────────────────────────────────────── */
+.tm-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: border-color var(--dur-base) ease,
+              box-shadow var(--dur-base) ease,
+              transform var(--dur-base) var(--ease-spring);
+}
+.tm-card:hover {
+  border-color: var(--card-hover-border);
+  box-shadow: var(--card-hover-shadow);
+  transform: translateY(-4px);
+}
+.tm-card-flat {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* ── Primary button ──────────────────────────────────────────────────── */
+.tm-btn {
+  background: var(--grad-primary);
+  background-size: 200% auto;
+  border: none;
+  border-radius: var(--btn-radius) !important;
+  box-shadow: var(--btn-shadow);
+  color: #fff;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-position 0.4s ease,
+              box-shadow var(--dur-base) ease,
+              transform var(--dur-base) var(--ease-spring);
+}
+.tm-btn:hover:not(:disabled) {
+  background-position: right center;
+  box-shadow: var(--btn-hover-shadow);
+  transform: translateY(-2px);
+}
+.tm-btn:active:not(:disabled) { transform: translateY(0); }
+.tm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Glow helpers ────────────────────────────────────────────────────── */
+.tm-glow       { box-shadow: var(--glow-strong) !important; }
+.tm-glow-text  { color: var(--section-accent); text-shadow: var(--glow-text); }
+.tm-glow-icon  { filter: var(--glow-icon); }
+
+/* ── Section label ───────────────────────────────────────────────────── */
+.tm-label {
+  color: var(--section-accent);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+/* ── Badge ───────────────────────────────────────────────────────────── */
+.tm-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--badge-bg);
+  border: 1px solid var(--badge-border);
+  color: var(--badge-color);
+  border-radius: 99px;
+  padding: 2px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* ── Input ───────────────────────────────────────────────────────────── */
+.tm-input {
+  background: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: var(--input-radius) !important;
+  color: var(--text-h) !important;
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+.tm-input:focus {
+  border-color: var(--section-accent) !important;
+  box-shadow: var(--input-focus-glow) !important;
+  outline: none !important;
+}
+
+/* ── Override existing shared classes ────────────────────────────────── */
+.grad-btn {
+  border-radius: var(--btn-radius) !important;
+  box-shadow: var(--btn-shadow) !important;
+  transition: box-shadow var(--dur-base) ease,
+              transform var(--dur-base) var(--ease-spring),
+              background-position 0.4s ease !important;
+}
+.grad-btn:hover:not(:disabled) {
+  box-shadow: var(--btn-hover-shadow) !important;
+  transform: translateY(-2px);
+}
+.grad-btn:active:not(:disabled) { transform: translateY(0); }
+
+.dark-input {
+  background: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  border-radius: var(--input-radius) !important;
+}
+.dark-input:focus {
+  border-color: var(--section-accent) !important;
+  box-shadow: var(--input-focus-glow) !important;
+}
+
+.stat-card-premium {
+  border-radius: var(--card-radius) !important;
+  transition: box-shadow var(--dur-base) ease,
+              border-color var(--dur-base) ease,
+              transform var(--dur-base) var(--ease-spring) !important;
+}
+.stat-card-premium:hover {
+  box-shadow: var(--card-hover-shadow) !important;
+  border-color: var(--card-hover-border) !important;
+  transform: translateY(-4px);
+}
+
+.glass-panel:hover {
+  border-color: var(--card-hover-border) !important;
+  box-shadow: var(--card-hover-shadow) !important;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb) !important;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--section-accent-rgb),0.4) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   PER-THEME AMBIENT ANIMATIONS on .tm-card elements
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Cyberpunk — glitch border flicker */
+html[data-theme="cyberpunk-neo"] .tm-card,
+html[data-theme="neon-cyberpunk"] .tm-card {
+  position: relative;
+  overflow: hidden;
+}
+html[data-theme="cyberpunk-neo"] .tm-card::before,
+html[data-theme="neon-cyberpunk"] .tm-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,255,65,0.014) 2px, rgba(0,255,65,0.014) 4px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+}
+html[data-theme="cyberpunk-neo"] .tm-card > *,
+html[data-theme="neon-cyberpunk"] .tm-card > * { position: relative; z-index: 1; }
+
+html[data-theme="cyberpunk-neo"] .tm-card:hover,
+html[data-theme="neon-cyberpunk"] .tm-card:hover {
+  animation: cyber-glitch-border 0.18s steps(2) infinite;
+}
+@keyframes cyber-glitch-border {
+  0%   { box-shadow: var(--card-hover-shadow); }
+  50%  { box-shadow: var(--card-hover-shadow), -2px 0 0 rgba(255,0,255,0.5), 2px 0 0 rgba(0,255,65,0.5); }
+  100% { box-shadow: var(--card-hover-shadow); }
+}
+
+/* Inferno — fire border breathe */
+html[data-theme="inferno"] .tm-card,
+html[data-theme="ember"] .tm-card {
+  animation: inferno-border-breathe 3s ease-in-out infinite;
+}
+@keyframes inferno-border-breathe {
+  0%,100% { box-shadow: var(--card-shadow); }
+  50%     { box-shadow: var(--card-shadow), 0 0 20px rgba(255,69,0,0.28), 0 0 40px rgba(255,69,0,0.1); }
+}
+html[data-theme="inferno"] .tm-card:hover,
+html[data-theme="ember"] .tm-card:hover { animation: none; box-shadow: var(--card-hover-shadow); }
+
+/* Neural Brain — synaptic pulse */
+html[data-theme="neural-brain"] .tm-card {
+  animation: neural-card-pulse 4s ease-in-out infinite;
+}
+@keyframes neural-card-pulse {
+  0%,100% { box-shadow: var(--card-shadow); }
+  50%     { box-shadow: var(--card-shadow), 0 0 30px rgba(139,92,246,0.22), 0 0 60px rgba(139,92,246,0.08); }
+}
+html[data-theme="neural-brain"] .tm-card:hover { animation: none; box-shadow: var(--card-hover-shadow); }
+
+/* Ocean — slow depth ripple */
+html[data-theme="ocean-intelligence"] .tm-card {
+  animation: ocean-card-ripple 5s ease-in-out infinite;
+}
+@keyframes ocean-card-ripple {
+  0%,100% { box-shadow: var(--card-shadow); }
+  50%     { box-shadow: var(--card-shadow), 0 0 26px rgba(0,206,209,0.2), 0 0 52px rgba(0,206,209,0.08); }
+}
+html[data-theme="ocean-intelligence"] .tm-card:hover { animation: none; box-shadow: var(--card-hover-shadow); }
+
+/* Nature — organic breathing */
+html[data-theme="nature-pulse"] .tm-card,
+html[data-theme="forest"] .tm-card {
+  animation: nature-card-breathe 5s ease-in-out infinite;
+}
+@keyframes nature-card-breathe {
+  0%,100% { box-shadow: var(--card-shadow); }
+  50%     { box-shadow: var(--card-shadow), 0 0 22px rgba(16,185,129,0.22), 0 0 44px rgba(16,185,129,0.08); }
+}
+html[data-theme="nature-pulse"] .tm-card:hover,
+html[data-theme="forest"] .tm-card:hover { animation: none; box-shadow: var(--card-hover-shadow); }
+
+/* Sakura — soft bloom pulse on buttons */
+html[data-theme="sakura-dream"] .tm-btn,
+html[data-theme="sakura"] .tm-btn,
+html[data-theme="sakura-dream"] .grad-btn,
+html[data-theme="sakura"] .grad-btn {
+  animation: sakura-btn-bloom 4s ease-in-out infinite;
+}
+@keyframes sakura-btn-bloom {
+  0%,100% { box-shadow: var(--btn-shadow); }
+  50%     { box-shadow: var(--btn-shadow), 0 0 32px rgba(255,107,157,0.38); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ADDITIONAL KEYFRAMES for ThemeEngine overlays (mirrored here for
+   any component that animates independently of ThemeEngine's style tag)
+   ══════════════════════════════════════════════════════════════════════ */
+@keyframes sakura-bloom {
+  0%   { opacity: 0.55; transform: scale(1) translateY(0); }
+  50%  { opacity: 1;    transform: scale(1.1) translateY(-10px); }
+  100% { opacity: 0.7;  transform: scale(1.04) translateY(-4px); }
+}
+@keyframes inferno-surge {
+  0%,100% { opacity: 0.55; transform: scaleY(1) scaleX(1); }
+  50%     { opacity: 1;    transform: scaleY(1.15) scaleX(1.06); }
+}
+@keyframes nature-ray {
+  0%   { opacity: 0.45; transform: rotate(-6deg) scaleX(0.9); }
+  100% { opacity: 0.85; transform: rotate(6deg)  scaleX(1.3); }
+}
+@keyframes brain-ring-expand {
+  0%   { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(2.6); opacity: 0; }
+}

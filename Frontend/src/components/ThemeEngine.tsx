@@ -21,37 +21,57 @@ const TAU   = Math.PI * 2;
 
 const BG: Record<ThemeId, string> = {
   'galaxy-nexus':
-    `radial-gradient(ellipse at 15% 55%, rgba(80,0,180,0.35) 0%, transparent 55%),
-     radial-gradient(ellipse at 85% 20%, rgba(0,60,200,0.25) 0%, transparent 50%),
-     radial-gradient(ellipse at 50% 95%, rgba(0,100,200,0.18) 0%, transparent 45%),
+    `radial-gradient(ellipse at 20% 60%, rgba(100,0,220,0.52) 0%, transparent 50%),
+     radial-gradient(ellipse at 80% 18%, rgba(0,80,220,0.4) 0%, transparent 45%),
+     radial-gradient(ellipse at 50% 100%, rgba(0,120,220,0.28) 0%, transparent 40%),
+     radial-gradient(ellipse at 5% 10%, rgba(60,0,180,0.3) 0%, transparent 40%),
+     radial-gradient(ellipse at 92% 78%, rgba(0,200,255,0.14) 0%, transparent 35%),
      #000510`,
   'sakura-dream':
-    `radial-gradient(ellipse at 30% 15%, rgba(255,180,200,0.45) 0%, transparent 55%),
-     radial-gradient(ellipse at 75% 80%, rgba(255,120,160,0.3) 0%, transparent 50%),
-     linear-gradient(170deg, #12020a 0%, #1f0513 50%, #14030c 100%)`,
+    `radial-gradient(ellipse at 25% 8%, rgba(255,200,220,0.65) 0%, transparent 50%),
+     radial-gradient(ellipse at 80% 85%, rgba(255,130,170,0.48) 0%, transparent 50%),
+     radial-gradient(ellipse at 60% 40%, rgba(200,80,130,0.14) 0%, transparent 55%),
+     radial-gradient(ellipse at 10% 75%, rgba(255,160,200,0.28) 0%, transparent 45%),
+     linear-gradient(170deg, #12020a 0%, #1f0513 55%, #14030c 100%)`,
   'inferno':
-    `radial-gradient(ellipse at 50% 100%, rgba(220,60,0,0.55) 0%, transparent 55%),
-     radial-gradient(ellipse at 20% 80%, rgba(180,30,0,0.3) 0%, transparent 40%),
-     radial-gradient(ellipse at 80% 70%, rgba(255,120,0,0.2) 0%, transparent 40%),
+    `radial-gradient(ellipse at 50% 112%, rgba(255,60,0,0.8) 0%, transparent 50%),
+     radial-gradient(ellipse at 15% 90%, rgba(200,30,0,0.52) 0%, transparent 40%),
+     radial-gradient(ellipse at 85% 75%, rgba(255,140,0,0.38) 0%, transparent 40%),
+     radial-gradient(ellipse at 30% 60%, rgba(180,20,0,0.22) 0%, transparent 50%),
+     radial-gradient(ellipse at 70% 50%, rgba(255,100,0,0.16) 0%, transparent 45%),
      #060100`,
   'arctic-aurora':
-    `radial-gradient(ellipse at 50% 0%, rgba(0,220,160,0.18) 0%, transparent 60%),
-     radial-gradient(ellipse at 20% 40%, rgba(0,150,255,0.15) 0%, transparent 50%),
+    `radial-gradient(ellipse at 50% -5%, rgba(0,255,180,0.3) 0%, transparent 55%),
+     radial-gradient(ellipse at 15% 35%, rgba(0,180,255,0.24) 0%, transparent 50%),
+     radial-gradient(ellipse at 85% 45%, rgba(80,0,255,0.2) 0%, transparent 45%),
+     radial-gradient(ellipse at 50% 72%, rgba(0,220,200,0.12) 0%, transparent 45%),
      #00060e`,
   'nature-pulse':
-    `radial-gradient(ellipse at 20% 80%, rgba(20,100,20,0.4) 0%, transparent 55%),
-     radial-gradient(ellipse at 80% 30%, rgba(10,80,10,0.25) 0%, transparent 50%),
+    `radial-gradient(ellipse at 15% 85%, rgba(20,120,20,0.58) 0%, transparent 50%),
+     radial-gradient(ellipse at 85% 25%, rgba(10,90,10,0.42) 0%, transparent 50%),
+     radial-gradient(ellipse at 50% 60%, rgba(5,60,5,0.28) 0%, transparent 55%),
+     radial-gradient(ellipse at 70% 85%, rgba(40,150,30,0.24) 0%, transparent 40%),
+     radial-gradient(ellipse at 30% 20%, rgba(20,80,10,0.18) 0%, transparent 40%),
      #010802`,
   'cyberpunk-neo':
-    `radial-gradient(ellipse at 50% 50%, rgba(100,0,200,0.12) 0%, transparent 70%),
+    `radial-gradient(ellipse at 50% 50%, rgba(120,0,240,0.2) 0%, transparent 65%),
+     radial-gradient(ellipse at 20% 80%, rgba(0,255,65,0.09) 0%, transparent 45%),
+     radial-gradient(ellipse at 80% 20%, rgba(255,0,255,0.08) 0%, transparent 45%),
+     radial-gradient(ellipse at 50% 0%, rgba(0,100,255,0.07) 0%, transparent 40%),
      #000000`,
   'ocean-intelligence':
-    `radial-gradient(ellipse at 30% 70%, rgba(0,80,160,0.4) 0%, transparent 55%),
-     radial-gradient(ellipse at 70% 20%, rgba(0,130,150,0.3) 0%, transparent 50%),
+    `radial-gradient(ellipse at 30% 75%, rgba(0,90,180,0.58) 0%, transparent 50%),
+     radial-gradient(ellipse at 70% 15%, rgba(0,150,170,0.45) 0%, transparent 50%),
+     radial-gradient(ellipse at 50% 50%, rgba(0,60,120,0.24) 0%, transparent 60%),
+     radial-gradient(ellipse at 85% 70%, rgba(0,200,200,0.2) 0%, transparent 40%),
+     radial-gradient(ellipse at 10% 30%, rgba(0,80,160,0.2) 0%, transparent 40%),
      #000814`,
   'neural-brain':
-    `radial-gradient(ellipse at 50% 50%, rgba(60,0,120,0.3) 0%, transparent 65%),
-     radial-gradient(ellipse at 20% 20%, rgba(0,100,180,0.2) 0%, transparent 50%),
+    `radial-gradient(ellipse at 50% 50%, rgba(80,0,160,0.45) 0%, transparent 60%),
+     radial-gradient(ellipse at 20% 20%, rgba(0,120,200,0.3) 0%, transparent 50%),
+     radial-gradient(ellipse at 80% 80%, rgba(100,0,200,0.24) 0%, transparent 50%),
+     radial-gradient(ellipse at 50% 0%, rgba(60,0,140,0.2) 0%, transparent 55%),
+     radial-gradient(ellipse at 10% 90%, rgba(0,80,180,0.2) 0%, transparent 45%),
      #020205`,
 };
 
@@ -61,16 +81,17 @@ function AuroraOverlay() {
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       {[
-        { top: '5%',  left: '10%', w: '80%',  h: '18%', c: 'rgba(0,220,160,0.18)',  dur: '8s',  del: '0s'   },
-        { top: '18%', left: '0%',  w: '70%',  h: '14%', c: 'rgba(0,150,255,0.14)',  dur: '11s', del: '2s'   },
-        { top: '30%', left: '25%', w: '60%',  h: '10%', c: 'rgba(100,0,255,0.12)',  dur: '9s',  del: '4s'   },
-        { top: '42%', left: '5%',  w: '75%',  h: '8%',  c: 'rgba(0,255,200,0.08)',  dur: '14s', del: '1.5s' },
+        { top: '2%',  left: '5%',  w: '90%', h: '22%', c: 'rgba(0,255,180,0.24)', dur: '8s',  del: '0s'   },
+        { top: '14%', left: '0%',  w: '78%', h: '17%', c: 'rgba(0,160,255,0.2)',  dur: '11s', del: '2s'   },
+        { top: '26%', left: '20%', w: '68%', h: '13%', c: 'rgba(100,0,255,0.17)', dur: '9s',  del: '4s'   },
+        { top: '38%', left: '5%',  w: '82%', h: '11%', c: 'rgba(0,255,200,0.12)', dur: '14s', del: '1.5s' },
+        { top: '48%', left: '30%', w: '52%', h: '8%',  c: 'rgba(80,0,200,0.1)',   dur: '12s', del: '3s'   },
       ].map((b, i) => (
         <div key={i} style={{
           position: 'absolute', top: b.top, left: b.left,
           width: b.w, height: b.h,
           background: `radial-gradient(ellipse at center, ${b.c} 0%, transparent 70%)`,
-          filter: 'blur(28px)',
+          filter: 'blur(26px)',
           animation: `aurora-wave ${b.dur} ease-in-out ${b.del} infinite alternate`,
           borderRadius: '50%',
         }} />
@@ -86,20 +107,36 @@ function CyberGridOverlay() {
       <div className="cyber-grid-lines" />
       {/* Scan-line sweep */}
       <div className="cyber-scan-line" />
-      {/* Corner brackets */}
-      {[
-        { top: 20, left: 20,  bt: '2px solid',  bb: 'none',     bl: '2px solid', br: 'none' },
-        { top: 20, right: 20, bt: '2px solid',  bb: 'none',     bl: 'none',      br: '2px solid' },
-        { bottom: 20, left: 20,  bt: 'none',    bb: '2px solid',bl: '2px solid', br: 'none' },
-        { bottom: 20, right: 20, bt: 'none',    bb: '2px solid',bl: 'none',      br: '2px solid' },
-      ].map((c, i) => (
+      {/* Data stream vertical lines */}
+      {[15, 35, 55, 75, 90].map((x, i) => (
         <div key={i} style={{
-          position: 'absolute', width: 30, height: 30, opacity: 0.4,
-          ...c,
-          borderColor: '#ff00ff',
-          top: c.top, left: c.left, bottom: c.bottom, right: c.right,
+          position: 'absolute', top: 0, bottom: 0, left: `${x}%`, width: 1,
+          background: `linear-gradient(180deg, transparent 0%, rgba(0,255,65,${0.04 + i*0.01}) 30%, transparent 100%)`,
+          animation: `cyber-scan ${5 + i * 1.5}s linear ${i * 0.8}s infinite`,
+          opacity: 0.5,
         }} />
       ))}
+      {/* Corner brackets */}
+      {[
+        { top: 20, left: 20,   borderTop: '2px solid', borderLeft:  '2px solid' },
+        { top: 20, right: 20,  borderTop: '2px solid', borderRight: '2px solid' },
+        { bottom: 20, left: 20,  borderBottom: '2px solid', borderLeft:  '2px solid' },
+        { bottom: 20, right: 20, borderBottom: '2px solid', borderRight: '2px solid' },
+      ].map((c, i) => (
+        <div key={i} style={{
+          position: 'absolute', width: 36, height: 36, opacity: 0.55,
+          ...c, borderColor: '#ff00ff',
+        }} />
+      ))}
+      {/* Central HUD cross */}
+      <div style={{
+        position: 'absolute', top: '50%', left: '50%',
+        width: 80, height: 80, marginLeft: -40, marginTop: -40,
+        border: '1px solid rgba(0,255,65,0.12)',
+        borderRadius: '50%',
+        boxShadow: '0 0 30px rgba(0,255,65,0.08), inset 0 0 30px rgba(0,255,65,0.04)',
+        animation: 'brain-pulse 3s ease-in-out infinite',
+      }} />
     </div>
   );
 }
@@ -108,17 +145,18 @@ function NebulaClouds() {
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       {[
-        { top: '10%',  left: '5%',  s: 400, c: 'rgba(80,0,200,0.12)',   dur: '22s', del: '0s'  },
-        { top: '30%',  left: '60%', s: 350, c: 'rgba(0,80,200,0.1)',    dur: '28s', del: '4s'  },
-        { top: '60%',  left: '20%', s: 500, c: 'rgba(0,180,255,0.08)',  dur: '18s', del: '8s'  },
-        { top: '70%',  left: '70%', s: 300, c: 'rgba(120,0,255,0.12)',  dur: '25s', del: '2s'  },
-        { top: '-5%',  left: '40%', s: 450, c: 'rgba(0,60,180,0.1)',    dur: '32s', del: '6s'  },
+        { top: '8%',  left: '5%',  s: 500, c: 'rgba(80,0,200,0.16)',   dur: '22s', del: '0s'  },
+        { top: '28%', left: '58%', s: 420, c: 'rgba(0,80,200,0.14)',   dur: '28s', del: '4s'  },
+        { top: '58%', left: '18%', s: 580, c: 'rgba(0,180,255,0.1)',   dur: '18s', del: '8s'  },
+        { top: '68%', left: '68%', s: 360, c: 'rgba(120,0,255,0.16)',  dur: '25s', del: '2s'  },
+        { top: '-8%', left: '38%', s: 520, c: 'rgba(0,60,180,0.13)',   dur: '32s', del: '6s'  },
+        { top: '40%', left: '80%', s: 280, c: 'rgba(0,200,255,0.1)',   dur: '20s', del: '10s' },
       ].map((n, i) => (
         <div key={i} style={{
           position: 'absolute', top: n.top, left: n.left,
           width: n.s, height: n.s,
           background: `radial-gradient(circle, ${n.c} 0%, transparent 70%)`,
-          filter: 'blur(40px)',
+          filter: 'blur(45px)',
           animation: `nebula-drift ${n.dur} ease-in-out ${n.del} infinite alternate`,
           borderRadius: '50%',
         }} />
@@ -129,17 +167,37 @@ function NebulaClouds() {
 
 function OceanDepthGlow() {
   return (
-    <div style={{ position: 'absolute', inset: 0 }}>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+      {/* Deep ocean floor glow */}
       <div style={{
-        position: 'absolute', bottom: 0, left: '10%', right: '10%', height: '40%',
-        background: 'radial-gradient(ellipse at 50% 100%, rgba(0,120,200,0.2) 0%, transparent 70%)',
+        position: 'absolute', bottom: 0, left: '5%', right: '5%', height: '45%',
+        background: 'radial-gradient(ellipse at 50% 100%, rgba(0,120,200,0.28) 0%, transparent 70%)',
         animation: 'ocean-pulse 6s ease-in-out infinite',
       }} />
+      {/* Mid-ocean bioluminescent glow */}
       <div style={{
-        position: 'absolute', top: '20%', left: '20%', right: '20%', height: '30%',
-        background: 'radial-gradient(ellipse at 50% 50%, rgba(0,200,200,0.06) 0%, transparent 70%)',
+        position: 'absolute', top: '20%', left: '15%', right: '15%', height: '35%',
+        background: 'radial-gradient(ellipse at 50% 50%, rgba(0,200,200,0.1) 0%, transparent 70%)',
         animation: 'ocean-pulse 9s ease-in-out 3s infinite',
+        filter: 'blur(25px)',
+      }} />
+      {/* Surface shimmer */}
+      <div style={{
+        position: 'absolute', top: '5%', left: '20%', right: '20%', height: '15%',
+        background: 'radial-gradient(ellipse at 50% 0%, rgba(0,180,220,0.14) 0%, transparent 70%)',
+        animation: 'ocean-pulse 7s ease-in-out 1.5s infinite',
         filter: 'blur(20px)',
+      }} />
+      {/* Side depth columns */}
+      <div style={{
+        position: 'absolute', top: '15%', bottom: '15%', left: 0, width: '8%',
+        background: 'linear-gradient(90deg, rgba(0,80,160,0.18) 0%, transparent 100%)',
+        animation: 'ocean-pulse 11s ease-in-out infinite',
+      }} />
+      <div style={{
+        position: 'absolute', top: '15%', bottom: '15%', right: 0, width: '8%',
+        background: 'linear-gradient(270deg, rgba(0,80,160,0.15) 0%, transparent 100%)',
+        animation: 'ocean-pulse 13s ease-in-out 2s infinite',
       }} />
     </div>
   );
@@ -147,12 +205,134 @@ function OceanDepthGlow() {
 
 function BrainGlow() {
   return (
-    <div style={{ position: 'absolute', inset: 0 }}>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+      {/* Central brain core */}
       <div style={{
-        position: 'absolute', top: '25%', left: '25%', right: '25%', bottom: '25%',
-        background: 'radial-gradient(ellipse at 50% 50%, rgba(100,0,200,0.15) 0%, transparent 70%)',
+        position: 'absolute', top: '20%', left: '20%', right: '20%', bottom: '20%',
+        background: 'radial-gradient(ellipse at 50% 50%, rgba(100,0,200,0.2) 0%, transparent 70%)',
         animation: 'brain-pulse 4s ease-in-out infinite',
         filter: 'blur(30px)',
+      }} />
+      {/* Secondary neural glow */}
+      <div style={{
+        position: 'absolute', top: '30%', left: '30%', right: '30%', bottom: '30%',
+        background: 'radial-gradient(ellipse at 50% 50%, rgba(0,150,255,0.14) 0%, transparent 70%)',
+        animation: 'brain-pulse 6s ease-in-out 2s infinite',
+        filter: 'blur(20px)',
+      }} />
+      {/* Expanding synapse rings */}
+      {[0, 1.5, 3].map((del, i) => (
+        <div key={i} style={{
+          position: 'absolute',
+          top: '50%', left: '50%',
+          width: 200 + i * 80, height: 200 + i * 80,
+          marginLeft: -(100 + i * 40), marginTop: -(100 + i * 40),
+          border: `1px solid rgba(139,92,246,${0.12 - i * 0.03})`,
+          borderRadius: '50%',
+          animation: `brain-ring-expand 4s ease-out ${del}s infinite`,
+        }} />
+      ))}
+    </div>
+  );
+}
+
+function SakuraBloom() {
+  return (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+      {/* Warm sunlight bloom from top */}
+      <div style={{
+        position: 'absolute', top: '-10%', left: '10%', right: '10%', height: '45%',
+        background: 'radial-gradient(ellipse at 50% 0%, rgba(255,210,190,0.16) 0%, transparent 70%)',
+        filter: 'blur(50px)',
+        animation: 'sakura-bloom 8s ease-in-out infinite alternate',
+      }} />
+      {/* Pink atmospheric bloom – top left */}
+      <div style={{
+        position: 'absolute', top: '0%', left: '-5%', width: '45%', height: '55%',
+        background: 'radial-gradient(ellipse at 0% 0%, rgba(255,160,195,0.22) 0%, transparent 70%)',
+        filter: 'blur(60px)',
+        animation: 'sakura-bloom 10s ease-in-out 2s infinite alternate',
+      }} />
+      {/* Soft pink bloom – bottom right */}
+      <div style={{
+        position: 'absolute', bottom: '5%', right: '0%', width: '40%', height: '45%',
+        background: 'radial-gradient(ellipse at 100% 100%, rgba(255,140,175,0.18) 0%, transparent 70%)',
+        filter: 'blur(55px)',
+        animation: 'sakura-bloom 12s ease-in-out 4s infinite alternate',
+      }} />
+      {/* Gentle centre haze */}
+      <div style={{
+        position: 'absolute', top: '35%', left: '25%', right: '25%', height: '30%',
+        background: 'radial-gradient(ellipse at 50% 50%, rgba(200,80,130,0.07) 0%, transparent 70%)',
+        filter: 'blur(40px)',
+        animation: 'sakura-bloom 7s ease-in-out 1s infinite alternate',
+      }} />
+    </div>
+  );
+}
+
+function InfernoHeat() {
+  return (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+      {/* Main heat core from bottom */}
+      <div style={{
+        position: 'absolute', bottom: '-5%', left: '15%', right: '15%', height: '55%',
+        background: 'radial-gradient(ellipse at 50% 100%, rgba(255,80,0,0.3) 0%, transparent 70%)',
+        filter: 'blur(35px)',
+        animation: 'inferno-surge 3s ease-in-out infinite',
+      }} />
+      {/* Secondary heat – left column */}
+      <div style={{
+        position: 'absolute', bottom: '0%', left: '0%', width: '30%', height: '40%',
+        background: 'radial-gradient(ellipse at 0% 100%, rgba(200,30,0,0.22) 0%, transparent 70%)',
+        filter: 'blur(40px)',
+        animation: 'inferno-surge 4s ease-in-out 0.8s infinite',
+      }} />
+      {/* Secondary heat – right column */}
+      <div style={{
+        position: 'absolute', bottom: '0%', right: '0%', width: '30%', height: '40%',
+        background: 'radial-gradient(ellipse at 100% 100%, rgba(255,120,0,0.2) 0%, transparent 70%)',
+        filter: 'blur(40px)',
+        animation: 'inferno-surge 5s ease-in-out 1.5s infinite',
+      }} />
+      {/* Upper heat haze */}
+      <div style={{
+        position: 'absolute', top: '20%', left: '20%', right: '20%', height: '30%',
+        background: 'radial-gradient(ellipse at 50% 50%, rgba(180,60,0,0.1) 0%, transparent 70%)',
+        filter: 'blur(50px)',
+        animation: 'inferno-surge 6s ease-in-out 2s infinite',
+      }} />
+    </div>
+  );
+}
+
+function NatureRays() {
+  return (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+      {/* Canopy light rays */}
+      {[
+        { left: '15%', opacity: 0.7, dur: '6s', del: '0s',   rot: '-8deg' },
+        { left: '28%', opacity: 0.55, dur: '8s', del: '1.2s', rot: '-4deg' },
+        { left: '42%', opacity: 0.65, dur: '7s', del: '0.5s', rot: '0deg' },
+        { left: '58%', opacity: 0.5, dur: '9s', del: '2s',   rot: '4deg' },
+        { left: '72%', opacity: 0.6, dur: '6s', del: '1.8s', rot: '8deg' },
+      ].map((r, i) => (
+        <div key={i} style={{
+          position: 'absolute', top: 0, left: r.left,
+          width: 3, height: '65%',
+          background: `linear-gradient(180deg, rgba(80,200,60,${r.opacity * 0.2}) 0%, rgba(40,160,30,${r.opacity * 0.1}) 60%, transparent 100%)`,
+          filter: 'blur(14px)',
+          transform: `rotate(${r.rot})`,
+          transformOrigin: 'top center',
+          animation: `nature-ray ${r.dur} ease-in-out ${r.del} infinite alternate`,
+        }} />
+      ))}
+      {/* Forest floor ambient */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '25%',
+        background: 'radial-gradient(ellipse at 50% 100%, rgba(10,60,10,0.35) 0%, transparent 70%)',
+        filter: 'blur(30px)',
+        animation: 'ocean-pulse 8s ease-in-out infinite',
       }} />
     </div>
   );
@@ -503,6 +683,9 @@ function Overlay({ id }: { id: ThemeId }) {
   if (id === 'galaxy-nexus')       return <NebulaClouds />;
   if (id === 'ocean-intelligence') return <OceanDepthGlow />;
   if (id === 'neural-brain')       return <BrainGlow />;
+  if (id === 'sakura-dream')       return <SakuraBloom />;
+  if (id === 'inferno')            return <InfernoHeat />;
+  if (id === 'nature-pulse')       return <NatureRays />;
   return null;
 }
 
@@ -515,10 +698,10 @@ const KEYFRAMES = `
   100% { transform: translateX(8%)  scaleY(0.8) skewX(-2deg); opacity: 0.7; }
 }
 @keyframes nebula-drift {
-  0%   { transform: translate(0,0)      scale(1);    opacity: 0.8; }
+  0%   { transform: translate(0,0)       scale(1);    opacity: 0.8; }
   33%  { transform: translate(40px,-30px) scale(1.1); opacity: 1;   }
   66%  { transform: translate(-25px,20px) scale(0.9); opacity: 0.7; }
-  100% { transform: translate(0,0)      scale(1);    opacity: 0.8; }
+  100% { transform: translate(0,0)       scale(1);    opacity: 0.8; }
 }
 @keyframes ocean-pulse {
   0%,100% { opacity: 0.6; transform: scaleX(1); }
@@ -527,6 +710,23 @@ const KEYFRAMES = `
 @keyframes brain-pulse {
   0%,100% { opacity: 0.5; transform: scale(1); }
   50%     { opacity: 1;   transform: scale(1.12); }
+}
+@keyframes brain-ring-expand {
+  0%   { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+@keyframes sakura-bloom {
+  0%   { opacity: 0.55; transform: scale(1) translateY(0); }
+  50%  { opacity: 1;    transform: scale(1.1) translateY(-10px); }
+  100% { opacity: 0.7;  transform: scale(1.04) translateY(-4px); }
+}
+@keyframes inferno-surge {
+  0%,100% { opacity: 0.55; transform: scaleY(1) scaleX(1); }
+  50%     { opacity: 1;    transform: scaleY(1.15) scaleX(1.06); }
+}
+@keyframes nature-ray {
+  0%   { opacity: 0.45; transform: rotate(-6deg) scaleX(0.9); }
+  100% { opacity: 0.85; transform: rotate(6deg)  scaleX(1.3); }
 }
 .cyber-grid-lines {
   position: absolute; inset: 0;
@@ -556,25 +756,30 @@ export default function ThemeEngine() {
   const { themeId } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Resize canvas to full viewport
+  // Single effect: handles both theme changes and window resize.
+  // Restarting particles on resize ensures particle positions stay within
+  // the new canvas bounds (setting canvas.width/height clears the drawing
+  // buffer, so without a restart the old particles would draw out of bounds).
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const resize = () => {
+
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let cancel = startParticles(themeId, canvas);
+
+    const handleResize = () => {
       canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
+      cancel();
+      cancel = startParticles(themeId, canvas);
     };
-    resize();
-    window.addEventListener('resize', resize);
-    return () => window.removeEventListener('resize', resize);
-  }, []);
 
-  // Start / restart particle system on theme change
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const cleanup = startParticles(themeId, canvas);
-    return cleanup;
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancel();
+    };
   }, [themeId]);
 
   return (
