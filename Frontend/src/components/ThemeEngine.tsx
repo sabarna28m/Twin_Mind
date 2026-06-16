@@ -47,12 +47,12 @@ const BG: Record<ThemeId, string> = {
      radial-gradient(ellipse at 50% 72%, rgba(0,220,200,0.12) 0%, transparent 45%),
      #00060e`,
   'nature-pulse':
-    `radial-gradient(ellipse at 15% 85%, rgba(20,120,20,0.58) 0%, transparent 50%),
-     radial-gradient(ellipse at 85% 25%, rgba(10,90,10,0.42) 0%, transparent 50%),
-     radial-gradient(ellipse at 50% 60%, rgba(5,60,5,0.28) 0%, transparent 55%),
-     radial-gradient(ellipse at 70% 85%, rgba(40,150,30,0.24) 0%, transparent 40%),
-     radial-gradient(ellipse at 30% 20%, rgba(20,80,10,0.18) 0%, transparent 40%),
-     #010802`,
+    `radial-gradient(ellipse at 15% 85%, rgba(82,255,184,0.09) 0%, transparent 50%),
+     radial-gradient(ellipse at 85% 15%, rgba(82,255,184,0.07) 0%, transparent 45%),
+     radial-gradient(ellipse at 50% 50%, rgba(30,60,40,0.12) 0%, transparent 60%),
+     radial-gradient(ellipse at 5% 50%, rgba(82,255,184,0.05) 0%, transparent 40%),
+     radial-gradient(ellipse at 95% 55%, rgba(82,255,184,0.04) 0%, transparent 40%),
+     #0B0F0E`,
   'cyberpunk-neo':
     `radial-gradient(ellipse at 50% 50%, rgba(120,0,240,0.2) 0%, transparent 65%),
      radial-gradient(ellipse at 20% 80%, rgba(0,255,65,0.09) 0%, transparent 45%),
@@ -309,30 +309,26 @@ function InfernoHeat() {
 function NatureRays() {
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-      {/* Canopy light rays */}
-      {[
-        { left: '15%', opacity: 0.7, dur: '6s', del: '0s',   rot: '-8deg' },
-        { left: '28%', opacity: 0.55, dur: '8s', del: '1.2s', rot: '-4deg' },
-        { left: '42%', opacity: 0.65, dur: '7s', del: '0.5s', rot: '0deg' },
-        { left: '58%', opacity: 0.5, dur: '9s', del: '2s',   rot: '4deg' },
-        { left: '72%', opacity: 0.6, dur: '6s', del: '1.8s', rot: '8deg' },
-      ].map((r, i) => (
-        <div key={i} style={{
-          position: 'absolute', top: 0, left: r.left,
-          width: 3, height: '65%',
-          background: `linear-gradient(180deg, rgba(80,200,60,${r.opacity * 0.2}) 0%, rgba(40,160,30,${r.opacity * 0.1}) 60%, transparent 100%)`,
-          filter: 'blur(14px)',
-          transform: `rotate(${r.rot})`,
-          transformOrigin: 'top center',
-          animation: `nature-ray ${r.dur} ease-in-out ${r.del} infinite alternate`,
-        }} />
-      ))}
-      {/* Forest floor ambient */}
+      {/* Primary ambient glow — bottom-left edge */}
       <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: '25%',
-        background: 'radial-gradient(ellipse at 50% 100%, rgba(10,60,10,0.35) 0%, transparent 70%)',
-        filter: 'blur(30px)',
-        animation: 'ocean-pulse 8s ease-in-out infinite',
+        position: 'absolute', bottom: '-5%', left: '-5%', width: '50%', height: '50%',
+        background: 'radial-gradient(ellipse at 0% 100%, rgba(82,255,184,0.1) 0%, transparent 70%)',
+        filter: 'blur(70px)',
+        animation: 'ocean-pulse 9s ease-in-out infinite',
+      }} />
+      {/* Secondary ambient glow — top-right edge */}
+      <div style={{
+        position: 'absolute', top: '-5%', right: '-5%', width: '45%', height: '45%',
+        background: 'radial-gradient(ellipse at 100% 0%, rgba(82,255,184,0.07) 0%, transparent 70%)',
+        filter: 'blur(80px)',
+        animation: 'ocean-pulse 13s ease-in-out 4s infinite',
+      }} />
+      {/* Subtle centre haze */}
+      <div style={{
+        position: 'absolute', top: '30%', left: '20%', right: '20%', bottom: '30%',
+        background: 'radial-gradient(ellipse at 50% 50%, rgba(30,60,40,0.14) 0%, transparent 70%)',
+        filter: 'blur(50px)',
+        animation: 'ocean-pulse 7s ease-in-out 2s infinite',
       }} />
     </div>
   );
@@ -490,32 +486,35 @@ function startArcticSnow(canvas: HTMLCanvasElement): Cleanup {
   tick(); return ()=>cancelAnimationFrame(af);
 }
 
-// Nature — falling leaves
+// Nature Pulse OS — slow floating green energy particles
 function startNature(canvas: HTMLCanvasElement): Cleanup {
   const ctx=canvas.getContext('2d')!;
   const W=canvas.width, H=canvas.height;
-  const COLORS=['rgba(34,139,34,0.8)','rgba(56,161,56,0.75)','rgba(80,180,40,0.8)','rgba(120,200,60,0.7)','rgba(200,180,40,0.65)'];
-  type Leaf={ x:number;y:number;vx:number;vy:number;sway:number;sp:number;rot:number;rs:number;sz:number;color:string };
-  const make=():Leaf=>({
-    x:rnd(-30,W+30), y:rnd(-60,H*0.3),
-    vx:rnd(-0.6,0.6), vy:rnd(0.6,1.8),
-    sway:rnd(0.4,1.5), sp:rnd(0,TAU),
-    rot:rnd(0,TAU), rs:rnd(-0.04,0.04),
-    sz:rnd(6,14), color:COLORS[rndI(0,4)],
+  type Orb={ x:number;y:number;vx:number;vy:number;r:number;op:number;opDir:number;ph:number };
+  const make=():Orb=>({
+    x:rnd(0,W), y:rnd(0,H),
+    vx:rnd(-0.12,0.12), vy:rnd(-0.18,0.06),
+    r:rnd(1.5,5), op:rnd(0.08,0.42), opDir:Math.random()>0.5?1:-1,
+    ph:rnd(0,TAU),
   });
-  const leaves:Leaf[]=Array.from({length:45},make);
+  const orbs:Orb[]=Array.from({length:75},make);
   let af=0;
-  function drawLeaf(l:Leaf){
-    ctx.save(); ctx.translate(l.x,l.y); ctx.rotate(l.rot);
-    ctx.beginPath(); ctx.ellipse(0,0,l.sz*0.4,l.sz,0,0,TAU);
-    ctx.fillStyle=l.color; ctx.fill(); ctx.restore();
-  }
   function tick(){
     ctx.clearRect(0,0,W,H);
-    for(const l of leaves){
-      l.sp+=0.018; l.x+=Math.sin(l.sp)*l.sway+l.vx; l.y+=l.vy; l.rot+=l.rs;
-      if(l.y>H+40) Object.assign(l,make(),{y:-40});
-      drawLeaf(l);
+    for(const o of orbs){
+      o.ph+=0.007; o.x+=o.vx+Math.sin(o.ph)*0.08; o.y+=o.vy;
+      o.op=Math.max(0.04,Math.min(0.45,o.op+0.002*o.opDir));
+      if(o.op>=0.45||o.op<=0.04) o.opDir*=-1;
+      if(o.y<-8){o.y=H+8;o.x=rnd(0,W);}
+      if(o.y>H+8){o.y=-8;o.x=rnd(0,W);}
+      if(o.x<-8) o.x=W+8;
+      if(o.x>W+8) o.x=-8;
+      const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r*3.5);
+      g.addColorStop(0,`rgba(82,255,184,${o.op})`);
+      g.addColorStop(0.5,`rgba(60,200,130,${o.op*0.35})`);
+      g.addColorStop(1,'transparent');
+      ctx.beginPath(); ctx.arc(o.x,o.y,o.r*3.5,0,TAU);
+      ctx.fillStyle=g; ctx.fill();
     }
     af=requestAnimationFrame(tick);
   }

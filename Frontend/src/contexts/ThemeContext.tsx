@@ -63,9 +63,9 @@ export const THEMES: ThemeMeta[] = [
     name: 'Nature Pulse',
     icon: '🌲',
     tagline: 'Growth & development',
-    description: 'Forest canopy, floating leaves, organic flow',
+    description: 'Premium dark OS, floating green particles, glassmorphism',
     isDark: true,
-    swatches: ['#010802', '#10b981', '#22c55e', '#86efac'],
+    swatches: ['#0B0F0E', '#52FFB8', '#39c98a', '#a3ffdc'],
   },
   {
     id: 'cyberpunk-neo',
@@ -121,9 +121,9 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  themeId:   'galaxy-nexus',
+  themeId:   'nature-pulse',
   setTheme:  () => {},
-  themeMeta: THEMES[0],
+  themeMeta: THEMES.find(t => t.id === 'nature-pulse') ?? THEMES[0],
   theme:     'dark',
   toggle:    () => {},
 });
@@ -136,7 +136,7 @@ function getInitialTheme(): ThemeId {
   }
   const legacy = localStorage.getItem('theme');
   if (legacy && MIGRATE[legacy]) return MIGRATE[legacy];
-  return 'galaxy-nexus';
+  return 'nature-pulse';
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {

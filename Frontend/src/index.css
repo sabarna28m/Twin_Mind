@@ -1275,33 +1275,33 @@ html[data-theme="arctic-aurora"] .hero-animated, html[data-theme="arctic"] .hero
 html[data-theme="arctic-aurora"] ::-webkit-scrollbar-thumb,
 html[data-theme="arctic"] ::-webkit-scrollbar-thumb { background:rgba(0,255,200,0.22)!important; }
 
-/* ── 🌲 Nature Pulse ─────────────────────────────────────────────────── */
+/* ── 🌲 Nature Pulse / Green OS ──────────────────────────────────────── */
 html[data-theme="nature-pulse"],
 html[data-theme="forest"] {
-  --bg:transparent; --bg-surface:rgba(16,185,129,0.06); --bg-elevated:rgba(16,185,129,0.09);
-  --text:rgba(110,231,183,0.88); --text-m:#a7f3d0; --text-h:#ecfdf5;
-  --border:rgba(16,185,129,0.16); --border-subtle:rgba(16,185,129,0.06);
-  --primary:#10b981; --secondary:#065f46; --accent:#059669; --accent-2:#34d399;
-  --accent-bg:rgba(16,185,129,0.1); --accent-border:rgba(16,185,129,0.38);
-  --grad-primary:linear-gradient(135deg,#10b981 0%,#065f46 100%);
-  --glass-bg:rgba(2,10,4,0.75); --glass-border:rgba(16,185,129,0.13);
-  --glow-primary:0 0 40px rgba(16,185,129,0.38); --glow-accent:0 0 30px rgba(5,150,105,0.35);
-  --glow-card:0 8px 40px rgba(0,0,0,0.65),0 0 0 1px rgba(16,185,129,0.08);
-  --primary-rgb:16,185,129; --accent-rgb:5,150,105;
+  --bg:transparent; --bg-surface:rgba(82,255,184,0.04); --bg-elevated:rgba(82,255,184,0.07);
+  --text:#A5B3AA; --text-m:#C7D2CC; --text-h:#FFFFFF;
+  --border:rgba(82,255,184,0.12); --border-subtle:rgba(82,255,184,0.06);
+  --primary:#52FFB8; --secondary:#1a2e26; --accent:#39c98a; --accent-2:#6bffc7;
+  --accent-bg:rgba(82,255,184,0.08); --accent-border:rgba(82,255,184,0.25);
+  --grad-primary:linear-gradient(135deg,#52FFB8 0%,#1fbb7c 100%);
+  --glass-bg:rgba(15,20,18,0.85); --glass-border:rgba(82,255,184,0.12);
+  --glow-primary:0 0 40px rgba(82,255,184,0.2); --glow-accent:0 0 30px rgba(82,255,184,0.15);
+  --glow-card:0 0 20px rgba(0,255,120,0.05),0 8px 32px rgba(0,0,0,0.5);
+  --primary-rgb:82,255,184; --accent-rgb:57,201,138;
   color-scheme:dark;
 }
 html[data-theme="nature-pulse"] body, html[data-theme="nature-pulse"] #root,
-html[data-theme="forest"] body, html[data-theme="forest"] #root { background:transparent; }
+html[data-theme="forest"] body, html[data-theme="forest"] #root { background:#0B0F0E; }
 html[data-theme="nature-pulse"] .nav-premium, html[data-theme="forest"] .nav-premium {
-  background:rgba(1,8,2,0.93)!important; border-bottom-color:rgba(16,185,129,0.2)!important;
-  box-shadow:0 1px 0 rgba(16,185,129,0.1),0 8px 32px rgba(0,0,0,0.6)!important;
+  background:rgba(10,14,12,0.9)!important; border-bottom-color:rgba(82,255,184,0.08)!important;
+  box-shadow:0 1px 0 rgba(82,255,184,0.05),0 8px 32px rgba(0,0,0,0.6)!important;
 }
 html[data-theme="nature-pulse"] .hero-animated, html[data-theme="forest"] .hero-animated {
-  background:linear-gradient(-45deg,#010802,#020c03,#020e03,#010a02,#010802)!important;
+  background:linear-gradient(-45deg,#0B0F0E,#0e1310,#0f1511,#0c110e,#0B0F0E)!important;
   background-size:400% 400%!important;
 }
 html[data-theme="nature-pulse"] ::-webkit-scrollbar-thumb,
-html[data-theme="forest"] ::-webkit-scrollbar-thumb { background:rgba(16,185,129,0.22)!important; }
+html[data-theme="forest"] ::-webkit-scrollbar-thumb { background:rgba(82,255,184,0.18)!important; }
 
 /* ── 🤖 Cyberpunk Neo ────────────────────────────────────────────────── */
 html[data-theme="cyberpunk-neo"],
@@ -1568,24 +1568,24 @@ html[data-theme="arctic-aurora"],html[data-theme="arctic"] {
   --scroll-thumb:rgba(0,255,204,0.22);
 }
 
-/* ── 🌲 Nature Pulse ── */
+/* ── 🌲 Nature Pulse / Green OS ── */
 html[data-theme="nature-pulse"],html[data-theme="forest"] {
-  --card-bg:rgba(1,8,2,0.82); --card-border:rgba(16,185,129,0.2); --card-radius:20px;
-  --card-shadow:0 8px 40px rgba(0,0,0,0.65),0 0 0 1px rgba(16,185,129,0.09),0 0 50px rgba(16,185,129,0.04);
-  --card-hover-border:rgba(16,185,129,0.44); --card-hover-shadow:0 0 0 1px rgba(16,185,129,0.44),0 20px 60px rgba(16,185,129,0.15),0 8px 24px rgba(0,0,0,0.65);
-  --btn-radius:16px; --btn-shadow:0 4px 28px rgba(16,185,129,0.38); --btn-hover-shadow:0 8px 48px rgba(16,185,129,0.56),0 0 25px rgba(5,150,105,0.36);
-  --glow-strong:0 0 60px rgba(16,185,129,0.38),0 0 120px rgba(16,185,129,0.15);
-  --glow-text:0 0 20px rgba(16,185,129,0.86),0 0 50px rgba(16,185,129,0.32);
-  --glow-icon:drop-shadow(0 0 8px rgba(16,185,129,0.9));
-  --chart-1:#10B981; --chart-2:#22C55E; --chart-3:#86EFAC; --chart-4:#059669; --chart-5:#34D399;
-  --chart-grid:rgba(16,185,129,0.09); --chart-tooltip-bg:rgba(1,5,2,0.97);
-  --input-bg:rgba(1,6,2,0.65); --input-border:rgba(16,185,129,0.25); --input-radius:16px;
-  --input-focus-glow:0 0 0 3px rgba(16,185,129,0.22),0 0 20px rgba(16,185,129,0.12);
-  --avatar-glow:0 0 50px rgba(16,185,129,0.42),0 0 100px rgba(5,150,105,0.28);
-  --dur-fast:0.2s; --dur-base:0.42s; --dur-slow:1.05s; --ease-spring:cubic-bezier(0.4,0,0.2,1);
-  --section-accent:#10B981; --section-accent-rgb:16,185,129;
-  --badge-bg:rgba(16,185,129,0.1); --badge-border:rgba(16,185,129,0.32); --badge-color:#10B981;
-  --scroll-thumb:rgba(16,185,129,0.22);
+  --card-bg:rgba(15,20,18,0.85); --card-border:rgba(82,255,184,0.12); --card-radius:18px;
+  --card-shadow:0 0 20px rgba(0,255,120,0.05),0 8px 32px rgba(0,0,0,0.4),0 0 0 1px rgba(82,255,184,0.06);
+  --card-hover-border:rgba(82,255,184,0.28); --card-hover-shadow:0 0 0 1px rgba(82,255,184,0.28),0 0 30px rgba(82,255,184,0.1),0 12px 40px rgba(0,0,0,0.5);
+  --btn-radius:12px; --btn-shadow:0 4px 20px rgba(0,0,0,0.3); --btn-hover-shadow:0 0 15px rgba(82,255,184,0.12),0 8px 24px rgba(0,0,0,0.4);
+  --glow-strong:0 0 40px rgba(82,255,184,0.2),0 0 80px rgba(82,255,184,0.08);
+  --glow-text:0 0 20px rgba(82,255,184,0.7),0 0 40px rgba(82,255,184,0.25);
+  --glow-icon:drop-shadow(0 0 8px rgba(82,255,184,0.8));
+  --chart-1:#52FFB8; --chart-2:#39c98a; --chart-3:#6bffc7; --chart-4:#1fbb7c; --chart-5:#a3ffdc;
+  --chart-grid:rgba(82,255,184,0.08); --chart-tooltip-bg:rgba(12,17,15,0.97);
+  --input-bg:rgba(12,16,14,0.8); --input-border:rgba(82,255,184,0.15); --input-radius:12px;
+  --input-focus-glow:0 0 0 2px rgba(82,255,184,0.2),0 0 15px rgba(82,255,184,0.08);
+  --avatar-glow:0 0 40px rgba(82,255,184,0.3),0 0 80px rgba(82,255,184,0.1);
+  --dur-fast:0.18s; --dur-base:0.35s; --dur-slow:0.9s; --ease-spring:cubic-bezier(0.4,0,0.2,1);
+  --section-accent:#52FFB8; --section-accent-rgb:82,255,184;
+  --badge-bg:rgba(82,255,184,0.08); --badge-border:rgba(82,255,184,0.2); --badge-color:#52FFB8;
+  --scroll-thumb:rgba(82,255,184,0.18);
 }
 
 /* ── 🤖 Cyberpunk Neo ── */
@@ -1906,4 +1906,115 @@ html[data-theme="sakura"] .grad-btn {
 @keyframes brain-ring-expand {
   0%   { transform: scale(0.8); opacity: 0.5; }
   100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   GREEN OS — GLOBAL DESIGN SYSTEM OVERRIDES
+   Premium dark-green glassmorphism applied universally when nature-pulse
+   is active. Ensures every page shares the same visual language without
+   touching individual page layouts or business logic.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Document base */
+html[data-theme="nature-pulse"],
+html[data-theme="forest"] { background:#0B0F0E; }
+
+/* Glass panels */
+html[data-theme="nature-pulse"] .glass-panel,
+html[data-theme="forest"] .glass-panel {
+  background:rgba(15,20,18,0.85)!important;
+  border-color:rgba(82,255,184,0.12)!important;
+  box-shadow:0 0 20px rgba(0,255,120,0.05),0 8px 32px rgba(0,0,0,0.4)!important;
+}
+
+/* Action tiles */
+html[data-theme="nature-pulse"] .action-tile,
+html[data-theme="forest"] .action-tile {
+  background:rgba(15,20,18,0.85)!important;
+  border-color:rgba(82,255,184,0.1)!important;
+}
+html[data-theme="nature-pulse"] .action-tile:hover,
+html[data-theme="forest"] .action-tile:hover {
+  border-color:rgba(82,255,184,0.25)!important;
+  box-shadow:0 0 15px rgba(82,255,184,0.08),0 8px 24px rgba(0,0,0,0.5)!important;
+}
+
+/* Headings */
+html[data-theme="nature-pulse"] h1,html[data-theme="forest"] h1,
+html[data-theme="nature-pulse"] h2,html[data-theme="forest"] h2,
+html[data-theme="nature-pulse"] h3,html[data-theme="forest"] h3 { color:#FFFFFF; }
+
+/* Dividers */
+html[data-theme="nature-pulse"] hr,html[data-theme="forest"] hr {
+  border-color:rgba(82,255,184,0.1)!important;
+}
+
+/* Recharts tooltips */
+html[data-theme="nature-pulse"] .recharts-default-tooltip,
+html[data-theme="forest"] .recharts-default-tooltip {
+  background:rgba(12,17,15,0.97)!important;
+  border-color:rgba(82,255,184,0.2)!important;
+  border-radius:10px!important;
+}
+html[data-theme="nature-pulse"] .recharts-tooltip-label,
+html[data-theme="forest"] .recharts-tooltip-label { color:#C7D2CC!important; }
+html[data-theme="nature-pulse"] .recharts-tooltip-item,
+html[data-theme="forest"] .recharts-tooltip-item { color:#52FFB8!important; }
+
+/* Stat/info badges */
+html[data-theme="nature-pulse"] .badge,html[data-theme="forest"] .badge {
+  background:rgba(82,255,184,0.08)!important;
+  border-color:rgba(82,255,184,0.2)!important;
+  color:#52FFB8!important;
+}
+
+/* Scrollable track */
+html[data-theme="nature-pulse"] ::-webkit-scrollbar-track,
+html[data-theme="forest"] ::-webkit-scrollbar-track {
+  background:rgba(15,20,18,0.5)!important;
+}
+
+/* tm-card ambient pulse (overrides per-theme animation defined earlier) */
+html[data-theme="nature-pulse"] .tm-card,
+html[data-theme="forest"] .tm-card {
+  animation:nature-green-pulse 5s ease-in-out infinite;
+}
+html[data-theme="nature-pulse"] .tm-card:hover,
+html[data-theme="forest"] .tm-card:hover { animation:none; }
+@keyframes nature-green-pulse {
+  0%,100% { box-shadow:var(--card-shadow); }
+  50%     { box-shadow:var(--card-shadow),0 0 25px rgba(82,255,184,0.1),0 0 50px rgba(82,255,184,0.04); }
+}
+
+/* Override nature-card-breathe keyframe with the spec-correct green version */
+@keyframes nature-card-breathe {
+  0%,100% { box-shadow:var(--card-shadow); }
+  50%     { box-shadow:var(--card-shadow),0 0 25px rgba(82,255,184,0.1),0 0 50px rgba(82,255,184,0.04); }
+}
+
+/* Gradient buttons — green on nature-pulse */
+html[data-theme="nature-pulse"] .grad-btn,
+html[data-theme="forest"] .grad-btn {
+  background:rgba(82,255,184,0.08)!important;
+  border:1px solid rgba(82,255,184,0.18)!important;
+  color:#52FFB8!important;
+  box-shadow:none!important;
+}
+html[data-theme="nature-pulse"] .grad-btn:hover,
+html[data-theme="forest"] .grad-btn:hover {
+  background:rgba(82,255,184,0.14)!important;
+  box-shadow:0 0 15px rgba(82,255,184,0.1)!important;
+}
+
+/* Dark inputs */
+html[data-theme="nature-pulse"] .dark-input,
+html[data-theme="forest"] .dark-input {
+  background:rgba(12,16,14,0.8)!important;
+  border-color:rgba(82,255,184,0.15)!important;
+  color:#FFFFFF!important;
+}
+html[data-theme="nature-pulse"] .dark-input:focus,
+html[data-theme="forest"] .dark-input:focus {
+  border-color:rgba(82,255,184,0.4)!important;
+  box-shadow:0 0 0 2px rgba(82,255,184,0.1)!important;
 }
