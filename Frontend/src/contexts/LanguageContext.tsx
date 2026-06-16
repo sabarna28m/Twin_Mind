@@ -56,6 +56,7 @@ const T: Record<LangCode, Translations> = {
     qa_desc_log: 'Log Today', qa_desc_language: 'Switch', qa_desc_battles: 'vs Peers', qa_desc_focus: 'Deep Work', qa_desc_videos: 'YouTube AI', qa_desc_burnout: 'Risk Score', qa_desc_subjects: 'Heatmap',
     qa_ai_focus: 'AI Focus', qa_desc_ai_focus: 'Eye Track',
     qa_career: 'Career', qa_desc_career: 'Career AI', qa_comm_twin: 'Comm Twin', qa_desc_comm_twin: 'Speak AI',
+    qa_smart_notes: 'Smart Notes', qa_desc_smart_notes: 'Knowledge Memory',
     /* study plan */
     my_study_plan: 'My Study Plan', generate_new: 'Generate new →', view_full_plan: 'View Full Plan',
     no_plan_title: 'No saved study plan yet',

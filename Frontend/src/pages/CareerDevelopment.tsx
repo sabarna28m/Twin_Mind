@@ -5,6 +5,7 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, AreaChart, Area, Legend,
 } from 'recharts';
 import BackButton from '../components/BackButton';
+import VoiceInterview from '../components/VoiceInterview';
 import api from '../services/api';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -2067,7 +2068,7 @@ export default function CareerDevelopment() {
       case 'overview':        return <OverviewSection />;
       case 'resume':          return <ResumeUploadSection />;
       case 'linkedin':        return <LinkedInSection />;
-      case 'interview':       return <InterviewSection />;
+      case 'interview':       return <VoiceInterview />;
       case 'coding':          return <CodingSection />;
       case 'skillgap':        return <SkillGapSection />;
       case 'recommendations': return <RecommendationsSection />;

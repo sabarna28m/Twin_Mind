@@ -212,6 +212,7 @@ const QA_DEFS = [
   { labelKey: 'qa_ai_focus',    descKey: 'qa_desc_ai_focus', icon: '👁',  grad: 'linear-gradient(135deg,#10b981,#00D4FF)', to: '/ai-focus'     },
   { labelKey: 'qa_career',      descKey: 'qa_desc_career',    icon: '🚀', grad: 'linear-gradient(135deg,#6366f1,#00D4FF)', to: '/career'      },
   { labelKey: 'qa_comm_twin',  descKey: 'qa_desc_comm_twin', icon: '🗣️', grad: 'linear-gradient(135deg,#14b8a6,#00D4FF)', to: '/comm-twin'   },
+  { labelKey: 'qa_smart_notes', descKey: 'qa_desc_smart_notes', icon: '🧠', grad: 'linear-gradient(135deg,#6366f1,#8b5cf6,#00D4FF)', to: '/smart-notes' },
 ];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }
