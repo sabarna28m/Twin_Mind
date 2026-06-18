@@ -2674,4 +2674,29 @@ html[data-theme="neural-brain"] h2 {
   .sessions-top-grid { grid-template-columns: 1fr !important; }
 }
 
+/* ── Achievements: badge unlock animation ── */
+@keyframes badge-unlock {
+  0%   { transform: scale(0.82); opacity: 0; }
+  55%  { transform: scale(1.07); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.badge-unlock { animation: badge-unlock 0.65s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+@keyframes legendary-pulse {
+  0%, 100% { box-shadow: 0 0 22px rgba(234,179,8,0.22), 0 0 44px rgba(234,179,8,0.08); }
+  50%       { box-shadow: 0 0 40px rgba(234,179,8,0.52), 0 0 80px rgba(234,179,8,0.18); }
+}
+.legendary-earned { animation: legendary-pulse 3s ease-in-out infinite; }
+
+@keyframes epic-pulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(168,85,247,0.18); }
+  50%       { box-shadow: 0 0 30px rgba(168,85,247,0.42); }
+}
+.epic-earned { animation: epic-pulse 2.5s ease-in-out infinite; }
+
+/* Achievements: scrollable tab bar on mobile */
+@media (max-width: 700px) {
+  .ach-tabs { overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap !important; }
+  .ach-tabs::-webkit-scrollbar { display: none; }
+}
 
