@@ -17,7 +17,6 @@ import SubjectWidgets from '../components/SubjectWidgets';
 import AICommandCenter from '../components/AICommandCenter';
 import AITwinAssistant from '../components/AITwinAssistant';
 import SmartDailyMission from '../components/SmartDailyMission';
-import FocusZoneHero from '../components/FocusZoneHero';
 import HeroPriorityCard from '../components/HeroPriorityCard';
 
 const BACKEND = BACKEND_URL;
@@ -209,7 +208,6 @@ const QA_DEFS = [
   { labelKey: 'qa_videos',       descKey: 'qa_desc_videos',   icon: '▶',  grad: 'linear-gradient(135deg,#ef4444,#f97316)', to: '/videos'       },
   { labelKey: 'qa_burnout',      descKey: 'qa_desc_burnout',  icon: '🧠', grad: 'linear-gradient(135deg,#ef4444,#f59e0b)', to: '/burnout'      },
   { labelKey: 'qa_subjects',     descKey: 'qa_desc_subjects', icon: '📊', grad: 'linear-gradient(135deg,#6366f1,#06b6d4)', to: '/subjects'     },
-  { labelKey: 'qa_ai_focus',    descKey: 'qa_desc_ai_focus', icon: '👁',  grad: 'linear-gradient(135deg,#10b981,#00D4FF)', to: '/ai-focus'     },
   { labelKey: 'qa_career',      descKey: 'qa_desc_career',    icon: '🚀', grad: 'linear-gradient(135deg,#6366f1,#00D4FF)', to: '/career'      },
   { labelKey: 'qa_comm_twin',  descKey: 'qa_desc_comm_twin', icon: '🗣️', grad: 'linear-gradient(135deg,#14b8a6,#00D4FF)', to: '/comm-twin'   },
   { labelKey: 'qa_smart_notes', descKey: 'qa_desc_smart_notes', icon: '🧠', grad: 'linear-gradient(135deg,#6366f1,#8b5cf6,#00D4FF)', to: '/notes' },
@@ -559,9 +557,6 @@ export default function Dashboard() {
           <AITwinAssistant />
           <SmartDailyMission />
         </div>
-
-        {/* ── 4. Focus Zone Hero ── */}
-        <FocusZoneHero />
 
         {/* ── 5. Subject Intelligence Panel ── */}
         <section style={s.panel} className="glass-panel">

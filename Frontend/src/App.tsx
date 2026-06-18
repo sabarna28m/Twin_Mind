@@ -60,7 +60,6 @@ import FocusSession from './pages/FocusSession';
 import StudyVideos from './pages/StudyVideos';
 import Burnout from './pages/Burnout';
 import SubjectAnalysis from './pages/SubjectAnalysis';
-import AIFocusDetector from './pages/AIFocusDetector';
 import CareerDevelopment from './pages/CareerDevelopment';
 import CommTwin from './pages/CommTwin';
 import SmartNotes from './pages/SmartNotes';
@@ -231,14 +230,6 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <SubjectAnalysis />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/ai-focus"
-            element={
-              <ProtectedRoute>
-                <AIFocusDetector />
               </ProtectedRoute>
             }
           />
