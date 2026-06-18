@@ -2669,3 +2669,9 @@ html[data-theme="neural-brain"] h2 {
 /* ── Copy-hint: ensure new animations don't conflict with Sakura btn-bloom ── */
 /* Sakura btn bloom is already defined in v2 section and still applies */
 
+/* ── Sessions page: responsive top grid (timer + stats) ── */
+@media (max-width: 860px) {
+  .sessions-top-grid { grid-template-columns: 1fr !important; }
+}
+
+

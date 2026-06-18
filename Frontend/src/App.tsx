@@ -56,7 +56,6 @@ import Quiz from './pages/Quiz';
 import Battles from './pages/Battles';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import FocusSession from './pages/FocusSession';
 import StudyVideos from './pages/StudyVideos';
 import Burnout from './pages/Burnout';
 import SubjectAnalysis from './pages/SubjectAnalysis';
@@ -201,14 +200,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/focus"
-            element={
-              <ProtectedRoute>
-                <FocusSession />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/focus" element={<Navigate to="/sessions" replace />} />
           <Route
             path="/videos"
             element={

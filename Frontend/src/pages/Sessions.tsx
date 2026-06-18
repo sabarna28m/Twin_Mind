@@ -1,374 +1,219 @@
-import { useEffect, useState } from 'react';
-import type { FormEvent } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
+import { Timer } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
+import api from '../services/api';
+import type { Session } from '../types/sessions';
+import SessionTimer from '../components/sessions/SessionTimer';
+import SessionStats from '../components/sessions/SessionStats';
+import SessionAnalytics from '../components/sessions/SessionAnalytics';
+import SessionFilters, { type FilterType, type SortType } from '../components/sessions/SessionFilters';
+import SessionHistory from '../components/sessions/SessionHistory';
 
-interface Session {
-  id: number;
-  title: string;
-  subject: string | null;
-  duration_minutes: number;
-  status: string;
-  created_at: string | null;
-}
+/* ── date helpers ── */
+function isoDate(iso: string | null) { return iso ? iso.slice(0, 10) : ''; }
+function todayKey()  { return new Date().toISOString().slice(0, 10); }
+function weekAgo()   { const d = new Date(); d.setDate(d.getDate() - 7);  return d.toISOString().slice(0, 10); }
+function monthAgo()  { const d = new Date(); d.setDate(d.getDate() - 30); return d.toISOString().slice(0, 10); }
 
 export default function Sessions() {
   const { user, token, studentProfile } = useAuth();
-  const { t } = useLanguage();
   const profileSubjects = studentProfile?.subjects ?? [];
   const headers = { Authorization: `Bearer ${token}` };
   const wsConnected = useWebSocket(user?.id, token, () => {});
 
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading,  setLoading]  = useState(true);
 
-  const [showForm, setShowForm] = useState(false);
-  const [title, setTitle] = useState('');
-  const [subject, setSubject] = useState('');
-  const [creating, setCreating] = useState(false);
+  const [filter,        setFilter]        = useState<FilterType>('all');
+  const [sort,          setSort]          = useState<SortType>('newest');
+  const [search,        setSearch]        = useState('');
+  const [subjectFilter, setSubjectFilter] = useState('');
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
+  /* ── subjects derived from sessions + profile ── */
+  const subjects = useMemo(() => {
+    const fromSessions = sessions.flatMap(s => s.subject ? [s.subject] : []);
+    return Array.from(new Set([...profileSubjects, ...fromSessions]));
+  }, [sessions, profileSubjects]);
+
+  /* ── load sessions ── */
   useEffect(() => {
-    api.get<Session[]>('/sessions', { headers }).then(r => setSessions(r.data)).finally(() => setLoading(false));
+    api.get<Session[]>('/sessions', { headers })
+      .then(r => setSessions(r.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  async function handleCreate(e: FormEvent) {
-    e.preventDefault();
-    setCreating(true);
+  /* ── callbacks ── */
+  function handleSessionComplete(s: Session) {
+    setSessions(prev => [s, ...prev]);
+  }
+
+  async function handleToggle(s: Session) {
+    const next = s.status === 'completed' ? 'active' : 'completed';
     try {
-      const { data } = await api.post<Session>('/sessions', { title, subject: subject || null }, { headers });
-      setSessions(prev => [data, ...prev]);
-      setTitle('');
-      setSubject('');
-      setShowForm(false);
-    } finally {
-      setCreating(false);
-    }
+      const { data } = await api.patch<Session>(`/sessions/${s.id}`, { status: next }, { headers });
+      setSessions(prev => prev.map(x => x.id === s.id ? data : x));
+    } catch { /* silent */ }
   }
 
   async function handleDelete(id: number) {
-    await api.delete(`/sessions/${id}`, { headers });
-    setSessions(prev => prev.filter(s => s.id !== id));
+    try {
+      await api.delete(`/sessions/${id}`, { headers });
+      setSessions(prev => prev.filter(s => s.id !== id));
+    } catch { /* silent */ }
   }
 
-  async function toggleStatus(s: Session) {
-    const next = s.status === 'active' ? 'completed' : 'active';
-    const { data } = await api.patch<Session>(`/sessions/${s.id}`, { status: next }, { headers });
-    setSessions(prev => prev.map(x => x.id === s.id ? data : x));
-  }
+  /* ── filtering + sorting ── */
+  const filteredSessions = useMemo(() => {
+    let list = [...sessions];
 
-  function formatDate(iso: string | null) {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-  }
+    /* status / date filter */
+    const today = todayKey();
+    const week  = weekAgo();
+    const month = monthAgo();
+    if (filter === 'today')     list = list.filter(s => isoDate(s.created_at) === today);
+    if (filter === 'week')      list = list.filter(s => isoDate(s.created_at) >= week);
+    if (filter === 'month')     list = list.filter(s => isoDate(s.created_at) >= month);
+    if (filter === 'completed') list = list.filter(s => s.status === 'completed');
+    if (filter === 'active')    list = list.filter(s => s.status !== 'completed');
 
-  function formatDuration(mins: number) {
-    if (!mins) return '—';
-    const h = Math.floor(mins / 60);
-    const m = mins % 60;
-    return h ? `${h}h ${m}m` : `${m}m`;
-  }
+    /* subject filter */
+    if (subjectFilter) list = list.filter(s => s.subject === subjectFilter);
+
+    /* search */
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(s =>
+        s.title.toLowerCase().includes(q) ||
+        (s.subject ?? '').toLowerCase().includes(q)
+      );
+    }
+
+    /* sort */
+    if (sort === 'newest')   list.sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''));
+    if (sort === 'oldest')   list.sort((a, b) => (a.created_at ?? '').localeCompare(b.created_at ?? ''));
+    if (sort === 'longest')  list.sort((a, b) => b.duration_minutes - a.duration_minutes);
+    if (sort === 'shortest') list.sort((a, b) => a.duration_minutes - b.duration_minutes);
+
+    return list;
+  }, [sessions, filter, sort, search, subjectFilter]);
 
   return (
-    <div style={s.shell}>
-      <header style={s.nav}>
-        <div style={s.navLeft}>
+    <div style={pg.shell}>
+
+      {/* Nav */}
+      <header style={pg.nav} className="nav-premium">
+        <div style={pg.navLeft}>
           <BackButton />
-          <Link to="/" style={s.navLogo}>TwinMind</Link>
+          <Link to="/" style={pg.navLogo}>TwinMind</Link>
           {wsConnected && <LiveBadge />}
+        </div>
+        <div style={pg.navRight}>
+          <div style={pg.pageTitlePill}>
+            <Timer size={14} color="#00D4FF" />
+            <span>Focus Sessions</span>
+          </div>
         </div>
       </header>
 
-      <main style={s.main}>
-        <div style={s.titleRow}>
-          <h1 style={s.pageTitle}>{t('sessions_title')}</h1>
-          <button onClick={() => setShowForm(v => !v)} style={s.newBtn}>
-            {showForm ? t('sessions_form_cancel') : t('sessions_new')}
-          </button>
-        </div>
+      <main style={pg.main}>
+        <div style={pg.content} className="animate-slide-up">
 
-        {showForm && (
-          <form onSubmit={handleCreate} style={s.form}>
-            <input
-              type="text"
-              placeholder={t('sessions_form_title')}
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              style={s.input}
-              required
-              autoFocus
-            />
-            {profileSubjects.length > 0 ? (
-              <select
-                value={subject}
-                onChange={e => setSubject(e.target.value)}
-                className="form-select"
-                style={{ ...s.input, cursor: 'pointer', background: '#1F2937', color: '#FFFFFF', border: '1px solid #4B5563' }}
-              >
-                <option value="">{t('sessions_form_subject_ph')}</option>
-                {profileSubjects.map(sub => (
-                  <option key={sub} value={sub}>{sub}</option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                placeholder="Subject (optional)"
-                value={subject}
-                onChange={e => setSubject(e.target.value)}
-                style={s.input}
-              />
-            )}
-            <button type="submit" disabled={creating} style={s.createBtn}>
-              {creating ? t('sessions_form_creating') : t('sessions_form_create')}
+          {/* ── Top section: Timer + Stats ── */}
+          <div style={pg.topGrid} className="sessions-top-grid">
+            <SessionTimer subjects={subjects} onComplete={handleSessionComplete} />
+            <div style={pg.statsCol}>
+              <SessionStats sessions={sessions} />
+            </div>
+          </div>
+
+          {/* ── Analytics toggle ── */}
+          <div style={pg.analyticsToggleRow}>
+            <button
+              onClick={() => setShowAnalytics(v => !v)}
+              style={pg.analyticsToggleBtn}
+            >
+              {showAnalytics ? '▲ Hide Analytics' : '▼ Show Analytics'}
             </button>
-          </form>
-        )}
+          </div>
 
-        {loading ? (
-          <p style={s.emptyText}>{t('loading')}</p>
-        ) : sessions.length === 0 ? (
-          <div style={s.empty}>
-            <p style={s.emptyIcon}>📖</p>
-            <p style={s.emptyTitle}>{t('sessions_empty')}</p>
-            <p style={s.emptyHint}>{t('sessions_empty_sub')}</p>
-          </div>
-        ) : (
-          <div style={s.list}>
-            {sessions.map(session => (
-              <div key={session.id} style={s.card}>
-                <div style={s.cardLeft}>
-                  <button
-                    onClick={() => toggleStatus(session)}
-                    style={session.status === 'completed' ? s.badgeDone : s.badgeActive}
-                    title="Toggle status"
-                  >
-                    {session.status === 'completed' ? t('sessions_completed') : t('sessions_active')}
-                  </button>
-                  <div>
-                    <p style={s.cardTitle}>{session.title}</p>
-                    <p style={s.cardMeta}>
-                      {session.subject && <span style={s.subject}>{session.subject}</span>}
-                      {formatDate(session.created_at)}
-                      {session.duration_minutes > 0 && ` · ${formatDuration(session.duration_minutes)}`}
-                    </p>
-                  </div>
-                </div>
-                <button onClick={() => handleDelete(session.id)} style={s.deleteBtn} title="Delete session">✕</button>
-              </div>
-            ))}
-          </div>
-        )}
+          {/* ── Analytics ── */}
+          {showAnalytics && sessions.length > 0 && (
+            <div className="animate-fade-in">
+              <SessionAnalytics sessions={sessions} />
+            </div>
+          )}
+
+          {/* ── Divider ── */}
+          <div style={pg.divider} />
+
+          {/* ── Filters ── */}
+          <SessionFilters
+            filter={filter}           setFilter={setFilter}
+            sort={sort}               setSort={setSort}
+            search={search}           setSearch={setSearch}
+            subjects={subjects}
+            subjectFilter={subjectFilter} setSubjectFilter={setSubjectFilter}
+          />
+
+          {/* ── History ── */}
+          <SessionHistory
+            sessions={filteredSessions}
+            loading={loading}
+            onToggle={handleToggle}
+            onDelete={handleDelete}
+            totalCount={sessions.length}
+          />
+
+        </div>
       </main>
     </div>
   );
 }
 
-const s: Record<string, React.CSSProperties> = {
-  shell: {
-    minHeight: '100svh',
-    display: 'flex',
-    flexDirection: 'column',
-    background: 'var(--bg)',
-  },
+const pg: Record<string, React.CSSProperties> = {
+  shell: { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: 'var(--sans)' },
+
   nav: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0 2rem',
-    height: '60px',
-    borderBottom: '1px solid var(--border)',
-    background: 'var(--bg)',
-    position: 'sticky',
-    top: 0,
-    zIndex: 10,
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '0 2rem', height: '60px',
+    position: 'sticky', top: 0, zIndex: 20, flexShrink: 0,
   },
   navLeft: { display: 'flex', alignItems: 'center', gap: '0.5rem' },
-  navLogo: {
-    fontSize: '1.2rem',
-    fontWeight: 700,
-    color: 'var(--accent)',
-    letterSpacing: '-0.5px',
-    textDecoration: 'none',
-  },
-  backLink: {
-    fontSize: '0.875rem',
-    color: 'var(--accent)',
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
-  main: {
-    flex: 1,
-    padding: '2rem',
-    maxWidth: '720px',
-    width: '100%',
-    margin: '0 auto',
-    boxSizing: 'border-box',
-    textAlign: 'left',
-  },
-  titleRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '1.5rem',
-  },
-  pageTitle: {
-    margin: 0,
-    fontSize: '1.5rem',
-    fontWeight: 600,
-    color: 'var(--text-h)',
-  },
-  newBtn: {
-    padding: '0.5rem 1rem',
-    background: 'var(--accent)',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    cursor: 'pointer',
+  navRight:{ display: 'flex', alignItems: 'center', gap: '0.75rem' },
+  navLogo: { fontSize: '1.18rem', fontWeight: 700, color: 'var(--primary)', letterSpacing: '-0.5px', textDecoration: 'none' },
+  pageTitlePill: {
+    display: 'flex', alignItems: 'center', gap: '0.4rem',
+    padding: '0.3rem 0.85rem', borderRadius: '99px',
+    border: '1px solid rgba(0,212,255,0.2)',
+    background: 'rgba(0,212,255,0.08)',
+    fontSize: '0.78rem', fontWeight: 700, color: '#00D4FF', letterSpacing: '0.02em',
   },
 
-  // Create form
-  form: {
-    display: 'flex',
-    gap: '0.75rem',
-    marginBottom: '1.5rem',
-    flexWrap: 'wrap' as const,
-    padding: '1.25rem',
-    border: '1px solid var(--border)',
-    borderRadius: '12px',
-    background: 'var(--bg)',
+  main: { flex: 1, display: 'flex', justifyContent: 'center', padding: '2rem 1.25rem 4rem', boxSizing: 'border-box' },
+  content: { width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', gap: '1.5rem' },
+
+  topGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 320px',
+    gap: '1.25rem',
+    alignItems: 'start',
   },
-  input: {
-    flex: '1 1 180px',
-    padding: '0.6rem 0.75rem',
-    border: '1px solid var(--border)',
-    borderRadius: '8px',
-    fontSize: '0.95rem',
-    color: 'var(--text-h)',
-    background: 'var(--bg)',
-    outline: 'none',
-  },
-  createBtn: {
-    padding: '0.6rem 1.25rem',
-    background: 'var(--accent)',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '0.9rem',
-    fontWeight: 600,
-    cursor: 'pointer',
+  statsCol: { display: 'flex', flexDirection: 'column', gap: '1rem' },
+
+  analyticsToggleRow: { display: 'flex', justifyContent: 'center' },
+  analyticsToggleBtn: {
+    padding: '0.38rem 1.1rem', borderRadius: '99px',
+    border: '1px solid rgba(0,212,255,0.2)',
+    background: 'rgba(0,212,255,0.06)', color: '#00D4FF',
+    fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+    transition: 'background 0.18s',
   },
 
-  // Empty state
-  empty: {
-    textAlign: 'center',
-    padding: '4rem 1rem',
-  },
-  emptyIcon: {
-    margin: '0 0 0.75rem',
-    fontSize: '2.5rem',
-  },
-  emptyTitle: {
-    margin: '0 0 0.375rem',
-    fontWeight: 600,
-    color: 'var(--text-h)',
-    fontSize: '1rem',
-  },
-  emptyHint: {
-    margin: 0,
-    color: 'var(--text)',
-    fontSize: '0.875rem',
-  },
-  emptyText: {
-    color: 'var(--text)',
-    fontSize: '0.9rem',
-    margin: 0,
-  },
-
-  // Session list
-  list: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.75rem',
-  },
-  card: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '1rem 1.25rem',
-    border: '1px solid var(--border)',
-    borderRadius: '12px',
-    background: 'var(--bg)',
-  },
-  cardLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.875rem',
-    minWidth: 0,
-  },
-  cardTitle: {
-    margin: '0 0 0.2rem',
-    fontWeight: 600,
-    color: 'var(--text-h)',
-    fontSize: '0.95rem',
-    whiteSpace: 'nowrap' as const,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  cardMeta: {
-    margin: 0,
-    color: 'var(--text)',
-    fontSize: '0.8rem',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-  },
-  subject: {
-    background: 'var(--accent-bg)',
-    color: 'var(--accent)',
-    padding: '0.1rem 0.45rem',
-    borderRadius: '4px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-  },
-  badgeActive: {
-    padding: '0.25rem 0.6rem',
-    borderRadius: '6px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-    border: '1px solid rgba(234,179,8,0.4)',
-    background: 'rgba(234,179,8,0.1)',
-    color: '#a16207',
-    flexShrink: 0,
-    whiteSpace: 'nowrap' as const,
-  },
-  badgeDone: {
-    padding: '0.25rem 0.6rem',
-    borderRadius: '6px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-    border: '1px solid rgba(34,197,94,0.4)',
-    background: 'rgba(34,197,94,0.1)',
-    color: '#16a34a',
-    flexShrink: 0,
-    whiteSpace: 'nowrap' as const,
-  },
-  deleteBtn: {
-    background: 'transparent',
-    border: 'none',
-    color: 'var(--text)',
-    cursor: 'pointer',
-    fontSize: '0.85rem',
-    padding: '0.25rem 0.5rem',
-    borderRadius: '6px',
-    flexShrink: 0,
-  },
+  divider: { height: '1px', background: 'rgba(255,255,255,0.06)' },
 };
