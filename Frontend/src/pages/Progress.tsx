@@ -549,7 +549,7 @@ export default function Progress() {
 const s: Record<string, React.CSSProperties> = {
   shell: {
     minHeight: '100svh', display: 'flex', flexDirection: 'column',
-    background: 'linear-gradient(180deg,#080d1a 0%,#0a0f20 100%)',
+    background: 'transparent',
     position: 'relative',
   },
   bgOrb: {
@@ -560,8 +560,8 @@ const s: Record<string, React.CSSProperties> = {
   nav: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: '0 1.75rem', height: '60px',
-    borderBottom: '1px solid rgba(255,255,255,0.06)',
-    background: 'rgba(8,13,26,0.85)', backdropFilter: 'blur(20px)',
+    borderBottom: '1px solid var(--glass-border)',
+    background: 'var(--glass-bg)', backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 50,
   },
   navLogo: { fontSize: '1.05rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.3px' },

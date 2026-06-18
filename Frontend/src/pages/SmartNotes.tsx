@@ -37,7 +37,7 @@ type AIAction = 'summarize' | 'keypoints' | 'quiz' | 'flashcards' | 'explain';
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 
-const BG      = '#060b18';
+const BG      = 'transparent';
 const CARD    = 'rgba(255,255,255,0.04)';
 const CARD2   = 'rgba(255,255,255,0.07)';
 const BORDER  = '1px solid rgba(255,255,255,0.08)';
@@ -172,7 +172,7 @@ function VersionModal({ noteId, currentVersion, onRestore, onClose }:
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-      <div style={{ background: '#0d1117', border: `1px solid rgba(255,255,255,0.12)`, borderRadius: 18, width: '100%', maxWidth: 780, maxHeight: '85vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--glass-border)', borderRadius: 18, width: '100%', maxWidth: 780, maxHeight: '85vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Header */}
         <div style={{ padding: '1rem 1.25rem', borderBottom: BORDER, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 700, color: TEXT, fontSize: '0.95rem' }}>🕑 Version History</span>
@@ -670,7 +670,7 @@ export default function SmartNotes() {
       `}</style>
 
       {/* ── Header ── */}
-      <div style={{ borderBottom: BORDER, padding: '0.85rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(6,11,24,0.92)', backdropFilter: 'blur(12px)', position: 'sticky', top: 0, zIndex: 50 }}>
+      <div style={{ borderBottom: 'var(--glass-border)', padding: '0.85rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--glass-bg)', backdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 50 }}>
         <BackButton />
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span style={{ fontSize: '1.25rem' }}>🧠</span>
@@ -699,7 +699,7 @@ export default function SmartNotes() {
       )}
 
       {/* ── View tabs ── */}
-      <div style={{ display: 'flex', borderBottom: BORDER, background: 'rgba(6,11,24,0.75)', backdropFilter: 'blur(8px)' }}>
+      <div style={{ display: 'flex', borderBottom: BORDER, background: 'var(--glass-bg)', backdropFilter: 'blur(16px)' }}>
         {([
           { id: 'notes',     icon: '📝', label: 'Notes'     },
           { id: 'history',   icon: '🗑️', label: 'History'   },

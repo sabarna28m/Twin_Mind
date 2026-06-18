@@ -145,7 +145,7 @@ const s: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100svh', display: 'flex', alignItems: 'center', justifyContent: 'center',
     padding: '1.5rem',
-    background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,0.14) 0%, transparent 70%), #060b18',
+    background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(var(--primary-rgb),0.13) 0%, transparent 70%)',
     position: 'relative', overflow: 'hidden',
   },
   orb1: {

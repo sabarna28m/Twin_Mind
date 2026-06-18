@@ -64,8 +64,8 @@ function SkeletonCard() {
 const sk: Record<string, React.CSSProperties> = {
   card: {
     borderRadius: '18px',
-    background: 'rgba(10,16,32,0.75)',
-    border: '1px solid rgba(255,255,255,0.07)',
+    background: 'var(--glass-bg)',
+    border: '1px solid var(--glass-border)',
     overflow: 'hidden',
   },
   thumb: { width: '100%', aspectRatio: '16/9', background: 'rgba(255,255,255,0.06)' },
@@ -222,9 +222,9 @@ function VideoCard({ video }: VideoCardProps) {
 const vc: Record<string, React.CSSProperties> = {
   card: {
     borderRadius: '18px',
-    background: 'rgba(10,16,32,0.82)',
-    backdropFilter: 'blur(24px)',
-    WebkitBackdropFilter: 'blur(24px)',
+    background: 'var(--glass-bg)',
+    backdropFilter: 'blur(var(--glass-blur))',
+    WebkitBackdropFilter: 'blur(var(--glass-blur))',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',

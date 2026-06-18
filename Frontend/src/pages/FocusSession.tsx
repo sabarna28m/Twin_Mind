@@ -602,8 +602,9 @@ export default function FocusSession() {
 const coach: Record<string, React.CSSProperties> = {
   wrap: {
     position: 'relative', overflow: 'hidden',
-    background: 'linear-gradient(135deg, rgba(6,4,18,0.96) 0%, rgba(14,6,36,0.96) 100%)',
-    border: '1px solid rgba(99,102,241,0.25)',
+    background: 'var(--glass-bg)',
+    backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))',
+    border: '1px solid var(--glass-border)',
     borderRadius: '20px', padding: '1.5rem',
     display: 'flex', flexDirection: 'column' as const, gap: '1rem',
   },

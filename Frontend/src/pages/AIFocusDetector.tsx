@@ -300,7 +300,7 @@ function SessionReport({ summary, onNew }: { summary: SessionSummary; onNew: () 
     { label: 'Away',        time: summary.awayTime,       color: STATE_COLOR.away       },
   ];
   return (
-    <div style={{ borderRadius: '20px', padding: '1.5rem', border: '1px solid rgba(0,212,255,0.12)', background: 'rgba(10,16,32,0.92)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', display: 'flex', flexDirection: 'column', gap: '1.1rem' }} className="glass-panel animate-slide-up">
+    <div style={{ borderRadius: '20px', padding: '1.5rem', border: '1px solid var(--glass-border)', background: 'var(--glass-bg)', backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))', display: 'flex', flexDirection: 'column', gap: '1.1rem' }} className="glass-panel animate-slide-up">
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
         <Trophy size={20} color="#F59E0B" />
@@ -383,7 +383,7 @@ function DailyStats() {
   const maxScore = Math.max(...sessions.map(r => r.avgScore));
 
   return (
-    <div style={{ borderRadius: '20px', background: 'rgba(10,16,32,0.82)', border: '1px solid rgba(255,255,255,0.07)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', overflow: 'hidden' }} className="glass-panel">
+    <div style={{ borderRadius: '20px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))', overflow: 'hidden' }} className="glass-panel">
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', padding: '1rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <BarChart2 size={15} color="#00D4FF" />
         <span style={{ flex: 1, fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-h)' }}>Focus History</span>

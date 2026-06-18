@@ -255,11 +255,11 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
    ══════════════════════════════ */
 
 .nav-premium {
-  background: rgba(6, 11, 24, 0.88) !important;
+  background: var(--glass-bg) !important;
   backdrop-filter: blur(28px) saturate(200%) !important;
   -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.13) !important;
-  box-shadow: 0 1px 0 rgba(0,212,255,0.07), 0 8px 32px rgba(0,0,0,0.4) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  box-shadow: 0 1px 0 rgba(var(--primary-rgb),0.07), 0 8px 32px rgba(0,0,0,0.4) !important;
 }
 
 /* ══════════════════════════════
@@ -1907,3 +1907,765 @@ html[data-theme="sakura"] .grad-btn {
   0%   { transform: scale(0.8); opacity: 0.5; }
   100% { transform: scale(2.6); opacity: 0; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DEEP THEME TRANSFORMATION SYSTEM v3
+   Makes every theme feel like a completely different application.
+   Adds unique visual DNA to cards, panels, nav, buttons, and interactions.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Enable pseudo-elements on shared panel classes ─────────────────────── */
+.glass-panel,
+.stat-card-premium,
+.tm-card {
+  position: relative;
+}
+
+/* ════ 🌌 GALAXY NEXUS — Holographic AI OS ══════════════════════════════ */
+
+html[data-theme="galaxy-nexus"] .glass-panel,
+html[data-theme="cosmos"] .glass-panel,
+html[data-theme="galaxy-nexus"] .stat-card-premium,
+html[data-theme="cosmos"] .stat-card-premium {
+  background: linear-gradient(145deg, rgba(0,8,32,0.88) 0%, rgba(0,18,52,0.80) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(0,212,255,0.16),
+    0 8px 40px rgba(0,0,0,0.74),
+    inset 0 1px 0 rgba(0,212,255,0.12),
+    inset 0 -1px 0 rgba(124,58,237,0.06),
+    0 0 80px rgba(0,212,255,0.04) !important;
+  backdrop-filter: blur(28px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+}
+
+/* Holographic corner accents */
+html[data-theme="galaxy-nexus"] .glass-panel::after,
+html[data-theme="cosmos"] .glass-panel::after,
+html[data-theme="galaxy-nexus"] .stat-card-premium::after,
+html[data-theme="cosmos"] .stat-card-premium::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(0,212,255,0.18) 0%, transparent 14%),
+    radial-gradient(circle at 100% 0%, rgba(124,58,237,0.14) 0%, transparent 14%),
+    radial-gradient(circle at 100% 100%, rgba(0,212,255,0.12) 0%, transparent 14%),
+    radial-gradient(circle at 0% 100%, rgba(124,58,237,0.10) 0%, transparent 14%),
+    linear-gradient(135deg, rgba(0,212,255,0.05) 0%, transparent 40%, rgba(124,58,237,0.04) 100%);
+  pointer-events: none;
+  animation: holo-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes holo-shimmer {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+html[data-theme="galaxy-nexus"] .glass-panel:hover::after,
+html[data-theme="cosmos"] .glass-panel:hover::after,
+html[data-theme="galaxy-nexus"] .stat-card-premium:hover::after,
+html[data-theme="cosmos"] .stat-card-premium:hover::after {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(0,212,255,0.30) 0%, transparent 16%),
+    radial-gradient(circle at 100% 0%, rgba(124,58,237,0.24) 0%, transparent 16%),
+    radial-gradient(circle at 100% 100%, rgba(0,212,255,0.22) 0%, transparent 16%),
+    radial-gradient(circle at 0% 100%, rgba(124,58,237,0.18) 0%, transparent 16%),
+    linear-gradient(135deg, rgba(0,212,255,0.10) 0%, transparent 40%, rgba(124,58,237,0.08) 100%);
+}
+
+/* Galaxy nav: animated constellation border */
+html[data-theme="galaxy-nexus"] .nav-premium,
+html[data-theme="cosmos"] .nav-premium { position: relative; }
+html[data-theme="galaxy-nexus"] .nav-premium::after,
+html[data-theme="cosmos"] .nav-premium::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.9) 30%, rgba(124,58,237,0.7) 65%, rgba(0,212,255,0.5) 85%, transparent 100%);
+  animation: galaxy-nav-line 4s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(0,212,255,0.5);
+}
+@keyframes galaxy-nav-line {
+  0%, 100% { opacity: 0.45; transform: scaleX(0.82); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+
+/* Galaxy nav-link hover: holographic text */
+html[data-theme="galaxy-nexus"] .nav-link:hover,
+html[data-theme="cosmos"] .nav-link:hover {
+  color: #00D4FF !important;
+  text-shadow: 0 0 12px rgba(0,212,255,0.8), 0 0 24px rgba(0,212,255,0.3);
+  background: rgba(0,212,255,0.07) !important;
+}
+
+/* Galaxy button: pulsing holographic shimmer */
+html[data-theme="galaxy-nexus"] .grad-btn:hover:not(:disabled),
+html[data-theme="cosmos"] .grad-btn:hover:not(:disabled) {
+  animation: galaxy-btn-shimmer 2.2s ease-in-out infinite !important;
+  filter: brightness(1.08);
+}
+@keyframes galaxy-btn-shimmer {
+  0%, 100% { box-shadow: var(--btn-hover-shadow); }
+  50% { box-shadow: var(--btn-hover-shadow), 0 0 50px rgba(0,212,255,0.4), 0 0 90px rgba(124,58,237,0.2); }
+}
+
+/* Galaxy headings: neon glow */
+html[data-theme="galaxy-nexus"] h1,
+html[data-theme="galaxy-nexus"] h2,
+html[data-theme="cosmos"] h1,
+html[data-theme="cosmos"] h2 {
+  text-shadow: 0 0 30px rgba(0,212,255,0.35), 0 0 60px rgba(124,58,237,0.15);
+}
+
+/* ════ 🌸 SAKURA DREAM — Tranquil Blossom Garden ═══════════════════════ */
+
+html[data-theme="sakura-dream"] .glass-panel,
+html[data-theme="sakura"] .glass-panel,
+html[data-theme="sakura-dream"] .stat-card-premium,
+html[data-theme="sakura"] .stat-card-premium {
+  background: linear-gradient(145deg, rgba(30,4,18,0.86) 0%, rgba(42,6,26,0.80) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,107,157,0.18),
+    0 8px 40px rgba(0,0,0,0.58),
+    inset 0 1px 0 rgba(255,190,215,0.12),
+    inset 0 -1px 0 rgba(147,51,234,0.05),
+    0 0 60px rgba(255,107,157,0.06) !important;
+  backdrop-filter: blur(22px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(145%) !important;
+}
+
+/* Sakura inner bloom: warm light from corners */
+html[data-theme="sakura-dream"] .glass-panel::after,
+html[data-theme="sakura"] .glass-panel::after,
+html[data-theme="sakura-dream"] .stat-card-premium::after,
+html[data-theme="sakura"] .stat-card-premium::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(255,165,205,0.18) 0%, transparent 32%),
+    radial-gradient(circle at 88% 88%, rgba(255,107,157,0.14) 0%, transparent 26%),
+    radial-gradient(circle at 82% 16%, rgba(255,200,225,0.10) 0%, transparent 20%),
+    linear-gradient(135deg, rgba(255,190,215,0.06) 0%, transparent 55%);
+  pointer-events: none;
+  animation: sakura-card-bloom 5.5s ease-in-out infinite alternate;
+}
+@keyframes sakura-card-bloom {
+  0% { opacity: 0.65; }
+  100% { opacity: 1; }
+}
+
+/* Sakura nav: elegant petal border */
+html[data-theme="sakura-dream"] .nav-premium,
+html[data-theme="sakura"] .nav-premium { position: relative; }
+html[data-theme="sakura-dream"] .nav-premium::after,
+html[data-theme="sakura"] .nav-premium::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,107,157,0.9) 35%, rgba(255,190,215,0.7) 60%, rgba(255,107,157,0.5) 80%, transparent 100%);
+  animation: sakura-nav-bloom 5s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(255,107,157,0.45);
+}
+@keyframes sakura-nav-bloom {
+  0%, 100% { opacity: 0.38; box-shadow: 0 0 6px rgba(255,107,157,0.2); }
+  50% { opacity: 0.92; box-shadow: 0 0 18px rgba(255,107,157,0.6); }
+}
+
+/* Sakura nav-link hover: rose glow */
+html[data-theme="sakura-dream"] .nav-link:hover,
+html[data-theme="sakura"] .nav-link:hover {
+  color: #FF9EC6 !important;
+  text-shadow: 0 0 12px rgba(255,107,157,0.8), 0 0 24px rgba(255,107,157,0.3);
+  background: rgba(255,107,157,0.08) !important;
+}
+
+/* Sakura: already has sakura-btn-bloom animation — enhance it */
+html[data-theme="sakura-dream"] .grad-btn,
+html[data-theme="sakura"] .grad-btn {
+  transition: all var(--dur-base) var(--ease-spring) !important;
+}
+
+/* Sakura headings: soft rose glow */
+html[data-theme="sakura-dream"] h1,
+html[data-theme="sakura-dream"] h2,
+html[data-theme="sakura"] h1,
+html[data-theme="sakura"] h2 {
+  text-shadow: 0 0 28px rgba(255,107,157,0.4), 0 0 55px rgba(255,107,157,0.15);
+}
+
+/* Sakura: all interactive elements are rounder */
+html[data-theme="sakura-dream"] .action-card,
+html[data-theme="sakura"] .action-card,
+html[data-theme="sakura-dream"] .action-tile,
+html[data-theme="sakura"] .action-tile {
+  border-radius: 24px !important;
+}
+
+/* ════ 🔥 INFERNO — High-Performance Energy Mode ═══════════════════════ */
+
+html[data-theme="inferno"] .glass-panel,
+html[data-theme="ember"] .glass-panel,
+html[data-theme="inferno"] .stat-card-premium,
+html[data-theme="ember"] .stat-card-premium {
+  background: linear-gradient(180deg, rgba(14,2,0,0.92) 0%, rgba(22,4,0,0.86) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,69,0,0.22),
+    0 8px 40px rgba(0,0,0,0.88),
+    inset 0 -1px 0 rgba(255,69,0,0.12),
+    0 0 50px rgba(255,69,0,0.08) !important;
+  backdrop-filter: blur(16px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(190%) !important;
+}
+
+/* Inferno: rising heat from bottom */
+html[data-theme="inferno"] .glass-panel::after,
+html[data-theme="ember"] .glass-panel::after,
+html[data-theme="inferno"] .stat-card-premium::after,
+html[data-theme="ember"] .stat-card-premium::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 50% 115%, rgba(255,80,0,0.22) 0%, transparent 42%),
+    radial-gradient(ellipse at 12% 100%, rgba(200,30,0,0.14) 0%, transparent 28%),
+    radial-gradient(ellipse at 88% 100%, rgba(255,130,0,0.12) 0%, transparent 24%),
+    linear-gradient(0deg, rgba(255,69,0,0.07) 0%, transparent 28%);
+  pointer-events: none;
+  animation: inferno-card-heat 2.4s ease-in-out infinite;
+}
+@keyframes inferno-card-heat {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
+}
+
+/* Inferno nav: fire-line border */
+html[data-theme="inferno"] .nav-premium,
+html[data-theme="ember"] .nav-premium { position: relative; }
+html[data-theme="inferno"] .nav-premium::after,
+html[data-theme="ember"] .nav-premium::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,69,0,1) 25%, rgba(255,160,0,0.9) 55%, rgba(255,220,0,0.5) 80%, transparent 100%);
+  animation: inferno-nav-fire 2.2s ease-in-out infinite;
+  box-shadow: 0 0 14px rgba(255,69,0,0.7);
+}
+@keyframes inferno-nav-fire {
+  0%, 100% { opacity: 0.55; box-shadow: 0 0 8px rgba(255,69,0,0.4); }
+  50% { opacity: 1; box-shadow: 0 0 24px rgba(255,69,0,0.9), 0 0 48px rgba(255,100,0,0.4); }
+}
+
+/* Inferno nav-link hover: fire glow */
+html[data-theme="inferno"] .nav-link:hover,
+html[data-theme="ember"] .nav-link:hover {
+  color: #FF7040 !important;
+  text-shadow: 0 0 12px rgba(255,80,0,0.9), 0 0 24px rgba(255,80,0,0.4);
+  background: rgba(255,69,0,0.08) !important;
+}
+
+/* Inferno button: intense power */
+html[data-theme="inferno"] .grad-btn:hover:not(:disabled),
+html[data-theme="ember"] .grad-btn:hover:not(:disabled) {
+  filter: brightness(1.25) saturate(1.35) !important;
+  animation: inferno-btn-surge 1.8s ease-in-out infinite !important;
+}
+@keyframes inferno-btn-surge {
+  0%, 100% { box-shadow: var(--btn-hover-shadow); }
+  50% { box-shadow: var(--btn-hover-shadow), 0 0 40px rgba(255,69,0,0.55), 0 0 80px rgba(255,100,0,0.25); }
+}
+
+/* Inferno headings: fire glow */
+html[data-theme="inferno"] h1,
+html[data-theme="inferno"] h2,
+html[data-theme="ember"] h1,
+html[data-theme="ember"] h2 {
+  text-shadow: 0 0 25px rgba(255,80,0,0.55), 0 0 50px rgba(255,80,0,0.22);
+}
+
+/* Inferno: sharper corners everywhere */
+html[data-theme="inferno"] .action-card,
+html[data-theme="ember"] .action-card,
+html[data-theme="inferno"] .action-tile,
+html[data-theme="ember"] .action-tile {
+  border-radius: 8px !important;
+}
+
+/* ════ ❄️ ARCTIC AURORA — Ice Intelligence ══════════════════════════════ */
+
+html[data-theme="arctic-aurora"] .glass-panel,
+html[data-theme="arctic"] .glass-panel,
+html[data-theme="arctic-aurora"] .stat-card-premium,
+html[data-theme="arctic"] .stat-card-premium {
+  background: linear-gradient(145deg, rgba(0,6,20,0.84) 0%, rgba(0,11,28,0.78) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(0,255,204,0.18),
+    0 8px 40px rgba(0,0,0,0.70),
+    inset 0 1px 0 rgba(0,255,204,0.14),
+    inset 0 -1px 0 rgba(14,165,233,0.06),
+    0 0 60px rgba(0,255,204,0.05) !important;
+  backdrop-filter: blur(32px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(130%) !important;
+}
+
+/* Arctic: frost crystalline light from top */
+html[data-theme="arctic-aurora"] .glass-panel::after,
+html[data-theme="arctic"] .glass-panel::after,
+html[data-theme="arctic-aurora"] .stat-card-premium::after,
+html[data-theme="arctic"] .stat-card-premium::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 50% -8%, rgba(0,255,204,0.14) 0%, transparent 42%),
+    radial-gradient(circle at 5% 5%, rgba(0,255,204,0.10) 0%, transparent 20%),
+    radial-gradient(circle at 95% 5%, rgba(14,165,233,0.08) 0%, transparent 16%),
+    linear-gradient(180deg, rgba(0,255,204,0.06) 0%, transparent 32%);
+  pointer-events: none;
+}
+
+/* Arctic nav: aurora border */
+html[data-theme="arctic-aurora"] .nav-premium,
+html[data-theme="arctic"] .nav-premium { position: relative; }
+html[data-theme="arctic-aurora"] .nav-premium::after,
+html[data-theme="arctic"] .nav-premium::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,255,204,1) 20%, rgba(14,165,233,0.8) 50%, rgba(124,58,237,0.6) 78%, transparent 100%);
+  animation: aurora-nav-line 5.5s ease-in-out infinite;
+  box-shadow: 0 0 14px rgba(0,255,204,0.55);
+}
+@keyframes aurora-nav-line {
+  0%, 100% { opacity: 0.4; background-size: 200% 100%; background-position: 0% 50%; }
+  50% { opacity: 1; background-size: 200% 100%; background-position: 100% 50%; }
+}
+
+/* Arctic nav-link hover: ice crystal */
+html[data-theme="arctic-aurora"] .nav-link:hover,
+html[data-theme="arctic"] .nav-link:hover {
+  color: #A5F3FC !important;
+  text-shadow: 0 0 12px rgba(0,255,204,0.9), 0 0 28px rgba(14,165,233,0.4);
+  background: rgba(0,255,204,0.07) !important;
+}
+
+/* Arctic: precise ice-sharp buttons */
+html[data-theme="arctic-aurora"] .grad-btn:hover:not(:disabled),
+html[data-theme="arctic"] .grad-btn:hover:not(:disabled) {
+  filter: brightness(1.14) saturate(1.18) !important;
+  text-shadow: 0 0 12px rgba(0,255,204,0.7);
+}
+
+/* Arctic headings: crystal clarity */
+html[data-theme="arctic-aurora"] h1,
+html[data-theme="arctic-aurora"] h2,
+html[data-theme="arctic"] h1,
+html[data-theme="arctic"] h2 {
+  text-shadow: 0 0 28px rgba(0,255,204,0.38), 0 0 56px rgba(14,165,233,0.16);
+}
+
+/* ════ 🌲 NATURE PULSE — Living Forest Growth ═══════════════════════════ */
+
+html[data-theme="nature-pulse"] .glass-panel,
+html[data-theme="forest"] .glass-panel,
+html[data-theme="nature-pulse"] .stat-card-premium,
+html[data-theme="forest"] .stat-card-premium {
+  background: linear-gradient(155deg, rgba(1,8,2,0.90) 0%, rgba(2,13,4,0.84) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(16,185,129,0.18),
+    0 8px 40px rgba(0,0,0,0.70),
+    inset 0 1px 0 rgba(16,185,129,0.10),
+    0 0 55px rgba(16,185,129,0.05) !important;
+  backdrop-filter: blur(20px) saturate(155%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(155%) !important;
+}
+
+/* Nature: life grows from the ground up */
+html[data-theme="nature-pulse"] .glass-panel::after,
+html[data-theme="forest"] .glass-panel::after,
+html[data-theme="nature-pulse"] .stat-card-premium::after,
+html[data-theme="forest"] .stat-card-premium::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 50% 115%, rgba(16,185,129,0.14) 0%, transparent 42%),
+    radial-gradient(circle at 5% 95%, rgba(16,185,129,0.10) 0%, transparent 26%),
+    radial-gradient(circle at 95% 95%, rgba(34,197,94,0.08) 0%, transparent 22%),
+    linear-gradient(180deg, transparent 68%, rgba(16,185,129,0.06) 100%);
+  pointer-events: none;
+  animation: nature-card-growth 5s ease-in-out infinite;
+}
+@keyframes nature-card-growth {
+  0%, 100% { opacity: 0.68; }
+  50% { opacity: 1; }
+}
+
+/* Nature nav: forest floor border */
+html[data-theme="nature-pulse"] .nav-premium,
+html[data-theme="forest"] .nav-premium { position: relative; }
+html[data-theme="nature-pulse"] .nav-premium::after,
+html[data-theme="forest"] .nav-premium::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(16,185,129,0.9) 38%, rgba(34,197,94,0.7) 65%, rgba(16,185,129,0.5) 82%, transparent 100%);
+  animation: nature-nav-pulse 4.5s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(16,185,129,0.45);
+}
+@keyframes nature-nav-pulse {
+  0%, 100% { opacity: 0.38; }
+  50% { opacity: 1; box-shadow: 0 0 20px rgba(16,185,129,0.7); }
+}
+
+/* Nature nav-link hover: forest green */
+html[data-theme="nature-pulse"] .nav-link:hover,
+html[data-theme="forest"] .nav-link:hover {
+  color: #34D399 !important;
+  text-shadow: 0 0 12px rgba(16,185,129,0.9), 0 0 24px rgba(16,185,129,0.35);
+  background: rgba(16,185,129,0.08) !important;
+}
+
+/* Nature button: organic growth */
+html[data-theme="nature-pulse"] .grad-btn:hover:not(:disabled),
+html[data-theme="forest"] .grad-btn:hover:not(:disabled) {
+  filter: brightness(1.1) saturate(1.15) !important;
+  animation: nature-btn-grow 0.7s ease-in-out forwards !important;
+}
+@keyframes nature-btn-grow {
+  0% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-4px) scale(1.025); }
+  70% { transform: translateY(-5px) scale(1.03); }
+  100% { transform: translateY(-2px) scale(1.01); }
+}
+
+/* Nature headings: earthy glow */
+html[data-theme="nature-pulse"] h1,
+html[data-theme="nature-pulse"] h2,
+html[data-theme="forest"] h1,
+html[data-theme="forest"] h2 {
+  text-shadow: 0 0 28px rgba(16,185,129,0.42), 0 0 55px rgba(16,185,129,0.16);
+}
+
+/* Nature: organic rounded corners everywhere */
+html[data-theme="nature-pulse"] .action-card,
+html[data-theme="forest"] .action-card,
+html[data-theme="nature-pulse"] .action-tile,
+html[data-theme="forest"] .action-tile {
+  border-radius: 20px !important;
+}
+
+/* ════ 🤖 CYBERPUNK NEO — Next-Gen AI Terminal ══════════════════════════ */
+
+html[data-theme="cyberpunk-neo"] .glass-panel,
+html[data-theme="neon-cyberpunk"] .glass-panel,
+html[data-theme="cyberpunk-neo"] .stat-card-premium,
+html[data-theme="neon-cyberpunk"] .stat-card-premium {
+  background: rgba(0,0,0,0.93) !important;
+  box-shadow:
+    0 0 0 1px rgba(0,255,65,0.28),
+    0 8px 32px rgba(0,0,0,0.98),
+    0 0 24px rgba(0,255,65,0.07),
+    inset 0 1px 0 rgba(0,255,65,0.10) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* Cyberpunk: terminal scanlines */
+html[data-theme="cyberpunk-neo"] .glass-panel::after,
+html[data-theme="neon-cyberpunk"] .glass-panel::after,
+html[data-theme="cyberpunk-neo"] .stat-card-premium::after,
+html[data-theme="neon-cyberpunk"] .stat-card-premium::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 2px,
+    rgba(0,255,65,0.022) 2px, rgba(0,255,65,0.022) 3px
+  );
+  pointer-events: none;
+}
+
+/* Cyberpunk hover: neon glitch flash */
+html[data-theme="cyberpunk-neo"] .glass-panel:hover,
+html[data-theme="neon-cyberpunk"] .glass-panel:hover,
+html[data-theme="cyberpunk-neo"] .stat-card-premium:hover,
+html[data-theme="neon-cyberpunk"] .stat-card-premium:hover {
+  box-shadow:
+    0 0 0 1px rgba(0,255,65,0.7),
+    0 8px 32px rgba(0,0,0,0.98),
+    0 0 40px rgba(0,255,65,0.16),
+    0 0 80px rgba(255,0,255,0.05),
+    inset 0 0 40px rgba(0,255,65,0.05) !important;
+  animation: cyber-glitch-border 0.2s steps(2) infinite !important;
+}
+/* cyber-glitch-border already defined above */
+
+/* Cyberpunk nav: terminal double-line */
+html[data-theme="cyberpunk-neo"] .nav-premium,
+html[data-theme="neon-cyberpunk"] .nav-premium {
+  position: relative;
+  border-bottom: 1px solid rgba(0,255,65,0.32) !important;
+}
+html[data-theme="cyberpunk-neo"] .nav-premium::after,
+html[data-theme="neon-cyberpunk"] .nav-premium::after {
+  content: '';
+  position: absolute; bottom: -3px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,0,255,0.7) 18%, rgba(0,255,65,1) 45%, rgba(0,255,255,0.7) 72%, transparent 100%);
+  animation: cyber-nav-scan 3s linear infinite;
+}
+@keyframes cyber-nav-scan {
+  0%   { transform: scaleX(0); transform-origin: left; }
+  49%  { transform: scaleX(1); transform-origin: left; }
+  50%  { transform: scaleX(1); transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
+
+/* Cyberpunk nav-link hover: glitch text */
+html[data-theme="cyberpunk-neo"] .nav-link:hover,
+html[data-theme="neon-cyberpunk"] .nav-link:hover {
+  color: #00FF41 !important;
+  text-shadow: 0 0 10px rgba(0,255,65,1), 2px 0 0 rgba(255,0,255,0.4), -2px 0 0 rgba(0,255,255,0.4);
+  background: rgba(0,255,65,0.06) !important;
+  letter-spacing: 0.06em;
+}
+
+/* Cyberpunk button: digital flicker + text glow */
+html[data-theme="cyberpunk-neo"] .grad-btn:hover:not(:disabled),
+html[data-theme="neon-cyberpunk"] .grad-btn:hover:not(:disabled) {
+  animation: cyber-btn-flicker 3.5s ease-in-out infinite !important;
+  text-shadow: 0 0 10px rgba(0,255,65,0.9);
+  letter-spacing: 0.05em;
+}
+@keyframes cyber-btn-flicker {
+  0%, 97%, 100% { filter: brightness(1.12); }
+  97.5% { filter: brightness(0.7) saturate(2.5) hue-rotate(20deg); }
+  98% { filter: brightness(1.5) saturate(1.5); }
+  98.8% { filter: brightness(0.85); }
+  99.4% { filter: brightness(1.3); }
+}
+
+/* Cyberpunk headings: matrix green glow */
+html[data-theme="cyberpunk-neo"] h1,
+html[data-theme="cyberpunk-neo"] h2,
+html[data-theme="neon-cyberpunk"] h1,
+html[data-theme="neon-cyberpunk"] h2 {
+  text-shadow: 0 0 22px rgba(0,255,65,0.6), 0 0 44px rgba(0,255,65,0.25);
+  letter-spacing: 0.03em;
+}
+
+/* Cyberpunk: sharp corners everywhere */
+html[data-theme="cyberpunk-neo"] .action-card,
+html[data-theme="neon-cyberpunk"] .action-card,
+html[data-theme="cyberpunk-neo"] .action-tile,
+html[data-theme="neon-cyberpunk"] .action-tile {
+  border-radius: 4px !important;
+}
+html[data-theme="cyberpunk-neo"] .dark-input,
+html[data-theme="neon-cyberpunk"] .dark-input {
+  border-radius: 2px !important;
+  font-family: ui-monospace, 'Courier New', monospace !important;
+  letter-spacing: 0.04em;
+}
+
+/* ════ 🌊 OCEAN INTELLIGENCE — Deep Ocean Thinking ══════════════════════ */
+
+html[data-theme="ocean-intelligence"] .glass-panel,
+html[data-theme="ocean-intelligence"] .stat-card-premium {
+  background: linear-gradient(175deg, rgba(0,5,20,0.90) 0%, rgba(0,9,28,0.84) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(0,206,209,0.20),
+    0 8px 40px rgba(0,0,0,0.74),
+    inset 0 1px 0 rgba(0,206,209,0.12),
+    inset 0 -1px 0 rgba(0,150,180,0.06),
+    0 0 65px rgba(0,206,209,0.06) !important;
+  backdrop-filter: blur(26px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(165%) !important;
+}
+
+/* Ocean: bioluminescent depth glow */
+html[data-theme="ocean-intelligence"] .glass-panel::after,
+html[data-theme="ocean-intelligence"] .stat-card-premium::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 32% 92%, rgba(0,206,209,0.16) 0%, transparent 36%),
+    radial-gradient(ellipse at 72% 22%, rgba(0,150,180,0.10) 0%, transparent 28%),
+    radial-gradient(circle at 12% 55%, rgba(0,100,190,0.08) 0%, transparent 22%),
+    linear-gradient(180deg, rgba(0,206,209,0.05) 0%, transparent 38%);
+  pointer-events: none;
+  animation: ocean-card-depth 5.5s ease-in-out infinite;
+}
+@keyframes ocean-card-depth {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* Ocean nav: deep water wave border */
+html[data-theme="ocean-intelligence"] .nav-premium { position: relative; }
+html[data-theme="ocean-intelligence"] .nav-premium::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,206,209,1) 30%, rgba(64,224,208,0.8) 60%, rgba(0,206,209,0.5) 82%, transparent 100%);
+  animation: ocean-nav-wave 4.5s ease-in-out infinite;
+  box-shadow: 0 0 16px rgba(0,206,209,0.55);
+}
+@keyframes ocean-nav-wave {
+  0%, 100% { opacity: 0.38; transform: scaleX(0.88); box-shadow: 0 0 8px rgba(0,206,209,0.25); }
+  50% { opacity: 1; transform: scaleX(1); box-shadow: 0 0 28px rgba(0,206,209,0.7); }
+}
+
+/* Ocean nav-link hover: bioluminescent */
+html[data-theme="ocean-intelligence"] .nav-link:hover {
+  color: #22D3EE !important;
+  text-shadow: 0 0 12px rgba(0,206,209,0.9), 0 0 28px rgba(0,206,209,0.35);
+  background: rgba(0,206,209,0.07) !important;
+}
+
+/* Ocean button: fluid wave */
+html[data-theme="ocean-intelligence"] .grad-btn:hover:not(:disabled) {
+  animation: ocean-btn-flow 3s ease-in-out infinite !important;
+}
+@keyframes ocean-btn-flow {
+  0%, 100% { box-shadow: var(--btn-hover-shadow); filter: hue-rotate(0deg) brightness(1); }
+  50% { box-shadow: var(--btn-hover-shadow), 0 0 35px rgba(0,206,209,0.5); filter: hue-rotate(10deg) brightness(1.08); }
+}
+
+/* Ocean headings: depth glow */
+html[data-theme="ocean-intelligence"] h1,
+html[data-theme="ocean-intelligence"] h2 {
+  text-shadow: 0 0 30px rgba(0,206,209,0.42), 0 0 60px rgba(0,150,180,0.18);
+}
+
+/* ════ 🧠 NEURAL BRAIN — Living Digital Twin OS ═════════════════════════ */
+
+html[data-theme="neural-brain"] .glass-panel,
+html[data-theme="neural-brain"] .stat-card-premium {
+  background: linear-gradient(145deg, rgba(2,2,16,0.92) 0%, rgba(5,2,22,0.86) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(139,92,246,0.22),
+    0 8px 40px rgba(0,0,0,0.78),
+    inset 0 1px 0 rgba(139,92,246,0.12),
+    inset 0 -1px 0 rgba(0,212,255,0.05),
+    0 0 65px rgba(139,92,246,0.07) !important;
+  backdrop-filter: blur(24px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(185%) !important;
+}
+
+/* Neural Brain: synapse corner nodes */
+html[data-theme="neural-brain"] .glass-panel::after,
+html[data-theme="neural-brain"] .stat-card-premium::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(139,92,246,0.24) 0%, transparent 10%),
+    radial-gradient(circle at 100% 0%, rgba(0,212,255,0.18) 0%, transparent 10%),
+    radial-gradient(circle at 100% 100%, rgba(139,92,246,0.20) 0%, transparent 10%),
+    radial-gradient(circle at 0% 100%, rgba(0,212,255,0.16) 0%, transparent 10%),
+    radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.05) 0%, transparent 65%);
+  pointer-events: none;
+  animation: neural-card-nodes 4.5s ease-in-out infinite;
+}
+@keyframes neural-card-nodes {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
+}
+
+/* Neural nav: brain interface pulse */
+html[data-theme="neural-brain"] .nav-premium { position: relative; }
+html[data-theme="neural-brain"] .nav-premium::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(139,92,246,1) 28%, rgba(0,212,255,0.8) 55%, rgba(139,92,246,0.6) 78%, transparent 100%);
+  animation: neural-nav-pulse 3.5s ease-in-out infinite;
+  box-shadow: 0 0 14px rgba(139,92,246,0.6);
+}
+@keyframes neural-nav-pulse {
+  0%, 100% { opacity: 0.38; box-shadow: 0 0 6px rgba(139,92,246,0.32); }
+  50% { opacity: 1; box-shadow: 0 0 24px rgba(139,92,246,0.8), 0 0 50px rgba(0,212,255,0.35); }
+}
+
+/* Neural nav-link hover: synapse spark */
+html[data-theme="neural-brain"] .nav-link:hover {
+  color: #C4B5FD !important;
+  text-shadow: 0 0 12px rgba(139,92,246,0.9), 0 0 28px rgba(0,212,255,0.35);
+  background: rgba(139,92,246,0.08) !important;
+}
+
+/* Neural button: synapse fire burst */
+html[data-theme="neural-brain"] .grad-btn:hover:not(:disabled) {
+  animation: neural-btn-fire 2.5s ease-in-out infinite !important;
+}
+@keyframes neural-btn-fire {
+  0%, 100% { box-shadow: var(--btn-hover-shadow); }
+  35% { box-shadow: var(--btn-hover-shadow), 0 0 45px rgba(139,92,246,0.6), 0 0 90px rgba(0,212,255,0.28); }
+  55% { box-shadow: var(--btn-hover-shadow), 0 0 20px rgba(139,92,246,0.35); }
+}
+
+/* Neural headings: brain OS glow */
+html[data-theme="neural-brain"] h1,
+html[data-theme="neural-brain"] h2 {
+  text-shadow: 0 0 28px rgba(139,92,246,0.5), 0 0 55px rgba(0,212,255,0.25);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   UNIVERSAL THEME INHERITANCE — Shared utility classes
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Action cards: inherit full theme card DNA */
+.action-card {
+  background: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+  border-radius: var(--card-radius) !important;
+  transition: all var(--dur-base) var(--ease-spring) !important;
+}
+.action-card:hover {
+  background: rgba(var(--primary-rgb), 0.06) !important;
+  border-color: var(--card-hover-border) !important;
+  box-shadow: var(--card-hover-shadow) !important;
+}
+
+/* Action tiles: inherit card radius + theme hover */
+.action-tile {
+  border-radius: var(--card-radius) !important;
+  transition: all var(--dur-base) var(--ease-spring) !important;
+}
+.action-tile:hover {
+  background: rgba(var(--primary-rgb), 0.08) !important;
+  border-color: rgba(var(--primary-rgb), 0.32) !important;
+  box-shadow: 0 8px 28px rgba(var(--primary-rgb), 0.16) !important;
+}
+
+/* Focus preset buttons: theme hover */
+.focus-preset-btn:hover:not(:disabled) {
+  background: rgba(var(--primary-rgb), 0.14) !important;
+  border-color: rgba(var(--primary-rgb), 0.44) !important;
+  box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.22) !important;
+}
+
+/* Video cards: inherit card radius */
+.sv-card { border-radius: var(--card-radius) !important; }
+
+/* Chips/tags: inherit button radius */
+.sv-chip, .tm-badge { border-radius: var(--btn-radius) !important; }
+
+/* Grad-text: always uses active theme gradient */
+.grad-text {
+  background: var(--grad-primary) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+.grad-text-cyan {
+  background: var(--grad-primary) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Sign-out button: theme danger hover unchanged */
+.sign-out-btn { border-radius: var(--btn-radius) !important; }
+
+/* Score bar fills: use primary gradient */
+.score-bar-fill {
+  background: var(--grad-primary) !important;
+  box-shadow: 0 0 8px rgba(var(--primary-rgb), 0.45) !important;
+}
+
+/* ── Chart axis/grid picks up theme ─────────────────────────────────────── */
+/* Chart libraries typically read from CSS vars; the --chart-* tokens set above
+   are available for recharts/chartjs wrappers to consume via getComputedStyle */
+
+/* ── Copy-hint: ensure new animations don't conflict with Sakura btn-bloom ── */
+/* Sakura btn bloom is already defined in v2 section and still applies */
+

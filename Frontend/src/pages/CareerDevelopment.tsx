@@ -95,7 +95,7 @@ interface Analytics {
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
 
-const BG     = '#060b18';
+const BG     = 'transparent';
 const CARD   = 'rgba(255,255,255,0.04)';
 const CARD2  = 'rgba(255,255,255,0.06)';
 const BORDER = '1px solid rgba(255,255,255,0.08)';
@@ -2131,7 +2131,7 @@ export default function CareerDevelopment() {
       `}</style>
 
       {/* Header */}
-      <div style={{ borderBottom:BORDER, padding:'0.9rem 1.5rem', display:'flex', alignItems:'center', gap:'1rem', background:'rgba(6,11,24,0.92)', backdropFilter:'blur(12px)', position:'sticky', top:0, zIndex:50 }}>
+      <div style={{ borderBottom:BORDER, padding:'0.9rem 1.5rem', display:'flex', alignItems:'center', gap:'1rem', background:'var(--glass-bg)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', position:'sticky', top:0, zIndex:50 }}>
         <BackButton />
         <div>
           <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
@@ -2146,7 +2146,7 @@ export default function CareerDevelopment() {
       </div>
 
       {/* Tab bar */}
-      <div style={{ overflowX:'auto', borderBottom:BORDER, background:'rgba(6,11,24,0.75)', backdropFilter:'blur(8px)', position:'sticky', top:62, zIndex:40 }}>
+      <div style={{ overflowX:'auto', borderBottom:BORDER, background:'var(--glass-bg)', backdropFilter:'blur(16px)', position:'sticky', top:62, zIndex:40 }}>
         <div style={{ display:'flex', minWidth:'max-content', padding:'0 1.5rem' }}>
           {TABS.map(tab=>{
             const active = activeTab===tab.id;
