@@ -30,6 +30,7 @@ def create_session(
         title=payload.title,
         subject=payload.subject,
         duration_minutes=payload.duration_minutes or 0,
+        status=payload.status or 'active',
     )
     db.add(session)
     db.commit()

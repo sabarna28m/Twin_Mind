@@ -7,6 +7,7 @@ class SessionCreate(BaseModel):
     title: str
     subject: Optional[str] = None
     duration_minutes: Optional[int] = 0
+    status: Optional[str] = 'active'
 
 
 class SessionUpdate(BaseModel):

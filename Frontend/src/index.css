@@ -2700,3 +2700,39 @@ html[data-theme="neural-brain"] h2 {
   .ach-tabs::-webkit-scrollbar { display: none; }
 }
 
+/* ── Mission system: completion animations ── */
+@keyframes mission-complete-glow {
+  0%   { box-shadow: 0 0 0 rgba(16,185,129,0); }
+  40%  { box-shadow: 0 0 28px rgba(16,185,129,0.55), 0 0 60px rgba(16,185,129,0.18); }
+  100% { box-shadow: 0 0 0 rgba(16,185,129,0); }
+}
+.mission-just-completed { animation: mission-complete-glow 0.85s ease both; }
+
+@keyframes xp-toast-rise {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  70%  { opacity: 1; transform: translateY(-28px) scale(1.08); }
+  100% { opacity: 0; transform: translateY(-44px) scale(0.9); }
+}
+.xp-toast-anim { animation: xp-toast-rise 1.6s ease forwards; }
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(-10px) rotate(0deg) scale(1); opacity: 1; }
+  60%  { opacity: 1; }
+  100% { transform: translateY(90px) rotate(540deg) scale(0.6); opacity: 0; }
+}
+.mission-confetti-item { animation: confetti-fall 1.4s ease-out forwards; }
+
+@keyframes prog-fill-flash {
+  0%   { filter: brightness(1); }
+  50%  { filter: brightness(1.6); }
+  100% { filter: brightness(1); }
+}
+.prog-fill-complete { animation: prog-fill-flash 0.5s ease 0.1s; }
+
+@keyframes mission-unlock-pop {
+  0%   { opacity: 0; transform: scale(0.85) translateY(6px); }
+  60%  { transform: scale(1.03) translateY(0); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.mission-bonus-unlock { animation: mission-unlock-pop 0.55s cubic-bezier(0.34,1.56,0.64,1) both; }
+

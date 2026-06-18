@@ -41,6 +41,7 @@ from app.api.routes import career as career_routes
 from app.api.routes import comm_twin as comm_routes
 from app.api.routes import smart_notes as smart_notes_routes
 from app.api.routes import skill_tree as skill_tree_routes
+from app.api.routes import missions as missions_routes
 from app.ml.predictor import get_model  # warm up model at startup
 
 Base.metadata.create_all(bind=engine)
@@ -310,6 +311,7 @@ app.include_router(career_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(comm_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(smart_notes_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(skill_tree_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(missions_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(ws_routes.router)
 
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"
