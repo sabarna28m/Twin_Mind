@@ -52,7 +52,7 @@ function buildMessages(burnout: BurnoutEntry | null, subjects: SubjectAnalysis |
 
   if (msgs.length < 3) {
     msgs.push(
-      `🧠 Use the AI Focus Detector during your next session to maintain a focus score above 80%.`
+      `🎯 Try a Focus Mode quiz in the Quiz module to track your attention score in real time. Aim for above 75%.`
     );
   }
 

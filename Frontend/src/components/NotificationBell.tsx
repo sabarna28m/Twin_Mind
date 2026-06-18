@@ -515,17 +515,10 @@ export default function NotificationBell() {
     if (generating) return;
     setGenerating(true);
     try {
-      // Pass focus score from localStorage if available
-      const focusSessions = JSON.parse(
-        localStorage.getItem('twinmind_ai_focus_sessions') || '[]',
-      ) as { avgScore?: number }[];
-      const focusScore = focusSessions.length
-        ? focusSessions.slice(0, 3).reduce((s, r) => s + (r.avgScore ?? 0), 0) / Math.min(focusSessions.length, 3)
-        : undefined;
-
+      // Focus score is now tracked inside Quiz focus mode sessions
       const { data } = await api.post<AINotification[]>('/notifications/generate-ai', {
-        focus_score: focusScore ?? null,
-        focus_sessions_count: focusSessions.length,
+        focus_score: null,
+        focus_sessions_count: 0,
       });
       setNotifications(data);
     } catch {
@@ -539,14 +532,8 @@ export default function NotificationBell() {
   async function fetchSummary() {
     setSummaryLoading(true);
     try {
-      const focusSessions = JSON.parse(
-        localStorage.getItem('twinmind_ai_focus_sessions') || '[]',
-      ) as { avgScore?: number }[];
-      const focusScore = focusSessions.length
-        ? focusSessions.slice(0, 3).reduce((s, r) => s + (r.avgScore ?? 0), 0) / Math.min(focusSessions.length, 3)
-        : undefined;
-
-      const params = focusScore != null ? `?focus_score=${Math.round(focusScore)}` : '';
+      // Focus score comes from Quiz focus mode; no standalone detector data
+      const params = '';
       const { data } = await api.get<DailySummary>(`/notifications/daily-summary${params}`);
       setSummary(data);
     } catch {

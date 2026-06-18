@@ -34,7 +34,7 @@ function buildRecommendations(
   if (burnout && (burnout.risk_level === 'medium' || burnout.risk_level === 'high')) {
     recs.push({ icon: '🧘', text: 'Log today\'s wellness check-in', xp: 20, link: '/checkin' });
   } else {
-    recs.push({ icon: '👁', text: 'Run AI Focus Session', xp: 40, link: '/ai-focus' });
+    recs.push({ icon: '🧠', text: 'Complete a quiz with focus score above 75%', xp: 40, link: '/quiz' });
   }
 
   return recs.slice(0, 3);
