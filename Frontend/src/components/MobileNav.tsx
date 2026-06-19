@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  X, BookOpen, FileText, Upload, BarChart2,
+  X, BookOpen, FileText, BarChart2,
   CheckSquare, Trophy, Brain, Zap, MessageCircle,
   Layers, Sword, Timer, Video, User, LogOut,
 } from 'lucide-react';
@@ -10,7 +10,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 const NAV_ITEMS = [
   { key: 'nav_sessions',     to: '/sessions',     Icon: BookOpen,      label: 'Sessions'     },
   { key: 'nav_notes',        to: '/notes',         Icon: FileText,      label: 'Notes'        },
-  { key: 'nav_materials',    to: '/materials',     Icon: Upload,        label: 'Materials'    },
   { key: 'nav_progress',     to: '/progress',      Icon: BarChart2,     label: 'Progress'     },
   { key: 'nav_checkin',      to: '/checkin',       Icon: CheckSquare,   label: 'Check-in'     },
   { key: 'nav_achievements', to: '/achievements',  Icon: Trophy,        label: 'Achievements' },

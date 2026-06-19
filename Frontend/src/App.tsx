@@ -43,7 +43,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Sessions from './pages/Sessions';
 import Notes from './pages/Notes';
-import Materials from './pages/Materials';
+// Materials page retired — content merged into /quiz (Study Resources tab)
 import Progress from './pages/Progress';
 import ProfileSetup from './pages/ProfileSetup';
 import CheckIn from './pages/CheckIn';
@@ -112,14 +112,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/materials"
-            element={
-              <ProtectedRoute>
-                <Materials />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/materials" element={<Navigate to="/quiz" replace />} />
           <Route
             path="/progress"
             element={

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, FileText, Upload, BarChart2, CheckSquare, Trophy, Brain, Zap, MessageCircle, Layers, Menu, Rocket, Mic2 } from 'lucide-react';
+import { BookOpen, FileText, BarChart2, CheckSquare, Trophy, Brain, Zap, MessageCircle, Layers, Menu, Rocket, Mic2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import ThemeToggle from '../components/ThemeToggle';
@@ -172,7 +172,6 @@ const ch: Record<string, React.CSSProperties> = {
 const NAV_KEYS = [
   { key: 'nav_sessions',     to: '/sessions',     Icon: BookOpen      },
   { key: 'nav_notes',        to: '/notes',         Icon: FileText      },
-  { key: 'nav_materials',    to: '/materials',     Icon: Upload        },
   { key: 'nav_progress',     to: '/progress',      Icon: BarChart2     },
   { key: 'nav_checkin',      to: '/checkin',       Icon: CheckSquare   },
   { key: 'nav_achievements', to: '/achievements',  Icon: Trophy        },
@@ -192,26 +191,6 @@ const NAV_TOUR: Record<string, string> = {
   '/quiz':     'quiz',
 };
 
-const QA_DEFS = [
-  { labelKey: 'qa_sessions',     descKey: 'qa_desc_study',    icon: '▶',  grad: 'linear-gradient(135deg,#6366f1,#8b5cf6)', to: '/sessions'     },
-  { labelKey: 'qa_materials',    descKey: 'qa_desc_upload',   icon: '↑',  grad: 'linear-gradient(135deg,#3b82f6,#06b6d4)', to: '/materials'    },
-  { labelKey: 'qa_progress',     descKey: 'qa_desc_analytics',icon: '◎',  grad: 'linear-gradient(135deg,#10b981,#34d399)', to: '/progress'     },
-  { labelKey: 'qa_quiz',         descKey: 'qa_desc_quiz',     icon: '🧠', grad: 'linear-gradient(135deg,#06b6d4,#3b82f6)', to: '/quiz'         },
-  { labelKey: 'qa_predict',      descKey: 'qa_desc_ml',       icon: '🎯', grad: 'linear-gradient(135deg,#8b5cf6,#d946ef)', to: '/predict'      },
-  { labelKey: 'qa_achievements', descKey: 'qa_desc_badges',   icon: '🏆', grad: 'linear-gradient(135deg,#f59e0b,#fbbf24)', to: '/achievements' },
-  { labelKey: 'qa_simulate',     descKey: 'qa_desc_whatif',   icon: '⚡', grad: 'linear-gradient(135deg,#f59e0b,#ef4444)', to: '/simulate'     },
-  { labelKey: 'qa_mentor',       descKey: 'qa_desc_advice',   icon: '💬', grad: 'linear-gradient(135deg,#ec4899,#8b5cf6)', to: '/mentor'       },
-  { labelKey: 'qa_twin',         descKey: 'qa_desc_twin',     icon: '◈',  grad: 'linear-gradient(135deg,#06b6d4,#6366f1)', to: '/twin'         },
-  { labelKey: 'qa_checkin',      descKey: 'qa_desc_log',      icon: '✓',  grad: 'linear-gradient(135deg,#34d399,#10b981)', to: '/checkin'      },
-  { labelKey: 'qa_battles',      descKey: 'qa_desc_battles',  icon: '⚔️', grad: 'linear-gradient(135deg,#ef4444,#f97316)', to: '/battles'      },
-  { labelKey: 'qa_videos',       descKey: 'qa_desc_videos',   icon: '▶',  grad: 'linear-gradient(135deg,#ef4444,#f97316)', to: '/videos'       },
-  { labelKey: 'qa_burnout',      descKey: 'qa_desc_burnout',  icon: '🧠', grad: 'linear-gradient(135deg,#ef4444,#f59e0b)', to: '/burnout'      },
-  { labelKey: 'qa_subjects',     descKey: 'qa_desc_subjects', icon: '📊', grad: 'linear-gradient(135deg,#6366f1,#06b6d4)', to: '/subjects'     },
-  { labelKey: 'qa_career',      descKey: 'qa_desc_career',    icon: '🚀', grad: 'linear-gradient(135deg,#6366f1,#00D4FF)', to: '/career'      },
-  { labelKey: 'qa_comm_twin',  descKey: 'qa_desc_comm_twin', icon: '🗣️', grad: 'linear-gradient(135deg,#14b8a6,#00D4FF)', to: '/comm-twin'   },
-  { labelKey: 'qa_smart_notes', descKey: 'qa_desc_smart_notes', icon: '🧠', grad: 'linear-gradient(135deg,#6366f1,#8b5cf6,#00D4FF)', to: '/notes' },
-  { labelKey: 'qa_skill_tree', descKey: 'qa_desc_skill_tree', icon: '🌳', grad: 'linear-gradient(135deg,#f59e0b,#7c3aed)', to: '/skill-tree' },
-];
 
 interface SavedPlan { id: number; plan_text: string; created_at: string }
 interface CalEvent  { id: string; title: string; start: string; link: string }
@@ -569,30 +548,7 @@ export default function Dashboard() {
           <SubjectWidgets />
         </section>
 
-        {/* ── 6. Quick AI Actions (full-width, hero prominence) ── */}
-        <section style={s.panel} className="glass-panel">
-          <div style={s.panelHead}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ fontSize: '1rem' }}>⚡</span>
-              <h2 style={s.panelTitle}>{t('quick_actions')}</h2>
-            </div>
-          </div>
-          <div style={s.actionGrid} className="mob-action-grid">
-            {QA_DEFS.map(a => (
-              <Link key={a.labelKey} to={a.to} style={{ textDecoration: 'none' }}>
-                <div className="action-tile" {...(a.to === '/predict' ? { 'data-tour': 'predict' } : {})}>
-                  <div className="action-icon-big" style={{ ...s.actionIconBig, background: a.grad }}>
-                    <span style={s.actionIconGlyph}>{a.icon}</span>
-                  </div>
-                  <p style={s.actionTileLabel}>{t(a.labelKey)}</p>
-                  <p style={s.actionTileDesc}>{t(a.descKey)}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* ── 7. Burnout Prevention Center ── */}
+        {/* ── 6. Burnout Prevention Center ── */}
         <section style={s.panel} className="glass-panel">
           <div style={s.panelHead}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -1039,13 +995,6 @@ const s: Record<string, React.CSSProperties> = {
     border: '1px solid rgba(0,212,255,0.3)',
     borderRadius: '10px', color: '#00D4FF', fontSize: '0.8rem', fontWeight: 700, textDecoration: 'none',
   },
-
-  /* Quick actions grid */
-  actionGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.3rem', marginTop: '0.35rem' },
-  actionIconBig: { width: '50px', height: '50px', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 20px rgba(0,0,0,0.45)', marginBottom: '0.15rem' },
-  actionIconGlyph: { fontSize: '1.25rem' },
-  actionTileLabel: { fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-h)', margin: 0, lineHeight: 1.2 },
-  actionTileDesc:  { fontSize: '0.62rem', color: 'var(--text)', margin: 0, lineHeight: 1.25 },
 
   /* Study plan card */
   planDate:        { fontSize: '0.72rem', color: 'rgba(148,163,184,0.55)', marginBottom: '0.85rem', fontWeight: 600, letterSpacing: '0.02em' },
