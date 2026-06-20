@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useXPStore } from '../contexts/XPStoreContext';
 import type { ShopItem } from '../contexts/XPStoreContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   isOpen:  boolean;
@@ -11,8 +12,8 @@ interface Props {
 interface ShopItemDef {
   key:       ShopItem;
   icon:      string;
-  name:      string;
-  tagline:   string;
+  nameKey:   string;
+  tagKey:    string;
   desc:      string;
   priceKey:  keyof NonNullable<ReturnType<typeof useXPStore>['status']>['pricing'];
   accentHex: string;
@@ -21,26 +22,22 @@ interface ShopItemDef {
 
 const ITEMS: ShopItemDef[] = [
   {
-    key: 'shield', icon: '🛡️', name: 'Streak Shield',
-    tagline: 'Miss a day — stay alive',
+    key: 'shield', icon: '🛡️', nameKey: 'shop_shield_name', tagKey: 'shop_shield_tag',
     desc: 'Auto-activates when you miss a single check-in. Keeps your streak alive silently.',
     priceKey: 'shield', accentHex: '#6366f1',
   },
   {
-    key: 'premium_shield', icon: '🛡️', name: 'Premium Shield',
-    tagline: 'Triple protection',
+    key: 'premium_shield', icon: '🛡️', nameKey: 'shop_premium_name', tagKey: 'shop_premium_tag',
     desc: 'Covers up to 3 consecutive missed days. Perfect for weekends and travel.',
     priceKey: 'premium_shield', accentHex: '#a78bfa', badge: 'PREMIUM',
   },
   {
-    key: 'streak_freeze', icon: '🔥', name: 'Streak Freeze',
-    tagline: 'Pause your streak today',
+    key: 'streak_freeze', icon: '🔥', nameKey: 'shop_freeze_name', tagKey: 'shop_freeze_tag',
     desc: 'Manually freeze your streak for today. Use it when you know you\'ll miss a day.',
     priceKey: 'streak_freeze', accentHex: '#f97316',
   },
   {
-    key: 'double_xp', icon: '⭐', name: 'Double XP Boost',
-    tagline: 'Earn 2× XP for 24 hours',
+    key: 'double_xp', icon: '⭐', nameKey: 'shop_double_name', tagKey: 'shop_double_tag',
     desc: 'Every activity awards double XP for the next 24 hours. Stack it with a quiz marathon.',
     priceKey: 'double_xp', accentHex: '#f59e0b', badge: 'HOT',
   },
@@ -48,6 +45,7 @@ const ITEMS: ShopItemDef[] = [
 
 export default function XPShopModal({ isOpen, onClose }: Props) {
   const { status, buying, lastMsg, buy, clearMsg } = useXPStore();
+  const { t } = useLanguage();
   const overlayRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape
@@ -120,8 +118,8 @@ export default function XPShopModal({ isOpen, onClose }: Props) {
             <div style={m.headerLeft}>
               <span style={m.shopIcon}>🛒</span>
               <div>
-                <h2 style={m.title}>XP Shop</h2>
-                <p style={m.subtitle}>Spend your earned XP on power-ups</p>
+                <h2 style={m.title}>{t('shop_modal_title')}</h2>
+                <p style={m.subtitle}>{t('shop_modal_sub')}</p>
               </div>
             </div>
             <div style={m.headerRight}>
@@ -164,8 +162,8 @@ export default function XPShopModal({ isOpen, onClose }: Props) {
                     </div>
                   </div>
 
-                  <h3 style={m.itemName}>{item.name}</h3>
-                  <p style={{ ...m.itemTagline, color: item.accentHex }}>{item.tagline}</p>
+                  <h3 style={m.itemName}>{t(item.nameKey)}</h3>
+                  <p style={{ ...m.itemTagline, color: item.accentHex }}>{t(item.tagKey)}</p>
                   <p style={m.itemDesc}>{item.desc}</p>
                   <p style={m.inventory}>{inventoryLabel(item.key)}</p>
 
@@ -184,7 +182,7 @@ export default function XPShopModal({ isOpen, onClose }: Props) {
                       disabled={disabled}
                       title={!afford ? `Need ${price} XP` : full ? 'Inventory full' : active ? 'Already active' : ''}
                     >
-                      {isBuying ? '…' : full ? 'Full' : active ? 'Active' : !afford ? 'Need XP' : 'Buy'}
+                      {isBuying ? '…' : full ? t('shop_full') : active ? t('shop_active') : !afford ? t('shop_need_xp') : t('shop_buy')}
                     </button>
                   </div>
                 </div>
@@ -198,7 +196,7 @@ export default function XPShopModal({ isOpen, onClose }: Props) {
               🏆 Earn XP by checking in daily, completing quizzes, and hitting streak milestones.
             </p>
             <Link to="/shop" style={m.fullPageLink} onClick={onClose}>
-              View full shop →
+              {t('shop_view_full')}
             </Link>
           </div>
         </div>

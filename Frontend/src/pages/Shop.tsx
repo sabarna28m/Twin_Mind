@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import BackButton from '../components/BackButton';
 import { XPStoreProvider, useXPStore } from '../contexts/XPStoreContext';
 import type { ShopItem } from '../contexts/XPStoreContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface ItemDef {
   key:       ShopItem;
   icon:      string;
-  name:      string;
-  tagline:   string;
+  nameKey:   string;
+  tagKey:    string;
   desc:      string[];
   priceKey:  'shield' | 'premium_shield' | 'streak_freeze' | 'double_xp';
   accent:    string;
@@ -17,8 +18,7 @@ interface ItemDef {
 
 const SHOP_ITEMS: ItemDef[] = [
   {
-    key: 'shield', icon: '🛡️', name: 'Streak Shield',
-    tagline: 'Protects your streak for 1 missed day',
+    key: 'shield', icon: '🛡️', nameKey: 'shop_shield_name', tagKey: 'shop_shield_tag',
     desc: [
       'Auto-activates silently when you miss a single check-in.',
       'Keeps your streak alive without any action from you.',
@@ -27,8 +27,7 @@ const SHOP_ITEMS: ItemDef[] = [
     priceKey: 'shield', accent: '#6366f1',
   },
   {
-    key: 'premium_shield', icon: '🛡️', name: 'Premium Shield',
-    tagline: 'Protects your streak for up to 3 missed days',
+    key: 'premium_shield', icon: '🛡️', nameKey: 'shop_premium_name', tagKey: 'shop_premium_tag',
     desc: [
       'Covers up to 3 consecutive missed check-in days.',
       'Perfect for travel, weekends, or exam cram weeks.',
@@ -37,8 +36,7 @@ const SHOP_ITEMS: ItemDef[] = [
     priceKey: 'premium_shield', accent: '#a78bfa', badge: 'PREMIUM',
   },
   {
-    key: 'streak_freeze', icon: '🔥', name: 'Streak Freeze',
-    tagline: 'Manually freeze your streak for one day',
+    key: 'streak_freeze', icon: '🔥', nameKey: 'shop_freeze_name', tagKey: 'shop_freeze_tag',
     desc: [
       'Activate when you know you\'ll miss a day in advance.',
       'Freezes your streak for the rest of today (UTC).',
@@ -47,8 +45,7 @@ const SHOP_ITEMS: ItemDef[] = [
     priceKey: 'streak_freeze', accent: '#f97316',
   },
   {
-    key: 'double_xp', icon: '⭐', name: 'Double XP Boost',
-    tagline: 'Earn 2× XP for the next 24 hours',
+    key: 'double_xp', icon: '⭐', nameKey: 'shop_double_name', tagKey: 'shop_double_tag',
     desc: [
       'Every activity awards double XP for 24 hours.',
       'Stack with a quiz marathon for maximum gains.',
@@ -60,6 +57,7 @@ const SHOP_ITEMS: ItemDef[] = [
 
 function ShopContent() {
   const { status, loading, buying, lastMsg, buy, clearMsg, refresh } = useXPStore();
+  const { t } = useLanguage();
 
   useEffect(() => { refresh(); }, []);
 
@@ -114,27 +112,27 @@ function ShopContent() {
         {/* Hero */}
         <div style={p.hero}>
           <div style={p.heroOrb} />
-          <h1 style={p.heading}>🛒 XP Shop</h1>
-          <p style={p.heroSub}>Spend your earned XP on streak protection and performance boosts.</p>
+          <h1 style={p.heading}>🛒 {t('shop_title')}</h1>
+          <p style={p.heroSub}>{t('shop_subtitle')}</p>
         </div>
 
         {/* XP Balance */}
         <div style={p.balanceCard}>
           <div style={p.balanceInner}>
             <div>
-              <p style={p.balLabel}>Available XP</p>
+              <p style={p.balLabel}>{t('shop_avail_xp')}</p>
               <p style={p.balValue}>{availXp.toLocaleString()} <span style={p.balUnit}>XP</span></p>
             </div>
             <div style={{ textAlign: 'right' as const }}>
-              <p style={p.balLabel}>Total Earned</p>
+              <p style={p.balLabel}>{t('shop_total_earned')}</p>
               <p style={{ ...p.balValue, color: '#64748b', fontSize: '1.2rem' }}>
                 {totalXp.toLocaleString()} XP
               </p>
             </div>
             <div style={{ textAlign: 'right' as const }}>
-              <p style={p.balLabel}>🔥 Streak</p>
+              <p style={p.balLabel}>🔥 {t('shop_streak')}</p>
               <p style={{ ...p.balValue, color: '#f97316', fontSize: '1.2rem' }}>
-                {status?.streak_days ?? 0} days
+                {status?.streak_days ?? 0} {t('shop_days')}
               </p>
             </div>
           </div>
@@ -155,7 +153,7 @@ function ShopContent() {
         )}
 
         {/* Items */}
-        <div style={p.sectionHead}>Items</div>
+        <div style={p.sectionHead}>{t('shop_items')}</div>
         <div style={p.grid}>
           {SHOP_ITEMS.map(item => {
             const price    = pricing ? (pricing as Record<string, number>)[item.priceKey] : null;
@@ -178,8 +176,8 @@ function ShopContent() {
                   </div>
                 </div>
 
-                <h3 style={p.itemName}>{item.name}</h3>
-                <p style={{ ...p.itemTagline, color: item.accent }}>{item.tagline}</p>
+                <h3 style={p.itemName}>{t(item.nameKey)}</h3>
+                <p style={{ ...p.itemTagline, color: item.accent }}>{t(item.tagKey)}</p>
                 <ul style={p.descList}>
                   {item.desc.map(d => <li key={d} style={p.descItem}>• {d}</li>)}
                 </ul>
@@ -204,7 +202,7 @@ function ShopContent() {
                     disabled={disabled || !afford}
                     onClick={() => !disabled && afford && buy(item.key)}
                   >
-                    {isBuying ? '…' : full ? 'Full' : active ? 'Active' : !afford ? 'Need XP' : 'Buy'}
+                    {isBuying ? '…' : full ? t('shop_full') : active ? t('shop_active') : !afford ? t('shop_need_xp') : t('shop_buy')}
                   </button>
                 </div>
               </div>
@@ -213,7 +211,7 @@ function ShopContent() {
         </div>
 
         {/* Earn XP guide */}
-        <div style={p.sectionHead}>How to Earn XP</div>
+        <div style={p.sectionHead}>{t('shop_earn_guide')}</div>
         <div style={p.earnGrid}>
           {[
             { icon: '📋', act: 'Daily Check-in',   xp: '10 XP each'        },
@@ -236,7 +234,7 @@ function ShopContent() {
         </div>
 
         {/* Free shields */}
-        <div style={p.sectionHead}>Earn Free Shields via Achievements</div>
+        <div style={p.sectionHead}>{t('shop_free_shields')}</div>
         <div style={p.freeList}>
           {[
             { icon: '⚔️', name: 'Week Warrior',  streak: 7,   reward: '+1 Shield' },

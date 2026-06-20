@@ -18,6 +18,7 @@ class MentorMessage(BaseModel):
 class MentorChatRequest(BaseModel):
     message: str
     history: List[MentorMessage] = []
+    language: Optional[str] = 'en'
 
 
 class HistoryMessage(BaseModel):

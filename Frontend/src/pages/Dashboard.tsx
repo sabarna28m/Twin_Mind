@@ -562,32 +562,32 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
   /* ── NAV GROUPS ── */
   const navGroups = [
     {
-      id: 'learning', label: 'Learning',
+      id: 'learning', label: t('nav_group_learning'),
       items: [
-        { icon: BookOpen,      label: 'Sessions',       desc: 'Track study sessions',       to: '/sessions',      tour: 'sessions'  },
-        { icon: FileText,      label: 'Smart Notes',    desc: 'AI-enhanced notes',          to: '/notes'                           },
-        { icon: Brain,         label: 'Quiz',           desc: 'Adaptive practice quizzes',  to: '/quiz',          tour: 'quiz'      },
-        { icon: Video,         label: 'AI Videos',      desc: 'Video learning resources',   to: '/videos'                          },
+        { icon: BookOpen,      label: t('nav_sessions'),    desc: 'Track study sessions',       to: '/sessions',      tour: 'sessions'  },
+        { icon: FileText,      label: t('nav_smart_notes'), desc: 'AI-enhanced notes',          to: '/notes'                           },
+        { icon: Brain,         label: t('nav_quiz'),        desc: 'Adaptive practice quizzes',  to: '/quiz',          tour: 'quiz'      },
+        { icon: Video,         label: t('nav_videos'),      desc: 'Video learning resources',   to: '/videos'                          },
       ],
     },
     {
-      id: 'performance', label: 'Performance',
+      id: 'performance', label: t('nav_group_performance'),
       items: [
-        { icon: BarChart2,     label: 'Progress',       desc: 'Track your progress',        to: '/progress'                        },
-        { icon: Trophy,        label: 'Achievements',   desc: 'Badges & milestones',        to: '/achievements'                    },
-        { icon: TrendingUp,    label: 'Predict',        desc: 'AI score prediction',        to: '/predict'                         },
-        { icon: Shield,        label: 'Burnout Guard',  desc: 'Monitor & prevent burnout',  to: '/burnout'                         },
+        { icon: BarChart2,     label: t('nav_progress'),      desc: 'Track your progress',        to: '/progress'                        },
+        { icon: Trophy,        label: t('nav_achievements'),  desc: 'Badges & milestones',        to: '/achievements'                    },
+        { icon: TrendingUp,    label: t('nav_predict'),       desc: 'AI score prediction',        to: '/predict'                         },
+        { icon: Shield,        label: t('nav_burnout'),       desc: 'Monitor & prevent burnout',  to: '/burnout'                         },
       ],
     },
     {
-      id: 'ai', label: 'AI Tools',
+      id: 'ai', label: t('nav_group_ai'),
       items: [
-        { icon: Layers,        label: 'Twin AI',        desc: 'Your digital study twin',    to: '/twin',          tour: 'twin'     },
-        { icon: Rocket,        label: 'Career AI',      desc: 'Career guidance & insights', to: '/career'                          },
-        { icon: Mic2,          label: 'Comm Twin',      desc: 'Communication practice',     to: '/comm-twin'                       },
-        { icon: MessageCircle, label: 'Mentor AI',      desc: 'Personalized AI mentor',     to: '/mentor',        tour: 'mentor'   },
-        { icon: Zap,           label: 'Simulate',       desc: 'Exam simulation',            to: '/simulate',      tour: 'simulate' },
-        { icon: Sword,         label: 'Battles',        desc: 'Competitive quiz battles',   to: '/battles'                         },
+        { icon: Layers,        label: t('nav_twin'),        desc: 'Your digital study twin',    to: '/twin',          tour: 'twin'     },
+        { icon: Rocket,        label: t('nav_career'),      desc: 'Career guidance & insights', to: '/career'                          },
+        { icon: Mic2,          label: t('nav_comm_twin'),   desc: 'Communication practice',     to: '/comm-twin'                       },
+        { icon: MessageCircle, label: t('nav_mentor'),      desc: 'Personalized AI mentor',     to: '/mentor',        tour: 'mentor'   },
+        { icon: Zap,           label: t('nav_simulate'),    desc: 'Exam simulation',            to: '/simulate',      tour: 'simulate' },
+        { icon: Sword,         label: t('nav_battles'),     desc: 'Competitive quiz battles',   to: '/battles'                         },
       ],
     },
   ];

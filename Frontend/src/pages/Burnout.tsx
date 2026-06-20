@@ -5,6 +5,7 @@ import {
   ResponsiveContainer, ReferenceLine,
 } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import BackButton from '../components/BackButton';
 import api from '../services/api';
 
@@ -179,6 +180,7 @@ function BurnoutTooltip({ active, payload, label }: {
 
 export default function Burnout() {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   // Form state
   const [studyH, setStudyH]     = useState(6);
@@ -292,9 +294,9 @@ export default function Burnout() {
         <BackButton />
         <div style={p.topBarCenter}>
           <span style={p.topIcon}>🧠</span>
-          <h1 style={p.pageTitle}>Burnout Risk</h1>
+          <h1 style={p.pageTitle}>{t('burnout_title')}</h1>
         </div>
-        <Link to="/" style={p.homeLink}>Dashboard</Link>
+        <Link to="/" style={p.homeLink}>{t('back_dashboard')}</Link>
       </div>
 
       <div style={p.content}>
@@ -305,7 +307,7 @@ export default function Burnout() {
             <div style={p.alertLeft}>
               <span style={p.alertIcon}>⚠️</span>
               <div>
-                <p style={p.alertTitle}>High Burnout Risk Detected</p>
+                <p style={p.alertTitle}>{t('burnout_alert_title')}</p>
                 <p style={p.alertMsg}>{alertMsg}</p>
               </div>
             </div>
@@ -314,7 +316,7 @@ export default function Burnout() {
                 style={p.alertViewBtn}
                 onClick={() => document.getElementById('recommendations')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                View Recommendations
+                {t('burnout_view_recs')}
               </button>
               <button style={p.alertDismissBtn} onClick={() => setAlertDismissed(true)}>✕</button>
             </div>
@@ -327,7 +329,7 @@ export default function Burnout() {
           {/* Left: Score widget */}
           <section style={p.card}>
             <div style={p.cardHead}>
-              <h2 style={p.cardTitle}>Burnout Score</h2>
+              <h2 style={p.cardTitle}>{t('burnout_score_title')}</h2>
               {displayed && (
                 <span style={{ ...p.riskBadge, background: `${riskColor(displayedRisk)}22`, color: riskColor(displayedRisk), border: `1px solid ${riskColor(displayedRisk)}44` }}>
                   {riskEmoji(displayedRisk)} {riskLabel(displayedRisk)}
@@ -392,7 +394,7 @@ export default function Burnout() {
           {/* Right: Check-in form */}
           <section style={p.card}>
             <div style={p.cardHead}>
-              <h2 style={p.cardTitle}>Today's Check-in</h2>
+              <h2 style={p.cardTitle}>{t('burnout_checkin_title')}</h2>
               <span style={p.dateBadge}>{new Date().toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
             </div>
 
@@ -401,7 +403,7 @@ export default function Burnout() {
               {/* Study Hours */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>📚 Study Hours</label>
+                  <label style={p.fieldLabel}>📚 {t('burnout_study_h')}</label>
                   <span style={p.fieldVal}>{studyH.toFixed(1)}h {studyH > 8 && <span style={p.warnTag}>⚠ High</span>}</span>
                 </div>
                 <input type="range" min={0} max={16} step={0.5} value={studyH}
@@ -412,7 +414,7 @@ export default function Burnout() {
               {/* Sleep Hours */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>😴 Sleep Hours</label>
+                  <label style={p.fieldLabel}>😴 {t('burnout_sleep_h')}</label>
                   <span style={p.fieldVal}>{sleepH.toFixed(1)}h {sleepH < 6 && <span style={p.warnTag}>⚠ Low</span>}</span>
                 </div>
                 <input type="range" min={0} max={12} step={0.5} value={sleepH}
@@ -423,7 +425,7 @@ export default function Burnout() {
               {/* Breaks */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>☕ Breaks Taken</label>
+                  <label style={p.fieldLabel}>☕ {t('burnout_breaks')}</label>
                   <span style={p.fieldVal}>{breaks} {breaks < 2 && <span style={p.warnTag}>⚠ Low</span>}</span>
                 </div>
                 <div style={p.counter}>
@@ -436,7 +438,7 @@ export default function Burnout() {
               {/* Mood */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>💛 Mood Rating</label>
+                  <label style={p.fieldLabel}>💛 {t('burnout_mood')}</label>
                   <span style={p.fieldVal}>{mood}/5</span>
                 </div>
                 <div style={p.emojiRow}>
@@ -453,7 +455,7 @@ export default function Burnout() {
               {/* Energy */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>⚡ Energy Level</label>
+                  <label style={p.fieldLabel}>⚡ {t('burnout_energy')}</label>
                   <span style={p.fieldVal}>{energy}/5</span>
                 </div>
                 <div style={p.emojiRow}>
@@ -470,7 +472,7 @@ export default function Burnout() {
               {/* Streak */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>🔥 Consecutive Study Days</label>
+                  <label style={p.fieldLabel}>🔥 {t('burnout_streak_days')}</label>
                   <span style={p.fieldVal}>{streak}d {streak > 10 && <span style={p.warnTag}>⚠ Long</span>}</span>
                 </div>
                 <div style={p.counter}>
@@ -491,7 +493,7 @@ export default function Burnout() {
               {formErr && <p style={p.errorBox}>{formErr}</p>}
 
               <button type="submit" disabled={submitting} style={{ ...p.submitBtn, opacity: submitting ? 0.7 : 1 }}>
-                {submitting ? 'Saving…' : submitted ? '✓ Update Check-in' : 'Submit Check-in'}
+                {submitting ? t('loading') : t('burnout_submit')}
               </button>
             </form>
           </section>
@@ -500,7 +502,7 @@ export default function Burnout() {
         {/* ── AI Recommendations ── */}
         {(displayedRecs.length > 0 || preview.score > 0) && (
           <section id="recommendations" style={p.card}>
-            <h2 style={p.cardTitle}>💡 AI Recommendations</h2>
+            <h2 style={p.cardTitle}>💡 {t('burnout_recs')}</h2>
             <div style={p.recGrid} className="burnout-rec-grid">
               {(displayedRecs.length > 0
                 ? displayedRecs.map((r, i) => ({ icon: ['😴','☕','💛','⚡','🗓','📚','✅','💧'][i % 8], title: ['Wellbeing Tip', 'Recovery', 'Focus', 'Energy', 'Rest Day', 'Study Load', 'Great Work', 'Hydration'][i % 8], text: r }))
@@ -522,8 +524,8 @@ export default function Burnout() {
             <div style={p.twinHead}>
               <div style={p.twinAvatar}>◈</div>
               <div>
-                <h2 style={p.cardTitle}>AI Twin Says</h2>
-                <p style={p.twinSub}>Your digital study companion</p>
+                <h2 style={p.cardTitle}>{t('burnout_twin_says')}</h2>
+                <p style={p.twinSub}>{t('twin_title')}</p>
               </div>
             </div>
             <div style={p.twinBubble}>
@@ -539,7 +541,7 @@ export default function Burnout() {
         {/* ── Burnout Trend ── */}
         <section style={p.card}>
           <div style={p.cardHead}>
-            <h2 style={p.cardTitle}>📈 Burnout Trend</h2>
+            <h2 style={p.cardTitle}>📈 {t('burnout_trend')}</h2>
             <div style={p.toggleGroup}>
               {([7, 30] as const).map(d => (
                 <button key={d} style={{ ...p.toggleBtn, background: trendDays === d ? 'rgba(99,102,241,0.25)' : 'transparent', color: trendDays === d ? '#818cf8' : 'var(--text)', border: `1px solid ${trendDays === d ? 'rgba(99,102,241,0.5)' : 'rgba(255,255,255,0.1)'}` }}

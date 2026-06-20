@@ -117,7 +117,7 @@ function WelcomeBubble() {
 
 export default function Mentor() {
   const { token, user } = useAuth();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const [messages,       setMessages]       = useState<ChatMessage[]>([]);
   const [input,          setInput]          = useState('');
@@ -376,7 +376,7 @@ export default function Mentor() {
       const response = await fetch(`${API_BASE}/mentor/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ message: apiMessage, history }),
+        body: JSON.stringify({ message: apiMessage, history, language: lang }),
       });
 
       if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
