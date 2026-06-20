@@ -31,7 +31,9 @@ from app.models import smart_note  # noqa: F401
 from app.models import note_history  # noqa: F401
 from app.models import note_version  # noqa: F401
 from app.models import skill_tree  # noqa: F401
+from app.models import streak_shield  # noqa: F401
 from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes, notifications as notif_routes, quiz as quiz_routes, gamification as gamif_routes, battles as battle_routes, calendar as calendar_routes, smart_plan as smart_plan_routes
+from app.api.routes import streak_protection as shield_routes
 from app.api.routes import websocket as ws_routes
 from app.api.routes import videos as video_routes
 from app.api.routes import burnout as burnout_routes
@@ -264,6 +266,20 @@ with engine.connect() as _conn:
             "UNIQUE(user_id, achievement_id))"
         ),
         "CREATE INDEX IF NOT EXISTS ix_sta_user ON skill_tree_achievements(user_id)",
+        (
+            "CREATE TABLE IF NOT EXISTS streak_shields ("
+            "id INTEGER PRIMARY KEY, "
+            "user_id INTEGER NOT NULL REFERENCES users(id) UNIQUE, "
+            "shield_count INTEGER NOT NULL DEFAULT 0, "
+            "auto_use_shield BOOLEAN NOT NULL DEFAULT 1, "
+            "recovery_used_month INTEGER, "
+            "recovery_used_year INTEGER, "
+            "streak_recovery_deadline DATETIME, "
+            "shield_protected_dates TEXT NOT NULL DEFAULT '[]', "
+            "xp_spent INTEGER NOT NULL DEFAULT 0, "
+            "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
+        ),
+        "CREATE INDEX IF NOT EXISTS ix_streak_shields_user_id ON streak_shields(user_id)",
     ]:
         try:
             _conn.execute(text(_sql))
@@ -312,6 +328,7 @@ app.include_router(comm_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(smart_notes_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(skill_tree_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(missions_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(shield_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(ws_routes.router)
 
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"

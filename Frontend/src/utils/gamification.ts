@@ -71,3 +71,33 @@ export function getLevelGradient(level: number): string {
 export function levelStorageKey(userId: string | number) {
   return `tm_lv_${userId}`;
 }
+
+export const SHIELD_COST   = 100;
+export const RECOVERY_COST = 200;
+export const MAX_SHIELDS   = 5;
+
+export interface StreakShieldStatus {
+  shield_count:              number;
+  auto_use_shield:           boolean;
+  streak_days:               number;
+  last_checkin:              string | null;
+  can_recover:               boolean;
+  recovery_deadline:         string | null;
+  recovery_used_this_month:  boolean;
+  next_milestone:            number | null;
+  xp_spent:                  number;
+  available_xp:              number;
+}
+
+export interface ShieldCheckResult {
+  shield_used:  boolean;
+  recovery_set: boolean;
+  shield_count: number;
+  streak_days:  number;
+}
+
+export const STREAK_SHIELD_REWARDS: Record<string, number> = {
+  week_warrior: 1,
+  month_master: 2,
+  unstoppable:  3,
+}

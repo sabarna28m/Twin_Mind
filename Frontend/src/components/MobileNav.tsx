@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   X, BookOpen, FileText, BarChart2, CheckSquare, Trophy, Brain,
   Zap, MessageCircle, Layers, Sword, Video, User, LogOut,
-  Rocket, Mic2, Shield, TrendingUp,
+  Rocket, Mic2, Shield, TrendingUp, ShoppingBag,
 } from 'lucide-react';
 
 interface NavItem {
@@ -36,7 +36,8 @@ const NAV_GROUPS: NavGroup[] = [
       { to: '/progress',     Icon: BarChart2,   label: 'Progress'      },
       { to: '/achievements', Icon: Trophy,      label: 'Achievements'  },
       { to: '/predict',      Icon: TrendingUp,  label: 'AI Predict'    },
-      { to: '/burnout',      Icon: Shield,      label: 'Burnout Guard' },
+      { to: '/burnout',      Icon: Shield,        label: 'Burnout Guard' },
+      { to: '/shop',         Icon: ShoppingBag,   label: 'XP Shop'       },
     ],
   },
   {

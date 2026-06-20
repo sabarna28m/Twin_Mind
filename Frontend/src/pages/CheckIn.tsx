@@ -8,7 +8,7 @@ import { WS_URL } from '../lib/config';
 import BadgeNotification, { type Badge } from '../components/BadgeNotification';
 import BackButton from '../components/BackButton';
 import LevelUpCelebration from '../components/LevelUpCelebration';
-import { levelStorageKey, STREAK_MILESTONES, type GamificationProgress } from '../utils/gamification';
+import { levelStorageKey, STREAK_MILESTONES, type GamificationProgress, type ShieldCheckResult } from '../utils/gamification';
 
 interface LearningEntry {
   id: number;
@@ -90,11 +90,12 @@ export default function CheckIn() {
   const [stress,     setStress]     = useState(0);
   const [notes,      setNotes]      = useState('');
 
-  const [saving,        setSaving]        = useState(false);
-  const [msg,           setMsg]           = useState<{ ok: boolean; text: string } | null>(null);
-  const [newBadges,     setNewBadges]     = useState<Badge[]>([]);
-  const [levelUpData,   setLevelUpData]   = useState<GamificationProgress | null>(null);
+  const [saving,          setSaving]          = useState(false);
+  const [msg,             setMsg]             = useState<{ ok: boolean; text: string } | null>(null);
+  const [newBadges,       setNewBadges]       = useState<Badge[]>([]);
+  const [levelUpData,     setLevelUpData]     = useState<GamificationProgress | null>(null);
   const [streakMilestone, setStreakMilestone] = useState<number | null>(null);
+  const [shieldMsg,       setShieldMsg]       = useState<string | null>(null);
 
   // Survey state
   const [showSurvey,    setShowSurvey]    = useState(false);
@@ -226,6 +227,15 @@ export default function CheckIn() {
           setStreakMilestone(prog.streak_days);
         }
       } catch { /* non-critical */ }
+      // Shield auto-use / recovery detection
+      try {
+        const { data: sc } = await api.post<ShieldCheckResult>('/streak-protection/check');
+        if (sc.shield_used) {
+          setShieldMsg(`🛡️ Streak Shield activated! Your ${sc.streak_days}-day streak is protected. (${sc.shield_count} shield${sc.shield_count !== 1 ? 's' : ''} left)`);
+        } else if (sc.recovery_set) {
+          setShieldMsg('⚡ You missed a check-in. Recover your streak within 24 hours in the Streak Protection panel.');
+        }
+      } catch { /* non-critical */ }
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setMsg({ ok: false, text: detail ?? 'Failed to save.' });
@@ -251,6 +261,19 @@ export default function CheckIn() {
       {newBadges.length > 0 && <BadgeNotification badges={newBadges} onDone={() => setNewBadges([])} />}
       {levelUpData && <LevelUpCelebration type="level_up" level={levelUpData.level} xp={levelUpData.xp} onClose={() => setLevelUpData(null)} />}
       {streakMilestone && <LevelUpCelebration type="streak" streak={streakMilestone} onClose={() => setStreakMilestone(null)} />}
+      {shieldMsg && (
+        <div style={{
+          position: 'fixed', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)',
+          zIndex: 2000, maxWidth: '480px', width: 'calc(100% - 2rem)',
+          background: 'rgba(4,8,22,0.97)', border: '1px solid rgba(99,102,241,0.4)',
+          borderRadius: '14px', padding: '0.85rem 1.1rem',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem',
+        }}>
+          <span style={{ fontSize: '0.82rem', color: '#e2e8f0', lineHeight: 1.4 }}>{shieldMsg}</span>
+          <button onClick={() => setShieldMsg(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1rem', flexShrink: 0, fontFamily: 'inherit' }}>✕</button>
+        </div>
+      )}
 
       <header style={s.nav}>
         <div style={s.navLeft}>

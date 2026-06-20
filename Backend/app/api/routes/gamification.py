@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import date, timedelta
 from typing import Optional
@@ -11,6 +12,7 @@ from app.core.database import get_db
 from app.models.achievement import UserAchievement
 from app.models.learning_data import LearningData
 from app.models.quiz import QuizSession
+from app.models.streak_shield import StreakShield
 from app.models.user import User
 from app.models.weekly_challenge import WeeklyChallenge
 
@@ -34,14 +36,33 @@ def xp_to_level(xp: int) -> int:
     return level
 
 
-def _compute_streak(entries: list) -> int:
+# Bonus XP awarded when a streak crosses these milestones (cumulative)
+STREAK_MILESTONE_XP: dict[int, int] = {7: 50, 30: 150, 100: 500, 365: 1500}
+
+
+def _compute_streak(entries: list, protected_dates: set | None = None) -> int:
     dates = {e.date for e in entries}
+    if protected_dates:
+        dates |= protected_dates
     streak = 0
     d = date.today()
     while d in dates:
         streak += 1
         d -= timedelta(days=1)
     return streak
+
+
+def _load_shield(user_id: int, db: DBSession):
+    return db.query(StreakShield).filter(StreakShield.user_id == user_id).first()
+
+
+def _protected_dates(shield) -> set:
+    if not shield:
+        return set()
+    try:
+        return {date.fromisoformat(d) for d in json.loads(shield.shield_protected_dates or "[]")}
+    except Exception:
+        return set()
 
 
 def get_week_start() -> date:
@@ -62,39 +83,50 @@ def compute_progress(user_id: int, db: DBSession) -> dict:
         .count()
     )
 
-    streak = _compute_streak(entries)
+    shield    = _load_shield(user_id, db)
+    protected = _protected_dates(shield)
+    streak    = _compute_streak(entries, protected)
+
     high_scores = sum(1 for q in quizzes if q.total and (q.score / q.total) >= 0.8)
 
-    checkin_xp     = len(entries) * 10
-    quiz_xp        = len(quizzes) * 20
-    high_score_xp  = high_scores * 30
-    streak_xp      = streak * 5
-    achievement_xp = earned_count * 50
+    checkin_xp      = len(entries) * 10
+    quiz_xp         = len(quizzes) * 20
+    high_score_xp   = high_scores * 30
+    streak_xp       = streak * 5
+    achievement_xp  = earned_count * 50
+    milestone_bonus = sum(v for k, v in STREAK_MILESTONE_XP.items() if streak >= k)
 
-    xp = checkin_xp + quiz_xp + high_score_xp + streak_xp + achievement_xp
+    xp    = checkin_xp + quiz_xp + high_score_xp + streak_xp + achievement_xp + milestone_bonus
     level = xp_to_level(xp)
 
-    level_start = XP_THRESHOLDS[level]
-    level_end   = XP_THRESHOLDS[level + 1] if level < 10 else XP_THRESHOLDS[10] + 500
-    xp_in_level = xp - level_start
+    level_start  = XP_THRESHOLDS[level]
+    level_end    = XP_THRESHOLDS[level + 1] if level < 10 else XP_THRESHOLDS[10] + 500
+    xp_in_level  = xp - level_start
     xp_for_level = level_end - level_start
     progress_pct = 100 if level == 10 else min(100, round(xp_in_level / xp_for_level * 100))
 
+    xp_spent     = shield.xp_spent if shield else 0
+    available_xp = max(0, xp - xp_spent)
+
     return {
-        "xp": xp,
-        "level": level,
-        "level_name": LEVEL_NAMES[level],
-        "xp_in_level": xp_in_level,
+        "xp":           xp,
+        "available_xp": available_xp,
+        "xp_spent":     xp_spent,
+        "level":        level,
+        "level_name":   LEVEL_NAMES[level],
+        "xp_in_level":  xp_in_level,
         "xp_for_level": xp_for_level,
-        "xp_to_next": max(0, xp_for_level - xp_in_level),
+        "xp_to_next":   max(0, xp_for_level - xp_in_level),
         "progress_pct": progress_pct,
-        "streak_days": streak,
+        "streak_days":  streak,
+        "shield_count": shield.shield_count if shield else 0,
         "breakdown": {
-            "checkins":     checkin_xp,
-            "quizzes":      quiz_xp,
-            "high_scores":  high_score_xp,
-            "streak":       streak_xp,
-            "achievements": achievement_xp,
+            "checkins":        checkin_xp,
+            "quizzes":         quiz_xp,
+            "high_scores":     high_score_xp,
+            "streak":          streak_xp,
+            "achievements":    achievement_xp,
+            "streak_milestones": milestone_bonus,
         },
     }
 

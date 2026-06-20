@@ -63,6 +63,7 @@ import CareerDevelopment from './pages/CareerDevelopment';
 import CommTwin from './pages/CommTwin';
 import SmartNotes from './pages/SmartNotes';
 import SkillTree from './pages/SkillTree';
+import Shop from './pages/Shop';
 
 export default function App() {
   return (
@@ -158,6 +159,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <CheckIn />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/shop"
+            element={
+              <ProtectedRoute>
+                <Shop />
               </ProtectedRoute>
             }
           />

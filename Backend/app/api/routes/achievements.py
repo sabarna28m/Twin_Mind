@@ -20,9 +20,32 @@ from app.models.mentor_conversation import MentorConversation
 from app.models.comm_twin import CommTwin
 from app.models.student_profile import StudentProfile
 from app.api.routes.auth import get_current_user
-from app.services.notifications import create_badge_notification
+from app.models.streak_shield import StreakShield
+from app.services.notifications import create_badge_notification, notify_shield_earned
 
 router = APIRouter(prefix="/achievements", tags=["achievements"])
+
+# Shields granted when these streak badges are newly earned
+_STREAK_BADGE_SHIELDS: dict[str, int] = {
+    "week_warrior": 1,
+    "month_master": 2,
+    "unstoppable":  3,
+}
+
+
+def _grant_shields_for_badges(new_ids: set, user_id: int, db: DBSession) -> None:
+    grants = sum(_STREAK_BADGE_SHIELDS.get(bid, 0) for bid in new_ids)
+    if not grants:
+        return
+    shield = db.query(StreakShield).filter(StreakShield.user_id == user_id).first()
+    if not shield:
+        shield = StreakShield(user_id=user_id)
+        db.add(shield)
+    prev = shield.shield_count
+    shield.shield_count = min(5, prev + grants)
+    db.commit()
+    if shield.shield_count > prev:
+        notify_shield_earned(db, user_id, shield.shield_count)
 
 # ── XP / Level helpers (mirrors gamification.py without importing it) ──────────
 _XP_THRESHOLDS = [0, 0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 3800]
@@ -646,5 +669,8 @@ def check_and_award(
     new_badges = [b for b in BADGES if b["id"] in new_ids]
     for badge in new_badges:
         create_badge_notification(db, uid, badge)
+
+    # Grant streak shields for milestone badges
+    _grant_shields_for_badges(new_ids, uid, db)
 
     return {"new_badges": new_badges}

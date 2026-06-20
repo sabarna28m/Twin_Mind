@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   BookOpen, FileText, BarChart2, Trophy, Brain, Zap,
   MessageCircle, Layers, Menu, Rocket, Mic2, ChevronDown, Video,
-  Shield, TrendingUp, Sword,
+  Shield, TrendingUp, Sword, ShoppingBag,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -25,6 +25,7 @@ import AICommandCenter from '../components/AICommandCenter';
 import AITwinAssistant from '../components/AITwinAssistant';
 import SmartDailyMission from '../components/SmartDailyMission';
 import HeroPriorityCard from '../components/HeroPriorityCard';
+import StreakShieldCard from '../components/StreakShieldCard';
 
 const BACKEND = BACKEND_URL;
 
@@ -573,6 +574,7 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
         { icon: Trophy,        label: 'Achievements',   desc: 'Badges & milestones',        to: '/achievements'                    },
         { icon: TrendingUp,    label: 'Predict',        desc: 'AI score prediction',        to: '/predict'                         },
         { icon: Shield,        label: 'Burnout Guard',  desc: 'Monitor & prevent burnout',  to: '/burnout'                         },
+        { icon: ShoppingBag,   label: 'XP Shop',        desc: 'Spend XP on streak shields',  to: '/shop'                            },
       ],
     },
     {
@@ -866,6 +868,12 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
         <section className="dash-section">
           <SectionHeader badge="AI INTELLIGENCE" title="Live Performance Monitor" />
           <AICommandCenter brainReadiness={health.pct} streak={streak} level={gamProgress?.level} />
+        </section>
+
+        {/* ── STREAK PROTECTION ── */}
+        <section className="dash-section">
+          <SectionHeader badge="STREAK PROTECTION" title="Streak Shield System" cta="XP Shop" ctaTo="/shop" />
+          <StreakShieldCard />
         </section>
 
         {/* ── S7: WELLNESS CENTER ── */}

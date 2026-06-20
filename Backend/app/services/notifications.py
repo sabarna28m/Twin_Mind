@@ -101,6 +101,65 @@ def maybe_notify_low_checkin(db: DBSession, user_id: int, entries) -> None:
         )
 
 
+def notify_shield_earned(db: DBSession, user_id: int, shield_count: int) -> None:
+    today = DateType.today()
+    _create(
+        db, user_id,
+        "shield_earned",
+        f"Congratulations! You earned a Streak Shield. You now have {shield_count} shield{'s' if shield_count != 1 else ''} ready.",
+        reference_key=f"shield_earned_{today.isoformat()}_{shield_count}",
+        priority="important",
+        category="achievement",
+        emoji="🛡️",
+        title="Streak Shield Earned",
+        action_url="/checkin",
+    )
+
+
+def notify_shield_used(db: DBSession, user_id: int, streak: int, shields_remaining: int) -> None:
+    today = DateType.today()
+    _create(
+        db, user_id,
+        "shield_used",
+        f"Your Streak Shield protected your {streak}-day streak! {shields_remaining} shield{'s' if shields_remaining != 1 else ''} remaining.",
+        reference_key=f"shield_used_{today.isoformat()}",
+        priority="important",
+        category="streak_milestone",
+        emoji="🛡️",
+        title="Streak Protected",
+        action_url="/checkin",
+    )
+
+
+def notify_recovery_available(db: DBSession, user_id: int, missed_date) -> None:
+    _create(
+        db, user_id,
+        "recovery_available",
+        f"You missed a check-in on {missed_date.strftime('%B %d')}. Recover your streak within 24 hours for 200 XP.",
+        reference_key=f"recovery_{missed_date.isoformat()}",
+        priority="critical",
+        category="streak_milestone",
+        emoji="⚡",
+        title="Streak Recovery Available",
+        action_url="/checkin",
+    )
+
+
+def notify_no_shields_warning(db: DBSession, user_id: int) -> None:
+    today = DateType.today()
+    _create(
+        db, user_id,
+        "no_shields",
+        "You have no Streak Shields remaining. Purchase one in the XP Shop to protect future streaks.",
+        reference_key=f"no_shields_{today.isoformat()}",
+        priority="important",
+        category="streak_milestone",
+        emoji="⚠️",
+        title="No Shields Remaining",
+        action_url="/shop",
+    )
+
+
 def maybe_notify_weekly_summary(db: DBSession, user_id: int, entries) -> None:
     today = DateType.today()
     year, week, _ = today.isocalendar()
