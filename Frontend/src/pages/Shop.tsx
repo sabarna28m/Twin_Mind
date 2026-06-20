@@ -1,40 +1,104 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import BackButton from '../components/BackButton';
-import api from '../services/api';
-import type { GamificationProgress, StreakShieldStatus } from '../utils/gamification';
-import { MAX_SHIELDS, RECOVERY_COST, SHIELD_COST } from '../utils/gamification';
+import { XPStoreProvider, useXPStore } from '../contexts/XPStoreContext';
+import type { ShopItem } from '../contexts/XPStoreContext';
 
-interface Purchase { ok: boolean; shield_count: number; available_xp: number }
+interface ItemDef {
+  key:       ShopItem;
+  icon:      string;
+  name:      string;
+  tagline:   string;
+  desc:      string[];
+  priceKey:  'shield' | 'premium_shield' | 'streak_freeze' | 'double_xp';
+  accent:    string;
+  badge?:    string;
+}
 
-export default function Shop() {
-  const [prog,   setProg]   = useState<GamificationProgress | null>(null);
-  const [shield, setShield] = useState<StreakShieldStatus | null>(null);
-  const [buying, setBuying] = useState(false);
-  const [msg,    setMsg]    = useState<{ ok: boolean; text: string } | null>(null);
+const SHOP_ITEMS: ItemDef[] = [
+  {
+    key: 'shield', icon: '🛡️', name: 'Streak Shield',
+    tagline: 'Protects your streak for 1 missed day',
+    desc: [
+      'Auto-activates silently when you miss a single check-in.',
+      'Keeps your streak alive without any action from you.',
+      'Maximum 5 in inventory.',
+    ],
+    priceKey: 'shield', accent: '#6366f1',
+  },
+  {
+    key: 'premium_shield', icon: '🛡️', name: 'Premium Shield',
+    tagline: 'Protects your streak for up to 3 missed days',
+    desc: [
+      'Covers up to 3 consecutive missed check-in days.',
+      'Perfect for travel, weekends, or exam cram weeks.',
+      'Maximum 5 in inventory.',
+    ],
+    priceKey: 'premium_shield', accent: '#a78bfa', badge: 'PREMIUM',
+  },
+  {
+    key: 'streak_freeze', icon: '🔥', name: 'Streak Freeze',
+    tagline: 'Manually freeze your streak for one day',
+    desc: [
+      'Activate when you know you\'ll miss a day in advance.',
+      'Freezes your streak for the rest of today (UTC).',
+      'One freeze per purchase.',
+    ],
+    priceKey: 'streak_freeze', accent: '#f97316',
+  },
+  {
+    key: 'double_xp', icon: '⭐', name: 'Double XP Boost',
+    tagline: 'Earn 2× XP for the next 24 hours',
+    desc: [
+      'Every activity awards double XP for 24 hours.',
+      'Stack with a quiz marathon for maximum gains.',
+      'Cannot stack multiple boosts.',
+    ],
+    priceKey: 'double_xp', accent: '#f59e0b', badge: 'HOT',
+  },
+];
 
-  useEffect(() => {
-    api.get<GamificationProgress>('/gamification/progress').then(r => setProg(r.data)).catch(() => {});
-    api.get<StreakShieldStatus>('/streak-protection/status').then(r => setShield(r.data)).catch(() => {});
-  }, []);
+function ShopContent() {
+  const { status, loading, buying, lastMsg, buy, clearMsg, refresh } = useXPStore();
 
-  const availableXp   = shield?.available_xp ?? (prog ? prog.xp : 0);
-  const shieldCount   = shield?.shield_count ?? 0;
-  const canBuy        = availableXp >= SHIELD_COST && shieldCount < MAX_SHIELDS;
-  const atMaxShields  = shieldCount >= MAX_SHIELDS;
+  useEffect(() => { refresh(); }, []);
 
-  async function handleBuy() {
-    setBuying(true); setMsg(null);
-    try {
-      const { data } = await api.post<Purchase>('/streak-protection/buy-shield');
-      setShield(prev => prev ? { ...prev, shield_count: data.shield_count, available_xp: data.available_xp } : prev);
-      setMsg({ ok: true, text: `Shield purchased! You now have ${data.shield_count} shield${data.shield_count !== 1 ? 's' : ''}.` });
-    } catch (e: unknown) {
-      const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setMsg({ ok: false, text: detail ?? 'Purchase failed.' });
-    } finally {
-      setBuying(false);
+  const pricing    = status?.pricing;
+  const availXp    = status?.available_xp ?? 0;
+  const totalXp    = availXp + (status?.xp_spent ?? 0);
+
+  function canAfford(priceKey: string) {
+    if (!pricing) return false;
+    return availXp >= (pricing as Record<string, number>)[priceKey];
+  }
+
+  function isActive(key: ShopItem) {
+    if (!status) return false;
+    if (key === 'streak_freeze') return status.streak_freeze_active;
+    if (key === 'double_xp')     return status.double_xp_active;
+    return false;
+  }
+
+  function isFull(key: ShopItem) {
+    if (!status) return false;
+    if (key === 'shield')         return status.shield_count >= 5;
+    if (key === 'premium_shield') return status.premium_shield_count >= 5;
+    return false;
+  }
+
+  function inventoryText(key: ShopItem) {
+    if (!status) return '';
+    if (key === 'shield')         return `${status.shield_count}/5 owned`;
+    if (key === 'premium_shield') return `${status.premium_shield_count}/5 owned`;
+    if (key === 'streak_freeze')  return status.streak_freeze_active ? '🟢 Active today' : 'Not active';
+    if (key === 'double_xp') {
+      if (status.double_xp_active && status.double_xp_expires) {
+        const mins = Math.max(0, Math.floor((new Date(status.double_xp_expires).getTime() - Date.now()) / 60000));
+        return `🟢 Active · ${mins}m left`;
+      }
+      return 'Not active';
     }
+    return '';
   }
 
   return (
@@ -47,131 +111,124 @@ export default function Shop() {
       </header>
 
       <main style={p.main}>
+        {/* Hero */}
         <div style={p.hero}>
-          <h1 style={p.heading}>🎁 XP Shop</h1>
-          <p style={p.sub}>Spend earned XP to protect your streaks and unlock rewards.</p>
+          <div style={p.heroOrb} />
+          <h1 style={p.heading}>🛒 XP Shop</h1>
+          <p style={p.heroSub}>Spend your earned XP on streak protection and performance boosts.</p>
         </div>
 
-        {/* XP balance card */}
+        {/* XP Balance */}
         <div style={p.balanceCard}>
-          <div style={p.balanceOrb} />
-          <div style={p.balanceRow}>
+          <div style={p.balanceInner}>
             <div>
-              <p style={p.balanceLabel}>Available XP</p>
-              <p style={p.balanceValue}>{availableXp.toLocaleString()} <span style={{ fontSize: '1.1rem', opacity: 0.5 }}>XP</span></p>
+              <p style={p.balLabel}>Available XP</p>
+              <p style={p.balValue}>{availXp.toLocaleString()} <span style={p.balUnit}>XP</span></p>
             </div>
             <div style={{ textAlign: 'right' as const }}>
-              <p style={p.balanceLabel}>Total Earned</p>
-              <p style={{ ...p.balanceValue, color: '#94a3b8', fontSize: '1.1rem' }}>
-                {(prog?.xp ?? 0).toLocaleString()} XP
+              <p style={p.balLabel}>Total Earned</p>
+              <p style={{ ...p.balValue, color: '#64748b', fontSize: '1.2rem' }}>
+                {totalXp.toLocaleString()} XP
+              </p>
+            </div>
+            <div style={{ textAlign: 'right' as const }}>
+              <p style={p.balLabel}>🔥 Streak</p>
+              <p style={{ ...p.balValue, color: '#f97316', fontSize: '1.2rem' }}>
+                {status?.streak_days ?? 0} days
               </p>
             </div>
           </div>
-          <div style={p.xpBreakdownRow}>
-            {prog && Object.entries(prog.breakdown).map(([k, v]) => (
-              <div key={k} style={p.xpChip}>
-                <span style={{ fontWeight: 700 }}>{v}</span>
-                <span style={{ opacity: 0.55, fontSize: '0.6rem' }}>{k.replace('_', ' ')}</span>
-              </div>
-            ))}
+          <div style={p.balShields}>
+            <span style={p.shieldChip}>🛡️ ×{status?.shield_count ?? 0}</span>
+            <span style={p.shieldChip}>🛡️✨ ×{status?.premium_shield_count ?? 0}</span>
+            {status?.streak_freeze_active && <span style={{ ...p.shieldChip, borderColor: 'rgba(249,115,22,0.3)', color: '#f97316' }}>🔥 Freeze Active</span>}
+            {status?.double_xp_active     && <span style={{ ...p.shieldChip, borderColor: 'rgba(245,158,11,0.3)', color: '#f59e0b' }}>⭐ 2× XP Active</span>}
           </div>
         </div>
 
-        {/* Shop items */}
-        <div style={p.sectionTitle}>Items</div>
-        <div style={p.grid}>
-
-          {/* Shield item */}
-          <div style={{ ...p.item, borderColor: atMaxShields ? 'rgba(148,163,184,0.1)' : 'rgba(99,102,241,0.25)' }}>
-            <div style={p.itemGlow} />
-            <div style={p.itemIcon}>🛡️</div>
-            <h3 style={p.itemName}>Streak Shield</h3>
-            <p style={p.itemDesc}>
-              Automatically protects your streak if you miss a single day.
-              Maximum {MAX_SHIELDS} shields in inventory.
-            </p>
-
-            {/* Inventory bar */}
-            <div style={p.invRow}>
-              <span style={p.invLabel}>Inventory: {shieldCount} / {MAX_SHIELDS}</span>
-              <div style={p.invTrack}>
-                {Array.from({ length: MAX_SHIELDS }).map((_, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      ...p.invDot,
-                      background: i < shieldCount ? '#a78bfa' : 'rgba(255,255,255,0.1)',
-                      boxShadow: i < shieldCount ? '0 0 6px rgba(167,139,250,0.5)' : 'none',
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div style={p.itemFooter}>
-              <span style={p.itemPrice}>
-                {SHIELD_COST} XP
-                {!canBuy && !atMaxShields && (
-                  <span style={{ fontSize: '0.65rem', color: '#ef4444', marginLeft: '0.4rem' }}>
-                    Need {SHIELD_COST - availableXp} more XP
-                  </span>
-                )}
-              </span>
-              <button
-                style={{
-                  ...p.buyBtn,
-                  opacity: canBuy ? 1 : 0.4,
-                  cursor: canBuy ? 'pointer' : 'not-allowed',
-                }}
-                onClick={handleBuy}
-                disabled={!canBuy || buying}
-              >
-                {buying ? '...' : atMaxShields ? 'Full' : 'Buy'}
-              </button>
-            </div>
-          </div>
-
-          {/* Streak Recovery info card (not purchasable directly — triggered automatically) */}
-          <div style={{ ...p.item, borderColor: 'rgba(16,185,129,0.2)', opacity: 0.8 }}>
-            <div style={{ ...p.itemGlow, background: 'radial-gradient(circle,rgba(16,185,129,0.08) 0%,transparent 70%)' }} />
-            <div style={p.itemIcon}>⚡</div>
-            <h3 style={p.itemName}>Streak Recovery</h3>
-            <p style={p.itemDesc}>
-              Miss a day with no shield? Recover your streak within 24 hours.
-              Limit: once per month. Activated automatically when needed.
-            </p>
-            <div style={p.itemFooter}>
-              <span style={{ ...p.itemPrice, color: '#10b981' }}>{RECOVERY_COST} XP</span>
-              <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 600 }}>
-                {shield?.can_recover ? '✅ Recovery Active' : 'Auto-triggered'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {msg && (
-          <div style={{ ...p.msgBar, borderColor: msg.ok ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)', color: msg.ok ? '#10b981' : '#ef4444' }}>
-            {msg.ok ? '✅' : '❌'} {msg.text}
+        {/* Msg */}
+        {lastMsg && (
+          <div style={{ ...p.msg, borderColor: lastMsg.ok ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)', color: lastMsg.ok ? '#10b981' : '#ef4444' }}>
+            {lastMsg.text}
+            <button onClick={clearMsg} style={p.msgX}>✕</button>
           </div>
         )}
 
-        {/* How to earn XP */}
-        <div style={p.sectionTitle}>How to Earn XP</div>
+        {/* Items */}
+        <div style={p.sectionHead}>Items</div>
+        <div style={p.grid}>
+          {SHOP_ITEMS.map(item => {
+            const price    = pricing ? (pricing as Record<string, number>)[item.priceKey] : null;
+            const afford   = canAfford(item.priceKey);
+            const active   = isActive(item.key);
+            const full     = isFull(item.key);
+            const isBuying = buying === item.key;
+            const disabled = isBuying || full || active;
+
+            return (
+              <div key={item.key} style={{ ...p.item, '--accent': item.accent } as React.CSSProperties}>
+                <div style={{ ...p.itemGlow, background: `radial-gradient(circle,${item.accent}14 0%,transparent 70%)` }} />
+
+                <div style={p.itemTop}>
+                  <span style={p.itemEmoji}>{item.icon}</span>
+                  <div style={p.itemChips}>
+                    {item.badge && <span style={{ ...p.chip, background: `${item.accent}20`, color: item.accent }}>{item.badge}</span>}
+                    {active     && <span style={p.activeChip}>ACTIVE</span>}
+                    {full       && <span style={p.fullChip}>FULL</span>}
+                  </div>
+                </div>
+
+                <h3 style={p.itemName}>{item.name}</h3>
+                <p style={{ ...p.itemTagline, color: item.accent }}>{item.tagline}</p>
+                <ul style={p.descList}>
+                  {item.desc.map(d => <li key={d} style={p.descItem}>• {d}</li>)}
+                </ul>
+                <p style={p.invLabel}>{inventoryText(item.key)}</p>
+
+                <div style={p.itemFoot}>
+                  <span style={{ ...p.price, color: item.accent }}>
+                    {price !== null ? `${price.toLocaleString()} XP` : '…'}
+                  </span>
+                  {!afford && !full && !active && price !== null && (
+                    <span style={p.needMore}>Need {(price - availXp).toLocaleString()} more</span>
+                  )}
+                  <button
+                    style={{
+                      ...p.buyBtn,
+                      background: `${item.accent}1a`,
+                      borderColor: `${item.accent}40`,
+                      color: item.accent,
+                      opacity: disabled ? 0.4 : afford ? 1 : 0.5,
+                      cursor: disabled || !afford ? 'not-allowed' : 'pointer',
+                    }}
+                    disabled={disabled || !afford}
+                    onClick={() => !disabled && afford && buy(item.key)}
+                  >
+                    {isBuying ? '…' : full ? 'Full' : active ? 'Active' : !afford ? 'Need XP' : 'Buy'}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Earn XP guide */}
+        <div style={p.sectionHead}>How to Earn XP</div>
         <div style={p.earnGrid}>
           {[
-            { icon: '📋', label: 'Daily Check-in', xp: '10 XP' },
-            { icon: '📝', label: 'Quiz Session', xp: '20 XP' },
-            { icon: '⭐', label: 'Score 80%+', xp: '30 XP' },
-            { icon: '🔥', label: 'Streak Day', xp: '5 XP/day' },
-            { icon: '🏆', label: 'Achievement', xp: '50 XP' },
-            { icon: '✅', label: '7-Day Streak', xp: '+50 XP bonus' },
-            { icon: '👑', label: '30-Day Streak', xp: '+150 XP bonus' },
-            { icon: '🚀', label: '100-Day Streak', xp: '+500 XP bonus' },
-          ].map(({ icon, label, xp }) => (
-            <div key={label} style={p.earnItem}>
-              <span style={{ fontSize: '1.2rem' }}>{icon}</span>
+            { icon: '📋', act: 'Daily Check-in',   xp: '10 XP each'        },
+            { icon: '📝', act: 'Quiz Session',      xp: '20 XP each'        },
+            { icon: '⭐', act: 'Score 80%+',       xp: '+30 XP bonus'      },
+            { icon: '🔥', act: 'Streak Day',       xp: '+5 XP/day'         },
+            { icon: '🏆', act: 'Achievement',      xp: '+50 XP each'       },
+            { icon: '✅', act: '7-Day Streak',     xp: '+50 XP milestone'  },
+            { icon: '👑', act: '30-Day Streak',    xp: '+150 XP milestone' },
+            { icon: '🚀', act: '100-Day Streak',   xp: '+500 XP milestone' },
+          ].map(({ icon, act, xp }) => (
+            <div key={act} style={p.earnItem}>
+              <span style={{ fontSize: '1.1rem' }}>{icon}</span>
               <div>
-                <p style={p.earnLabel}>{label}</p>
+                <p style={p.earnAct}>{act}</p>
                 <p style={p.earnXp}>{xp}</p>
               </div>
             </div>
@@ -179,25 +236,37 @@ export default function Shop() {
         </div>
 
         {/* Free shields */}
-        <div style={p.sectionTitle}>Earn Free Shields</div>
-        <div style={p.freeGrid}>
+        <div style={p.sectionHead}>Earn Free Shields via Achievements</div>
+        <div style={p.freeList}>
           {[
-            { badge: 'Week Warrior', icon: '⚔️', streak: 7,  shields: 1 },
-            { badge: 'Month Master', icon: '👑', streak: 30, shields: 2 },
-            { badge: 'Unstoppable',  icon: '🚀', streak: 100, shields: 3 },
-          ].map(({ badge, icon, streak, shields }) => (
-            <div key={badge} style={p.freeItem}>
-              <span style={{ fontSize: '1.5rem' }}>{icon}</span>
+            { icon: '⚔️', name: 'Week Warrior',  streak: 7,   reward: '+1 Shield' },
+            { icon: '👑', name: 'Month Master',  streak: 30,  reward: '+2 Shields' },
+            { icon: '🚀', name: 'Unstoppable',   streak: 100, reward: '+3 Shields' },
+          ].map(row => (
+            <div key={row.name} style={p.freeRow}>
+              <span style={{ fontSize: '1.5rem' }}>{row.icon}</span>
               <div style={{ flex: 1 }}>
-                <p style={p.freeName}>{badge}</p>
-                <p style={p.freeSub}>{streak}-day streak → +{shields} Shield{shields > 1 ? 's' : ''}</p>
+                <p style={p.freeName}>{row.name}</p>
+                <p style={p.freeSub}>{row.streak}-day streak → {row.reward}</p>
               </div>
               <Link to="/achievements" style={p.freeLink}>View →</Link>
             </div>
           ))}
         </div>
+
+        {loading && (
+          <p style={{ textAlign: 'center', color: 'rgba(148,163,184,0.4)', fontSize: '0.8rem', margin: '2rem 0' }}>Loading…</p>
+        )}
       </main>
     </div>
+  );
+}
+
+export default function Shop() {
+  return (
+    <XPStoreProvider>
+      <ShopContent />
+    </XPStoreProvider>
   );
 }
 
@@ -211,93 +280,113 @@ const p: Record<string, React.CSSProperties> = {
   },
   navLeft:  { display: 'flex', alignItems: 'center', gap: '0.75rem' },
   navLogo:  { fontWeight: 900, fontSize: '1rem', color: 'var(--primary)', textDecoration: 'none', letterSpacing: '-0.5px' },
-  main:     { maxWidth: '820px', margin: '0 auto', padding: '2rem 1.25rem 4rem' },
-  hero:     { marginBottom: '1.75rem' },
-  heading:  { margin: '0 0 0.4rem', fontSize: '1.8rem', fontWeight: 900, color: 'var(--text-h)' },
-  sub:      { margin: 0, fontSize: '0.9rem', color: 'var(--text)', opacity: 0.7 },
+  main:     { maxWidth: '860px', margin: '0 auto', padding: '2rem 1.25rem 5rem' },
+
+  hero: {
+    position: 'relative', overflow: 'hidden',
+    marginBottom: '1.75rem',
+  },
+  heroOrb: {
+    position: 'absolute', width: '400px', height: '400px', borderRadius: '50%',
+    background: 'radial-gradient(circle,rgba(99,102,241,0.08) 0%,transparent 70%)',
+    top: '-180px', right: '-100px', pointerEvents: 'none',
+  },
+  heading: { margin: '0 0 0.4rem', fontSize: '2rem', fontWeight: 900, color: 'var(--text-h)', position: 'relative' },
+  heroSub: { margin: 0, fontSize: '0.9rem', color: 'var(--text)', opacity: 0.65, position: 'relative' },
 
   balanceCard: {
     position: 'relative', overflow: 'hidden',
-    background: 'linear-gradient(135deg,rgba(99,102,241,0.12),rgba(0,212,255,0.06))',
-    border: '1px solid rgba(99,102,241,0.22)',
-    borderRadius: '20px', padding: '1.5rem 1.75rem',
-    marginBottom: '2rem',
+    background: 'linear-gradient(135deg,rgba(99,102,241,0.1),rgba(0,212,255,0.05))',
+    border: '1px solid rgba(99,102,241,0.2)', borderRadius: '20px',
+    padding: '1.5rem 1.75rem', marginBottom: '1.5rem',
   },
-  balanceOrb: {
-    position: 'absolute', width: '280px', height: '280px', borderRadius: '50%',
-    background: 'radial-gradient(circle,rgba(99,102,241,0.12) 0%,transparent 70%)',
-    top: '-100px', right: '-60px', pointerEvents: 'none',
-  },
-  balanceRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 },
-  balanceLabel: { margin: '0 0 0.2rem', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(148,163,184,0.55)' },
-  balanceValue: { margin: 0, fontSize: '1.8rem', fontWeight: 900, color: 'var(--primary)' },
-  xpBreakdownRow: { display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.9rem', position: 'relative', zIndex: 1 },
-  xpChip: {
-    display: 'flex', flexDirection: 'column', alignItems: 'center',
-    padding: '0.3rem 0.6rem', background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px',
-    fontSize: '0.72rem', color: 'var(--text)', minWidth: '60px',
+  balanceInner: { display: 'flex', gap: '2rem', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap' },
+  balLabel: { margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(148,163,184,0.5)' },
+  balValue: { margin: 0, fontSize: '1.75rem', fontWeight: 900, color: 'var(--primary)' },
+  balUnit:  { fontSize: '1rem', opacity: 0.4 },
+  balShields: { display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '1rem' },
+  shieldChip: {
+    padding: '0.25rem 0.65rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700,
+    border: '1px solid rgba(99,102,241,0.25)', color: '#a78bfa',
+    background: 'rgba(99,102,241,0.1)',
   },
 
-  sectionTitle: {
-    fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.12em',
-    textTransform: 'uppercase', color: 'rgba(148,163,184,0.45)',
+  msg: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem',
+    padding: '0.65rem 0.9rem', borderRadius: '12px', border: '1px solid',
+    background: 'rgba(255,255,255,0.02)', fontSize: '0.8rem', fontWeight: 600,
+    marginBottom: '1rem',
+  },
+  msgX: { background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', opacity: 0.6, fontFamily: 'inherit' },
+
+  sectionHead: {
+    fontSize: '0.62rem', fontWeight: 800, letterSpacing: '0.12em',
+    textTransform: 'uppercase', color: 'rgba(148,163,184,0.4)',
     marginBottom: '0.85rem', marginTop: '0.25rem',
   },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '1rem', marginBottom: '2rem' },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '1rem', marginBottom: '2.5rem' },
+
   item: {
     position: 'relative', overflow: 'hidden',
-    background: 'rgba(255,255,255,0.04)', border: '1px solid',
-    borderRadius: '18px', padding: '1.4rem',
-    display: 'flex', flexDirection: 'column', gap: '0.65rem',
+    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '20px', padding: '1.4rem',
+    display: 'flex', flexDirection: 'column', gap: '0.5rem',
+    transition: 'border-color 0.2s',
   },
   itemGlow: {
-    position: 'absolute', top: '-40%', right: '-20%',
-    width: '200px', height: '200px', borderRadius: '50%',
-    background: 'radial-gradient(circle,rgba(99,102,241,0.08) 0%,transparent 70%)',
-    pointerEvents: 'none',
+    position: 'absolute', top: '-60%', right: '-20%',
+    width: '220px', height: '220px', borderRadius: '50%', pointerEvents: 'none',
   },
-  itemIcon: { fontSize: '2rem', lineHeight: 1 },
-  itemName: { margin: 0, fontSize: '1.1rem', fontWeight: 900, color: 'var(--text-h)', position: 'relative', zIndex: 1 },
-  itemDesc: { margin: 0, fontSize: '0.78rem', color: 'var(--text)', lineHeight: 1.55, flex: 1, position: 'relative', zIndex: 1 },
-  invRow:  { display: 'flex', alignItems: 'center', gap: '0.6rem', position: 'relative', zIndex: 1 },
-  invLabel: { fontSize: '0.68rem', fontWeight: 600, color: 'rgba(148,163,184,0.5)', whiteSpace: 'nowrap' },
-  invTrack: { display: 'flex', gap: '4px' },
-  invDot:   { width: '12px', height: '12px', borderRadius: '50%', transition: 'background 0.25s, box-shadow 0.25s' },
-  itemFooter: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 },
-  itemPrice:  { fontSize: '1rem', fontWeight: 900, color: '#a78bfa' },
+  itemTop: {
+    display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+    position: 'relative', zIndex: 1,
+  },
+  itemEmoji:   { fontSize: '2rem', lineHeight: 1 },
+  itemChips:   { display: 'flex', gap: '0.35rem', flexWrap: 'wrap', justifyContent: 'flex-end' },
+  chip: {
+    fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.07em',
+    padding: '0.15rem 0.5rem', borderRadius: '6px',
+  },
+  activeChip: {
+    fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.07em',
+    padding: '0.15rem 0.5rem', borderRadius: '6px',
+    background: 'rgba(16,185,129,0.15)', color: '#10b981',
+  },
+  fullChip: {
+    fontSize: '0.55rem', fontWeight: 800, letterSpacing: '0.07em',
+    padding: '0.15rem 0.5rem', borderRadius: '6px',
+    background: 'rgba(148,163,184,0.1)', color: '#94a3b8',
+  },
+  itemName:    { margin: 0, fontSize: '1.05rem', fontWeight: 900, color: 'var(--text-h)', position: 'relative', zIndex: 1 },
+  itemTagline: { margin: 0, fontSize: '0.72rem', fontWeight: 700, position: 'relative', zIndex: 1 },
+  descList:    { margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.2rem', flex: 1, position: 'relative', zIndex: 1 },
+  descItem:    { margin: 0, fontSize: '0.72rem', color: 'rgba(148,163,184,0.65)', lineHeight: 1.5 },
+  invLabel:    { margin: 0, fontSize: '0.65rem', color: 'rgba(148,163,184,0.35)', fontWeight: 600, position: 'relative', zIndex: 1 },
+  itemFoot:    { display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', position: 'relative', zIndex: 1, marginTop: '0.15rem' },
+  price:       { fontSize: '1.05rem', fontWeight: 900 },
+  needMore:    { fontSize: '0.62rem', color: '#ef4444', fontWeight: 600 },
   buyBtn: {
-    padding: '0.42rem 1.1rem', borderRadius: '10px', fontFamily: 'inherit',
-    background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.4)',
-    color: '#a78bfa', fontSize: '0.82rem', fontWeight: 800,
-    transition: 'background 0.18s, opacity 0.18s',
+    marginLeft: 'auto', padding: '0.38rem 1rem', borderRadius: '10px',
+    border: '1px solid', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 800,
+    transition: 'opacity 0.15s, background 0.15s',
   },
 
-  msgBar: {
-    padding: '0.75rem 1rem', borderRadius: '12px', border: '1px solid',
-    background: 'rgba(255,255,255,0.03)', fontSize: '0.82rem', fontWeight: 600,
-    marginBottom: '1.5rem',
-  },
-
-  earnGrid: {
-    display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.65rem',
-    marginBottom: '2rem',
-  },
+  earnGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.65rem', marginBottom: '2.5rem' },
   earnItem: {
     display: 'flex', alignItems: 'center', gap: '0.5rem',
     background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
-    borderRadius: '12px', padding: '0.65rem 0.75rem',
+    borderRadius: '12px', padding: '0.65rem',
   },
-  earnLabel: { margin: '0 0 0.1rem', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text)' },
-  earnXp:   { margin: 0, fontSize: '0.68rem', color: 'var(--primary)', fontWeight: 700 },
+  earnAct: { margin: '0 0 0.1rem', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text)' },
+  earnXp:  { margin: 0, fontSize: '0.65rem', color: 'var(--primary)', fontWeight: 700 },
 
-  freeGrid: { display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1rem' },
-  freeItem: {
+  freeList: { display: 'flex', flexDirection: 'column', gap: '0.65rem' },
+  freeRow: {
     display: 'flex', alignItems: 'center', gap: '0.85rem',
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,165,0,0.12)',
+    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(245,158,11,0.12)',
     borderRadius: '14px', padding: '0.9rem 1rem',
   },
   freeName: { margin: '0 0 0.15rem', fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-h)' },
-  freeSub:  { margin: 0, fontSize: '0.72rem', color: 'var(--text)', opacity: 0.7 },
+  freeSub:  { margin: 0, fontSize: '0.72rem', color: 'var(--text)', opacity: 0.65 },
   freeLink: { fontSize: '0.72rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', opacity: 0.8 },
 };

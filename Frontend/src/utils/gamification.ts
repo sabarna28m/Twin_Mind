@@ -72,13 +72,21 @@ export function levelStorageKey(userId: string | number) {
   return `tm_lv_${userId}`;
 }
 
-export const SHIELD_COST   = 100;
-export const RECOVERY_COST = 200;
-export const MAX_SHIELDS   = 5;
+export const SHIELD_COST         = 500;
+export const PREMIUM_SHIELD_COST = 1200;
+export const FREEZE_COST         = 800;
+export const DOUBLE_XP_COST      = 1000;
+export const RECOVERY_COST       = 200;
+export const MAX_SHIELDS         = 5;
 
 export interface StreakShieldStatus {
   shield_count:              number;
+  premium_shield_count:      number;
   auto_use_shield:           boolean;
+  streak_freeze_active:      boolean;
+  streak_freeze_expires:     string | null;
+  double_xp_active:          boolean;
+  double_xp_expires:         string | null;
   streak_days:               number;
   last_checkin:              string | null;
   can_recover:               boolean;
@@ -87,10 +95,18 @@ export interface StreakShieldStatus {
   next_milestone:            number | null;
   xp_spent:                  number;
   available_xp:              number;
+  pricing: {
+    shield:         number;
+    premium_shield: number;
+    streak_freeze:  number;
+    double_xp:      number;
+    recovery:       number;
+  };
 }
 
 export interface ShieldCheckResult {
   shield_used:  boolean;
+  item_used:    string | null;
   recovery_set: boolean;
   shield_count: number;
   streak_days:  number;

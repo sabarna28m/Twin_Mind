@@ -59,10 +59,21 @@ def _load_shield(user_id: int, db: DBSession):
 def _protected_dates(shield) -> set:
     if not shield:
         return set()
+    base: set = set()
     try:
-        return {date.fromisoformat(d) for d in json.loads(shield.shield_protected_dates or "[]")}
+        base = {date.fromisoformat(d) for d in json.loads(shield.shield_protected_dates or "[]")}
     except Exception:
-        return set()
+        pass
+    # Streak freeze counts as today covered
+    from datetime import datetime as _dt
+    if shield.streak_freeze_expires and _dt.utcnow() < shield.streak_freeze_expires:
+        base.add(date.today())
+    return base
+
+
+def _double_xp_active(shield) -> bool:
+    from datetime import datetime as _dt
+    return bool(shield and shield.double_xp_expires and _dt.utcnow() < shield.double_xp_expires)
 
 
 def get_week_start() -> date:
@@ -96,7 +107,8 @@ def compute_progress(user_id: int, db: DBSession) -> dict:
     achievement_xp  = earned_count * 50
     milestone_bonus = sum(v for k, v in STREAK_MILESTONE_XP.items() if streak >= k)
 
-    xp    = checkin_xp + quiz_xp + high_score_xp + streak_xp + achievement_xp + milestone_bonus
+    raw_xp   = checkin_xp + quiz_xp + high_score_xp + streak_xp + achievement_xp + milestone_bonus
+    xp       = raw_xp * 2 if _double_xp_active(shield) else raw_xp
     level = xp_to_level(xp)
 
     level_start  = XP_THRESHOLDS[level]
@@ -119,7 +131,10 @@ def compute_progress(user_id: int, db: DBSession) -> dict:
         "xp_to_next":   max(0, xp_for_level - xp_in_level),
         "progress_pct": progress_pct,
         "streak_days":  streak,
-        "shield_count": shield.shield_count if shield else 0,
+        "shield_count":          shield.shield_count if shield else 0,
+        "premium_shield_count":  shield.premium_shield_count if shield else 0,
+        "double_xp_active":      _double_xp_active(shield),
+        "double_xp_expires":     shield.double_xp_expires.isoformat() if (shield and shield.double_xp_expires) else None,
         "breakdown": {
             "checkins":        checkin_xp,
             "quizzes":         quiz_xp,

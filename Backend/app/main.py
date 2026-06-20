@@ -280,6 +280,9 @@ with engine.connect() as _conn:
             "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)"
         ),
         "CREATE INDEX IF NOT EXISTS ix_streak_shields_user_id ON streak_shields(user_id)",
+        "ALTER TABLE streak_shields ADD COLUMN premium_shield_count INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE streak_shields ADD COLUMN streak_freeze_expires DATETIME",
+        "ALTER TABLE streak_shields ADD COLUMN double_xp_expires DATETIME",
     ]:
         try:
             _conn.execute(text(_sql))

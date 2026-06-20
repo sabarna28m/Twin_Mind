@@ -37,13 +37,18 @@ const NAV_GROUPS: NavGroup[] = [
       { to: '/achievements', Icon: Trophy,      label: 'Achievements'  },
       { to: '/predict',      Icon: TrendingUp,  label: 'AI Predict'    },
       { to: '/burnout',      Icon: Shield,        label: 'Burnout Guard' },
-      { to: '/shop',         Icon: ShoppingBag,   label: 'XP Shop'       },
     ],
   },
   {
     id: 'checkin', label: 'Check-in', emoji: '✅',
     items: [
       { to: '/checkin',      Icon: CheckSquare, label: 'Daily Check-in' },
+    ],
+  },
+  {
+    id: 'shop', label: 'XP Shop', emoji: '🛒',
+    items: [
+      { to: '/shop',         Icon: ShoppingBag, label: 'XP Shop'        },
     ],
   },
   {

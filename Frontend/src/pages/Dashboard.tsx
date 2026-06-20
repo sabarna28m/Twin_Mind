@@ -5,6 +5,8 @@ import {
   MessageCircle, Layers, Menu, Rocket, Mic2, ChevronDown, Video,
   Shield, TrendingUp, Sword, ShoppingBag,
 } from 'lucide-react';
+import XPShopModal from '../components/XPShopModal';
+import { XPStoreProvider } from '../contexts/XPStoreContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import ThemeToggle from '../components/ThemeToggle';
@@ -431,6 +433,7 @@ export default function Dashboard() {
   const [chCheckin,         setChCheckin]         = useState('');
   const [savingChallenge,   setSavingChallenge]   = useState(false);
   const [drawerOpen,        setDrawerOpen]        = useState(false);
+  const [shopOpen,          setShopOpen]          = useState(false);
 
   // Dropdown nav state
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -574,7 +577,6 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
         { icon: Trophy,        label: 'Achievements',   desc: 'Badges & milestones',        to: '/achievements'                    },
         { icon: TrendingUp,    label: 'Predict',        desc: 'AI score prediction',        to: '/predict'                         },
         { icon: Shield,        label: 'Burnout Guard',  desc: 'Monitor & prevent burnout',  to: '/burnout'                         },
-        { icon: ShoppingBag,   label: 'XP Shop',        desc: 'Spend XP on streak shields',  to: '/shop'                            },
       ],
     },
     {
@@ -591,7 +593,9 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
   ];
 
   return (
+    <XPStoreProvider>
     <div style={s.shell}>
+      <XPShopModal isOpen={shopOpen} onClose={() => setShopOpen(false)} />
       <MobileNav
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -681,6 +685,21 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
         <div style={s.navRight} className="mob-nav-right">
           <span className="mob-hide-mobile"><LanguageSwitcher /></span>
           <ThemeToggle />
+          <button
+            onClick={() => setShopOpen(true)}
+            className="nav-shop-btn"
+            title="XP Shop"
+            aria-label="Open XP Shop"
+            style={{
+              background: 'none', border: '1px solid rgba(var(--primary-rgb),0.2)',
+              borderRadius: '9px', width: '34px', height: '34px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'var(--primary)', transition: 'border-color 0.2s, box-shadow 0.2s',
+              fontFamily: 'inherit',
+            }}
+          >
+            <ShoppingBag size={16} />
+          </button>
           <span className="mob-hide-mobile"><NotificationBell /></span>
           <Link to="/profile" style={s.navUser} data-tour="profile">
             {avatarSrc
@@ -1149,6 +1168,7 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
         </div>
       )}
     </div>
+    </XPStoreProvider>
   );
 }
 
