@@ -13,9 +13,10 @@ function buildMessages(burnout: BurnoutEntry | null, subjects: SubjectAnalysis |
   const msgs: string[] = [];
 
   if (subjects?.weakest) {
+    const score = subjects.weakest.avg_score ?? null;
     msgs.push(
-      `📉 Your ${subjects.weakest.subject} score is at ${subjects.weakest.avg_score.toFixed(0)}%. ` +
-      `I recommend ${subjects.weakest.recommended_daily_minutes} min/day to recover it.`
+      `📉 Your ${subjects.weakest.subject} score is at ${score != null ? score.toFixed(0) : '?'}%. ` +
+      `I recommend ${subjects.weakest.recommended_daily_minutes ?? 30} min/day to recover it.`
     );
   }
 

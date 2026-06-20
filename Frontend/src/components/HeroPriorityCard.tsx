@@ -41,24 +41,27 @@ function buildRecommendations(
 }
 
 function buildInsight(subjects: SubjectAnalysis | null, burnout: BurnoutEntry | null, prediction: PredictionData | null): string {
-  if (subjects?.weakest && subjects.weakest.avg_score < 60) {
-    const drop = Math.round(Math.abs(70 - subjects.weakest.avg_score));
-    return `Your ${subjects.weakest.subject} performance is at ${subjects.weakest.avg_score.toFixed(0)}% — ${drop}% below the target threshold. Today is the perfect time to recover.`;
+  const weakScore = subjects?.weakest?.avg_score ?? null;
+  if (subjects?.weakest && weakScore != null && weakScore < 60) {
+    const drop = Math.round(Math.abs(70 - weakScore));
+    return `Your ${subjects.weakest.subject} performance is at ${weakScore.toFixed(0)}% — ${drop}% below the target threshold. Today is the perfect time to recover.`;
   }
   if (burnout?.risk_level === 'high') {
-    return `High burnout risk detected (score: ${burnout.burnout_score}/100). A focused but shorter study session today will protect your long-term performance.`;
+    return `High burnout risk detected (score: ${burnout.burnout_score ?? '?'}/100). A focused but shorter study session today will protect your long-term performance.`;
   }
-  if (prediction && prediction.predicted_score < 65) {
-    return `Your predicted exam score is ${prediction.predicted_score.toFixed(0)}%. Focused effort now can significantly improve this before exams.`;
+  const predScore = prediction?.predicted_score ?? null;
+  if (predScore != null && predScore < 65) {
+    return `Your predicted exam score is ${predScore.toFixed(0)}%. Focused effort now can significantly improve this before exams.`;
   }
-  if (subjects?.weakest) {
-    return `${subjects.weakest.subject} is your current weak point at ${subjects.weakest.avg_score.toFixed(0)}%. A daily ${subjects.weakest.recommended_daily_minutes}-min session will compound into real improvement.`;
+  if (subjects?.weakest && weakScore != null) {
+    return `${subjects.weakest.subject} is your current weak point at ${weakScore.toFixed(0)}%. A daily ${subjects.weakest.recommended_daily_minutes ?? 30}-min session will compound into real improvement.`;
   }
   return `Your AI twin has analyzed your patterns. Stay consistent with today's recommended actions to hit your academic goals.`;
 }
 
 function computeExpectedBoost(subjects: SubjectAnalysis | null): number {
-  if (subjects?.weakest) return Math.max(8, Math.round((80 - subjects.weakest.avg_score) * 0.3));
+  const score = subjects?.weakest?.avg_score ?? null;
+  if (score != null) return Math.max(8, Math.round((80 - score) * 0.3));
   return 12;
 }
 
@@ -111,7 +114,7 @@ export default function HeroPriorityCard() {
         <span style={{ ...h.tag, color: urgencyColor, background: `${urgencyColor}18`, borderColor: `${urgencyColor}30` }}>
           {urgencyLabel}
         </span>
-        {prediction && (
+        {prediction?.predicted_score != null && (
           <span style={h.scoreBadge}>
             Predicted: <strong>{prediction.predicted_score.toFixed(0)}%</strong>
           </span>

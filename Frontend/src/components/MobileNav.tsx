@@ -1,26 +1,62 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  X, BookOpen, FileText, BarChart2,
-  CheckSquare, Trophy, Brain, Zap, MessageCircle,
-  Layers, Sword, Timer, Video, User, LogOut,
+  X, BookOpen, FileText, BarChart2, CheckSquare, Trophy, Brain,
+  Zap, MessageCircle, Layers, Sword, Video, User, LogOut,
+  Rocket, Mic2, Shield, TrendingUp,
 } from 'lucide-react';
-import { useLanguage } from '../contexts/LanguageContext';
 
-const NAV_ITEMS = [
-  { key: 'nav_sessions',     to: '/sessions',     Icon: BookOpen,      label: 'Sessions'     },
-  { key: 'nav_notes',        to: '/notes',         Icon: FileText,      label: 'Notes'        },
-  { key: 'nav_progress',     to: '/progress',      Icon: BarChart2,     label: 'Progress'     },
-  { key: 'nav_checkin',      to: '/checkin',       Icon: CheckSquare,   label: 'Check-in'     },
-  { key: 'nav_achievements', to: '/achievements',  Icon: Trophy,        label: 'Achievements' },
-  { key: 'nav_quiz',         to: '/quiz',          Icon: Brain,         label: 'Quiz'         },
-  { key: 'nav_simulate',     to: '/simulate',      Icon: Zap,           label: 'Simulate'     },
-  { key: 'nav_mentor',       to: '/mentor',        Icon: MessageCircle, label: 'Mentor'       },
-  { key: 'nav_twin',         to: '/twin',          Icon: Layers,        label: 'Twin'         },
-  { key: 'nav_battles',      to: '/battles',       Icon: Sword,         label: 'Battles'      },
-  { key: 'qa_focus',         to: '/focus',         Icon: Timer,         label: 'Focus'        },
-  { key: 'qa_videos',        to: '/videos',        Icon: Video,         label: 'AI Videos'    },
-] as const;
+interface NavItem {
+  to:    string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Icon:  React.ComponentType<any>;
+  label: string;
+}
+
+interface NavGroup {
+  id:    string;
+  label: string;
+  emoji: string;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    id: 'learning', label: 'Learning', emoji: '📚',
+    items: [
+      { to: '/sessions',     Icon: BookOpen,    label: 'Sessions'      },
+      { to: '/notes',        Icon: FileText,    label: 'Smart Notes'   },
+      { to: '/quiz',         Icon: Brain,       label: 'Quiz Practice' },
+      { to: '/videos',       Icon: Video,       label: 'AI Videos'     },
+    ],
+  },
+  {
+    id: 'performance', label: 'Performance', emoji: '📊',
+    items: [
+      { to: '/progress',     Icon: BarChart2,   label: 'Progress'      },
+      { to: '/achievements', Icon: Trophy,      label: 'Achievements'  },
+      { to: '/predict',      Icon: TrendingUp,  label: 'AI Predict'    },
+      { to: '/burnout',      Icon: Shield,      label: 'Burnout Guard' },
+    ],
+  },
+  {
+    id: 'checkin', label: 'Check-in', emoji: '✅',
+    items: [
+      { to: '/checkin',      Icon: CheckSquare, label: 'Daily Check-in' },
+    ],
+  },
+  {
+    id: 'ai', label: 'AI Tools', emoji: '🤖',
+    items: [
+      { to: '/twin',         Icon: Layers,        label: 'Twin AI'      },
+      { to: '/career',       Icon: Rocket,        label: 'Career AI'    },
+      { to: '/comm-twin',    Icon: Mic2,          label: 'Comm Twin'    },
+      { to: '/mentor',       Icon: MessageCircle, label: 'Mentor AI'    },
+      { to: '/simulate',     Icon: Zap,           label: 'Simulate'     },
+      { to: '/battles',      Icon: Sword,         label: 'Battles'      },
+    ],
+  },
+];
 
 interface Props {
   isOpen:     boolean;
@@ -31,26 +67,25 @@ interface Props {
 }
 
 export default function MobileNav({ isOpen, onClose, userName, avatarSrc, onLogout }: Props) {
-  const { t } = useLanguage();
   const location = useLocation();
 
-  // Lock body scroll when drawer is open
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  // Close on route change
   useEffect(() => { onClose(); }, [location.pathname]);
+
+  const isActive = (to: string) => location.pathname === to;
 
   return (
     <>
       {/* Overlay */}
       <div
         style={{
-          ...styles.overlay,
-          opacity:        isOpen ? 1 : 0,
-          pointerEvents:  isOpen ? 'auto' : 'none',
+          ...st.overlay,
+          opacity:       isOpen ? 1 : 0,
+          pointerEvents: isOpen ? 'auto' : 'none',
         }}
         onClick={onClose}
         aria-hidden
@@ -59,66 +94,80 @@ export default function MobileNav({ isOpen, onClose, userName, avatarSrc, onLogo
       {/* Drawer */}
       <aside
         style={{
-          ...styles.drawer,
+          ...st.drawer,
           transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
         }}
         aria-label="Navigation menu"
       >
-        {/* Drawer header */}
-        <div style={styles.drawerHeader}>
-          <div style={styles.drawerLogo}>
-            <span style={styles.logoIcon}>◈</span>
-            <span style={styles.logoText}>TwinMind</span>
+        {/* Header */}
+        <div style={st.drawerHeader}>
+          <div style={st.drawerLogo}>
+            <span style={st.logoIcon}>◈</span>
+            <span style={st.logoText}>TwinMind</span>
           </div>
-          <button style={styles.closeBtn} onClick={onClose} aria-label="Close menu">
-            <X size={20} />
+          <button style={st.closeBtn} onClick={onClose} aria-label="Close menu">
+            <X size={18} />
           </button>
         </div>
 
         {/* User info */}
         {userName && (
-          <div style={styles.userRow}>
+          <div style={st.userRow}>
             {avatarSrc
-              ? <img src={avatarSrc} alt="" style={styles.avatar} />
-              : <div style={styles.initials}>{userName[0]?.toUpperCase()}</div>
+              ? <img src={avatarSrc} alt="" style={st.avatar} />
+              : <div style={st.initials}>{userName[0]?.toUpperCase()}</div>
             }
             <div>
-              <p style={styles.userName}>{userName}</p>
-              <Link to="/profile" style={styles.profileLink} onClick={onClose}>
+              <p style={st.userName}>{userName}</p>
+              <Link to="/profile" style={st.profileLink} onClick={onClose}>
+                <User size={11} style={{ display: 'inline', marginRight: '0.25rem' }} />
                 View Profile
               </Link>
             </div>
           </div>
         )}
 
-        {/* Nav links */}
-        <nav style={styles.navList}>
-          {NAV_ITEMS.map(({ key, to, Icon: NavIcon, label }) => {
-            const active = location.pathname === to;
-            return (
-              <Link
-                key={to}
-                to={to}
-                style={{
-                  ...styles.navItem,
-                  background: active ? 'rgba(0,212,255,0.1)' : 'transparent',
-                  borderColor: active ? 'rgba(0,212,255,0.25)' : 'transparent',
-                  color:       active ? '#00D4FF' : 'var(--text-m)',
-                }}
-                onClick={onClose}
-              >
-                <NavIcon size={18} style={{ flexShrink: 0, opacity: active ? 1 : 0.65 }} />
-                <span style={styles.navLabel}>{t(key) || label}</span>
-                {active && <div style={styles.activeDot} />}
-              </Link>
-            );
-          })}
+        {/* Nav groups */}
+        <nav style={st.navScroll}>
+          {NAV_GROUPS.map(group => (
+            <div key={group.id} style={st.group}>
+              <div style={st.groupHeader}>
+                <span style={st.groupEmoji}>{group.emoji}</span>
+                <span style={st.groupLabel}>{group.label}</span>
+              </div>
+              <div style={st.groupItems}>
+                {group.items.map(({ to, Icon, label }) => {
+                  const active = isActive(to);
+                  return (
+                    <Link
+                      key={`${group.id}-${to}-${label}`}
+                      to={to}
+                      style={{
+                        ...st.navItem,
+                        background:  active ? 'rgba(var(--primary-rgb), 0.12)' : 'transparent',
+                        borderColor: active ? 'rgba(var(--primary-rgb), 0.28)' : 'transparent',
+                        color:       active ? 'var(--primary)' : 'var(--text-m)',
+                      }}
+                      onClick={onClose}
+                    >
+                      <Icon
+                        size={16}
+                        style={{ flexShrink: 0, opacity: active ? 1 : 0.6 }}
+                      />
+                      <span style={st.navLabel}>{label}</span>
+                      {active && <div style={st.activeDot} />}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
-        {/* Bottom: logout */}
-        <div style={styles.drawerFooter}>
-          <button style={styles.logoutBtn} onClick={() => { onLogout(); onClose(); }}>
-            <LogOut size={16} />
+        {/* Footer */}
+        <div style={st.drawerFooter}>
+          <button style={st.logoutBtn} onClick={() => { onLogout(); onClose(); }}>
+            <LogOut size={15} />
             Sign out
           </button>
         </div>
@@ -127,169 +176,106 @@ export default function MobileNav({ isOpen, onClose, userName, avatarSrc, onLogo
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
+const st: Record<string, React.CSSProperties> = {
   overlay: {
-    position: 'fixed',
-    inset: 0,
+    position: 'fixed', inset: 0,
     background: 'rgba(0,0,0,0.65)',
     backdropFilter: 'blur(4px)',
     WebkitBackdropFilter: 'blur(4px)',
-    zIndex: 299,
-    transition: 'opacity 0.25s ease',
+    zIndex: 299, transition: 'opacity 0.25s ease',
   },
   drawer: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    width: '280px',
-    maxWidth: '85vw',
-    background: 'rgba(6,11,24,0.98)',
-    borderRight: '1px solid rgba(0,212,255,0.15)',
-    zIndex: 300,
-    display: 'flex',
-    flexDirection: 'column',
+    position: 'fixed', top: 0, left: 0, bottom: 0,
+    width: '290px', maxWidth: '88vw',
+    background: 'rgba(4,8,22,0.99)',
+    borderRight: '1px solid rgba(0,212,255,0.14)',
+    zIndex: 300, display: 'flex', flexDirection: 'column',
     backdropFilter: 'blur(28px)',
     WebkitBackdropFilter: 'blur(28px)',
     transition: 'transform 0.28s cubic-bezier(0.16,1,0.3,1)',
-    overflowY: 'auto',
-    boxShadow: '4px 0 40px rgba(0,0,0,0.6)',
+    overflowY: 'hidden',
+    boxShadow: '6px 0 48px rgba(0,0,0,0.7)',
   },
   drawerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '1.1rem 1.1rem 0.85rem',
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '1.1rem 1.1rem 0.9rem',
     borderBottom: '1px solid rgba(255,255,255,0.07)',
     flexShrink: 0,
   },
-  drawerLogo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.45rem',
-  },
-  logoIcon: {
-    fontSize: '1.2rem',
-    color: '#00D4FF',
-    filter: 'drop-shadow(0 0 6px rgba(0,212,255,0.7))',
-  },
+  drawerLogo: { display: 'flex', alignItems: 'center', gap: '0.45rem' },
+  logoIcon: { fontSize: '1.2rem', color: '#00D4FF', filter: 'drop-shadow(0 0 6px rgba(0,212,255,0.7))' },
   logoText: {
-    fontSize: '1.05rem',
-    fontWeight: 900,
-    letterSpacing: '-0.5px',
+    fontSize: '1.05rem', fontWeight: 900, letterSpacing: '-0.5px',
     background: 'linear-gradient(135deg,#00D4FF,#a78bfa)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
+    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
   },
   closeBtn: {
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '8px',
-    width: '34px',
-    height: '34px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    color: 'var(--text)',
-    flexShrink: 0,
-    fontFamily: 'inherit',
+    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '8px', width: '34px', height: '34px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', color: 'var(--text)', flexShrink: 0, fontFamily: 'inherit',
   },
   userRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem',
+    display: 'flex', alignItems: 'center', gap: '0.75rem',
     padding: '0.9rem 1.1rem',
     borderBottom: '1px solid rgba(255,255,255,0.06)',
     flexShrink: 0,
   },
   avatar: {
-    width: '38px',
-    height: '38px',
-    borderRadius: '50%',
-    objectFit: 'cover',
-    border: '2px solid rgba(0,212,255,0.35)',
-    flexShrink: 0,
+    width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' as const,
+    border: '2px solid rgba(0,212,255,0.35)', flexShrink: 0,
   },
   initials: {
-    width: '38px',
-    height: '38px',
-    borderRadius: '50%',
-    background: 'rgba(0,212,255,0.12)',
-    border: '2px solid rgba(0,212,255,0.35)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '0.75rem',
-    fontWeight: 800,
-    color: '#00D4FF',
-    flexShrink: 0,
+    width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
+    background: 'rgba(0,212,255,0.12)', border: '2px solid rgba(0,212,255,0.35)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: '0.78rem', fontWeight: 800, color: '#00D4FF',
   },
-  userName: {
-    margin: 0,
-    fontSize: '0.88rem',
-    fontWeight: 700,
-    color: 'var(--text-h)',
-    lineHeight: 1.2,
+  userName:    { margin: 0, fontSize: '0.88rem', fontWeight: 700, color: '#f1f5f9', lineHeight: 1.2 },
+  profileLink: { fontSize: '0.7rem', color: '#00D4FF', textDecoration: 'none', opacity: 0.8, display: 'flex', alignItems: 'center' },
+
+  /* Scrollable nav area */
+  navScroll: { flex: 1, overflowY: 'auto' as const, padding: '0.5rem 0.7rem 0.5rem', display: 'flex', flexDirection: 'column', gap: '0.15rem' },
+
+  /* Group */
+  group:      { marginBottom: '0.2rem' },
+  groupHeader: {
+    display: 'flex', alignItems: 'center', gap: '0.45rem',
+    padding: '0.55rem 0.7rem 0.3rem',
   },
-  profileLink: {
-    fontSize: '0.72rem',
-    color: '#00D4FF',
-    textDecoration: 'none',
-    opacity: 0.8,
+  groupEmoji: { fontSize: '0.9rem' },
+  groupLabel: {
+    fontSize: '0.62rem', fontWeight: 800, letterSpacing: '0.1em',
+    textTransform: 'uppercase' as const, color: 'rgba(148,163,184,0.5)',
   },
-  navList: {
-    flex: 1,
-    padding: '0.6rem 0.65rem',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.2rem',
-    overflowY: 'auto',
-  },
+  groupItems: { display: 'flex', flexDirection: 'column', gap: '0.1rem' },
+
   navItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem',
-    padding: '0.75rem 0.85rem',
-    borderRadius: '10px',
-    border: '1px solid',
-    textDecoration: 'none',
-    fontSize: '0.9rem',
-    fontWeight: 600,
-    transition: 'background 0.18s, color 0.18s',
+    display: 'flex', alignItems: 'center', gap: '0.7rem',
+    padding: '0.62rem 0.8rem', borderRadius: '9px',
+    border: '1px solid', textDecoration: 'none',
+    fontSize: '0.87rem', fontWeight: 600,
+    transition: 'background 0.15s, color 0.15s',
     position: 'relative',
   },
-  navLabel: {
-    flex: 1,
-  },
+  navLabel:  { flex: 1 },
   activeDot: {
-    width: '6px',
-    height: '6px',
-    borderRadius: '50%',
-    background: '#00D4FF',
-    boxShadow: '0 0 8px rgba(0,212,255,0.7)',
+    width: '6px', height: '6px', borderRadius: '50%',
+    background: '#00D4FF', boxShadow: '0 0 8px rgba(0,212,255,0.7)',
     flexShrink: 0,
   },
+
+  /* Footer */
   drawerFooter: {
-    padding: '0.85rem 0.65rem',
+    padding: '0.85rem 0.7rem',
     borderTop: '1px solid rgba(255,255,255,0.07)',
     flexShrink: 0,
   },
   logoutBtn: {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.6rem',
-    padding: '0.7rem 0.85rem',
-    borderRadius: '10px',
-    background: 'rgba(239,68,68,0.08)',
-    border: '1px solid rgba(239,68,68,0.2)',
-    color: '#fca5a5',
-    fontSize: '0.88rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-    transition: 'background 0.18s',
+    width: '100%', display: 'flex', alignItems: 'center', gap: '0.6rem',
+    padding: '0.7rem 0.85rem', borderRadius: '10px',
+    background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+    color: '#fca5a5', fontSize: '0.87rem', fontWeight: 600,
+    cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.18s',
   },
 };

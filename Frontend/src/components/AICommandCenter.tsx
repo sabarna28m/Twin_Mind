@@ -116,7 +116,7 @@ export default function AICommandCenter({ brainReadiness, streak, level = 1 }: P
     {
       icon: '📉', label: 'Weakest Subject', to: '/subjects',
       value: subjects?.weakest?.subject ?? '—',
-      sub: subjects?.weakest ? `${subjects.weakest.avg_score.toFixed(0)}% avg · needs focus` : 'Add subject data',
+      sub: subjects?.weakest ? `${subjects.weakest.avg_score != null ? subjects.weakest.avg_score.toFixed(0) : '?'}% avg · needs focus` : 'Add subject data',
       color: '#ef4444',
     },
     {

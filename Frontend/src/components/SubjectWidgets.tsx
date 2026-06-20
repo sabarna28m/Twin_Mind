@@ -31,7 +31,7 @@ function MiniCard({ icon, label, subject, score, detail, cta, color }: {
       <div style={{ ...w.iconBox, background: `${color}20`, color }}>{icon}</div>
       <p style={{ ...w.label, color: `${color}bb` }}>{label}</p>
       {subject && <p style={{ ...w.subject, color }}>{ICONS[subject] ?? '📚'} {subject}</p>}
-      {score !== undefined && <p style={{ ...w.score, color }}>{score.toFixed(0)}%</p>}
+      {score != null && <p style={{ ...w.score, color }}>{score.toFixed(0)}%</p>}
       <p style={w.detail}>{detail}</p>
       <Link to="/subjects" style={{ ...w.cta, color, borderColor: `${color}40`, background: `${color}10` }}>
         {cta ?? 'View Details →'}
