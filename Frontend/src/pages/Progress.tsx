@@ -338,7 +338,7 @@ export default function Progress() {
               fontFamily: 'inherit',
             }}
           >
-            {pdfBusy ? 'Generating…' : '↓ Download Report'}
+            {pdfBusy ? t('progress_generating') : t('progress_download')}
           </button>
         </div>
       </header>
@@ -346,13 +346,13 @@ export default function Progress() {
       <main style={s.main}>
         <div style={{ marginBottom: '2rem' }}>
           <h1 style={s.pageTitle}>{t('nav_progress')}</h1>
-          <p style={{ color: '#475569', fontSize: '0.9rem', margin: 0 }}>Your academic journey, visualised.</p>
+          <p style={{ color: '#475569', fontSize: '0.9rem', margin: 0 }}>{t('progress_subtitle')}</p>
         </div>
 
         {loading && (
           <div style={{ textAlign: 'center', padding: '4rem', color: '#475569' }}>
             <div style={{ fontSize: '2rem', marginBottom: '1rem', animation: 'float 2s ease-in-out infinite' }}>◈</div>
-            <p>Loading analytics…</p>
+            <p>{t('progress_loading')}</p>
           </div>
         )}
 
@@ -361,10 +361,10 @@ export default function Progress() {
             {/* ── Overview stat cards ── */}
             <div style={s.statsRow} className="mob-stats-row-4">
               {[
-                { label: 'Total Check-ins',  value: summary.total_checkins,                 sub: 'all time',           grad: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
-                { label: 'Current Streak',   value: `${summary.current_streak}d`,           sub: `Best: ${summary.longest_streak}d`, grad: 'linear-gradient(135deg,#10b981,#06b6d4)' },
-                { label: 'Avg Study Hours',  value: `${summary.avg_study_hours}h`,          sub: 'per day',            grad: 'linear-gradient(135deg,#3b82f6,#6366f1)' },
-                { label: 'Avg Score',        value: avgScore || '—',                        sub: 'last 12 weeks',      grad: 'linear-gradient(135deg,#f59e0b,#f97316)' },
+                { label: t('progress_total_checkins'), value: summary.total_checkins,                 sub: t('progress_all_time'),   grad: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
+                { label: t('progress_current_streak'), value: `${summary.current_streak}d`,           sub: `Best: ${summary.longest_streak}d`, grad: 'linear-gradient(135deg,#10b981,#06b6d4)' },
+                { label: t('progress_avg_study'),  value: `${summary.avg_study_hours}h`,          sub: t('progress_per_day'),    grad: 'linear-gradient(135deg,#3b82f6,#6366f1)' },
+                { label: t('progress_avg_score'),  value: avgScore || '—',                        sub: t('progress_last_12w'),   grad: 'linear-gradient(135deg,#f59e0b,#f97316)' },
               ].map(c => (
                 <div key={c.label} style={s.statCard}>
                   <p style={{ margin: '0 0 0.4rem', fontSize: '0.72rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{c.label}</p>
@@ -377,11 +377,11 @@ export default function Progress() {
             {/* ── Study heatmap ── */}
             <div style={{ ...s.card, marginBottom: '1.25rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h2 style={s.cardTitle}>Study Heatmap</h2>
-                <span style={{ fontSize: '0.72rem', color: '#475569' }}>Last 3 months · daily check-ins</span>
+                <h2 style={s.cardTitle}>{t('progress_heatmap')}</h2>
+                <span style={{ fontSize: '0.72rem', color: '#475569' }}>{t('progress_heatmap_sub')}</span>
               </div>
               {summary.total_checkins === 0 ? (
-                <p style={s.empty}>Log your first check-in to start building your heatmap.</p>
+                <p style={s.empty}>{t('progress_heatmap_empty')}</p>
               ) : (
                 <StudyHeatmap heatmap={summary.heatmap} />
               )}
@@ -391,9 +391,9 @@ export default function Progress() {
             <div style={s.twoCol} className="mob-two-col">
               {/* Weekly trend */}
               <div style={s.card}>
-                <h2 style={s.cardTitle}>Weekly Score Trend</h2>
+                <h2 style={s.cardTitle}>{t('progress_weekly_trend')}</h2>
                 {summary.weekly_summaries.length < 2 ? (
-                  <p style={s.empty}>Need at least 2 weeks of data.</p>
+                  <p style={s.empty}>{t('progress_weekly_min')}</p>
                 ) : (
                   <ResponsiveContainer width="100%" height={200}>
                     <AreaChart data={summary.weekly_summaries} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
@@ -414,8 +414,8 @@ export default function Progress() {
                 {summary.weekly_summaries.length >= 2 && (
                   <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
                     {[
-                      { lbl: 'Avg Study', val: `${(summary.weekly_summaries.reduce((a,w)=>a+w.study_hours,0)/summary.weekly_summaries.length).toFixed(1)}h/day` },
-                      { lbl: 'Avg Attendance', val: `${Math.round(summary.weekly_summaries.reduce((a,w)=>a+w.attendance,0)/summary.weekly_summaries.length)}%` },
+                      { lbl: t('progress_avg_study_lbl'), val: `${(summary.weekly_summaries.reduce((a,w)=>a+w.study_hours,0)/summary.weekly_summaries.length).toFixed(1)}h/day` },
+                      { lbl: t('progress_avg_attend'), val: `${Math.round(summary.weekly_summaries.reduce((a,w)=>a+w.attendance,0)/summary.weekly_summaries.length)}%` },
                     ].map(m => (
                       <div key={m.lbl}>
                         <p style={{ margin: 0, fontSize: '0.68rem', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{m.lbl}</p>
@@ -428,7 +428,7 @@ export default function Progress() {
 
               {/* Monthly bars */}
               <div style={s.card}>
-                <h2 style={s.cardTitle}>Monthly Performance</h2>
+                <h2 style={s.cardTitle}>{t('progress_monthly')}</h2>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={summary.monthly_summaries} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
@@ -440,7 +440,7 @@ export default function Progress() {
                   </BarChart>
                 </ResponsiveContainer>
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.6rem', flexWrap: 'wrap' }}>
-                  {[['#6366f1', 'Avg Score'], ['rgba(59,130,246,0.7)', 'Study Hrs']].map(([c, lbl]) => (
+                  {[['#6366f1', t('progress_avg_score_leg')], ['rgba(59,130,246,0.7)', t('simulate_study_hours')]].map(([c, lbl]) => (
                     <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                       <div style={{ width: 10, height: 10, borderRadius: 2, background: c }} />
                       <span style={{ fontSize: '0.7rem', color: '#475569' }}>{lbl}</span>
@@ -454,9 +454,9 @@ export default function Progress() {
             <div style={s.twoCol} className="mob-two-col">
               {/* Subject performance */}
               <div style={s.card}>
-                <h2 style={s.cardTitle}>Subject Sessions</h2>
+                <h2 style={s.cardTitle}>{t('progress_subjects')}</h2>
                 {summary.subject_performance.length === 0 ? (
-                  <p style={s.empty}>No study sessions with subjects recorded yet.</p>
+                  <p style={s.empty}>{t('progress_no_subjects')}</p>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
                     {summary.subject_performance.slice(0, 7).map(sub => {

@@ -816,20 +816,20 @@ export default function Twin() {
           {wsConnected && <LiveBadge />}
         </div>
         <div style={s.navRight}>
-          <Link to="/checkin" className="nav-link" style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', color: '#818cf8' }}>Log Check-in</Link>
+          <Link to="/checkin" className="nav-link" style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', color: '#818cf8' }}>{t('twin_log_checkin')}</Link>
         </div>
       </header>
 
       <main style={s.main}>
         <div style={{ marginBottom: '2rem' }} className="animate-slide-up">
           <h1 style={s.pageTitle}>{t('twin_title')}</h1>
-          <p style={s.pageSub}>A living model of your academic self, built from your data.</p>
+          <p style={s.pageSub}>{t('twin_sub')}</p>
         </div>
 
         {loading && (
           <div style={{ textAlign: 'center', padding: '4rem', color: '#475569' }}>
             <div style={{ fontSize: '2rem', marginBottom: '1rem', animation: 'float 2s ease-in-out infinite' }}>◈</div>
-            <p>Loading your twin…</p>
+            <p>{t('twin_loading')}</p>
           </div>
         )}
         {error && <p style={{ color: '#f87171', textAlign: 'center', marginTop: '3rem' }}>{error}</p>}
@@ -854,7 +854,7 @@ export default function Twin() {
                     </div>
                     <div>
                       <p style={{ margin: '0 0 0.1rem', fontSize: '0.65rem', fontWeight: 700, color: getLevelColor(progress.level), textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>
-                        Level {progress.level}
+                        {t('twin_level_prefix')} {progress.level}
                       </p>
                       <p style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.3px' }}>
                         {progress.level_name}

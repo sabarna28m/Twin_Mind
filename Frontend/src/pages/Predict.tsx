@@ -119,7 +119,7 @@ export default function Predict() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!stress) { setError('Please select a stress level.'); return; }
+    if (!stress) { setError(t('predict_err_stress')); return; }
     setError(''); setLoading(true); setResult(null);
     try {
       const { data } = await api.post<PredictionResult>('/predict', {
@@ -133,7 +133,7 @@ export default function Predict() {
       setResult(data);
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(detail ?? 'Prediction failed. Please check your inputs.');
+      setError(detail ?? t('predict_err_failed'));
     } finally {
       setLoading(false);
     }
@@ -155,48 +155,48 @@ export default function Predict() {
 
       <main style={s.main}>
         <h1 style={s.pageTitle}>{t('predict_title')}</h1>
-        <p style={s.subtitle}>Enter your learning stats and TwinMind will predict your likely exam result.</p>
+        <p style={s.subtitle}>{t('predict_subtitle')}</p>
 
         <div style={result ? s.layout2 : s.layout1}>
           {/* ── Input form ──────────────────────────────────────── */}
           <section style={s.formCard}>
-            {prefilled && <p style={s.prefillNote}>Pre-filled from your latest check-in</p>}
+            {prefilled && <p style={s.prefillNote}>{t('predict_prefilled')}</p>}
             {error && <p style={s.errorMsg}>{error}</p>}
 
             <form onSubmit={handleSubmit} style={s.form}>
               <div style={s.row2}>
                 <label style={s.label}>
-                  Study Hours
+                  {t('simulate_study_hours')}
                   <input type="number" value={studyHours} onChange={e => setStudyHours(e.target.value)}
                     style={s.input} min={0} max={24} step={0.5} placeholder="e.g. 4" required />
                 </label>
                 <label style={s.label}>
-                  Sleep (hrs)
+                  {t('predict_sleep_h')}
                   <input type="number" value={sleep} onChange={e => setSleep(e.target.value)}
                     style={s.input} min={0} max={24} step={0.5} placeholder="e.g. 7" required />
                 </label>
               </div>
               <div style={s.row2}>
                 <label style={s.label}>
-                  Attendance (%)
+                  {t('predict_attendance_p')}
                   <input type="number" value={attendance} onChange={e => setAttendance(e.target.value)}
                     style={s.input} min={0} max={100} step={1} placeholder="e.g. 85" required />
                 </label>
                 <label style={s.label}>
-                  Assignment Completion (%)
+                  {t('predict_completion_p')}
                   <input type="number" value={completion} onChange={e => setCompletion(e.target.value)}
                     style={s.input} min={0} max={100} step={1} placeholder="e.g. 90" required />
                 </label>
               </div>
               <label style={s.label}>
-                Quiz Score (%) <span style={s.optional}>optional — leave blank to estimate</span>
+                {t('predict_quiz_optional')}
                 <input type="number" value={quizScore} onChange={e => setQuizScore(e.target.value)}
                   style={s.input} min={0} max={100} step={0.5} placeholder="—" />
               </label>
 
               <div>
                 <p style={s.stressLabel}>
-                  Stress Level
+                  {t('predict_stress')}
                   {stress > 0 && <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', fontWeight: 600, color: stress >= 8 ? '#dc2626' : stress >= 5 ? '#d97706' : '#16a34a' }}>{stress}/10</span>}
                 </p>
                 <div style={s.stressRow}>
@@ -224,7 +224,7 @@ export default function Predict() {
               <section style={s.panel}>
                 <ScoreGauge score={result.predicted_score} />
                 <p style={{ ...s.confRange, marginTop: '0.5rem' }}>
-                  Confidence range: {result.confidence_range[0]}–{result.confidence_range[1]}
+                  {t('predict_confidence')}: {result.confidence_range[0]}–{result.confidence_range[1]}
                 </p>
                 <div style={{
                   ...s.riskBadge,
@@ -239,10 +239,10 @@ export default function Predict() {
               {/* XGBoost Feature Importance */}
               <section style={s.panel}>
                 <div style={s.panelHeader}>
-                  <h2 style={s.panelTitle}>Feature Importance</h2>
+                  <h2 style={s.panelTitle}>{t('predict_importance')}</h2>
                   <span style={s.xgbBadge}>XGBoost</span>
                 </div>
-                <p style={s.importanceDesc}>How much each factor influences the model's prediction (% of total importance)</p>
+                <p style={s.importanceDesc}>{t('predict_xgb_desc')}</p>
                 <div style={s.barList}>
                   {sortedImportance.map(([key, pct], idx) => {
                     const barColor = idx === 0 ? '#6366f1' : idx === 1 ? '#8b5cf6' : idx === 2 ? '#06b6d4' : 'var(--accent)';
@@ -261,7 +261,7 @@ export default function Predict() {
 
               {/* Recommendations */}
               <section style={s.panel}>
-                <h2 style={{ ...s.panelTitle, marginBottom: '1rem' }}>Recommendations</h2>
+                <h2 style={{ ...s.panelTitle, marginBottom: '1rem' }}>{t('predict_recommendations')}</h2>
                 <ul style={s.recList}>
                   {result.recommendations.map((rec, i) => (
                     <li key={i} style={s.recItem}>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import PracticeQuiz   from '../components/quiz/PracticeQuiz';
 import FocusModeQuiz  from '../components/quiz/FocusModeQuiz';
 import StudyResources from '../components/quiz/StudyResources';
@@ -8,21 +9,22 @@ import PaperAnalyzer  from '../components/quiz/PaperAnalyzer';
 type View = 'hub' | 'practice' | 'focus';
 type Tab  = 'modes' | 'resources' | 'papers';
 
-const TABS: { key: Tab; icon: string; label: string; desc: string }[] = [
-  { key: 'modes',     icon: '🧠', label: 'Quiz Modes',      desc: 'Practice & Focus' },
-  { key: 'resources', icon: '📚', label: 'Study Resources', desc: 'Upload & Analyze' },
-  { key: 'papers',    icon: '📄', label: 'Paper Analyzer',  desc: 'Exam Pattern AI' },
-];
-
 export default function Quiz() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [view, setView] = useState<View>('hub');
   const [tab,  setTab]  = useState<Tab>('modes');
 
   if (view === 'practice') return <PracticeQuiz  onBack={() => setView('hub')} />;
   if (view === 'focus')    return <FocusModeQuiz onBack={() => setView('hub')} />;
 
-  const currentTabLabel = TABS.find(t => t.key === tab)?.label ?? 'Quiz Modes';
+  const TABS: { key: Tab; icon: string; label: string; desc: string }[] = [
+    { key: 'modes',     icon: '🧠', label: t('quiz_tab_modes'),     desc: t('quiz_tab_modes_sub') },
+    { key: 'resources', icon: '📚', label: t('quiz_tab_resources'), desc: t('quiz_tab_resources_sub') },
+    { key: 'papers',    icon: '📄', label: t('quiz_tab_papers'),    desc: t('quiz_tab_papers_sub') },
+  ];
+
+  const currentTabLabel = TABS.find(tb => tb.key === tab)?.label ?? t('quiz_tab_modes');
 
   return (
     <div style={s.shell}>
@@ -32,12 +34,12 @@ export default function Quiz() {
           {/* Back + breadcrumb row */}
           <div style={s.navRow}>
             <button onClick={() => navigate('/')} style={s.backBtn}>
-              ← Dashboard
+              {t('back_dashboard')}
             </button>
             <nav style={s.breadcrumb} aria-label="breadcrumb">
               <span style={s.bcDim}>Dashboard</span>
               <span style={s.bcSep}>›</span>
-              <span style={s.bcDim}>Learning Hub</span>
+              <span style={s.bcDim}>{t('quiz_bc_learning')}</span>
               <span style={s.bcSep}>›</span>
               <span style={s.bcActive}>{currentTabLabel}</span>
             </nav>
@@ -46,8 +48,8 @@ export default function Quiz() {
           <div style={s.brandRow}>
             <span style={s.brandIcon}>🎓</span>
             <div>
-              <p style={s.brandName}>Learning &amp; Assessment Hub</p>
-              <p style={s.brandSub}>AI-powered study tools in one place</p>
+              <p style={s.brandName}>{t('quiz_hub_title')}</p>
+              <p style={s.brandSub}>{t('quiz_hub_sub')}</p>
             </div>
           </div>
         </div>
@@ -56,12 +58,12 @@ export default function Quiz() {
       {/* ── Tab navigation ── */}
       <div style={s.tabRailWrap}>
         <div style={s.tabRail}>
-          {TABS.map(t => {
-            const active = tab === t.key;
+          {TABS.map(tb => {
+            const active = tab === tb.key;
             return (
               <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
+                key={tb.key}
+                onClick={() => setTab(tb.key)}
                 style={{
                   ...s.tabBtn,
                   background:  active ? 'rgba(0,212,255,0.12)' : 'transparent',
@@ -69,12 +71,12 @@ export default function Quiz() {
                   color:       active ? '#00D4FF'               : 'rgba(148,163,184,0.55)',
                 }}
               >
-                <span style={{ fontSize: '1rem' }}>{t.icon}</span>
+                <span style={{ fontSize: '1rem' }}>{tb.icon}</span>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                   <span style={{ fontWeight: active ? 800 : 600, fontSize: '0.8rem', lineHeight: 1.1 }}>
-                    {t.label}
+                    {tb.label}
                   </span>
-                  <span style={{ fontSize: '0.6rem', opacity: 0.6, lineHeight: 1.1 }}>{t.desc}</span>
+                  <span style={{ fontSize: '0.6rem', opacity: 0.6, lineHeight: 1.1 }}>{tb.desc}</span>
                 </div>
                 {active && <div style={s.activeBar} />}
               </button>
@@ -87,17 +89,14 @@ export default function Quiz() {
       <main style={s.main}>
         {tab === 'modes' && (
           <div style={s.modesWrap}>
-            <p style={s.sectionLabel}>Choose your session type</p>
+            <p style={s.sectionLabel}>{t('quiz_choose_type')}</p>
             <div style={s.modesGrid}>
               {/* Practice Quiz */}
               <button onClick={() => setView('practice')} style={s.modeCard}>
                 <div style={s.modeCardGlow} />
                 <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}>📚</div>
-                <p style={s.modeTitle}>Practice Quiz</p>
-                <p style={s.modeDesc}>
-                  Flexible, self-paced learning. No monitoring required. Pause anytime
-                  and review answers at your own speed.
-                </p>
+                <p style={s.modeTitle}>{t('quiz_practice_title')}</p>
+                <p style={s.modeDesc}>{t('quiz_practice_desc')}</p>
                 <div style={s.modeFeats}>
                   {['No camera or mic', 'Pause & resume', 'Full answer review', 'Performance history'].map(f => (
                     <div key={f} style={s.modeFeat}>
@@ -107,7 +106,7 @@ export default function Quiz() {
                   ))}
                 </div>
                 <div style={{ ...s.modeCTA, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}>
-                  Start Practice →
+                  {t('quiz_start_practice')}
                 </div>
               </button>
 
@@ -115,11 +114,8 @@ export default function Quiz() {
               <button onClick={() => setView('focus')} style={{ ...s.modeCard, borderColor: 'rgba(0,212,255,0.2)' }}>
                 <div style={{ ...s.modeCardGlow, background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 65%)' }} />
                 <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#00D4FF,#7c3aed)' }}>👁</div>
-                <p style={{ ...s.modeTitle, color: '#00D4FF' }}>Focus Mode Quiz</p>
-                <p style={s.modeDesc}>
-                  Full exam simulation with AI integrity monitoring. Camera and
-                  microphone required for proctoring.
-                </p>
+                <p style={{ ...s.modeTitle, color: '#00D4FF' }}>{t('quiz_focus_title')}</p>
+                <p style={s.modeDesc}>{t('quiz_focus_desc')}</p>
                 <div style={s.modeFeats}>
                   {['AI webcam monitoring', 'Tab-switch detection', '6-warning system', 'Integrity report'].map(f => (
                     <div key={f} style={s.modeFeat}>
@@ -129,13 +125,13 @@ export default function Quiz() {
                   ))}
                 </div>
                 <div style={{ ...s.modeCTA, background: 'linear-gradient(135deg,#00D4FF,#7c3aed)' }}>
-                  Start Focus Mode →
+                  {t('quiz_start_focus')}
                 </div>
               </button>
             </div>
 
             {/* Quick links to other tabs */}
-            <p style={{ ...s.sectionLabel, marginTop: '1.5rem' }}>AI-powered tools</p>
+            <p style={{ ...s.sectionLabel, marginTop: '1.5rem' }}>{t('quiz_ai_tools_label')}</p>
             <div style={s.quickRow}>
               {[
                 { icon: '📚', label: 'Upload, analyze & generate quizzes from study materials', tab: 'resources' as Tab, color: '#10b981' },
@@ -150,7 +146,7 @@ export default function Quiz() {
                     {item.label}
                   </p>
                   <span style={{ fontSize: '0.65rem', color: item.color, fontWeight: 700, marginTop: 'auto' }}>
-                    Open →
+                    {t('quiz_open')}
                   </span>
                 </button>
               ))}

@@ -190,16 +190,14 @@ export default function Simulate() {
           {wsConnected && <LiveBadge />}
         </div>
         <nav style={sc.navRight}>
-          <Link to="/predict" style={sc.navLink}>Predict</Link>
+          <Link to="/predict" style={sc.navLink}>{t('nav_predict')}</Link>
         </nav>
       </header>
 
       <main style={sc.main}>
         <h1 style={sc.pageTitle}>{t('simulate_title')}</h1>
         <p style={sc.subtitle}>
-          {hasData
-            ? 'Adjust the sliders to explore how habit changes would affect your predicted exam score.'
-            : 'No check-in data found — using default values. Complete a check-in for a personalised baseline.'}
+          {hasData ? t('simulate_subtitle') : t('simulate_subtitle_nodata')}
         </p>
 
         {error && <p style={sc.errorMsg}>{error}</p>}
@@ -208,36 +206,36 @@ export default function Simulate() {
           {/* ── Slider panel ─────────────────────────────────── */}
           <section style={sc.card}>
             <h2 style={sc.cardTitle}>{t('simulate_hypothetical')}</h2>
-            <p style={sc.cardSub}>Drag sliders to explore "what if" changes</p>
+            <p style={sc.cardSub}>{t('simulate_card_hint')}</p>
 
             <SliderRow
-              label="Study Hours / day" value={hypothetical.study_hours}
+              label={t('simulate_study_day')} value={hypothetical.study_hours}
               min={0} max={12} step={0.5} unit="h"
               onChange={v => updateHypo('study_hours', v)}
             />
             <SliderRow
-              label="Attendance" value={hypothetical.attendance_percentage}
+              label={t('simulate_attendance')} value={hypothetical.attendance_percentage}
               min={40} max={100} step={1} unit="%"
               onChange={v => updateHypo('attendance_percentage', v)}
             />
             <SliderRow
-              label="Assignment Completion" value={hypothetical.assignment_completion_rate}
+              label={t('simulate_completion')} value={hypothetical.assignment_completion_rate}
               min={0} max={100} step={1} unit="%"
               onChange={v => updateHypo('assignment_completion_rate', v)}
             />
             <SliderRow
-              label="Sleep Duration" value={hypothetical.sleep_duration}
+              label={t('simulate_sleep_h')} value={hypothetical.sleep_duration}
               min={3} max={11} step={0.5} unit="h"
               onChange={v => updateHypo('sleep_duration', v)}
             />
             <SliderRow
-              label="Stress Level" value={hypothetical.stress_level}
+              label={t('simulate_stress')} value={hypothetical.stress_level}
               min={1} max={10} step={1} unit="/10"
               color={stressColor(hypothetical.stress_level)}
               onChange={v => updateHypo('stress_level', v)}
             />
             <SliderRow
-              label="Quiz Score" value={hypothetical.quiz_scores ?? 0}
+              label={t('simulate_quiz')} value={hypothetical.quiz_scores ?? 0}
               min={0} max={100} step={1} unit="%"
               onChange={v => updateHypo('quiz_scores', v === 0 ? null : v)}
             />
@@ -255,14 +253,14 @@ export default function Simulate() {
           <div style={sc.resultCol}>
             {/* Score comparison */}
             <section style={sc.card}>
-              <h2 style={sc.cardTitle}>Score Comparison</h2>
-              {loading && !result && <p style={sc.loadingMsg}>Running simulation…</p>}
+              <h2 style={sc.cardTitle}>{t('simulate_score_compare')}</h2>
+              {loading && !result && <p style={sc.loadingMsg}>{t('simulate_running')}</p>}
               {result && (
                 <>
                   <div style={sc.scoreRow}>
                     <ScoreBadge label={t('simulate_current')} detail={result.current} />
                     <div style={sc.arrow}>→</div>
-                    <ScoreBadge label="What-If" detail={result.hypothetical} />
+                    <ScoreBadge label={t('simulate_whatif')} detail={result.hypothetical} />
                   </div>
                   <div style={sc.deltaRow}>
                     <DeltaBadge delta={result.delta} pct={result.improvement_pct} />
@@ -278,8 +276,8 @@ export default function Simulate() {
             {/* Feature contributions comparison */}
             {result && (
               <section style={sc.card}>
-                <h2 style={sc.cardTitle}>Impact Breakdown</h2>
-                <p style={sc.cardSub}>How each factor contributes to the What-If score</p>
+                <h2 style={sc.cardTitle}>{t('simulate_impact_break')}</h2>
+                <p style={sc.cardSub}>{t('simulate_impact_desc')}</p>
                 <div style={sc.barList}>
                   {Object.entries(result.hypothetical.feature_contributions).map(([key, hypoVal]) => {
                     const currVal = result.current.feature_contributions[key] ?? 0;
@@ -315,7 +313,7 @@ export default function Simulate() {
             {/* Recommendations */}
             {result && (
               <section style={sc.card}>
-                <h2 style={sc.cardTitle}>What-If Recommendations</h2>
+                <h2 style={sc.cardTitle}>{t('simulate_whatif_recs')}</h2>
                 <ul style={sc.recList}>
                   {result.hypothetical.recommendations.map((rec, i) => (
                     <li key={i} style={sc.recItem}>

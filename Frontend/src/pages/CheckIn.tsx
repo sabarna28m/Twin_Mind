@@ -355,11 +355,11 @@ export default function CheckIn() {
                   <span style={{ ...s.surveyDoneBadge, color: stressColor(stress), borderColor: stressColor(stress) }}>
                     {stress}/10 — {stressLabel(stress, t)}
                   </span>
-                  <button type="button" onClick={openSurvey} style={s.retakeSurveyBtn}>Retake Survey</button>
+                  <button type="button" onClick={openSurvey} style={s.retakeSurveyBtn}>{t('checkin_retake')}</button>
                 </div>
               ) : (
                 <button type="button" onClick={openSurvey} style={s.takeSurveyBtn}>
-                  Take Daily Stress Survey (10 questions)
+                  {t('checkin_take_survey')}
                 </button>
               )}
             </div>
@@ -378,7 +378,7 @@ export default function CheckIn() {
 
         {sparkData.length > 1 && (
           <section style={s.panel}>
-            <h2 style={s.panelTitle}>Study hours — last {sparkData.length} entries</h2>
+            <h2 style={s.panelTitle}>{t('simulate_study_hours')} — last {sparkData.length} entries</h2>
             <div style={s.spark}>
               {sparkData.map((e, i) => (
                 <div key={i} style={s.sparkCol}>
@@ -394,17 +394,17 @@ export default function CheckIn() {
         )}
 
         <section style={s.panel}>
-          <h2 style={s.panelTitle}>History</h2>
+          <h2 style={s.panelTitle}>{t('checkin_history_title')}</h2>
           {loading ? (
-            <p style={s.empty}>Loading…</p>
+            <p style={s.empty}>{t('loading')}</p>
           ) : entries.length === 0 ? (
-            <p style={s.empty}>No entries yet. Log your first check-in above.</p>
+            <p style={s.empty}>{t('checkin_no_entries')}</p>
           ) : (
             <div style={s.tableWrap}>
               <table style={s.table}>
                 <thead>
                   <tr>
-                    {['Date','Study h','Sleep h','Attendance','Completion','Quiz','Exam','Stress',''].map(h => (
+                    {[t('checkin_col_date'),t('checkin_col_study'),t('checkin_col_sleep'),t('checkin_col_attend'),t('checkin_col_complete'),t('checkin_col_quiz'),t('checkin_col_exam'),t('checkin_col_stress'),''].map(h => (
                       <th key={h} style={s.th}>{h}</th>
                     ))}
                   </tr>
@@ -445,8 +445,8 @@ export default function CheckIn() {
               <>
                 <div style={s.surveyHeader}>
                   <div>
-                    <p style={s.surveyTitle}>Daily Stress Level Survey</p>
-                    <p style={s.surveySub}>10 questions · ~1 minute</p>
+                    <p style={s.surveyTitle}>{t('checkin_survey_title')}</p>
+                    <p style={s.surveySub}>{t('checkin_survey_sub')}</p>
                   </div>
                   <button onClick={() => setShowSurvey(false)} style={s.surveyClose}>✕</button>
                 </div>
@@ -459,7 +459,7 @@ export default function CheckIn() {
                 </div>
 
                 <div style={s.questionWrap}>
-                  <p style={s.questionNum}>Question {currentQ + 1}</p>
+                  <p style={s.questionNum}>{t('checkin_question')} {currentQ + 1}</p>
                   <p style={s.questionText}>{SURVEY_QUESTIONS[currentQ].q}</p>
                   <div style={s.optionsWrap}>
                     {SURVEY_QUESTIONS[currentQ].opts.map((opt, i) => {
@@ -518,7 +518,7 @@ export default function CheckIn() {
             ) : (
               <>
                 <div style={s.surveyHeader}>
-                  <p style={s.surveyTitle}>Survey Complete</p>
+                  <p style={s.surveyTitle}>{t('checkin_survey_complete')}</p>
                   <button onClick={() => setShowSurvey(false)} style={s.surveyClose}>✕</button>
                 </div>
 
@@ -535,7 +535,7 @@ export default function CheckIn() {
                   <p style={s.catDesc}>{cat!.desc}</p>
 
                   <div style={s.mappedWrap}>
-                    <span style={s.mappedLabel}>Maps to stress level:</span>
+                    <span style={s.mappedLabel}>{t('checkin_stress_maps')}</span>
                     <div style={s.mappedDots}>
                       {Array.from({ length: 10 }, (_, i) => (
                         <span key={i} style={{ ...s.mappedDot, background: i < mappedStress ? cat!.color : 'var(--border)' }} />
@@ -553,10 +553,10 @@ export default function CheckIn() {
                   <button type="button"
                     onClick={() => { setSurveyAnswers(Array(10).fill(0)); setCurrentQ(0); setSurveyDone(false); }}
                     style={s.retakeBtn}>
-                    Retake Survey
+                    {t('checkin_retake')}
                   </button>
                   <button type="button" onClick={applySurveyScore} style={s.applyBtn}>
-                    Apply Score ({mappedStress}/10)
+                    {t('checkin_apply_score')} ({mappedStress}/10)
                   </button>
                 </div>
               </>
