@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   BookOpen, FileText, BarChart2, Trophy, Brain, Zap,
   MessageCircle, Layers, Menu, Rocket, Mic2, ChevronDown, Video,
-  Shield, TrendingUp, Sword, ShoppingBag,
+  Shield, TrendingUp, Sword, ShoppingBag, Dumbbell,
 } from 'lucide-react';
 import XPShopModal from '../components/XPShopModal';
 import { XPStoreProvider } from '../contexts/XPStoreContext';
@@ -19,7 +19,7 @@ import api from '../services/api';
 import { BACKEND_URL, WS_URL } from '../lib/config';
 import {
   getLevelColor, getLevelGradient,
-  type GamificationProgress, type WeeklyChallengeData,
+  type GamificationProgress,
 } from '../utils/gamification';
 import BurnoutWidget from '../components/BurnoutWidget';
 import SubjectWidgets from '../components/SubjectWidgets';
@@ -28,6 +28,7 @@ import AITwinAssistant from '../components/AITwinAssistant';
 import SmartDailyMission from '../components/SmartDailyMission';
 import HeroPriorityCard from '../components/HeroPriorityCard';
 import StreakShieldCard from '../components/StreakShieldCard';
+import WeeklyChallengesModal from '../components/WeeklyChallengesModal';
 
 const BACKEND = BACKEND_URL;
 
@@ -292,15 +293,10 @@ export default function Dashboard() {
   const [smartPlan,         setSmartPlan]         = useState<SmartPlan | null>(null);
   const [planLoading,       setPlanLoading]       = useState(false);
   const [planError,         setPlanError]         = useState<string | null>(null);
-  const [gamProgress,       setGamProgress]       = useState<GamificationProgress | null>(null);
-  const [weeklyChallenge,   setWeeklyChallenge]   = useState<WeeklyChallengeData | null>(null);
-  const [showChallengeForm, setShowChallengeForm] = useState(false);
-  const [chStudy,           setChStudy]           = useState('');
-  const [chQuiz,            setChQuiz]            = useState('');
-  const [chCheckin,         setChCheckin]         = useState('');
-  const [savingChallenge,   setSavingChallenge]   = useState(false);
-  const [drawerOpen,        setDrawerOpen]        = useState(false);
-  const [shopOpen,          setShopOpen]          = useState(false);
+  const [gamProgress,   setGamProgress]   = useState<GamificationProgress | null>(null);
+  const [drawerOpen,    setDrawerOpen]    = useState(false);
+  const [shopOpen,      setShopOpen]      = useState(false);
+  const [challengeOpen, setChallengeOpen] = useState(false);
 
   // Dropdown nav state
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -337,7 +333,6 @@ export default function Dashboard() {
     api.get<SavedPlan>('/mentor/study-plan/saved').then(r => setSavedPlan(r.data)).catch(() => setSavedPlan(null));
     api.get<{ events: CalEvent[] }>('/calendar/upcoming').then(r => setCalEvents(r.data.events)).catch(() => {});
     api.get<GamificationProgress>('/gamification/progress').then(r => setGamProgress(r.data)).catch(() => {});
-    api.get<WeeklyChallengeData>('/gamification/weekly-challenge').then(r => setWeeklyChallenge(r.data)).catch(() => {});
     api.get<SmartPlan>('/smart-plan/current').then(r => setSmartPlan(r.data)).catch(() => {});
   }, []);
 
@@ -406,20 +401,6 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
     win.onload = () => { win.focus(); win.print(); };
   }
 
-  async function saveChallenge() {
-    setSavingChallenge(true);
-    try {
-      await api.post('/gamification/weekly-challenge', {
-        target_study_hours:  chStudy   ? parseFloat(chStudy)  : null,
-        target_quiz_count:   chQuiz    ? parseInt(chQuiz)     : null,
-        target_checkin_days: chCheckin ? parseInt(chCheckin)  : null,
-      });
-      const { data } = await api.get<WeeklyChallengeData>('/gamification/weekly-challenge');
-      setWeeklyChallenge(data); setShowChallengeForm(false);
-    } catch { /* ignore */ }
-    finally { setSavingChallenge(false); }
-  }
-
   const streak     = computeStreak(entries);
   const totalHours = Math.round(entries.reduce((s, e) => s + e.study_hours, 0));
   const last7      = getLast7Days(entries);
@@ -463,6 +444,7 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
     <XPStoreProvider>
     <div style={s.shell}>
       <XPShopModal isOpen={shopOpen} onClose={() => setShopOpen(false)} />
+      <WeeklyChallengesModal isOpen={challengeOpen} onClose={() => setChallengeOpen(false)} />
       <MobileNav
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -552,6 +534,20 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
         <div style={s.navRight} className="mob-nav-right">
           <span className="mob-hide-mobile"><LanguageSwitcher /></span>
           <ThemeToggle />
+          <button
+            onClick={() => setChallengeOpen(true)}
+            title="Weekly Challenges"
+            aria-label="Open Weekly Challenges"
+            style={{
+              background: 'none', border: '1px solid rgba(var(--primary-rgb),0.2)',
+              borderRadius: '9px', width: '34px', height: '34px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'var(--primary)', transition: 'border-color 0.2s, box-shadow 0.2s',
+              fontFamily: 'inherit',
+            }}
+          >
+            <Dumbbell size={16} />
+          </button>
           <button
             onClick={() => setShopOpen(true)}
             className="nav-shop-btn"
@@ -806,80 +802,7 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
           )}
         </section>
 
-        {/* ── S9: WEEKLY CHALLENGE ── */}
-        {weeklyChallenge && (
-          <section style={s.panel} className="glass-panel dash-section">
-            <div style={s.panelHead}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1rem' }}>⚔️</span>
-                <h2 style={s.panelTitle}>Weekly Challenge</h2>
-                {weeklyChallenge.has_challenge && (
-                  <span style={{
-                    fontSize: '0.7rem', fontWeight: 700, padding: '0.15rem 0.5rem',
-                    borderRadius: '99px',
-                    color: weeklyChallenge.completion_pct >= 100 ? '#10b981' : 'var(--accent)',
-                    background: weeklyChallenge.completion_pct >= 100 ? 'rgba(16,185,129,0.1)' : 'var(--accent-bg)',
-                    border: `1px solid ${weeklyChallenge.completion_pct >= 100 ? 'rgba(16,185,129,0.3)' : 'var(--accent-border)'}`,
-                  }}>{weeklyChallenge.completion_pct}% done</span>
-                )}
-              </div>
-              <button onClick={() => { setShowChallengeForm(f => !f); setChStudy(''); setChQuiz(''); setChCheckin(''); }}
-                style={{ fontSize: '0.75rem', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>
-                {weeklyChallenge.has_challenge ? 'Update' : 'Set Challenge'}
-              </button>
-            </div>
-            {showChallengeForm && (
-              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', flexWrap: 'wrap' as const, marginBottom: '0.85rem', padding: '0.85rem', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)', borderRadius: '10px' }}>
-                {[
-                  { label: 'Study hours goal', val: chStudy,   set: setChStudy,   ph: 'e.g. 30' },
-                  { label: 'Quizzes goal',      val: chQuiz,    set: setChQuiz,    ph: 'e.g. 5'  },
-                  { label: 'Check-in days',     val: chCheckin, set: setChCheckin, ph: 'e.g. 7'  },
-                ].map(f => (
-                  <label key={f.label} style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.2rem', fontSize: '0.75rem', color: 'var(--text)', fontWeight: 500 }}>
-                    {f.label}
-                    <input type="number" value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph} min={0}
-                      style={{ width: '100px', padding: '0.35rem 0.5rem', border: '1px solid var(--border)', borderRadius: '6px', background: 'var(--bg)', color: 'var(--text-h)', fontSize: '0.875rem', outline: 'none' }} />
-                  </label>
-                ))}
-                <button onClick={saveChallenge} disabled={savingChallenge || (!chStudy && !chQuiz && !chCheckin)}
-                  style={{ padding: '0.4rem 1rem', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', opacity: (!chStudy && !chQuiz && !chCheckin) ? 0.5 : 1 }}>
-                  {savingChallenge ? 'Saving…' : 'Save'}
-                </button>
-              </div>
-            )}
-            {weeklyChallenge.has_challenge && weeklyChallenge.targets ? (
-              <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.55rem' }}>
-                {[
-                  { label: 'Study Hours',   cur: weeklyChallenge.progress.study_hours,  target: weeklyChallenge.targets.study_hours,  unit: 'h'     },
-                  { label: 'Quizzes',       cur: weeklyChallenge.progress.quiz_count,   target: weeklyChallenge.targets.quiz_count,   unit: ''      },
-                  { label: 'Check-in Days', cur: weeklyChallenge.progress.checkin_days, target: weeklyChallenge.targets.checkin_days, unit: ' days' },
-                ].filter(m => m.target).map(m => {
-                  const pct  = Math.min(100, Math.round((m.cur / m.target!) * 100));
-                  const done = pct >= 100;
-                  return (
-                    <div key={m.label}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                        <span style={{ fontSize: '0.78rem', color: 'var(--text)', fontWeight: 500 }}>{m.label}</span>
-                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: done ? '#10b981' : 'var(--text-h)' }}>
-                          {m.cur}{m.unit} / {m.target}{m.unit} {done ? '✓' : ''}
-                        </span>
-                      </div>
-                      <div style={{ height: '6px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${pct}%`, background: done ? 'linear-gradient(90deg,#10b981,#34d399)' : 'linear-gradient(90deg,var(--accent),#8b5cf6)', borderRadius: '99px', transition: 'width 0.6s ease' }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : !showChallengeForm && (
-              <p style={{ fontSize: '0.85rem', color: 'var(--text)', margin: 0 }}>
-                Set weekly study targets to track your progress and stay accountable.
-              </p>
-            )}
-          </section>
-        )}
-
-        {/* ── S10: CALENDAR EVENTS ── */}
+        {/* ── S9: CALENDAR EVENTS ── */}
         {calEvents.length > 0 && (
           <section style={s.panel} className="glass-panel dash-section">
             <div style={s.panelHead}>
@@ -913,7 +836,7 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
           </section>
         )}
 
-        {/* ── S11: MY STUDY PLAN ── */}
+        {/* ── S10: MY STUDY PLAN ── */}
         <section style={s.panel} className="glass-panel dash-section">
           <div style={s.panelHead}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
