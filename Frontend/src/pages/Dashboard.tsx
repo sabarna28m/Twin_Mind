@@ -199,139 +199,6 @@ const qs: Record<string, React.CSSProperties> = {
   },
 };
 
-/* ── AI Tool Card ── */
-function AIToolCard({ icon, title, desc, to, fromColor, toColor, badge }: {
-  icon: string; title: string; desc: string; to: string;
-  fromColor: string; toColor: string; badge?: string;
-}) {
-  return (
-    <Link to={to} style={{ textDecoration: 'none', display: 'flex' }}>
-      <div
-        className="ai-tool-card"
-        style={{
-          position: 'relative', overflow: 'hidden',
-          background: `linear-gradient(135deg, ${fromColor}18 0%, ${toColor}0e 100%)`,
-          border: `1px solid ${fromColor}28`,
-          borderRadius: '22px', padding: '2rem 1.75rem',
-          cursor: 'pointer', width: '100%',
-          boxShadow: `0 4px 32px rgba(0,0,0,0.3), inset 0 1px 0 ${fromColor}18`,
-        }}
-      >
-        <div style={{
-          position: 'absolute', top: '-80px', right: '-80px',
-          width: '240px', height: '240px', borderRadius: '50%',
-          background: `radial-gradient(circle, ${fromColor}16 0%, transparent 65%)`,
-          pointerEvents: 'none', animation: 'orb-drift-1 18s ease-in-out infinite',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: '-60px', left: '-40px',
-          width: '160px', height: '160px', borderRadius: '50%',
-          background: `radial-gradient(circle, ${toColor}12 0%, transparent 65%)`,
-          pointerEvents: 'none', animation: 'orb-drift-2 14s ease-in-out infinite',
-        }} />
-
-        {badge && (
-          <span style={{
-            position: 'absolute', top: '1.25rem', right: '1.25rem',
-            padding: '0.2rem 0.62rem', borderRadius: '99px',
-            fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.1em',
-            background: `${fromColor}22`, color: fromColor,
-            border: `1px solid ${fromColor}35`,
-          }}>{badge}</span>
-        )}
-
-        <div style={{
-          fontSize: '2.25rem', marginBottom: '1.1rem',
-          filter: `drop-shadow(0 0 14px ${fromColor}65)`,
-          position: 'relative', zIndex: 1,
-        }}>{icon}</div>
-
-        <h3 style={{
-          fontSize: '1.15rem', fontWeight: 900, color: '#f1f5f9',
-          margin: '0 0 0.65rem', letterSpacing: '-0.3px',
-          position: 'relative', zIndex: 1,
-        }}>{title}</h3>
-
-        <p style={{
-          fontSize: '0.82rem', color: 'rgba(148,163,184,0.8)', lineHeight: 1.65,
-          margin: '0 0 1.5rem', position: 'relative', zIndex: 1,
-        }}>{desc}</p>
-
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-          fontSize: '0.78rem', fontWeight: 700, color: fromColor,
-          padding: '0.45rem 1rem',
-          background: `${fromColor}16`,
-          border: `1px solid ${fromColor}30`,
-          borderRadius: '99px',
-          position: 'relative', zIndex: 1,
-          transition: 'background 0.2s',
-        }}>
-          Explore {title.split(' ')[0]} <span>→</span>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-/* ── Learning Action Card ── */
-function LearningCard({ icon, title, desc, to, accentColor, isMain = false }: {
-  icon: string; title: string; desc: string; to: string;
-  accentColor: string; isMain?: boolean;
-}) {
-  return (
-    <Link to={to} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column' }}>
-      <div
-        className="learning-card"
-        style={{
-          position: 'relative', overflow: 'hidden',
-          background: isMain
-            ? `linear-gradient(135deg, ${accentColor}1c 0%, ${accentColor}0c 100%)`
-            : 'rgba(255,255,255,0.04)',
-          border: `1px solid ${accentColor}${isMain ? '32' : '1c'}`,
-          borderRadius: '18px',
-          padding: isMain ? '1.6rem' : '1.3rem',
-          cursor: 'pointer', height: '100%',
-          display: 'flex', flexDirection: 'column', gap: '0.55rem',
-          boxShadow: isMain ? `0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 ${accentColor}20` : 'none',
-        }}
-      >
-        {isMain && (
-          <div style={{
-            position: 'absolute', top: '-40px', right: '-40px',
-            width: '130px', height: '130px', borderRadius: '50%',
-            background: `radial-gradient(circle, ${accentColor}20 0%, transparent 65%)`,
-            pointerEvents: 'none',
-          }} />
-        )}
-        <span style={{
-          fontSize: isMain ? '1.8rem' : '1.45rem',
-          filter: `drop-shadow(0 0 10px ${accentColor}60)`,
-          position: 'relative', zIndex: 1,
-        }}>{icon}</span>
-        <h3 style={{
-          margin: 0, position: 'relative', zIndex: 1,
-          fontSize: isMain ? '0.95rem' : '0.85rem',
-          fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.2px',
-        }}>{title}</h3>
-        <p style={{
-          margin: 0, flex: 1, position: 'relative', zIndex: 1,
-          fontSize: '0.72rem', color: 'rgba(148,163,184,0.8)', lineHeight: 1.55,
-        }}>{desc}</p>
-        {isMain && (
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '0.35rem',
-            fontSize: '0.78rem', fontWeight: 700, color: accentColor,
-            marginTop: '0.35rem', position: 'relative', zIndex: 1,
-          }}>
-            ▶ Start Now
-          </div>
-        )}
-      </div>
-    </Link>
-  );
-}
-
 /* ── Section Header ── */
 function SectionHeader({ badge, title, cta, ctaTo }: {
   badge: string; title: string; cta?: string; ctaTo?: string;
@@ -779,66 +646,7 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
           <QuickStatCard icon="⭐" label="XP Points"    value={gamProgress?.xp ?? 0}             grad="linear-gradient(135deg,#8b5cf6,#a78bfa)" delay={300} />
         </div>
 
-        {/* ── S3: AI COMMAND SUITE ── */}
-        <section className="dash-section">
-          <SectionHeader badge="AI POWERED" title="AI Command Suite" />
-          <div style={s.aiToolsGrid} className="mob-ai-tools-grid">
-            <AIToolCard
-              icon="🧬" title="Twin AI"
-              desc="Your digital learning twin mirrors your study patterns and predicts optimal learning paths in real time."
-              to="/twin" fromColor="#00D4FF" toColor="#3B82F6" badge="LIVE"
-            />
-            <AIToolCard
-              icon="🚀" title="Career AI"
-              desc="Personalized career guidance, skill gap analysis, and actionable job market insights powered by AI."
-              to="/career" fromColor="#7C3AED" toColor="#EC4899" badge="NEW"
-            />
-            <AIToolCard
-              icon="🎙" title="Comm Twin"
-              desc="Master communication with AI-powered interview simulations and public speaking feedback."
-              to="/comm-twin" fromColor="#F97316" toColor="#EF4444"
-            />
-            <AIToolCard
-              icon="🎓" title="Mentor AI"
-              desc="Your personal AI mentor creates customized weekly study plans and provides expert academic guidance."
-              to="/mentor" fromColor="#F59E0B" toColor="#FCD34D"
-            />
-          </div>
-        </section>
-
-        {/* ── S4: LEARNING CENTER ── */}
-        <section className="dash-section">
-          <SectionHeader badge="LEARNING CENTER" title="Your Learning Journey" cta="All Sessions" ctaTo="/sessions" />
-          <div style={s.learningGrid} className="mob-learning-grid">
-            <LearningCard
-              icon="▶" title="Start Study Session"
-              desc="Launch a focused study session with AI-powered tracking and real-time analytics."
-              to="/sessions" accentColor="#6366F1" isMain
-            />
-            <LearningCard
-              icon="🧠" title="AI Mentor Plan"
-              desc="View your AI-generated personalized weekly study schedule."
-              to="/mentor" accentColor="#00D4FF"
-            />
-            <LearningCard
-              icon="📝" title="Smart Notes"
-              desc="Create and review AI-enhanced study notes with auto-summaries."
-              to="/notes" accentColor="#10B981"
-            />
-            <LearningCard
-              icon="🎯" title="Quiz Practice"
-              desc="Test your knowledge with adaptive difficulty quizzes."
-              to="/quiz" accentColor="#8B5CF6"
-            />
-            <LearningCard
-              icon="⚡" title="Exam Simulator"
-              desc="Full exam simulation with integrity monitoring and detailed reports."
-              to="/simulate" accentColor="#F59E0B"
-            />
-          </div>
-        </section>
-
-        {/* ── S5: PERFORMANCE ANALYTICS ── */}
+        {/* ── S3: PERFORMANCE ANALYTICS ── */}
         <section className="dash-section">
           <SectionHeader badge="PERFORMANCE" title="Analytics & Insights" cta="Full Report" ctaTo="/progress" />
           <div style={s.perfGrid} className="mob-mid-row">
@@ -883,19 +691,19 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
           </div>
         </section>
 
-        {/* ── S6: AI COMMAND CENTER (live metrics) ── */}
+        {/* ── S4: AI COMMAND CENTER (live metrics) ── */}
         <section className="dash-section">
           <SectionHeader badge="AI INTELLIGENCE" title="Live Performance Monitor" />
           <AICommandCenter brainReadiness={health.pct} streak={streak} level={gamProgress?.level} />
         </section>
 
-        {/* ── STREAK PROTECTION ── */}
+        {/* ── S5: STREAK PROTECTION ── */}
         <section className="dash-section">
           <SectionHeader badge="STREAK PROTECTION" title="Streak Shield System" cta="XP Shop" ctaTo="/shop" />
           <StreakShieldCard />
         </section>
 
-        {/* ── S7: WELLNESS CENTER ── */}
+        {/* ── S6: WELLNESS CENTER ── */}
         <section className="dash-section">
           <SectionHeader badge="WELLNESS & FOCUS" title="Mental Health Center" cta="Full Report" ctaTo="/burnout" />
           <div style={s.wellnessGrid} className="mob-wellness-grid">
@@ -927,13 +735,13 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
           </div>
         </section>
 
-        {/* ── S8: AI TWIN ASSISTANT ── */}
+        {/* ── S7: AI TWIN ASSISTANT ── */}
         <section className="dash-section">
           <SectionHeader badge="DIGITAL TWIN" title="Twin Intelligence Hub" />
           <AITwinAssistant />
         </section>
 
-        {/* ── S9: SMART PLAN ── */}
+        {/* ── S8: SMART PLAN ── */}
         <section style={sp.card} className="dash-section">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -998,7 +806,7 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
           )}
         </section>
 
-        {/* ── S10: WEEKLY CHALLENGE ── */}
+        {/* ── S9: WEEKLY CHALLENGE ── */}
         {weeklyChallenge && (
           <section style={s.panel} className="glass-panel dash-section">
             <div style={s.panelHead}>
@@ -1071,7 +879,7 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
           </section>
         )}
 
-        {/* ── S11: CALENDAR EVENTS ── */}
+        {/* ── S10: CALENDAR EVENTS ── */}
         {calEvents.length > 0 && (
           <section style={s.panel} className="glass-panel dash-section">
             <div style={s.panelHead}>
@@ -1105,7 +913,7 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
           </section>
         )}
 
-        {/* ── S12: MY STUDY PLAN ── */}
+        {/* ── S11: MY STUDY PLAN ── */}
         <section style={s.panel} className="glass-panel dash-section">
           <div style={s.panelHead}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -1230,7 +1038,7 @@ const s: Record<string, React.CSSProperties> = {
   },
 
   /* Main */
-  main: { flex: 1, padding: '2.5rem 2rem 5rem', maxWidth: '1200px', width: '100%', margin: '0 auto', boxSizing: 'border-box' as const, display: 'flex', flexDirection: 'column', gap: '2.75rem' },
+  main: { flex: 1, padding: '2rem 2rem 5rem', maxWidth: '1200px', width: '100%', margin: '0 auto', boxSizing: 'border-box' as const, display: 'flex', flexDirection: 'column', gap: '2rem' },
 
   /* Hero 2-col layout */
   heroGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', alignItems: 'stretch' },
@@ -1299,12 +1107,6 @@ const s: Record<string, React.CSSProperties> = {
 
   /* Quick Stats Strip */
   statsStrip: { display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '1rem' },
-
-  /* AI Tools Grid (4 cards) */
-  aiToolsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem' },
-
-  /* Learning Center Grid (5 cards) */
-  learningGrid: { display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem' },
 
   /* Performance Grid */
   perfGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' },
