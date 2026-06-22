@@ -273,7 +273,7 @@ interface SmartPlan {
    MAIN DASHBOARD COMPONENT
    ══════════════════════════════════════════════ */
 export default function Dashboard() {
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, studentProfile } = useAuth();
   const { t } = useLanguage();
   const hour = new Date().getHours();
   const greeting = hour < 5 ? t('greeting_midnight') : hour < 12 ? t('greeting_morning') : hour < 17 ? t('greeting_afternoon') : t('greeting_evening');
@@ -293,10 +293,12 @@ export default function Dashboard() {
   const [smartPlan,         setSmartPlan]         = useState<SmartPlan | null>(null);
   const [planLoading,       setPlanLoading]       = useState(false);
   const [planError,         setPlanError]         = useState<string | null>(null);
-  const [gamProgress,   setGamProgress]   = useState<GamificationProgress | null>(null);
-  const [drawerOpen,    setDrawerOpen]    = useState(false);
-  const [shopOpen,      setShopOpen]      = useState(false);
-  const [challengeOpen, setChallengeOpen] = useState(false);
+  const [gamProgress,     setGamProgress]     = useState<GamificationProgress | null>(null);
+  const [drawerOpen,      setDrawerOpen]      = useState(false);
+  const [shopOpen,        setShopOpen]        = useState(false);
+  const [challengeOpen,   setChallengeOpen]   = useState(false);
+  const [profileDropOpen, setProfileDropOpen] = useState(false);
+  const profileDropRef = useRef<HTMLDivElement>(null);
 
   // Dropdown nav state
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -312,6 +314,17 @@ export default function Dashboard() {
   const ddStay = () => {
     if (ddTimer.current) clearTimeout(ddTimer.current);
   };
+
+  useEffect(() => {
+    if (!profileDropOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (profileDropRef.current && !profileDropRef.current.contains(e.target as Node)) {
+        setProfileDropOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [profileDropOpen]);
 
   const refreshData = useCallback(() => {
     Promise.all([
@@ -564,15 +577,127 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
             <ShoppingBag size={16} />
           </button>
           <span className="mob-hide-mobile"><NotificationBell /></span>
-          <Link to="/profile" style={s.navUser} data-tour="profile">
-            {avatarSrc
-              ? <img src={avatarSrc} alt="" style={s.navAvatar} />
-              : <span style={s.navInitials}>{firstName[0]?.toUpperCase()}</span>}
-            <span className="mob-nav-user-text">{user?.full_name}</span>
-          </Link>
-          <span className="mob-hide-mobile">
-            <button className="sign-out-btn" onClick={logout}>{t('sign_out')}</button>
-          </span>
+          {/* ── Profile avatar + dropdown ── */}
+          <div ref={profileDropRef} style={{ position: 'relative' }} data-tour="profile">
+            <button
+              className="profile-avatar-btn"
+              data-tooltip="Profile"
+              onClick={() => setProfileDropOpen(o => !o)}
+              aria-label="Profile menu"
+              style={{
+                width: '34px', height: '34px', borderRadius: '50%',
+                boxShadow: profileDropOpen
+                  ? '0 0 0 2px rgba(0,212,255,0.6), 0 0 18px rgba(0,212,255,0.35)'
+                  : '0 0 0 2px rgba(0,212,255,0.3), 0 0 12px rgba(0,212,255,0.15)',
+              }}
+            >
+              {avatarSrc
+                ? <img src={avatarSrc} alt="" style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover', display: 'block' }} />
+                : (
+                  <span style={{
+                    width: '34px', height: '34px', borderRadius: '50%',
+                    background: 'linear-gradient(135deg,rgba(0,212,255,0.18),rgba(124,58,237,0.18))',
+                    border: '2px solid rgba(0,212,255,0.35)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '0.72rem', fontWeight: 800, color: '#00D4FF',
+                  }}>
+                    {user?.full_name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+                  </span>
+                )
+              }
+            </button>
+
+            {profileDropOpen && (
+              <div
+                className="profile-drop-animate"
+                style={{
+                  position: 'absolute', top: 'calc(100% + 10px)', right: 0,
+                  minWidth: '268px', zIndex: 500,
+                  background: 'rgba(4,8,22,0.96)',
+                  border: '1px solid rgba(0,212,255,0.16)',
+                  borderRadius: '18px',
+                  backdropFilter: 'blur(32px) saturate(200%)',
+                  WebkitBackdropFilter: 'blur(32px) saturate(200%)',
+                  boxShadow: '0 0 0 1px rgba(0,212,255,0.06), 0 20px 60px rgba(0,0,0,0.65)',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* User info header */}
+                <div style={{ padding: '1.1rem 1.1rem 0.85rem', display: 'flex', alignItems: 'center', gap: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div style={{ flexShrink: 0 }}>
+                    {avatarSrc
+                      ? <img src={avatarSrc} alt="" style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(0,212,255,0.35)', boxShadow: '0 0 14px rgba(0,212,255,0.25)' }} />
+                      : (
+                        <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg,rgba(0,212,255,0.2),rgba(124,58,237,0.2))', border: '2px solid rgba(0,212,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: 800, color: '#00D4FF', boxShadow: '0 0 16px rgba(0,212,255,0.25)' }}>
+                          {user?.full_name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+                        </div>
+                      )
+                    }
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ margin: '0 0 0.08rem', fontSize: '0.88rem', fontWeight: 800, color: '#f1f5f9', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.full_name}</p>
+                    <p style={{ margin: '0 0 0.05rem', fontSize: '0.67rem', color: 'rgba(148,163,184,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</p>
+                    {studentProfile?.course && (
+                      <p style={{ margin: 0, fontSize: '0.67rem', color: 'rgba(0,212,255,0.65)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{studentProfile.course}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* XP / Level row */}
+                {gamProgress && (
+                  <div style={{ padding: '0.75rem 1.1rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                        <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: getLevelGradient(gamProgress.level), display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 900, color: '#fff', flexShrink: 0 }}>{gamProgress.level}</div>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: getLevelColor(gamProgress.level) }}>{gamProgress.level_name}</span>
+                      </div>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#f59e0b' }}>⭐ {(gamProgress.xp ?? 0).toLocaleString()} XP</span>
+                    </div>
+                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${gamProgress.progress_pct ?? 0}%`, background: getLevelGradient(gamProgress.level), borderRadius: '99px', transition: 'width 0.6s ease' }} />
+                    </div>
+                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.63rem', color: 'rgba(148,163,184,0.42)' }}>{(gamProgress.xp_to_next ?? 0) > 0 ? `${gamProgress.xp_to_next} XP to level up` : 'Max level reached!'}</p>
+                  </div>
+                )}
+
+                {/* Navigation links */}
+                <div style={{ padding: '0.45rem 0.45rem' }}>
+                  <Link to="/profile" className="profile-drop-item" onClick={() => setProfileDropOpen(false)} style={{ textDecoration: 'none' }}>
+                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(var(--primary-rgb),0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', flexShrink: 0 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                    </div>
+                    <div>
+                      <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9' }}>Profile & Settings</p>
+                      <p style={{ margin: 0, fontSize: '0.65rem', color: 'rgba(148,163,184,0.5)' }}>Edit your info & preferences</p>
+                    </div>
+                  </Link>
+                  <Link to="/achievements" className="profile-drop-item" onClick={() => setProfileDropOpen(false)} style={{ textDecoration: 'none' }}>
+                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b', flexShrink: 0 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                    </div>
+                    <div>
+                      <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9' }}>Achievements</p>
+                      <p style={{ margin: 0, fontSize: '0.65rem', color: 'rgba(148,163,184,0.5)' }}>Badges & milestones</p>
+                    </div>
+                  </Link>
+                </div>
+
+                {/* Sign out */}
+                <div style={{ padding: '0.45rem 0.45rem 0.55rem', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                  <button
+                    onClick={() => { setProfileDropOpen(false); logout(); }}
+                    className="profile-drop-item"
+                    style={{ width: '100%', background: 'none', border: 'none', fontFamily: 'inherit', textAlign: 'left' }}
+                  >
+                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444', flexShrink: 0 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#fca5a5' }}>{t('sign_out')}</p>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -929,13 +1054,10 @@ const s: Record<string, React.CSSProperties> = {
     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
   },
   navCenter: { display: 'flex', alignItems: 'center', gap: '0.15rem' },
-  navRight:  { display: 'flex', alignItems: 'center', gap: '0.75rem' },
+  navRight:  { display: 'flex', alignItems: 'center', gap: '0.6rem' },
   navDivider: { width: '1px', height: '18px', background: 'rgba(255,255,255,0.1)', flexShrink: 0, margin: '0 0.35rem' },
   liveBadge: { display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.22rem 0.7rem', background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.28)', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 800, color: '#00D4FF', letterSpacing: '0.06em' },
   liveDot:   { width: '6px', height: '6px', borderRadius: '50%', background: '#00D4FF', boxShadow: '0 0 8px rgba(0,212,255,0.9)', flexShrink: 0 },
-  navUser:   { display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', color: 'var(--text-m)', textDecoration: 'none', fontWeight: 600 },
-  navAvatar: { width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' as const, border: '2px solid rgba(0,212,255,0.4)', boxShadow: '0 0 12px rgba(0,212,255,0.2)' },
-  navInitials: { width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,212,255,0.12)', border: '2px solid rgba(0,212,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 800, color: '#00D4FF', flexShrink: 0 },
 
   /* Dropdown */
   ddTrigger: {

@@ -2752,6 +2752,42 @@ html[data-theme="neural-brain"] h2 {
   background: rgba(var(--primary-rgb), 0.07) !important;
 }
 
+/* ── Profile avatar dropdown ── */
+@keyframes profile-drop-in {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)     scale(1);    }
+}
+.profile-drop-animate {
+  animation: profile-drop-in 0.2s cubic-bezier(0.16,1,0.3,1) both;
+}
+.profile-drop-item {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.52rem 0.85rem; border-radius: 10px; cursor: pointer;
+  text-decoration: none; transition: background 0.15s;
+  color: inherit;
+}
+.profile-drop-item:hover { background: rgba(var(--primary-rgb), 0.07); }
+.profile-avatar-btn {
+  position: relative; background: none; border: none;
+  padding: 0; cursor: pointer; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.profile-avatar-btn:hover  { transform: scale(1.06); }
+.profile-avatar-btn:focus  { outline: none; }
+.profile-avatar-btn::after {
+  content: attr(data-tooltip);
+  position: absolute; bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%);
+  background: rgba(4,8,22,0.9); color: #e2e8f0;
+  font-size: 0.7rem; font-weight: 600; white-space: nowrap;
+  padding: 0.25rem 0.55rem; border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.15s; backdrop-filter: blur(8px);
+}
+.profile-avatar-btn:hover::after { opacity: 1; }
+
 /* ── Dropdown trigger button ── */
 .nav-dd-btn:hover {
   color: var(--text-h) !important;
