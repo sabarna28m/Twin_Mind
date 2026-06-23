@@ -370,10 +370,11 @@ export default function Dashboard() {
     {
       id: 'learning', label: t('nav_group_learning'),
       items: [
-        { icon: BookOpen,      label: t('nav_sessions'),    desc: 'Track study sessions',       to: '/sessions',      tour: 'sessions'  },
-        { icon: FileText,      label: t('nav_smart_notes'), desc: 'AI-enhanced notes',          to: '/notes'                           },
-        { icon: Brain,         label: t('nav_quiz'),        desc: 'Adaptive practice quizzes',  to: '/quiz',          tour: 'quiz'      },
-        { icon: Video,         label: t('nav_videos'),      desc: 'Video learning resources',   to: '/videos'                          },
+        { icon: BookOpen,      label: 'Subjects',           desc: 'Subject performance overview',       to: '/subjects'                        },
+        { icon: FileText,      label: 'Notes',              desc: 'AI-enhanced note-taking',            to: '/notes'                           },
+        { icon: Brain,         label: 'Quiz',               desc: 'Adaptive practice quizzes',          to: '/quiz',          tour: 'quiz'      },
+        { icon: Zap,           label: 'Focus Mode',         desc: 'Focus timer & study sessions',       to: '/sessions',      tour: 'sessions'  },
+        { icon: Layers,        label: 'Smart Notes',        desc: 'AI-powered note generation',         to: '/notes'                           },
       ],
     },
     {
@@ -434,7 +435,7 @@ export default function Dashboard() {
 
         {/* Grouped nav with dropdowns */}
         <nav style={s.navCenter} className="mob-nav-links">
-          <Link to="/" className="nav-link" style={{ fontWeight: 700, color: 'var(--primary)' }}
+          <Link to="/" className="nav-link" style={{ ...s.navStandaloneLink, fontWeight: 700, color: 'var(--primary)' }}
                 data-tour="dashboard">
             Dashboard
           </Link>
@@ -483,15 +484,15 @@ export default function Dashboard() {
             );
             if (gi === 1) {
               return [
-                <Link key="nav-planner" to="/study-planner" className="nav-link" style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  📅 Study Planner
+                <Link key="nav-planner" to="/study-planner" className="nav-link" style={s.navStandaloneLink}>
+                  Study Planner
                 </Link>,
                 dropdown,
               ];
             }
             if (gi === 2) {
               return [
-                <Link key="nav-checkin" to="/checkin" className="nav-link" style={{ fontWeight: 600 }}
+                <Link key="nav-checkin" to="/checkin" className="nav-link" style={s.navStandaloneLink}
                       data-tour="checkin">
                   Check-in
                 </Link>,
@@ -869,9 +870,10 @@ const s: Record<string, React.CSSProperties> = {
     background: 'linear-gradient(135deg, #00D4FF 0%, #a78bfa 100%)',
     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
   },
-  navCenter: { display: 'flex', alignItems: 'center', gap: '0.15rem' },
+  navCenter: { display: 'flex', alignItems: 'center', gap: '0.2rem' },
   navRight:  { display: 'flex', alignItems: 'center', gap: '0.6rem' },
-  navDivider: { width: '1px', height: '18px', background: 'rgba(255,255,255,0.1)', flexShrink: 0, margin: '0 0.35rem' },
+  navDivider: { width: '1px', height: '14px', background: 'rgba(255,255,255,0.09)', flexShrink: 0, margin: '0 0.45rem' },
+  navStandaloneLink: { display: 'flex', alignItems: 'center', padding: '0.38rem 0.65rem', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600, whiteSpace: 'nowrap' as const, letterSpacing: '0.01em' },
   liveBadge: { display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.22rem 0.7rem', background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.28)', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 800, color: '#00D4FF', letterSpacing: '0.06em' },
   liveDot:   { width: '6px', height: '6px', borderRadius: '50%', background: '#00D4FF', boxShadow: '0 0 8px rgba(0,212,255,0.9)', flexShrink: 0 },
 
