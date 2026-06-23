@@ -387,12 +387,10 @@ export default function Dashboard() {
     {
       id: 'ai', label: 'AI Tools',
       items: [
-        { icon: Layers,        label: 'Twin Intelligence',   desc: 'Your digital study twin',         to: '/twin',     tour: 'twin'    },
-        { icon: Zap,           label: 'Twin Simulation',     desc: 'Simulate exam performance',       to: '/simulate', tour: 'simulate'},
-        { icon: BarChart2,     label: 'Weakness Analysis',   desc: 'AI subject weakness detection',   to: '/subjects'                },
-        { icon: TrendingUp,    label: 'Performance Forecast',desc: 'AI score prediction',             to: '/predict'                 },
-        { icon: Shield,        label: 'Burnout Analysis',    desc: 'Monitor burnout & focus health',  to: '/burnout'                 },
-        { icon: MessageCircle, label: 'AI Recommendations',  desc: 'Personalised AI mentor',          to: '/mentor',   tour: 'mentor' },
+        { icon: Layers,        label: 'Twin Intelligence', desc: 'Your digital study twin',                                 to: '/twin',     tour: 'twin'    },
+        { icon: Zap,           label: 'Twin Simulation',   desc: 'Simulate learning outcomes and exam performance',         to: '/simulate', tour: 'simulate'},
+        { icon: Shield,        label: 'Burnout Analysis',  desc: 'Monitor burnout risk, focus health, and study balance',  to: '/burnout'                 },
+        { icon: MessageCircle, label: 'AI Mentor',         desc: 'Your personalised AI learning coach',                    to: '/mentor',   tour: 'mentor' },
       ],
     },
   ];
