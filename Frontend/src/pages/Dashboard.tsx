@@ -23,7 +23,7 @@ import {
 import BurnoutWidget from '../components/BurnoutWidget';
 
 import AICommandCenter from '../components/AICommandCenter';
-import AITwinAssistant from '../components/AITwinAssistant';
+
 import SmartDailyMission from '../components/SmartDailyMission';
 import HeroPriorityCard from '../components/HeroPriorityCard';
 import StreakShieldCard from '../components/StreakShieldCard';
@@ -388,14 +388,17 @@ export default function Dashboard() {
       ],
     },
     {
-      id: 'ai', label: t('nav_group_ai'),
+      id: 'ai', label: 'AI Twin',
       items: [
-        { icon: Layers,        label: t('nav_twin'),        desc: 'Your digital study twin',    to: '/twin',          tour: 'twin'     },
-        { icon: Rocket,        label: t('nav_career'),      desc: 'Career guidance & insights', to: '/career'                          },
-        { icon: Mic2,          label: t('nav_comm_twin'),   desc: 'Communication practice',     to: '/comm-twin'                       },
-        { icon: MessageCircle, label: t('nav_mentor'),      desc: 'Personalized AI mentor',     to: '/mentor',        tour: 'mentor'   },
-        { icon: Zap,           label: t('nav_simulate'),    desc: 'Exam simulation',            to: '/simulate',      tour: 'simulate' },
-        { icon: Sword,         label: t('nav_battles'),     desc: 'Competitive quiz battles',   to: '/battles'                         },
+        { icon: Layers,        label: 'Twin Intelligence',   desc: 'Your digital study twin',            to: '/twin',       tour: 'twin'     },
+        { icon: Zap,           label: 'Twin Simulation',     desc: 'Simulate exam performance',          to: '/simulate',   tour: 'simulate' },
+        { icon: BarChart2,     label: 'Weakness Analysis',   desc: 'AI subject performance analysis',    to: '/subjects'                    },
+        { icon: MessageCircle, label: 'AI Recommendations',  desc: 'Personalized AI mentor & guidance',  to: '/mentor',     tour: 'mentor'   },
+        { icon: Shield,        label: 'Burnout & Wellness',  desc: 'Monitor burnout and focus health',   to: '/burnout'                     },
+        { icon: TrendingUp,    label: 'Performance Forecast',desc: 'AI score prediction & trends',       to: '/predict'                     },
+        { icon: Rocket,        label: t('nav_career'),       desc: 'Career guidance & insights',         to: '/career'                      },
+        { icon: Mic2,          label: t('nav_comm_twin'),    desc: 'Communication practice',             to: '/comm-twin'                   },
+        { icon: Sword,         label: t('nav_battles'),      desc: 'Competitive quiz battles',           to: '/battles'                     },
       ],
     },
   ];
@@ -797,12 +800,6 @@ export default function Dashboard() {
             </div>
             <SmartDailyMission />
           </div>
-        </section>
-
-        {/* ── S7: AI TWIN ASSISTANT ── */}
-        <section className="dash-section">
-          <SectionHeader badge="DIGITAL TWIN" title="Twin Intelligence Hub" />
-          <AITwinAssistant />
         </section>
 
         {/* ── S9: CALENDAR EVENTS ── */}
