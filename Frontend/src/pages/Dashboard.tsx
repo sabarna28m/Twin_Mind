@@ -365,41 +365,40 @@ export default function Dashboard() {
   const health     = computeTwinHealth(entries);
   const weekHours  = last7.reduce((s, d) => s + d.hours, 0);
 
-  /* ── NAV GROUPS ── */
-  const navGroups = [
+  /* ── DROPDOWN NAV GROUPS ── */
+  const dropdownGroups = [
     {
-      id: 'learning', label: t('nav_group_learning'),
+      id: 'performance', label: 'Performance',
       items: [
-        { icon: BookOpen,      label: 'Subjects',           desc: 'Subject performance overview',       to: '/subjects'                        },
-        { icon: FileText,      label: 'Notes',              desc: 'AI-enhanced note-taking',            to: '/notes'                           },
-        { icon: Brain,         label: 'Quiz',               desc: 'Adaptive practice quizzes',          to: '/quiz',          tour: 'quiz'      },
-        { icon: Zap,           label: 'Focus Mode',         desc: 'Focus timer & study sessions',       to: '/sessions',      tour: 'sessions'  },
-        { icon: Layers,        label: 'Smart Notes',        desc: 'AI-powered note generation',         to: '/notes'                           },
-      ],
-    },
-    {
-      id: 'performance', label: t('nav_group_performance'),
-      items: [
-        { icon: Layers,        label: 'Subject Analysis',     desc: 'AI subject performance analysis',      to: '/subjects'                        },
-        { icon: BarChart2,     label: 'Performance Analytics',desc: 'Full progress report',                 to: '/progress'                        },
-        { icon: Brain,         label: 'Quiz Performance',     desc: 'Quiz history & accuracy',              to: '/quiz'                            },
-        { icon: Shield,        label: 'Focus Score Analysis', desc: 'Monitor burnout & focus health',       to: '/burnout'                         },
-        { icon: TrendingUp,    label: 'Improvement Trends',   desc: 'AI score prediction & trends',         to: '/predict'                         },
-        { icon: Trophy,        label: t('nav_achievements'),  desc: 'Badges & milestones',                  to: '/achievements'                    },
+        { icon: Layers,        label: 'Subject Analysis',     desc: 'AI subject performance analysis',  to: '/subjects'                        },
+        { icon: BarChart2,     label: 'Performance Analytics',desc: 'Full progress report',             to: '/progress'                        },
+        { icon: Brain,         label: 'Quiz Performance',     desc: 'Quiz history & accuracy',          to: '/quiz'                            },
+        { icon: Shield,        label: 'Focus Score Analysis', desc: 'Burnout & focus health monitor',   to: '/burnout'                         },
+        { icon: TrendingUp,    label: 'Improvement Trends',   desc: 'AI score prediction & trends',     to: '/predict'                         },
+        { icon: Trophy,        label: 'Achievements',         desc: 'Badges & milestones',              to: '/achievements'                    },
       ],
     },
     {
       id: 'ai', label: 'AI Twin',
       items: [
-        { icon: Layers,        label: 'Twin Intelligence',   desc: 'Your digital study twin',            to: '/twin',       tour: 'twin'     },
-        { icon: Zap,           label: 'Twin Simulation',     desc: 'Simulate exam performance',          to: '/simulate',   tour: 'simulate' },
-        { icon: BarChart2,     label: 'Weakness Analysis',   desc: 'AI subject performance analysis',    to: '/subjects'                    },
-        { icon: MessageCircle, label: 'AI Recommendations',  desc: 'Personalized AI mentor & guidance',  to: '/mentor',     tour: 'mentor'   },
-        { icon: Shield,        label: 'Burnout & Wellness',  desc: 'Monitor burnout and focus health',   to: '/burnout'                     },
-        { icon: TrendingUp,    label: 'Performance Forecast',desc: 'AI score prediction & trends',       to: '/predict'                     },
-        { icon: Rocket,        label: t('nav_career'),       desc: 'Career guidance & insights',         to: '/career'                      },
-        { icon: Mic2,          label: t('nav_comm_twin'),    desc: 'Communication practice',             to: '/comm-twin'                   },
-        { icon: Sword,         label: t('nav_battles'),      desc: 'Competitive quiz battles',           to: '/battles'                     },
+        { icon: Layers,        label: 'Twin Intelligence',    desc: 'Your digital study twin',          to: '/twin',       tour: 'twin'     },
+        { icon: Zap,           label: 'Twin Simulation',      desc: 'Simulate exam performance',        to: '/simulate',   tour: 'simulate' },
+        { icon: BarChart2,     label: 'Weakness Analysis',    desc: 'AI subject weakness detection',    to: '/subjects'                    },
+        { icon: MessageCircle, label: 'AI Recommendations',   desc: 'Personalised AI mentor',           to: '/mentor',     tour: 'mentor'   },
+        { icon: Shield,        label: 'Burnout & Wellness',   desc: 'Monitor burnout & focus health',   to: '/burnout'                     },
+        { icon: TrendingUp,    label: 'Performance Forecast', desc: 'AI score prediction',              to: '/predict'                     },
+        { icon: Rocket,        label: 'Career Guidance',      desc: 'Career insights & planning',       to: '/career'                      },
+        { icon: Mic2,          label: 'Comm Twin',            desc: 'Communication practice',           to: '/comm-twin'                   },
+      ],
+    },
+    {
+      id: 'tools', label: 'AI Tools',
+      items: [
+        { icon: FileText,      label: 'Smart Notes',          desc: 'AI-powered note generation',       to: '/notes'                           },
+        { icon: Brain,         label: 'Quiz',                 desc: 'Adaptive practice quizzes',        to: '/quiz',       tour: 'quiz'      },
+        { icon: Video,         label: 'Study Videos',         desc: 'Video learning resources',         to: '/videos'                          },
+        { icon: Sword,         label: 'Battles',              desc: 'Competitive quiz battles',         to: '/battles'                         },
+        { icon: Trophy,        label: 'Skill Tree',           desc: 'Visual skill progression',         to: '/skill-tree'                      },
       ],
     },
   ];
@@ -433,74 +432,41 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Grouped nav with dropdowns */}
+        {/* Nav: standalone items then dropdown group */}
         <nav style={s.navCenter} className="mob-nav-links">
-          <Link to="/" className="nav-link" style={{ ...s.navStandaloneLink, fontWeight: 700, color: 'var(--primary)' }}
-                data-tour="dashboard">
+          {/* ── Standalone links ── */}
+          <Link to="/" className="nav-link" style={{ ...s.navStandaloneLink, fontWeight: 700, color: 'var(--primary)' }} data-tour="dashboard">
             Dashboard
           </Link>
-          <div style={s.navDivider} />
-          {navGroups.flatMap((group, gi) => {
-            const dropdown = (
-              <div
-                key={group.id}
-                style={{ position: 'relative' }}
-                onMouseEnter={() => ddOpen(group.id)}
-                onMouseLeave={ddClose}
-              >
-                <button
-                  className="nav-dd-btn nav-link"
-                  style={s.ddTrigger}
-                >
-                  {group.label}
-                  <ChevronDown
-                    size={13}
-                    style={{
-                      opacity: 0.6,
-                      transition: 'transform 0.22s ease',
-                      transform: openDropdown === group.id ? 'rotate(180deg)' : 'none',
-                    }}
-                  />
-                </button>
-                {openDropdown === group.id && (
-                  <div
-                    style={s.ddMenu}
-                    className="dd-menu-animate"
-                    onMouseEnter={ddStay}
-                    onMouseLeave={ddClose}
-                  >
-                    {group.items.map(item => (
-                      <DDItem
-                        key={item.to}
-                        icon={item.icon}
-                        label={item.label}
-                        desc={item.desc}
-                        to={item.to}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-            if (gi === 1) {
-              return [
-                <Link key="nav-planner" to="/study-planner" className="nav-link" style={s.navStandaloneLink}>
-                  Study Planner
-                </Link>,
-                dropdown,
-              ];
-            }
-            if (gi === 2) {
-              return [
-                <Link key="nav-checkin" to="/checkin" className="nav-link" style={s.navStandaloneLink}
-                      data-tour="checkin">
-                  Check-in
-                </Link>,
-                dropdown,
-              ];
-            }
-            return [dropdown];
-          })}
+          <Link to="/sessions" className="nav-link" style={s.navStandaloneLink} data-tour="sessions">
+            Learning
+          </Link>
+          <Link to="/study-planner" className="nav-link" style={s.navStandaloneLink}>
+            Study Planner
+          </Link>
+          <Link to="/checkin" className="nav-link" style={s.navStandaloneLink} data-tour="checkin">
+            Check-in
+          </Link>
+
+          {/* ── Section divider ── */}
+          <div style={s.navSectionDivider} />
+
+          {/* ── Dropdown groups ── */}
+          {dropdownGroups.map(group => (
+            <div key={group.id} style={{ position: 'relative' }} onMouseEnter={() => ddOpen(group.id)} onMouseLeave={ddClose}>
+              <button className="nav-dd-btn nav-link" style={s.ddTrigger}>
+                {group.label}
+                <ChevronDown size={13} style={{ opacity: 0.6, transition: 'transform 0.22s ease', transform: openDropdown === group.id ? 'rotate(180deg)' : 'none' }} />
+              </button>
+              {openDropdown === group.id && (
+                <div style={s.ddMenu} className="dd-menu-animate" onMouseEnter={ddStay} onMouseLeave={ddClose}>
+                  {group.items.map(item => (
+                    <DDItem key={item.to} icon={item.icon} label={item.label} desc={item.desc} to={item.to} />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </nav>
 
         <div style={s.navRight} className="mob-nav-right">
@@ -870,10 +836,11 @@ const s: Record<string, React.CSSProperties> = {
     background: 'linear-gradient(135deg, #00D4FF 0%, #a78bfa 100%)',
     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
   },
-  navCenter: { display: 'flex', alignItems: 'center', gap: '0.2rem' },
+  navCenter: { display: 'flex', alignItems: 'center', gap: '0.15rem' },
   navRight:  { display: 'flex', alignItems: 'center', gap: '0.6rem' },
   navDivider: { width: '1px', height: '14px', background: 'rgba(255,255,255,0.09)', flexShrink: 0, margin: '0 0.45rem' },
-  navStandaloneLink: { display: 'flex', alignItems: 'center', padding: '0.38rem 0.65rem', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600, whiteSpace: 'nowrap' as const, letterSpacing: '0.01em' },
+  navSectionDivider: { width: '1px', height: '20px', background: 'rgba(255,255,255,0.14)', flexShrink: 0, margin: '0 0.85rem' },
+  navStandaloneLink: { display: 'flex', alignItems: 'center', padding: '0.38rem 0.75rem', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600, whiteSpace: 'nowrap' as const, letterSpacing: '0.01em' },
   liveBadge: { display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.22rem 0.7rem', background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.28)', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 800, color: '#00D4FF', letterSpacing: '0.06em' },
   liveDot:   { width: '6px', height: '6px', borderRadius: '50%', background: '#00D4FF', boxShadow: '0 0 8px rgba(0,212,255,0.9)', flexShrink: 0 },
 
