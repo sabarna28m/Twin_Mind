@@ -388,7 +388,7 @@ export default function Dashboard() {
       id: 'ai', label: 'AI Tools',
       items: [
         { icon: Layers,        label: 'Digital Twin',        desc: 'AI-powered replica of the learner',              to: '/twin',      tour: 'twin'    },
-        { icon: Zap,           label: 'Twin Simulation',     desc: 'Simulate future learning outcomes',              to: '/simulate',  tour: 'simulate'},
+        { icon: Zap,           label: 'What-If Simulator',   desc: 'Explore future academic outcomes based on different study decisions', to: '/simulate', tour: 'simulate' },
         { icon: Mic2,          label: 'Communication Twin',  desc: 'AI communication and interview coach',           to: '/comm-twin'                  },
         { icon: Rocket,        label: 'Career Twin',         desc: 'AI career guidance and career forecasting',      to: '/career'                     },
         { icon: Shield,        label: 'Burnout Analysis',    desc: 'Monitor focus, stress and burnout risk',         to: '/burnout'                    },
