@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Timer } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { BrainIcon } from '../components/TwinMindLogo';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
@@ -110,6 +111,7 @@ export default function Sessions() {
       <header style={pg.nav} className="nav-premium">
         <div style={pg.navLeft}>
           <BackButton />
+          <BrainIcon size={24} />
           <Link to="/" style={pg.navLogo}>TwinMind</Link>
           {wsConnected && <LiveBadge />}
         </div>

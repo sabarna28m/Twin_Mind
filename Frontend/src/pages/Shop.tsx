@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import BackButton from '../components/BackButton';
+import { BrainIcon } from '../components/TwinMindLogo';
 import { XPStoreProvider, useXPStore } from '../contexts/XPStoreContext';
 import type { ShopItem } from '../contexts/XPStoreContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -104,6 +105,7 @@ function ShopContent() {
       <header style={p.nav}>
         <div style={p.navLeft}>
           <BackButton />
+          <BrainIcon size={24} />
           <Link to="/" style={p.navLogo}>TwinMind</Link>
         </div>
       </header>

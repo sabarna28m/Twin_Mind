@@ -8,6 +8,7 @@ import { GOOGLE_CLIENT_ID } from '../lib/config';
 import CustomCaptcha from '../components/CustomCaptcha';
 import PasswordInput from '../components/PasswordInput';
 import PasswordStrength from '../components/PasswordStrength';
+import TwinMindLogo from '../components/TwinMindLogo';
 
 export default function Register() {
   const { register, loginWithGoogle } = useAuth();
@@ -61,8 +62,7 @@ export default function Register() {
 
       <div className="glass animate-slide-up mob-auth-card" style={s.card}>
         <div style={s.logoWrap}>
-          <span style={s.logoIcon}>◈</span>
-          <span className="grad-text" style={s.logoText}>TwinMind</span>
+          <TwinMindLogo size={44} variant="auth" />
         </div>
         <p style={s.tagline}>{t('login_tagline')}</p>
         <h2 style={s.title}>{t('register_title')}</h2>

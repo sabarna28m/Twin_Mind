@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { BrainIcon } from '../components/TwinMindLogo';
 import {
   Timer, Play, Pause, Square, RotateCcw,
   Clock, Zap, CheckCircle, Trash2,
@@ -298,6 +299,7 @@ export default function FocusSession() {
       <header style={s.nav} className="nav-premium">
         <div style={s.navLeft}>
           <BackButton />
+          <BrainIcon size={24} />
           <Link to="/" style={s.navLogo}>TwinMind</Link>
           {wsConnected && <LiveBadge />}
         </div>

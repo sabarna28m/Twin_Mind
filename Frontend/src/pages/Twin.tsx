@@ -3,6 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { BrainIcon } from '../components/TwinMindLogo';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
@@ -1496,7 +1497,7 @@ export default function Twin() {
       <header style={s.nav}>
         <div style={s.navLeft}>
           <BackButton />
-          <span style={{ fontSize: '1rem', color: '#6366f1' }}>◈</span>
+          <BrainIcon size={24} />
           <span style={s.navLogo}>TwinMind</span>
           {wsConnected && <LiveBadge />}
         </div>

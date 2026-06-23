@@ -3,6 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { BrainIcon } from '../components/TwinMindLogo';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
@@ -186,6 +187,7 @@ export default function Simulate() {
       <header style={sc.nav}>
         <div style={sc.navLeft}>
           <BackButton />
+          <BrainIcon size={24} />
           <Link to="/" style={sc.navLogo}>TwinMind</Link>
           {wsConnected && <LiveBadge />}
         </div>

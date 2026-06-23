@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { BrainIcon } from '../components/TwinMindLogo';
 import api from '../services/api';
 import { WS_URL } from '../lib/config';
 import BadgeNotification, { type Badge } from '../components/BadgeNotification';
@@ -278,6 +279,7 @@ export default function CheckIn() {
       <header style={s.nav}>
         <div style={s.navLeft}>
           <BackButton />
+          <BrainIcon size={24} />
           <Link to="/" style={s.navLogo}>TwinMind</Link>
           {wsConnected && (
             <div style={s.liveBadge}>

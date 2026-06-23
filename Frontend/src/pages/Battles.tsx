@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import BackButton from '../components/BackButton';
+import { BrainIcon } from '../components/TwinMindLogo';
 import { getLevelColor, getLevelGradient, LEVEL_NAMES } from '../utils/gamification';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -448,6 +449,7 @@ export default function Battles() {
       <header style={s.nav}>
         <div style={s.navLeft}>
           <BackButton />
+          <BrainIcon size={24} />
           <Link to="/" style={s.navLogo}>TwinMind</Link>
         </div>
       </header>

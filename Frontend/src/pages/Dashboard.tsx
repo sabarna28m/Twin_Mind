@@ -5,6 +5,7 @@ import {
   MessageCircle, Layers, Menu, Rocket, Mic2, ChevronDown, Video,
   Shield, TrendingUp, Sword, Dumbbell,
 } from 'lucide-react';
+import { BrainIcon } from '../components/TwinMindLogo';
 import { XPStoreProvider } from '../contexts/XPStoreContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -413,7 +414,7 @@ export default function Dashboard() {
           <button className="mob-hamburger" onClick={() => setDrawerOpen(true)} aria-label="Open menu">
             <Menu size={20} />
           </button>
-          <span style={s.logoIcon}>◈</span>
+          <BrainIcon size={28} />
           <span style={s.navLogo}>TwinMind</span>
           {wsConnected && (
             <div style={s.liveBadge} className="mob-hide-mobile">

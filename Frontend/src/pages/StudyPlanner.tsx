@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { BrainIcon } from '../components/TwinMindLogo';
 import type { GamificationProgress } from '../utils/gamification';
 
 /* ════════════════════════════════════════════
@@ -499,7 +500,8 @@ export default function StudyPlanner() {
         {/* ── Header nav ── */}
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', height: '58px', borderBottom: '1.5px solid rgba(var(--primary-rgb),0.15)', background: 'rgba(4,8,22,0.9)', backdropFilter: 'blur(24px)', position: 'sticky', top: 0, zIndex: 30, flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <Link to="/" style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--primary)', textDecoration: 'none' }}>◈ TwinMind</Link>
+            <BrainIcon size={24} />
+            <Link to="/" style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--primary)', textDecoration: 'none' }}>TwinMind</Link>
             <span style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)' }} />
             <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0' }}>📅 AI Study Planner</span>
           </div>

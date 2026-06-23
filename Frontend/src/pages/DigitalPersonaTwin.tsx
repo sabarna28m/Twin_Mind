@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import BackButton from '../components/BackButton';
 import { type GamificationProgress } from '../utils/gamification';
+import { BrainIcon } from '../components/TwinMindLogo';
 
 /* ═══════════════════════════════════════════════════════════════════════
    DPT PROFILE — persisted in localStorage
@@ -965,8 +966,8 @@ export default function DigitalPersonaTwin() {
       <header className="nav-premium" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 1.75rem', height:60, position:'sticky', top:0, zIndex:50 }}>
         <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
           <BackButton />
-          <span style={{ fontSize:'1rem', color:'#6366f1' }}>◈</span>
-          <span style={{ fontSize:'1.05rem', fontWeight:800, color:'#f1f5f9', letterSpacing:'-0.3px' }}>TwinMind</span>
+          <BrainIcon size={26} />
+          <span style={{ fontSize:'1.05rem', fontWeight:900, color:'#f1f5f9', letterSpacing:'-0.3px' }}>TwinMind</span>
         </div>
         <div style={{ display:'flex', gap:'0.6rem', alignItems:'center' }}>
           <Link to="/checkin" style={{ padding:'0.38rem 0.9rem', borderRadius:9, background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.25)', color:'#818cf8', fontSize:'0.78rem', fontWeight:700, textDecoration:'none' }}>Log Check-in</Link>

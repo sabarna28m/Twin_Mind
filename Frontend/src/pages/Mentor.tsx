@@ -3,6 +3,7 @@ import type { KeyboardEvent } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { BrainIcon } from '../components/TwinMindLogo';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
@@ -490,6 +491,7 @@ export default function Mentor() {
       <header style={mc.nav}>
         <div style={mc.navLeft}>
           <BackButton />
+          <BrainIcon size={24} />
           <Link to="/" style={mc.navLogo}>TwinMind</Link>
           {wsConnected && <LiveBadge />}
         </div>

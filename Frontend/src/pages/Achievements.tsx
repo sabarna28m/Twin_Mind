@@ -3,6 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { BrainIcon } from '../components/TwinMindLogo';
 import BackButton from '../components/BackButton';
 
 interface Achievement {
@@ -407,6 +408,7 @@ export default function Achievements() {
       <header style={s.nav}>
         <div style={s.navLeft}>
           <BackButton />
+          <BrainIcon size={24} />
           <Link to="/" style={s.navLogo}>TwinMind</Link>
         </div>
         <div style={s.xpBadge}>⭐ {xpFromBadges.toLocaleString()} XP from badges</div>

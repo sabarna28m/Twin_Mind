@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { BrainIcon } from '../components/TwinMindLogo';
 import {
   AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -321,7 +322,7 @@ export default function Progress() {
       <header style={s.nav}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           <BackButton />
-          <span style={{ fontSize: '1rem', color: '#6366f1' }}>◈</span>
+          <BrainIcon size={24} />
           <span style={s.navLogo}>TwinMind</span>
           {wsConnected && <LiveBadge />}
         </div>
