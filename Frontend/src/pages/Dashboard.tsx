@@ -815,32 +815,6 @@ export default function Dashboard() {
           <AITwinAssistant />
         </section>
 
-        {/* ── S8: STUDY PLANNER COMPACT CARD ── */}
-        <section style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)', backdropFilter: 'blur(var(--glass-blur))', padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem', flexWrap: 'wrap' as const }} className="dash-section">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '240px' }}>
-            <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg,rgba(var(--primary-rgb),0.22),rgba(124,58,237,0.18))', border: '1.5px solid rgba(var(--primary-rgb),0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0, boxShadow: '0 8px 24px rgba(var(--primary-rgb),0.2)' }}>📅</div>
-            <div>
-              <h2 style={{ margin: '0 0 0.2rem', fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>Study Planner</h2>
-              <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8' }}>Monthly goals → weekly tasks → daily actions. Auto-tracked by AI.</p>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' as const }}>
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ margin: '0 0 0.1rem', fontSize: '1.2rem', fontWeight: 900, color: '#00D4FF', textShadow: '0 0 12px rgba(0,212,255,0.5)' }}>{Math.round(weekHours)}h</p>
-              <p style={{ margin: 0, fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Week Hours</p>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ margin: '0 0 0.1rem', fontSize: '1.2rem', fontWeight: 900, color: '#10b981', textShadow: '0 0 12px rgba(16,185,129,0.5)' }}>{Math.round(Math.min(100, (weekHours / 14) * 100))}%</p>
-              <p style={{ margin: 0, fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Weekly Goal</p>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ margin: '0 0 0.1rem', fontSize: '1.2rem', fontWeight: 900, color: '#f59e0b', textShadow: '0 0 12px rgba(245,158,11,0.5)' }}>{Math.round(Math.min(100, (totalHours / 60) * 100))}%</p>
-              <p style={{ margin: 0, fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Monthly Goal</p>
-            </div>
-            <Link to="/study-planner" style={{ padding: '0.58rem 1.25rem', background: 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', borderRadius: '10px', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none', boxShadow: '0 4px 16px rgba(var(--primary-rgb),0.35)', flexShrink: 0, whiteSpace: 'nowrap' as const }}>Open Planner →</Link>
-          </div>
-        </section>
-
         {/* ── S9: CALENDAR EVENTS ── */}
         {calEvents.length > 0 && (
           <section style={s.panel} className="glass-panel dash-section">
