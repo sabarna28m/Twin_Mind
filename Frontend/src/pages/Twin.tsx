@@ -79,6 +79,13 @@ interface TwinState {
   evolution_timeline: EvolutionEvent[];
 }
 
+/* ── Extended model interfaces ───────────────────────────────────────── */
+interface SubjectSummary  { subject: string; avg_score: number; recommended_daily_minutes: number; trend?: string }
+interface SubjectAnalysis { weakest: SubjectSummary | null; strongest: SubjectSummary | null; focus_today: SubjectSummary | null }
+interface BurnoutData     { burnout_score: number; risk_level: 'low' | 'medium' | 'high' }
+interface LearningEntry   { study_hours: number; quiz_accuracy?: number | null; notes_created: number; focus_sessions: number; stress_level: number; sleep_duration: number; assignment_completion_rate: number }
+interface StreakStatus     { streak_days: number; shield_count: number; last_checkin: string | null }
+
 const RISK_COLOR  = { low: '#10b981', medium: '#f59e0b', high: '#ef4444' };
 const RISK_BG     = { low: 'rgba(16,185,129,0.12)', medium: 'rgba(245,158,11,0.12)', high: 'rgba(239,68,68,0.12)' };
 const RISK_BORDER = { low: 'rgba(16,185,129,0.4)', medium: 'rgba(245,158,11,0.4)', high: 'rgba(239,68,68,0.4)' };
@@ -767,13 +774,687 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
   );
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   TWIN FIDELITY BANNER
+══════════════════════════════════════════════════════════════════════ */
+function TwinFidelityBanner({
+  twin, subjects, burnout, learningData, progress,
+}: {
+  twin: TwinState;
+  subjects: SubjectAnalysis | null;
+  burnout: BurnoutData | null;
+  learningData: LearningEntry[];
+  progress: import('../utils/gamification').GamificationProgress | null;
+}) {
+  const knowledgeFid = subjects ? Math.min(95, 55 + (subjects.strongest ? 15 : 0) + (subjects.weakest ? 15 : 0)) : 18;
+  const behaviorFid  = Math.min(95, 25 + learningData.length * 2.8);
+  const predFid      = twin.prediction_reliability;
+  const goalFid      = progress ? Math.min(88, 35 + progress.level * 5 + Math.min(progress.breakdown.achievements / 5, 10)) : 22;
+  const prodFid      = burnout ? Math.min(92, 62 + (burnout.burnout_score > 0 ? 20 : 0)) : 30;
+  const overall      = Math.round((knowledgeFid + behaviorFid + predFid + goalFid + prodFid) / 5);
+
+  const models = [
+    { label: 'Knowledge',    value: Math.round(knowledgeFid), color: '#6366f1' },
+    { label: 'Behavior',     value: Math.round(behaviorFid),  color: '#06b6d4' },
+    { label: 'Prediction',   value: Math.round(predFid),      color: '#8b5cf6' },
+    { label: 'Goal',         value: Math.round(goalFid),      color: '#f59e0b' },
+    { label: 'Productivity', value: Math.round(prodFid),      color: '#10b981' },
+  ];
+
+  const fidelityColor = overall >= 80 ? '#10b981' : overall >= 55 ? '#f59e0b' : '#ef4444';
+
+  return (
+    <div style={{ ...x.card, ...x.fullWidth, padding: '1.25rem 1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+        {/* Overall score */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
+          <div style={{ position: 'relative', width: '76px', height: '76px' }}>
+            <svg width="76" height="76" viewBox="0 0 76 76" style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx="38" cy="38" r="32" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" />
+              <circle cx="38" cy="38" r="32" fill="none" stroke={fidelityColor} strokeWidth="7"
+                strokeDasharray={`${2 * Math.PI * 32 * overall / 100} ${2 * Math.PI * 32 * (1 - overall / 100)}`}
+                strokeLinecap="round" style={{ transition: 'stroke-dasharray 1s ease' }} />
+            </svg>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+              <span style={{ fontSize: '1.25rem', fontWeight: 900, color: fidelityColor, lineHeight: 1 }}>{overall}</span>
+              <span style={{ fontSize: '0.5rem', color: '#475569', fontWeight: 700, letterSpacing: '0.05em' }}>%</span>
+            </div>
+          </div>
+          <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#475569', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Twin Fidelity</span>
+        </div>
+
+        <div style={{ flex: 1, minWidth: '260px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#f1f5f9' }}>Digital Twin Accuracy System</span>
+            <span style={{ fontSize: '0.6rem', fontWeight: 700, color: fidelityColor, padding: '0.12rem 0.5rem', borderRadius: '99px', background: `${fidelityColor}18`, border: `1px solid ${fidelityColor}30` }}>
+              {overall >= 80 ? 'HIGH FIDELITY' : overall >= 55 ? 'DEVELOPING' : 'CALIBRATING'}
+            </span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem' }}>
+            {models.map(m => (
+              <div key={m.label} style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '0.58rem', fontWeight: 700, color: '#475569', letterSpacing: '0.05em' }}>{m.label}</span>
+                  <span style={{ fontSize: '0.6rem', fontWeight: 800, color: m.color }}>{m.value}%</span>
+                </div>
+                <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${m.value}%`, background: m.color, borderRadius: '99px', transition: 'width 1s ease' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ flexShrink: 0, fontSize: '0.72rem', color: '#475569', maxWidth: '180px', lineHeight: 1.6 }}>
+          The twin's accuracy improves automatically as you log more check-ins, quizzes, and study sessions. Target 100% fidelity for fully personalized predictions.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   EXTENDED MODELS SECTION (Knowledge + Behavior + Learning Style +
+   Personality + Productivity)
+══════════════════════════════════════════════════════════════════════ */
+type ModelTab = 'knowledge' | 'behavior' | 'style' | 'personality' | 'productivity';
+
+function ExtendedModelsSection({
+  twin, subjects, burnout, learningData, streakData, progress,
+}: {
+  twin: TwinState;
+  subjects: SubjectAnalysis | null;
+  burnout: BurnoutData | null;
+  learningData: LearningEntry[];
+  streakData: StreakStatus | null;
+  progress: import('../utils/gamification').GamificationProgress | null;
+}) {
+  const [tab, setTab] = useState<ModelTab>('knowledge');
+
+  const tabs: { key: ModelTab; label: string; icon: string; color: string }[] = [
+    { key: 'knowledge',   label: 'Knowledge',   icon: '🧠', color: '#6366f1' },
+    { key: 'behavior',    label: 'Behavior',    icon: '📊', color: '#06b6d4' },
+    { key: 'style',       label: 'Learning Style', icon: '🎯', color: '#8b5cf6' },
+    { key: 'personality', label: 'Personality', icon: '⚡', color: '#f59e0b' },
+    { key: 'productivity',label: 'Productivity',icon: '🚀', color: '#10b981' },
+  ];
+
+  /* ── derived metrics ── */
+  const totalSessions    = learningData.length;
+  const avgStudyHours    = totalSessions ? learningData.reduce((s, d) => s + d.study_hours, 0) / totalSessions : 0;
+  const avgStress        = totalSessions ? learningData.reduce((s, d) => s + d.stress_level, 0) / totalSessions : 3;
+  const avgSleep         = totalSessions ? learningData.reduce((s, d) => s + d.sleep_duration, 0) / totalSessions : 7;
+  const quizSessions     = learningData.filter(d => d.quiz_accuracy != null && d.quiz_accuracy > 0).length;
+  const noteSessions     = learningData.filter(d => d.notes_created > 0).length;
+  const focusSessions    = learningData.reduce((s, d) => s + (d.focus_sessions || 0), 0);
+  const avgQuizAccuracy  = quizSessions ? learningData.filter(d => d.quiz_accuracy).reduce((s, d) => s + (d.quiz_accuracy ?? 0), 0) / quizSessions : 0;
+  const avgCompletion    = totalSessions ? learningData.reduce((s, d) => s + d.assignment_completion_rate, 0) / totalSessions * 100 : 0;
+  const sessionStyleTotal = quizSessions + noteSessions + Math.min(focusSessions, totalSessions);
+
+  const styleScores = {
+    quiz:     sessionStyleTotal ? Math.round(quizSessions / sessionStyleTotal * 100) : 0,
+    reading:  sessionStyleTotal ? Math.round(noteSessions / sessionStyleTotal * 100) : 0,
+    practice: sessionStyleTotal ? Math.round(Math.min(focusSessions, totalSessions) / sessionStyleTotal * 100) : 0,
+    video:    0,
+    mixed:    0,
+  };
+  styleScores.video = Math.max(0, 25 - Math.round((styleScores.quiz + styleScores.reading + styleScores.practice) / 6));
+  styleScores.mixed = Math.max(0, 100 - styleScores.quiz - styleScores.reading - styleScores.practice - styleScores.video);
+
+  const dominantStyle = Object.entries(styleScores).reduce((a, b) => b[1] > a[1] ? b : a, ['mixed', 0])[0];
+  const styleLabels: Record<string, string> = {
+    quiz: 'Quiz Learner', reading: 'Reading Learner', practice: 'Practice Learner',
+    video: 'Video Learner', mixed: 'Mixed Learner',
+  };
+
+  const streakDays   = streakData?.streak_days ?? 0;
+  const personality  = {
+    Discipline:       Math.round(twin.consistency_score),
+    Persistence:      Math.min(100, Math.round(streakDays * 3 + 10)),
+    Curiosity:        Math.min(100, Math.round(noteSessions * 8 + (twin.academic_score / 3))),
+    Consistency:      Math.round(twin.consistency_score),
+    Competitiveness:  Math.min(100, Math.round((progress?.level ?? 0) * 10 + (progress?.breakdown.achievements ?? 0) * 3)),
+    Adaptability:     twin.trend === 'improving' ? 82 : twin.trend === 'stable' ? 62 : 42,
+    Focus:            Math.round(Math.max(0, 100 - (burnout?.burnout_score ?? 35))),
+  };
+
+  const PERS_COLORS: Record<string, string> = {
+    Discipline: '#6366f1', Persistence: '#f97316', Curiosity: '#06b6d4',
+    Consistency: '#8b5cf6', Competitiveness: '#f59e0b', Adaptability: '#10b981', Focus: '#ec4899',
+  };
+
+  const focusScore     = Math.round(Math.max(0, 100 - (burnout?.burnout_score ?? 30)));
+  const efficiency     = Math.min(100, Math.round(avgCompletion * 0.6 + avgQuizAccuracy * 0.4));
+  const burnoutRisk    = burnout?.burnout_score ?? 30;
+  const energyTrend    = twin.trend === 'improving' ? 78 : twin.trend === 'stable' ? 60 : 38;
+  const dailyProd      = Math.round((focusScore * 0.35 + efficiency * 0.35 + (100 - burnoutRisk) * 0.3));
+  const weeklyProd     = Math.round(dailyProd * 0.9);
+  const monthlyProd    = Math.round(dailyProd * 0.85);
+
+  function MBar({ label, value, color, note }: { label: string; value: number; color: string; note?: string }) {
+    return (
+      <div style={{ marginBottom: '0.75rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+          <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600 }}>{label}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {note && <span style={{ fontSize: '0.62rem', color: '#475569' }}>{note}</span>}
+            <span style={{ fontSize: '0.82rem', fontWeight: 800, color }}>{value}</span>
+          </div>
+        </div>
+        <div style={{ height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
+          <div className="score-bar-fill" style={{ width: `${value}%`, height: '100%', background: color, borderRadius: '99px', boxShadow: `0 0 6px ${color}60` }} />
+        </div>
+      </div>
+    );
+  }
+
+  const activeColor = tabs.find(t => t.key === tab)?.color ?? '#6366f1';
+
+  return (
+    <div style={{ ...x.card, ...x.fullWidth }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+        <span style={{ fontSize: '1rem' }}>🤖</span>
+        <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Twin Model Analytics</h3>
+        <span style={{ marginLeft: 'auto', fontSize: '0.62rem', color: '#475569' }}>8 adaptive models</span>
+      </div>
+
+      {/* Tab bar */}
+      <div style={{ display: 'flex', gap: '0.3rem', marginBottom: '1.5rem', padding: '4px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', flexWrap: 'wrap' }}>
+        {tabs.map(t => {
+          const active = tab === t.key;
+          return (
+            <button key={t.key} onClick={() => setTab(t.key)} style={{
+              flex: 1, padding: '0.42rem 0.6rem', borderRadius: '10px', border: 'none', fontFamily: 'inherit',
+              background: active ? `${t.color}22` : 'transparent',
+              color: active ? t.color : '#475569',
+              fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer',
+              borderBottom: active ? `2px solid ${t.color}` : '2px solid transparent',
+              transition: 'all 0.18s', whiteSpace: 'nowrap',
+            }}>
+              {t.icon} {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Knowledge Model ── */}
+      {tab === 'knowledge' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="mob-twin-row">
+          <div>
+            <p style={{ ...x.sectionLabel, color: activeColor }}>Subject Mastery</p>
+            {subjects?.strongest && (
+              <MBar label={`${subjects.strongest.subject} (Strongest)`} value={Math.round(subjects.strongest.avg_score)} color="#10b981" note="Strong" />
+            )}
+            {subjects?.focus_today && subjects.focus_today.subject !== subjects.weakest?.subject && (
+              <MBar label={`${subjects.focus_today.subject} (Focus Today)`} value={Math.round(subjects.focus_today.avg_score)} color="#6366f1" />
+            )}
+            {subjects?.weakest && (
+              <MBar label={`${subjects.weakest.subject} (Priority)`} value={Math.round(subjects.weakest.avg_score)} color="#ef4444" note="Weak" />
+            )}
+            {!subjects && <p style={{ color: '#475569', fontSize: '0.82rem' }}>Log subject sessions to build your knowledge model.</p>}
+            <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.15)', borderRadius: '12px' }}>
+              <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 600, color: '#818cf8' }}>
+                🧠 Knowledge Velocity: <strong>{twin.trend === 'improving' ? 'Accelerating' : twin.trend === 'stable' ? 'Steady' : 'Decelerating'}</strong>
+              </p>
+              <p style={{ margin: '0.3rem 0 0', fontSize: '0.68rem', color: '#475569' }}>
+                Based on {twin.data_points} data points over {twin.twin_age} days
+              </p>
+            </div>
+          </div>
+          <div>
+            <p style={{ ...x.sectionLabel, color: activeColor }}>Memory & Retention</p>
+            <MBar label="Memory Strength"     value={twin.cognitive_heatmap?.memory_strength ?? Math.round(twin.academic_score * 0.9)}      color="#8b5cf6" />
+            <MBar label="Learning Speed"      value={twin.cognitive_heatmap?.learning_speed ?? Math.round(twin.twin_intelligence_score * 0.85)} color="#06b6d4" />
+            <MBar label="Knowledge Areas"     value={twin.cognitive_heatmap?.knowledge_areas ?? Math.round(twin.academic_score)}              color="#6366f1" />
+            <MBar label="Prediction Confidence" value={twin.cognitive_heatmap?.prediction_confidence ?? Math.round(twin.confidence_level)}   color="#10b981" />
+            {subjects?.weakest && (
+              <div style={{ marginTop: '1rem', padding: '0.65rem 0.85rem', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.18)', borderRadius: '10px' }}>
+                <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: '#f87171' }}>⚠ Forgetting Risk: {subjects.weakest.subject}</p>
+                <p style={{ margin: '0.2rem 0 0', fontSize: '0.67rem', color: '#475569' }}>
+                  Not studied recently — review every {subjects.weakest.recommended_daily_minutes} min/day to prevent decay.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Behavior Model ── */}
+      {tab === 'behavior' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="mob-twin-row">
+          <div>
+            <p style={{ ...x.sectionLabel, color: activeColor }}>Study Patterns</p>
+            <MBar label="Session Consistency" value={Math.round(twin.consistency_score)} color={activeColor} />
+            <MBar label="Assignment Completion" value={Math.round(avgCompletion)} color="#8b5cf6" />
+            <MBar label="Focus Stability" value={twin.cognitive_heatmap?.focus_stability ?? Math.round(focusScore * 0.9)} color="#10b981" />
+            <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+              {[
+                { label: 'Avg Study', value: `${avgStudyHours.toFixed(1)}h`, sub: 'per session' },
+                { label: 'Avg Sleep', value: `${avgSleep.toFixed(1)}h`, sub: 'per night' },
+                { label: 'Avg Stress', value: `${avgStress.toFixed(1)}/10`, sub: 'stress level' },
+              ].map(stat => (
+                <div key={stat.label} style={{ padding: '0.6rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', textAlign: 'center' }}>
+                  <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>{stat.value}</p>
+                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.6rem', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p style={{ ...x.sectionLabel, color: activeColor }}>Behavioral Insights</p>
+            {[
+              { icon: '⏰', title: 'Peak Productivity', text: avgStudyHours >= 2.5 ? 'Long focused sessions — deep work oriented.' : 'Short distributed sessions — sprint learner.' },
+              { icon: '📈', title: 'Habit Trend', text: twin.trend === 'improving' ? 'Positive habit formation detected. Keep going.' : twin.trend === 'stable' ? 'Stable patterns — consider adding variety.' : 'Habit disruption detected. Re-anchor your routine.' },
+              { icon: '🔁', title: 'Consistency Forecast', text: `${Math.round(twin.consistency_score)}% consistency score. ${twin.consistency_score >= 70 ? 'Excellent — sustain this rhythm.' : 'Needs improvement — aim for daily check-ins.'}` },
+              { icon: '🎯', title: 'Preferred Method', text: `Your twin detects ${styleLabels[dominantStyle]} tendencies based on session data.` },
+            ].map(ins => (
+              <div key={ins.title} style={{ display: 'flex', gap: '0.6rem', padding: '0.7rem 0.85rem', background: `${activeColor}08`, border: `1px solid ${activeColor}18`, borderRadius: '12px', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '1rem', flexShrink: 0 }}>{ins.icon}</span>
+                <div>
+                  <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: '#f1f5f9' }}>{ins.title}</p>
+                  <p style={{ margin: '0.15rem 0 0', fontSize: '0.68rem', color: '#94a3b8', lineHeight: 1.5 }}>{ins.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Learning Style Model ── */}
+      {tab === 'style' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="mob-twin-row">
+          <div>
+            <p style={{ ...x.sectionLabel, color: activeColor }}>Learning Style Detection</p>
+            <div style={{ marginBottom: '1rem', padding: '0.85rem 1rem', background: `${activeColor}10`, border: `1px solid ${activeColor}28`, borderRadius: '14px' }}>
+              <p style={{ margin: 0, fontSize: '0.65rem', fontWeight: 700, color: activeColor, letterSpacing: '0.08em' }}>DETECTED STYLE</p>
+              <p style={{ margin: '0.2rem 0 0', fontSize: '1.2rem', fontWeight: 900, color: '#f1f5f9' }}>{styleLabels[dominantStyle]}</p>
+            </div>
+            {Object.entries(styleScores).map(([key, val]) => (
+              <MBar key={key} label={styleLabels[key]} value={val} color={key === dominantStyle ? activeColor : '#334155'} />
+            ))}
+          </div>
+          <div>
+            <p style={{ ...x.sectionLabel, color: activeColor }}>Style-Based Recommendations</p>
+            {[
+              dominantStyle === 'quiz'     && { icon: '🧩', text: 'Your twin recommends short daily quizzes of 5–10 questions. Spaced repetition is your superpower.' },
+              dominantStyle === 'reading'  && { icon: '📖', text: 'Your twin recommends structured note-taking and summary writing. Review notes within 24h.' },
+              dominantStyle === 'practice' && { icon: '💪', text: 'Your twin recommends long focus sessions with deliberate practice. Use the Focus Timer daily.' },
+              dominantStyle === 'video'    && { icon: '🎥', text: 'Your twin recommends curated video playlists. Pair with notes for maximum retention.' },
+              { icon: '🔄', text: 'Your twin adapts its study plan recommendations based on your evolving learning style profile.' },
+              { icon: '📊', text: `You have completed ${totalSessions} sessions analyzed. Your style accuracy improves with more data.` },
+              { icon: '🎯', text: `${dominantStyle === 'mixed' ? 'Mixed learners benefit from variety.' : `${styleLabels[dominantStyle]}s retain best through ${dominantStyle === 'quiz' ? 'active recall' : dominantStyle === 'practice' ? 'deliberate practice' : 'structured review'}.`}` },
+            ].filter(Boolean).slice(0, 4).map((ins: unknown, i) => {
+              const item = ins as { icon: string; text: string };
+              return (
+                <div key={i} style={{ display: 'flex', gap: '0.6rem', padding: '0.65rem 0.85rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', marginBottom: '0.5rem' }}>
+                  <span style={{ flexShrink: 0 }}>{item.icon}</span>
+                  <p style={{ margin: 0, fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.55 }}>{item.text}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Personality Model ── */}
+      {tab === 'personality' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="mob-twin-row">
+          <div>
+            <p style={{ ...x.sectionLabel, color: activeColor }}>Personality Profile (0–100)</p>
+            {Object.entries(personality).map(([trait, score]) => (
+              <MBar key={trait} label={trait} value={score} color={PERS_COLORS[trait] ?? activeColor} />
+            ))}
+          </div>
+          <div>
+            <p style={{ ...x.sectionLabel, color: activeColor }}>Trait Insights</p>
+            {[
+              { trait: 'Discipline', icon: '🔒', note: personality.Discipline >= 70 ? 'Strong. Your twin sees structured study habits.' : 'Developing. Build daily routines to strengthen this.' },
+              { trait: 'Persistence', icon: '🔥', note: streakDays >= 7 ? `${streakDays}-day streak proves your persistence.` : 'Build a 7-day streak to unlock persistence recognition.' },
+              { trait: 'Focus', icon: '🎯', note: burnout?.risk_level === 'low' ? 'Excellent focus health detected.' : 'Focus is under pressure — manage burnout risk.' },
+              { trait: 'Curiosity', icon: '💡', note: noteSessions > 5 ? 'High note-taking activity signals strong curiosity.' : 'Take more notes to signal curiosity to your twin.' },
+            ].map(({ trait, icon, note }) => (
+              <div key={trait} style={{ display: 'flex', gap: '0.6rem', padding: '0.65rem 0.85rem', background: `${PERS_COLORS[trait] ?? activeColor}08`, border: `1px solid ${PERS_COLORS[trait] ?? activeColor}20`, borderRadius: '12px', marginBottom: '0.5rem' }}>
+                <span>{icon}</span>
+                <div>
+                  <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: '#f1f5f9' }}>{trait}</p>
+                  <p style={{ margin: '0.15rem 0 0', fontSize: '0.67rem', color: '#94a3b8', lineHeight: 1.5 }}>{note}</p>
+                </div>
+              </div>
+            ))}
+            <div style={{ marginTop: '0.5rem', padding: '0.7rem', background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '12px' }}>
+              <p style={{ margin: 0, fontSize: '0.72rem', color: '#fbbf24' }}>
+                ⚡ Scores update automatically based on your actions, goal completions, and study behavior.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Productivity Model ── */}
+      {tab === 'productivity' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="mob-twin-row">
+          <div>
+            <p style={{ ...x.sectionLabel, color: activeColor }}>Productivity Scores</p>
+            <MBar label="Focus Score"       value={focusScore}                     color="#10b981" note={burnout?.risk_level ?? '—'} />
+            <MBar label="Study Efficiency"  value={efficiency}                     color="#6366f1" />
+            <MBar label="Task Completion"   value={Math.round(avgCompletion)}      color="#8b5cf6" />
+            <MBar label="Energy Trend"      value={energyTrend}                    color="#f59e0b" />
+            <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '0.85rem 0' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+              {[
+                { label: 'Daily Score',   value: dailyProd,   color: '#10b981' },
+                { label: 'Weekly Score',  value: weeklyProd,  color: '#06b6d4' },
+                { label: 'Monthly Score', value: monthlyProd, color: '#8b5cf6' },
+              ].map(s => (
+                <div key={s.label} style={{ padding: '0.65rem', background: `${s.color}0d`, border: `1px solid ${s.color}22`, borderRadius: '10px', textAlign: 'center' }}>
+                  <p style={{ margin: 0, fontSize: '1.1rem', fontWeight: 900, color: s.color }}>{s.value}</p>
+                  <p style={{ margin: '0.15rem 0 0', fontSize: '0.58rem', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p style={{ ...x.sectionLabel, color: activeColor }}>Burnout & Predictions</p>
+            <div style={{ padding: '0.85rem 1rem', background: `${burnout?.risk_level === 'high' ? '#ef4444' : burnout?.risk_level === 'medium' ? '#f59e0b' : '#10b981'}10`, border: `1px solid ${burnout?.risk_level === 'high' ? 'rgba(239,68,68,0.3)' : burnout?.risk_level === 'medium' ? 'rgba(245,158,11,0.3)' : 'rgba(16,185,129,0.3)'}`, borderRadius: '12px', marginBottom: '0.85rem' }}>
+              <p style={{ margin: 0, fontSize: '0.65rem', fontWeight: 700, color: '#475569', letterSpacing: '0.07em' }}>BURNOUT RISK</p>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', margin: '0.2rem 0 0.35rem' }}>
+                <span style={{ fontSize: '1.6rem', fontWeight: 900, color: burnout?.risk_level === 'high' ? '#ef4444' : burnout?.risk_level === 'medium' ? '#f59e0b' : '#10b981' }}>{burnout?.burnout_score ?? '—'}</span>
+                <span style={{ fontSize: '0.75rem', color: '#475569' }}>/100 · {(burnout?.risk_level ?? 'unknown').toUpperCase()}</span>
+              </div>
+              <MBar label="Burnout Pressure" value={burnout?.burnout_score ?? 0} color={burnout?.risk_level === 'high' ? '#ef4444' : burnout?.risk_level === 'medium' ? '#f59e0b' : '#10b981'} />
+            </div>
+            {[
+              { icon: '⚡', title: 'Burnout Probability (7d)', value: `${Math.min(95, Math.round((burnout?.burnout_score ?? 30) * 0.8 + 5))}%` },
+              { icon: '📉', title: 'Productivity Decline Risk', value: twin.trend === 'declining' ? 'HIGH' : twin.trend === 'stable' ? 'MEDIUM' : 'LOW' },
+              { icon: '🎯', title: 'Missed Study Probability', value: `${Math.max(5, Math.round(100 - twin.consistency_score * 0.9))}%` },
+            ].map(p => (
+              <div key={p.title} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.55rem 0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', marginBottom: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <span>{p.icon}</span>
+                  <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{p.title}</span>
+                </div>
+                <span style={{ fontSize: '0.8rem', fontWeight: 800, color: activeColor }}>{p.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   PREDICTION CENTER
+══════════════════════════════════════════════════════════════════════ */
+function PredictionCenterSection({
+  twin, subjects, burnout, streakData,
+}: {
+  twin: TwinState;
+  subjects: SubjectAnalysis | null;
+  burnout: BurnoutData | null;
+  streakData: StreakStatus | null;
+}) {
+  const streakDays = streakData?.streak_days ?? 0;
+  const streakProb = Math.min(98, 50 + streakDays * 2);
+  const syllabusProb = Math.round(twin.consistency_score * 0.85);
+  const forgettingSubject = subjects?.weakest?.subject ?? 'Unknown';
+  const forgettingRisk = subjects?.weakest ? Math.max(20, 100 - Math.round(subjects.weakest.avg_score)) : 40;
+  const goalFailRisk = Math.max(5, Math.round(100 - twin.consistency_score * 0.9));
+  const quizScoreNext = Math.min(98, Math.round((twin.academic_score * 0.85) + (twin.trend === 'improving' ? 5 : 0)));
+  const examReadiness = Math.round(twin.academic_score);
+  const burnoutProb = Math.min(95, Math.round((burnout?.burnout_score ?? 25) * 0.75 + 5));
+  const focusProb = Math.round(Math.max(10, 100 - (burnout?.burnout_score ?? 25) * 0.7));
+
+  const predictions = [
+    { icon: '🔥', label: 'Maintain streak this week', prob: streakProb,      conf: Math.min(95, 55 + streakDays), color: '#f97316' },
+    { icon: '📚', label: 'Complete syllabus on time',  prob: syllabusProb,   conf: Math.round(twin.confidence_level * 0.9), color: '#6366f1' },
+    { icon: '🧠', label: `Forgetting risk: ${forgettingSubject}`, prob: forgettingRisk, conf: subjects ? 82 : 30, color: '#ef4444' },
+    { icon: '🎯', label: 'Goal failure probability',   prob: goalFailRisk,   conf: Math.round(twin.prediction_reliability * 0.85), color: '#f59e0b' },
+    { icon: '📝', label: 'Expected quiz score (next week)', prob: quizScoreNext, conf: Math.round(twin.confidence_level), color: '#10b981' },
+    { icon: '🏆', label: 'Exam readiness',             prob: examReadiness,  conf: Math.round(twin.confidence_level * 0.95), color: '#8b5cf6' },
+    { icon: '⚠️', label: 'Burnout probability',        prob: burnoutProb,    conf: burnout ? 88 : 40, color: '#ef4444' },
+    { icon: '⚡', label: 'Focus probability (today)',   prob: focusProb,      conf: burnout ? 85 : 45, color: '#06b6d4' },
+  ];
+
+  return (
+    <div style={{ ...x.card, ...x.fullWidth }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+        <span style={{ fontSize: '1rem' }}>🔮</span>
+        <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Predictive AI Engine</h3>
+        <span style={{ marginLeft: 'auto', fontSize: '0.62rem', color: '#475569' }}>Confidence-weighted predictions</span>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }} className="mob-4-col">
+        {predictions.map(pred => (
+          <div key={pred.label} style={{ padding: '0.85rem', background: `${pred.color}08`, border: `1px solid ${pred.color}1a`, borderRadius: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '1.1rem' }}>{pred.icon}</span>
+              <span style={{ fontSize: '0.58rem', fontWeight: 700, color: '#475569', padding: '0.12rem 0.4rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '99px' }}>
+                {pred.conf}% conf.
+              </span>
+            </div>
+            <p style={{ margin: '0 0 0.4rem', fontSize: '0.68rem', color: '#94a3b8', lineHeight: 1.4 }}>{pred.label}</p>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem', marginBottom: '0.4rem' }}>
+              <span style={{ fontSize: '1.5rem', fontWeight: 900, color: pred.color, lineHeight: 1 }}>{pred.prob}</span>
+              <span style={{ fontSize: '0.65rem', color: '#475569' }}>%</span>
+            </div>
+            <div style={{ height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${pred.prob}%`, background: pred.color, borderRadius: '99px', transition: 'width 1s ease' }} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ASK MY TWIN — Interactive Simulation Engine
+══════════════════════════════════════════════════════════════════════ */
+function AskMyTwinSection({
+  twin, subjects, burnout, learningData, streakData,
+}: {
+  twin: TwinState;
+  subjects: SubjectAnalysis | null;
+  burnout: BurnoutData | null;
+  learningData: LearningEntry[];
+  streakData: StreakStatus | null;
+}) {
+  const [input,    setInput]    = useState('');
+  const [messages, setMessages] = useState<{ q: string; a: string }[]>([]);
+  const [thinking, setThinking] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const QUICK_ASK = [
+    'If I skip studying today?',
+    'If I study 2 extra hours daily?',
+    `If I focus only on ${subjects?.weakest?.subject ?? 'my weakest subject'}?`,
+    'If I increase quizzes by 50%?',
+    'What is my exam readiness?',
+    'Am I at risk of burnout?',
+  ];
+
+  function generate(q: string): string {
+    const ql = q.toLowerCase();
+    const streak = streakData?.streak_days ?? 0;
+    const totalSessions = learningData.length;
+    const avgQuiz = learningData.filter(d => d.quiz_accuracy).length
+      ? learningData.reduce((s, d) => s + (d.quiz_accuracy ?? 0), 0) / learningData.filter(d => d.quiz_accuracy).length
+      : 65;
+
+    if ((ql.includes('skip') || ql.includes('miss')) && (ql.includes('study') || ql.includes('session') || ql.includes('today'))) {
+      const streakMsg = streak > 0 ? ` Your ${streak}-day streak is at risk.` : '';
+      const dropPct   = Math.round(2.5 + (100 - twin.consistency_score) * 0.08);
+      const cascadePct = Math.round(12 + (100 - twin.consistency_score) * 0.18);
+      return `⚠️ Simulating: "Skip studying today"\n\nMy twin model projects the following outcomes:\n\n• Academic score may drop by ~${dropPct}% within 3 days without recovery.${streakMsg}\n• ${cascadePct}% probability this leads to consecutive missed days based on your pattern.\n• Knowledge retention in ${subjects?.weakest?.subject ?? 'your weakest subject'} would decline fastest.\n\n✅ Recommendation: If unavoidable, activate a Streak Shield and schedule a recovery session tomorrow. Even 30 minutes is significantly better than nothing.`;
+    }
+
+    if (ql.includes('extra') || (ql.includes('more') && ql.includes('hour'))) {
+      const match = ql.match(/(\d+(\.\d+)?)\s*(extra\s*)?(hour|hr)/);
+      const hours  = match ? parseFloat(match[1]) : 2;
+      const boost  = Math.min(15, Math.round(hours * 3.2));
+      const burnRisk = Math.min(95, Math.round((burnout?.burnout_score ?? 25) + hours * 12));
+      return `📈 Simulating: "Study ${hours} extra hours daily"\n\nProjected outcomes over 14 days:\n\n• Academic score: +${boost}% improvement (projected)\n• Consistency score: +${Math.round(hours * 2.5)} points\n• Burnout probability rises to ${burnRisk}% — monitor this closely.\n\n🎯 Sweet spot: ${hours <= 2 ? 'This is sustainable with proper breaks.' : 'Consider 1.5h extra maximum to balance performance and wellness.'}\n\n⚡ Recommendation: Use the Focus Timer, take 10-min breaks every 45 minutes, and log your wellness check-in daily.`;
+    }
+
+    if (ql.includes('quiz') && (ql.includes('more') || ql.includes('increase') || ql.includes('50'))) {
+      const current = Math.round(avgQuiz);
+      const projected = Math.min(97, Math.round(current * 1.1 + 5));
+      return `🧩 Simulating: "Increase quizzes by 50%"\n\nBased on your current accuracy of ~${current}%:\n\n• Projected accuracy in 3 weeks: ~${projected}%\n• Knowledge retention: +18% improvement expected\n• Academic score boost: +${Math.round(6 + current * 0.04)} points\n• Twin fidelity: Will improve significantly with more quiz data\n\n📊 The spaced repetition effect kicks in after 10+ quiz sessions. Your twin learns your weak areas and will prioritize them automatically.`;
+    }
+
+    const weakSubj = subjects?.weakest?.subject;
+    if (weakSubj && ql.includes(weakSubj.toLowerCase())) {
+      const score    = subjects!.weakest!.avg_score;
+      const dailyMin = subjects!.weakest!.recommended_daily_minutes;
+      const boost    = Math.round(dailyMin * 0.45);
+      return `🎯 Simulating: "Focus only on ${weakSubj}"\n\nCurrent mastery: ${score.toFixed(0)}%\n\nProjected after 7-day focused study (${dailyMin} min/day):\n\n• ${weakSubj} score: +${boost}% improvement\n• Overall academic score: +${Math.round(boost * 0.3)}% lift\n• Forgetting risk: Reduced significantly\n• Recommended daily minimum: ${dailyMin} minutes\n\n⚡ Warning: Neglecting other subjects for more than 10 days may cause regression. Balance is key.`;
+    }
+
+    if (ql.includes('burnout') || ql.includes('burn out') || ql.includes('tired') || ql.includes('exhausted')) {
+      const score = burnout?.burnout_score ?? 40;
+      const risk  = burnout?.risk_level ?? 'medium';
+      return `🔥 Burnout Analysis:\n\nCurrent burnout score: ${score}/100 (${risk.toUpperCase()} RISK)\n\n${risk === 'high'
+        ? `⚠️ HIGH RISK DETECTED.\n• Immediate action required: limit study to 1.5h today.\n• Sleep ≥8h tonight is critical.\n• ${Math.round(45 + score * 0.3)}% probability of performance drop within 5 days if unchecked.`
+        : risk === 'medium'
+        ? `🟡 MEDIUM RISK.\n• Sustainable with minor adjustments.\n• Add 10-min breaks every 45 minutes.\n• ${Math.round(25 + score * 0.2)}% burnout escalation risk if pattern continues.`
+        : `✅ LOW RISK.\n• You are in a healthy productivity zone.\n• Maintain sleep, breaks, and current study rhythm.\n• ${Math.round(8 + score * 0.15)}% baseline burnout probability.`}\n\nLog your wellness check-in daily for the most accurate burnout tracking.`;
+    }
+
+    if (ql.includes('exam') || ql.includes('ready') || ql.includes('readiness') || ql.includes('prepared')) {
+      const predScore = twin.future_twin?.predicted_exam_score ?? Math.round(twin.academic_score * 0.88);
+      const readPct   = Math.round(twin.academic_score);
+      return `🏆 Exam Readiness Report:\n\nCurrent readiness: ${readPct}%\nPredicted exam score (30 days): ${predScore}/100\n\nStrength areas: ${twin.strengths.slice(0, 2).join(', ') || 'Building up'}\nFocus areas: ${twin.areas_to_improve.slice(0, 2).join(', ') || 'Continue current progress'}\n${subjects?.weakest ? `\nHighest-impact improvement: ${subjects.weakest.subject} at ${subjects.weakest.avg_score.toFixed(0)}% (${subjects.weakest.recommended_daily_minutes} min/day recommended)` : ''}\n\nTo reach ${Math.min(95, predScore + 10)}%: Maintain streak, hit 80%+ quiz accuracy, and study consistently for ${Math.max(14, Math.round((90 - twin.academic_score) * 0.8))} more days.`;
+    }
+
+    if (ql.includes('streak') || ql.includes('maintain') || ql.includes('keep going')) {
+      const prob = Math.min(98, 50 + streak * 2);
+      return `🔥 Streak Analysis:\n\nCurrent streak: ${streak} days\nWeekly maintenance probability: ${prob}%\n\nStreak milestones:\n• 7 days → +1 Shield, +50 XP bonus\n• 30 days → +2 Shields, +150 XP bonus\n• 100 days → +3 Shields, +500 XP bonus\n\nYou are ${streak >= 7 ? 'above' : `${7 - streak} days away from`} the 7-day milestone.\n\n⚡ Your twin estimates a ${Math.round(100 - (100 - twin.consistency_score) * 0.7)}% probability of breaking your all-time record if you maintain current habits for ${Math.max(3, 30 - streak)} more days.`;
+    }
+
+    const insight = twin.ai_insights[Math.floor(Math.random() * Math.max(1, twin.ai_insights.length))]
+      ?? `Your twin has analyzed ${twin.data_points} data points across ${twin.twin_age} days.`;
+    return `◈ Twin Response:\n\nYour current twin state: ${twin.current_state_label} (${Math.round(twin.overall_score)}/100 overall, trending ${twin.trend}).\n\n${insight}\n\nStrengths detected: ${twin.strengths.slice(0, 2).join(', ') || 'Still building your profile.'}\nFocus areas: ${twin.areas_to_improve.slice(0, 1).join(', ') || 'Keep consistent.'}\n\nTry asking: "If I skip studying today?", "What is my exam readiness?", "If I focus on ${subjects?.weakest?.subject ?? 'a subject'}?"`;
+  }
+
+  function handleAsk(question?: string) {
+    const q = (question ?? input).trim();
+    if (!q) return;
+    setInput('');
+    setThinking(true);
+    setTimeout(() => {
+      const a = generate(q);
+      setMessages(prev => [...prev, { q, a }]);
+      setThinking(false);
+      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 80);
+    }, 800);
+  }
+
+  return (
+    <div style={{ ...x.card, ...x.fullWidth }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+        <span style={{ fontSize: '1rem' }}>◈</span>
+        <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Ask My Twin — What-If Simulator</h3>
+        <span style={{ marginLeft: 'auto', fontSize: '0.62rem', color: '#475569' }}>Scenario simulation engine</span>
+      </div>
+
+      {/* Quick Ask chips */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1rem' }}>
+        {QUICK_ASK.map(q => (
+          <button key={q} onClick={() => handleAsk(q)} style={{
+            padding: '0.3rem 0.75rem', borderRadius: '99px', border: '1px solid rgba(99,102,241,0.25)',
+            background: 'rgba(99,102,241,0.08)', color: '#818cf8', fontSize: '0.7rem', fontWeight: 600,
+            cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s',
+          }}>
+            {q}
+          </button>
+        ))}
+      </div>
+
+      {/* Message history */}
+      {messages.length > 0 && (
+        <div style={{ maxHeight: '360px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '1rem', padding: '0.5rem' }}>
+          {messages.map((m, i) => (
+            <div key={i}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.35rem' }}>
+                <div style={{ maxWidth: '75%', padding: '0.55rem 0.85rem', background: 'rgba(99,102,241,0.18)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '14px 14px 4px 14px', fontSize: '0.78rem', color: '#c7d2fe' }}>
+                  {m.q}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.55rem' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg,#6366f1,#00D4FF)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', flexShrink: 0, color: '#fff', fontWeight: 800 }}>◈</div>
+                <div style={{ flex: 1, padding: '0.75rem 0.95rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '4px 14px 14px 14px', fontSize: '0.77rem', color: '#94a3b8', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                  {m.a}
+                </div>
+              </div>
+            </div>
+          ))}
+          {thinking && (
+            <div style={{ display: 'flex', gap: '0.55rem' }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg,#6366f1,#00D4FF)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', flexShrink: 0, color: '#fff', fontWeight: 800, animation: 'breathe 1.5s ease-in-out infinite' }}>◈</div>
+              <div style={{ padding: '0.75rem 0.95rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '4px 14px 14px 14px', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                {[0, 0.2, 0.4].map(delay => (
+                  <div key={delay} style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#818cf8', animation: `particle-float 1.2s ease-in-out infinite`, animationDelay: `${delay}s` }} />
+                ))}
+              </div>
+            </div>
+          )}
+          <div ref={bottomRef} />
+        </div>
+      )}
+
+      {/* Input */}
+      <div style={{ display: 'flex', gap: '0.6rem' }}>
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleAsk()}
+          placeholder='Ask your twin anything… "If I skip studying today?"'
+          style={{
+            flex: 1, padding: '0.65rem 1rem', borderRadius: '12px',
+            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(99,102,241,0.25)',
+            color: '#f1f5f9', fontSize: '0.82rem', fontFamily: 'inherit', outline: 'none',
+          }}
+        />
+        <button
+          onClick={() => handleAsk()}
+          disabled={!input.trim() || thinking}
+          style={{
+            padding: '0.65rem 1.25rem', borderRadius: '12px',
+            background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none',
+            color: '#fff', fontWeight: 800, fontSize: '0.82rem', cursor: input.trim() ? 'pointer' : 'not-allowed',
+            opacity: input.trim() ? 1 : 0.5, fontFamily: 'inherit', transition: 'opacity 0.15s',
+          }}
+        >
+          Ask →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Extra styles for new sections ───────────────────────────────── */
+const x: Record<string, React.CSSProperties> = {
+  card: {
+    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '20px', padding: '1.75rem',
+    backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+  },
+  fullWidth: { gridColumn: '1 / -1' },
+  cardTitle: { fontSize: '0.95rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '1.25rem', letterSpacing: '-0.1px' },
+  sectionLabel: { margin: '0 0 0.85rem', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.09em', textTransform: 'uppercase' as const },
+};
+
 export default function Twin() {
   const { user, token } = useAuth();
   const { t } = useLanguage();
-  const [twin,     setTwin]     = useState<TwinState | null>(null);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState('');
-  const [progress, setProgress] = useState<GamificationProgress | null>(null);
+  const [twin,         setTwin]         = useState<TwinState | null>(null);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState('');
+  const [progress,     setProgress]     = useState<GamificationProgress | null>(null);
+  const [subjects,     setSubjects]     = useState<SubjectAnalysis | null>(null);
+  const [burnout,      setBurnout]      = useState<BurnoutData | null>(null);
+  const [learningData, setLearningData] = useState<LearningEntry[]>([]);
+  const [streakData,   setStreakData]   = useState<StreakStatus | null>(null);
 
   const ageCount  = useCounter(twin?.twin_age ?? 0, 900);
   const dataCount = useCounter(twin?.data_points ?? 0, 800);
@@ -792,6 +1473,10 @@ export default function Twin() {
     api.get<GamificationProgress>('/gamification/progress')
       .then(r => setProgress(r.data))
       .catch(() => {});
+    api.get('/subject-performance/analysis').then(r => setSubjects(r.data)).catch(() => {});
+    api.get('/burnout/latest').then(r => setBurnout(r.data)).catch(() => {});
+    api.get('/learning-data?limit=30').then(r => setLearningData(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+    api.get('/streak-protection/status').then(r => setStreakData(r.data)).catch(() => {});
   }, [token]);
 
   const wsConnected = useWebSocket(user?.id, token, refreshTwin);
@@ -1054,6 +1739,18 @@ export default function Twin() {
 
             {/* ── Human vs Twin Analysis ── */}
             <HumanVsTwinDashboard />
+
+            {/* ── Twin Fidelity Banner ── */}
+            <TwinFidelityBanner twin={twin} subjects={subjects} burnout={burnout} learningData={learningData} progress={progress} />
+
+            {/* ── Extended Model Analytics ── */}
+            <ExtendedModelsSection twin={twin} subjects={subjects} burnout={burnout} learningData={learningData} streakData={streakData} progress={progress} />
+
+            {/* ── Prediction Center ── */}
+            <PredictionCenterSection twin={twin} subjects={subjects} burnout={burnout} streakData={streakData} />
+
+            {/* ── Ask My Twin ── */}
+            <AskMyTwinSection twin={twin} subjects={subjects} burnout={burnout} learningData={learningData} streakData={streakData} />
           </div>
         )}
       </main>
