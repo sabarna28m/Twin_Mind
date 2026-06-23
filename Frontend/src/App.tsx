@@ -64,6 +64,7 @@ import CommTwin from './pages/CommTwin';
 import SmartNotes from './pages/SmartNotes';
 import SkillTree from './pages/SkillTree';
 import Shop from './pages/Shop';
+import StudyPlanner from './pages/StudyPlanner';
 
 export default function App() {
   return (
@@ -252,6 +253,14 @@ export default function App() {
             }
           />
           <Route path="/smart-notes" element={<Navigate to="/notes" replace />} />
+          <Route
+            path="/study-planner"
+            element={
+              <ProtectedRoute>
+                <StudyPlanner />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <TwinMindCopilot />

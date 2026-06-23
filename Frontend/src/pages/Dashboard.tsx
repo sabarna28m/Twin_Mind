@@ -12,7 +12,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 import ThemeToggle from '../components/ThemeToggle';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import NotificationBell from '../components/NotificationBell';
-import PlanContent from '../components/PlanContent';
 import TutorialOverlay from '../components/TutorialOverlay';
 import MobileNav from '../components/MobileNav';
 import api from '../services/api';
@@ -258,16 +257,7 @@ function DDItem({ icon: Icon, label, desc, to }: {
 }
 
 /* ── Data constants ── */
-interface SavedPlan { id: number; plan_text: string; created_at: string }
 interface CalEvent  { id: string; title: string; start: string; link: string }
-interface DayPlan   { day: string; tasks: string[] }
-interface SmartPlan {
-  current_score: number;
-  target_score: number;
-  daily_hours: number;
-  forecast: string;
-  days: DayPlan[];
-}
 
 /* ══════════════════════════════════════════════
    MAIN DASHBOARD COMPONENT
@@ -287,12 +277,7 @@ export default function Dashboard() {
   const [badgeCount, setBadgeCount]     = useState(0);
   const [wsConnected, setWsConnected]   = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
-  const [savedPlan,         setSavedPlan]         = useState<SavedPlan | null>(null);
-  const [showPlanModal,     setShowPlanModal]     = useState(false);
   const [calEvents,         setCalEvents]         = useState<CalEvent[]>([]);
-  const [smartPlan,         setSmartPlan]         = useState<SmartPlan | null>(null);
-  const [planLoading,       setPlanLoading]       = useState(false);
-  const [planError,         setPlanError]         = useState<string | null>(null);
   const [gamProgress,     setGamProgress]     = useState<GamificationProgress | null>(null);
   const [drawerOpen,      setDrawerOpen]      = useState(false);
   const [shopOpen,        setShopOpen]        = useState(false);
@@ -343,10 +328,8 @@ export default function Dashboard() {
   useEffect(() => { refreshData(); }, [refreshData]);
 
   useEffect(() => {
-    api.get<SavedPlan>('/mentor/study-plan/saved').then(r => setSavedPlan(r.data)).catch(() => setSavedPlan(null));
     api.get<{ events: CalEvent[] }>('/calendar/upcoming').then(r => setCalEvents(r.data.events)).catch(() => {});
     api.get<GamificationProgress>('/gamification/progress').then(r => setGamProgress(r.data)).catch(() => {});
-    api.get<SmartPlan>('/smart-plan/current').then(r => setSmartPlan(r.data)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -375,44 +358,6 @@ export default function Dashboard() {
       wsRef.current = null;
     };
   }, [user?.id, token, refreshData]);
-
-  async function generatePlan() {
-    setPlanLoading(true); setPlanError(null);
-    try {
-      const { data } = await api.post<SmartPlan>('/smart-plan/generate');
-      setSmartPlan(data);
-      api.post('/smart-plan/save', data).catch(() => {});
-    } catch (err: unknown) {
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setPlanError(detail ?? 'Failed to generate plan. Please try again.');
-    } finally { setPlanLoading(false); }
-  }
-
-  function downloadPDF(plan: SmartPlan) {
-    const rows = plan.days.map(d => `
-      <div class="day-col"><div class="day-name">${d.day.slice(0, 3)}</div>
-      ${d.tasks.map(t => `<div class="task">${t}</div>`).join('')}</div>`).join('');
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>TwinMind Smart Plan</title>
-<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:2rem;color:#0f172a;background:#fff}
-h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-size:0.9rem;color:#475569;margin:0 0 1.5rem}
-.badge{display:inline-block;background:#eef2ff;color:#4338ca;border-radius:99px;padding:0.25rem 0.85rem;font-size:0.82rem;font-weight:700;margin-bottom:1.5rem}
-.grid{display:flex;gap:0.75rem;margin-bottom:1.5rem}.day-col{flex:1;background:#f8fafc;border-radius:10px;padding:0.75rem;border:1px solid #e2e8f0}
-.day-name{font-size:0.75rem;font-weight:800;color:#4338ca;text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.5rem}
-.task{font-size:0.72rem;color:#334155;padding:0.35rem 0;border-bottom:1px solid #e2e8f0;line-height:1.4}.task:last-child{border-bottom:none}
-.report{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1rem;margin-top:0.5rem}
-.report-title{font-size:0.8rem;font-weight:700;color:#4338ca;margin:0 0 0.4rem}.forecast{font-size:0.82rem;color:#475569;line-height:1.5;margin:0}
-@media print{body{padding:1rem}}</style></head><body>
-<h1>TwinMind Smart Plan</h1>
-<p class="sub">Raise expected performance from <strong>${plan.current_score}%</strong> to <strong>${plan.target_score}%</strong> over the next 3 weeks</p>
-<div class="badge">${plan.daily_hours}h/day recommended</div>
-<div class="grid">${rows}</div>
-<div class="report"><p class="report-title">Twin Report</p><p class="forecast">${plan.forecast}</p></div>
-</body></html>`;
-    const win = window.open('', '_blank');
-    if (!win) return;
-    win.document.write(html); win.document.close();
-    win.onload = () => { win.focus(); win.print(); };
-  }
 
   const streak     = computeStreak(entries);
   const totalHours = Math.round(entries.reduce((s, e) => s + e.study_hours, 0));
@@ -531,6 +476,14 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
                 )}
               </div>
             );
+            if (gi === 1) {
+              return [
+                <Link key="nav-planner" to="/study-planner" className="nav-link" style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  📅 Study Planner
+                </Link>,
+                dropdown,
+              ];
+            }
             if (gi === 2) {
               return [
                 <Link key="nav-checkin" to="/checkin" className="nav-link" style={{ fontWeight: 600 }}
@@ -862,69 +815,30 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
           <AITwinAssistant />
         </section>
 
-        {/* ── S8: SMART PLAN ── */}
-        <section style={sp.card} className="dash-section">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <span style={{ fontSize: '1.15rem' }}>◈</span>
-              <h2 style={sp.title}>Smart Study Plan</h2>
+        {/* ── S8: STUDY PLANNER COMPACT CARD ── */}
+        <section style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)', backdropFilter: 'blur(var(--glass-blur))', padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem', flexWrap: 'wrap' as const }} className="dash-section">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '240px' }}>
+            <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg,rgba(var(--primary-rgb),0.22),rgba(124,58,237,0.18))', border: '1.5px solid rgba(var(--primary-rgb),0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0, boxShadow: '0 8px 24px rgba(var(--primary-rgb),0.2)' }}>📅</div>
+            <div>
+              <h2 style={{ margin: '0 0 0.2rem', fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>Study Planner</h2>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8' }}>Monthly goals → weekly tasks → daily actions. Auto-tracked by AI.</p>
             </div>
-            <button onClick={generatePlan} disabled={planLoading} style={sp.regenBtn}>
-              {planLoading ? '⟳ Generating…' : smartPlan ? '⟳ Regenerate' : '✦ Generate Plan'}
-            </button>
           </div>
-          {planError && <div style={sp.errorBox}>{planError}</div>}
-          {!smartPlan && !planLoading && !planError && (
-            <div style={sp.emptyWrap}>
-              <p style={sp.emptyIcon}>🧠</p>
-              <p style={sp.emptyTitle}>AI-Powered Weekly Schedule</p>
-              <p style={sp.emptySub}>Generate a personalized 7-day study plan based on your performance data, weak areas, and academic goals.</p>
-              <button onClick={generatePlan} style={sp.generateBigBtn}>Generate My Smart Plan</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' as const }}>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ margin: '0 0 0.1rem', fontSize: '1.2rem', fontWeight: 900, color: '#00D4FF', textShadow: '0 0 12px rgba(0,212,255,0.5)' }}>{Math.round(weekHours)}h</p>
+              <p style={{ margin: 0, fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Week Hours</p>
             </div>
-          )}
-          {planLoading && (
-            <div style={sp.loadingWrap}>
-              <div style={sp.spinner} className="spin" />
-              <p style={sp.loadingText}>Analyzing your performance data…</p>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ margin: '0 0 0.1rem', fontSize: '1.2rem', fontWeight: 900, color: '#10b981', textShadow: '0 0 12px rgba(16,185,129,0.5)' }}>{Math.round(Math.min(100, (weekHours / 14) * 100))}%</p>
+              <p style={{ margin: 0, fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Weekly Goal</p>
             </div>
-          )}
-          {smartPlan && !planLoading && (
-            <>
-              <div style={sp.headline}>
-                <p style={sp.headlineText}>
-                  Raise expected performance from&nbsp;
-                  <span style={sp.scoreFrom}>{smartPlan.current_score}%</span>
-                  &nbsp;to&nbsp;
-                  <span style={sp.scoreTo}>{smartPlan.target_score}%</span>
-                  &nbsp;over the next 3 weeks
-                </p>
-                <span style={sp.hoursBadge}>{smartPlan.daily_hours}h/day recommended</span>
-              </div>
-              <div style={sp.dayGrid} className="mob-day-grid">
-                {smartPlan.days.map((d, i) => (
-                  <div key={i} style={sp.dayCol}>
-                    <p style={sp.dayName}>{d.day.slice(0, 3).toUpperCase()}</p>
-                    {d.tasks.map((task, j) => (
-                      <div key={j} style={sp.taskCard}>
-                        <span style={sp.taskDot} />
-                        <span style={sp.taskText}>{task}</span>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-              <div style={sp.reportBox}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.85rem' }}>◈</span>
-                    <span style={sp.reportTitle}>Twin Report</span>
-                  </div>
-                  <button onClick={() => downloadPDF(smartPlan)} style={sp.downloadBtn}>↓ Download PDF</button>
-                </div>
-                <p style={sp.forecastText}>{smartPlan.forecast}</p>
-              </div>
-            </>
-          )}
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ margin: '0 0 0.1rem', fontSize: '1.2rem', fontWeight: 900, color: '#f59e0b', textShadow: '0 0 12px rgba(245,158,11,0.5)' }}>{Math.round(Math.min(100, (totalHours / 60) * 100))}%</p>
+              <p style={{ margin: 0, fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Monthly Goal</p>
+            </div>
+            <Link to="/study-planner" style={{ padding: '0.58rem 1.25rem', background: 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', borderRadius: '10px', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none', boxShadow: '0 4px 16px rgba(var(--primary-rgb),0.35)', flexShrink: 0, whiteSpace: 'nowrap' as const }}>Open Planner →</Link>
+          </div>
         </section>
 
         {/* ── S9: CALENDAR EVENTS ── */}
@@ -961,68 +875,9 @@ h1{font-size:1.4rem;font-weight:800;color:#4338ca;margin:0 0 0.25rem}.sub{font-s
           </section>
         )}
 
-        {/* ── S10: MY STUDY PLAN ── */}
-        <section style={s.panel} className="glass-panel dash-section">
-          <div style={s.panelHead}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>📋</span>
-              <h2 style={s.panelTitle}>{t('my_study_plan') || 'My Study Plan'}</h2>
-            </div>
-            <Link to="/mentor" style={s.panelCta}>{t('generate_new') || 'Generate New'}</Link>
-          </div>
-          {savedPlan ? (
-            <div>
-              <p style={s.planDate}>
-                {t('plan_saved') || 'Saved'}{' '}
-                {new Date(savedPlan.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-              </p>
-              <div style={s.planPreview}>
-                {savedPlan.plan_text.split('\n').filter(l => l.trim()).slice(0, 4).map((line, i) => {
-                  const clean = line.replace(/^#{1,3}\s*/, '').replace(/\*\*/g, '');
-                  return <p key={i} style={i === 0 ? s.planPreviewHead : s.planPreviewLine}>{clean}</p>;
-                })}
-                <p style={s.planFade}>…</p>
-              </div>
-              <button onClick={() => setShowPlanModal(true)} style={s.viewPlanBtn}>{t('view_full_plan') || 'View Full Plan'}</button>
-            </div>
-          ) : (
-            <div style={s.emptyState}>
-              <p style={s.emptyIcon}>📋</p>
-              <p style={s.emptyText}>{t('no_plan_title') || 'No Plan Yet'}</p>
-              <p style={s.emptySub}>{t('no_plan_sub') || 'Generate a personalized AI study plan to get started'}</p>
-              <Link to="/mentor" style={s.emptyBtn}>{t('go_to_mentor') || 'Go to AI Mentor'}</Link>
-            </div>
-          )}
-        </section>
-
       </main>
 
       <TutorialOverlay />
-
-      {/* Full Plan Modal */}
-      {showPlanModal && savedPlan && (
-        <div style={s.modalOverlay} className="mob-modal-overlay" onClick={() => setShowPlanModal(false)}>
-          <div style={s.modalBox} className="mob-modal-box" onClick={e => e.stopPropagation()}>
-            <div style={s.modalHeader}>
-              <div>
-                <p style={s.modalTitle}>{t('modal_plan_title') || 'My Study Plan'}</p>
-                <p style={s.modalSub}>
-                  {t('plan_saved') || 'Saved'}{' '}
-                  {new Date(savedPlan.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
-                </p>
-              </div>
-              <button onClick={() => setShowPlanModal(false)} style={s.modalClose}>✕</button>
-            </div>
-            <div style={s.modalBody}><PlanContent text={savedPlan.plan_text} /></div>
-            <div style={s.modalFooter}>
-              <Link to="/mentor" style={s.modalMentorLink} onClick={() => setShowPlanModal(false)}>
-                {t('modal_regenerate') || 'Regenerate Plan'}
-              </Link>
-              <button onClick={() => setShowPlanModal(false)} style={s.modalCloseBtn}>{t('close') || 'Close'}</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
     </XPStoreProvider>
   );
@@ -1218,81 +1073,3 @@ const s: Record<string, React.CSSProperties> = {
 };
 
 /* ── Smart Plan styles ── */
-const sp: Record<string, React.CSSProperties> = {
-  card: {
-    position: 'relative',
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: 'var(--card-radius)',
-    padding: '1.75rem',
-    overflow: 'hidden',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08)',
-  },
-  title: { margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.2px' },
-  regenBtn: {
-    padding: '0.4rem 1rem',
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.14)',
-    borderRadius: '99px', color: 'var(--text-m)',
-    fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer',
-    fontFamily: 'inherit', letterSpacing: '0.01em',
-    backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-    transition: 'background 0.25s, border-color 0.25s',
-  },
-  emptyWrap:     { textAlign: 'center' as const, padding: '2rem 1rem' },
-  emptyIcon:     { fontSize: '2.5rem', margin: '0 0 0.75rem' },
-  emptyTitle:    { margin: '0 0 0.4rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-h)' },
-  emptySub:      { margin: '0 0 1.5rem', fontSize: '0.83rem', color: 'var(--text)', lineHeight: 1.5, maxWidth: '380px', marginLeft: 'auto', marginRight: 'auto' },
-  generateBigBtn: {
-    padding: '0.65rem 1.75rem',
-    background: 'rgba(255,255,255,0.08)',
-    border: '1px solid rgba(255,255,255,0.18)',
-    borderRadius: 'var(--btn-radius)', color: 'var(--text-h)',
-    fontSize: '0.88rem', fontWeight: 700, cursor: 'pointer',
-    fontFamily: 'inherit', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
-    transition: 'background 0.25s, border-color 0.25s, box-shadow 0.25s',
-  },
-  loadingWrap: { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '0.85rem', padding: '2.5rem 1rem' },
-  spinner:     { width: '32px', height: '32px', border: '3px solid rgba(255,255,255,0.1)', borderTop: '3px solid var(--primary)', borderRadius: '50%' },
-  loadingText: { fontSize: '0.85rem', color: 'var(--text)', margin: 0 },
-  errorBox:    { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', padding: '0.75rem 1rem', fontSize: '0.82rem', color: '#fca5a5', marginBottom: '1rem' },
-  headline:    { marginBottom: '1.5rem' },
-  headlineText:{ margin: '0 0 0.75rem', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-h)', lineHeight: 1.4 },
-  scoreFrom:   { color: '#fbbf24', fontWeight: 800 },
-  scoreTo:     { color: '#34d399', fontWeight: 800 },
-  hoursBadge: {
-    display: 'inline-block', padding: '0.3rem 0.9rem',
-    background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)',
-    borderRadius: '99px', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-m)',
-    backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-  },
-  dayGrid: { display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '0.55rem', marginBottom: '1.5rem' },
-  dayCol: {
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '12px', padding: '0.7rem 0.55rem',
-    backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-    transition: 'background 0.2s, border-color 0.2s',
-  },
-  dayName: { margin: '0 0 0.55rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--section-accent)', letterSpacing: '0.08em', textAlign: 'center' as const },
-  taskCard:{ display: 'flex', gap: '0.35rem', alignItems: 'flex-start', marginBottom: '0.45rem' },
-  taskDot: { width: '5px', height: '5px', borderRadius: '50%', background: 'var(--primary)', flexShrink: 0, marginTop: '5px' },
-  taskText:{ fontSize: '0.67rem', color: 'var(--text-m)', lineHeight: 1.45 },
-  reportBox: {
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '12px', padding: '1rem 1.1rem',
-    backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-  },
-  reportTitle:  { fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-m)', letterSpacing: '0.02em' },
-  forecastText: { margin: 0, fontSize: '0.82rem', color: 'var(--text)', lineHeight: 1.6, fontStyle: 'italic' },
-  downloadBtn: {
-    padding: '0.3rem 0.8rem',
-    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)',
-    borderRadius: '8px', color: 'var(--text-m)', fontSize: '0.74rem', fontWeight: 700,
-    cursor: 'pointer', fontFamily: 'inherit',
-    backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-    transition: 'background 0.2s, border-color 0.2s',
-  },
-};
