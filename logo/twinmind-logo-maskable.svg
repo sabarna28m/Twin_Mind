@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+<defs>
+  <linearGradient id="alg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%"   stop-color="#00D4FF"/>
+    <stop offset="100%" stop-color="#0066FF"/>
+  </linearGradient>
+  <linearGradient id="arg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%"   stop-color="#8B00FF"/>
+    <stop offset="100%" stop-color="#FF00CC"/>
+  </linearGradient>
+  <radialGradient id="bgr" cx="35%" cy="30%" r="75%">
+    <stop offset="0%"   stop-color="#0D1A38"/>
+    <stop offset="100%" stop-color="#08081C"/>
+  </radialGradient>
+  <filter id="aglow" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <clipPath id="alc"><path d="M 256,108 C 238,91 208,81 177,87 C 142,93 108,116 89,155 C 65,202 68,260 87,304 C 106,348 141,373 179,383 C 209,391 234,389 256,382 Z"/></clipPath>
+  <clipPath id="arc"><path d="M 256,108 C 274,91 304,81 335,87 C 370,93 404,116 423,155 C 447,202 444,260 425,304 C 406,348 371,373 333,383 C 303,391 278,389 256,382 Z"/></clipPath>
+</defs>
+
+<!-- App background -->
+<rect width="1024" height="1024" rx="0" fill="#1A1A2E"/>
+<rect width="1024" height="1024" rx="0" fill="url(#bgr)"/>
+
+<!-- Brain: scale up and centre -->
+<g transform="translate(122.0,122.0) scale(1.5234)">
+  <g filter="url(#aglow)">
+    <path d="M 256,108 C 238,91 208,81 177,87 C 142,93 108,116 89,155 C 65,202 68,260 87,304 C 106,348 141,373 179,383 C 209,391 234,389 256,382 Z"  fill="url(#alg)" opacity="0.95"/>
+    <path d="M 256,108 C 274,91 304,81 335,87 C 370,93 404,116 423,155 C 447,202 444,260 425,304 C 406,348 371,373 333,383 C 303,391 278,389 256,382 Z" fill="url(#arg)" opacity="0.95"/>
+  </g>
+  <g clip-path="url(#alc)">
+    <polyline points="128,152 172,152 172,198" fill="none" stroke="#7FEFFF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="128" cy="152" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="172" cy="152" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="172" cy="198" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/>
+    <polyline points="104,218 152,218" fill="none" stroke="#7FEFFF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="104" cy="218" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="152" cy="218" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/>
+    <polyline points="156,182 156,234 204,234" fill="none" stroke="#7FEFFF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="156" cy="182" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="156" cy="234" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="204" cy="234" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/>
+    <polyline points="106,282 150,282 150,246" fill="none" stroke="#7FEFFF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="106" cy="282" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="150" cy="282" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="150" cy="246" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/>
+    <polyline points="126,328 170,328 170,360" fill="none" stroke="#7FEFFF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="126" cy="328" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="170" cy="328" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="170" cy="360" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/>
+    <polyline points="200,140 200,176 242,176" fill="none" stroke="#7FEFFF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="200" cy="140" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="200" cy="176" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="242" cy="176" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/>
+    <polyline points="176,308 218,308 218,268" fill="none" stroke="#7FEFFF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="176" cy="308" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="218" cy="308" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/><circle cx="218" cy="268" r="5.5" fill="#7FEFFF" fill-opacity="0.85"/>
+  </g>
+  <g clip-path="url(#arc)">
+    <polyline points="384,152 340,152 340,198" fill="none" stroke="#D4A0FF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="384" cy="152" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="340" cy="152" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="340" cy="198" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/>
+    <polyline points="408,218 360,218" fill="none" stroke="#D4A0FF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="408" cy="218" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="360" cy="218" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/>
+    <polyline points="356,182 356,234 308,234" fill="none" stroke="#D4A0FF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="356" cy="182" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="356" cy="234" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="308" cy="234" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/>
+    <polyline points="406,282 362,282 362,246" fill="none" stroke="#D4A0FF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="406" cy="282" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="362" cy="282" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="362" cy="246" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/>
+    <polyline points="386,328 342,328 342,360" fill="none" stroke="#D4A0FF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="386" cy="328" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="342" cy="328" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="342" cy="360" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/>
+    <polyline points="312,140 312,176 270,176" fill="none" stroke="#D4A0FF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="312" cy="140" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="312" cy="176" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="270" cy="176" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/>
+    <polyline points="336,308 294,308 294,268" fill="none" stroke="#D4A0FF" stroke-width="2.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="336" cy="308" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="294" cy="308" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/><circle cx="294" cy="268" r="5.5" fill="#D4A0FF" fill-opacity="0.85"/>
+  </g>
+  <line x1="256" y1="108" x2="256" y2="382"
+    stroke="rgba(255,255,255,0.35)" stroke-width="1" stroke-dasharray="5 4"/>
+</g>
+</svg>
