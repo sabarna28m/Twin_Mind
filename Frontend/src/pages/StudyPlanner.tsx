@@ -581,114 +581,284 @@ export default function StudyPlanner() {
           ) : activeTab === 'monthly' ? (
 
             /* ══════ MONTHLY TAB ══════ */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-                <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>Monthly Goals — {getMonthName()}</h2>
-                {!smartPlan && (
-                  <button onClick={generateAIPlan} disabled={generating} style={{ padding: '0.45rem 1.05rem', background: 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', border: 'none', borderRadius: '9px', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'inherit' }}>✦ Generate AI Plan</button>
-                )}
-              </div>
+            (() => {
+              const curScore     = smartPlan?.current_score ?? planner?.twinSim?.currentScore ?? 70;
+              const targetScore  = smartPlan?.target_score  ?? planner?.twinSim?.predictedScore ?? 85;
+              const gain         = targetScore - curScore;
+              const milestones   = [
+                Math.round((curScore + gain * 0.27) * 10) / 10,
+                Math.round((curScore + gain * 0.54) * 10) / 10,
+                Math.round((curScore + gain * 0.78) * 10) / 10,
+                targetScore,
+              ];
+              const subjects = planner?.monthlyGoals ?? [];
+              const weakSubjects = subjects.filter((_,i) => i < 2);
+              const biggestGap = [...subjects].sort((a,b) => (b.toScore-b.fromScore)-(a.toScore-a.fromScore));
 
-              {/* Subject allocation */}
-              {planner && planner.subjectAllocation.length > 0 && (
-                <div style={{ background: 'rgba(4,8,22,0.90)', border: '1.5px solid rgba(var(--primary-rgb),0.18)', borderRadius: '16px', padding: '1.1rem 1.35rem', backdropFilter: 'blur(28px)' }}>
-                  <p style={{ margin: '0 0 0.8rem', fontSize: '0.82rem', fontWeight: 800, color: '#f1f5f9' }}>Intelligent Time Allocation</p>
-                  <div style={{ display: 'flex', height: '22px', borderRadius: '8px', overflow: 'hidden', marginBottom: '0.7rem', gap: '1px' }}>
-                    {planner.subjectAllocation.map(a => (
-                      <div key={a.subject} style={{ flex: a.percentage, background: a.color, opacity: 0.82, minWidth: '4px' }} title={`${a.subject}: ${a.percentage}%`} />
-                    ))}
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {planner.subjectAllocation.map(a => (
-                      <div key={a.subject} style={{ display: 'flex', alignItems: 'center', gap: '0.32rem', fontSize: '0.7rem', color: '#cbd5e1' }}>
-                        <span style={{ width: '9px', height: '9px', borderRadius: '3px', background: a.color, flexShrink: 0 }} />
-                        <span style={{ fontWeight: 700, color: a.color }}>{a.percentage}%</span>
-                        <span>{a.subject}</span>
-                        <span style={{ fontSize: '0.6rem', padding: '0.06rem 0.32rem', borderRadius: '99px', background: a.level === 'weak' ? 'rgba(239,68,68,0.14)' : a.level === 'strong' ? 'rgba(16,185,129,0.14)' : 'rgba(245,158,11,0.14)', color: a.level === 'weak' ? '#f87171' : a.level === 'strong' ? '#34d399' : '#fbbf24', fontWeight: 700 }}>{a.level}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              const WEEK_CARDS = [
+                {
+                  num: 1 as WeekNum, label: 'Foundation Week', color: '#00D4FF', icon: '🏗️',
+                  goal: 'Build a strong base across all core subjects. Identify knowledge gaps early so they do not affect exam performance.',
+                  mustComplete: [
+                    ...subjects.slice(0, 5).map(s => `${s.subject}: ${getTopicsFor(s.subject)[0]}`),
+                    '1 Mock Quiz — baseline assessment',
+                  ],
+                  quizNote: '1 Mock Quiz',
+                },
+                {
+                  num: 2 as WeekNum, label: 'Application Week', color: '#8b5cf6', icon: '⚙️',
+                  goal: 'Shift from reading to active problem-solving. Apply every concept through structured practice questions and case discussions.',
+                  mustComplete: [
+                    ...subjects.slice(0, 4).map(s => `${s.subject}: Practice questions & problem sets`),
+                    'Pharmacology drug classification review',
+                    '2 Practice Quizzes — timed conditions',
+                  ],
+                  quizNote: '2 Practice Quizzes',
+                },
+                {
+                  num: 3 as WeekNum, label: 'Advanced Week', color: '#f59e0b', icon: '🎯',
+                  goal: 'Target your weakest areas precisely. Use AI analysis to find exactly where marks are being lost and fix them.',
+                  mustComplete: [
+                    'Review AI-identified weak concepts',
+                    'Complete previous year exam questions',
+                    ...subjects.slice(0, 3).map(s => `${s.subject}: Focused revision session`),
+                    '3 Timed practice quizzes',
+                    'Subject-wise error analysis',
+                  ],
+                  quizNote: '3 Timed Quizzes',
+                },
+                {
+                  num: 4 as WeekNum, label: 'Exam Readiness Week', color: '#10b981', icon: '🏆',
+                  goal: 'Consolidate everything. Simulate full exam conditions and confirm you are ready to achieve your target score.',
+                  mustComplete: [
+                    'Full syllabus rapid revision',
+                    'Final mock tests — 2 per day',
+                    'Error correction notebook review',
+                    'Rapid revision notes for all subjects',
+                    'Final performance self-assessment',
+                  ],
+                  quizNote: 'Final Mock Test',
+                },
+              ];
 
-              {/* Goal cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem' }}>
-                {(planner?.monthlyGoals ?? []).map(goal => (
-                  <div key={goal.id} style={{ background: 'rgba(4,8,22,0.90)', border: `1.5px solid ${goal.color}33`, borderRadius: '18px', padding: '1.25rem', backdropFilter: 'blur(28px)', boxShadow: `0 12px 40px rgba(0,0,0,0.6), 0 0 18px ${goal.color}0d` }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.7rem' }}>
+              const isWeekComplete = (w: WeekNum) => {
+                const ws = planner?.weekSchedules[w];
+                if (!ws) return false;
+                const nb = ws.days.flatMap(d => d.blocks).filter(b => b.type !== 'break');
+                return nb.length > 0 && nb.every(b => completedIds[b.id]);
+              };
+              const weekStatus = (w: WeekNum): 'done' | 'current' | 'upcoming' => {
+                if (isWeekComplete(w)) return 'done';
+                if (w === weekOfMonth()) return 'current';
+                return w < weekOfMonth() ? 'done' : 'upcoming';
+              };
+
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+
+                  {/* ── MONTHLY MISSION CARD ── */}
+                  <div style={{ background: 'rgba(4,8,22,0.93)', border: '1.5px solid rgba(var(--primary-rgb),0.3)', borderRadius: '20px', padding: '1.75rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 0% 0%, rgba(var(--primary-rgb),0.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
                       <div>
-                        <p style={{ margin: '0 0 0.15rem', fontSize: '0.95rem', fontWeight: 800, color: '#fff' }}>{goal.subject}</p>
-                        <div style={{ display: 'flex', gap: '0.42rem', alignItems: 'center' }}>
-                          <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{goal.fromScore}%</span>
-                          <span style={{ color: goal.color }}>→</span>
-                          <span style={{ fontSize: '0.9rem', fontWeight: 800, color: goal.color }}>{goal.toScore}%</span>
-                          <span style={{ fontSize: '0.62rem', background: `${goal.color}18`, color: goal.color, padding: '0.07rem 0.4rem', borderRadius: '99px', fontWeight: 700 }}>+{goal.toScore - goal.fromScore}%</span>
+                        <p style={{ margin: '0 0 0.2rem', fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Monthly Mission — {getMonthName()}</p>
+                        <h2 style={{ margin: '0 0 0.1rem', fontSize: '1.4rem', fontWeight: 900, color: '#f1f5f9' }}>Reach {targetScore}% This Month</h2>
+                        <p style={{ margin: 0, fontSize: '0.82rem', color: '#94a3b8' }}>4-week structured roadmap to your target score</p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '1.25rem', flexShrink: 0, flexWrap: 'wrap' }}>
+                        <div style={{ textAlign: 'center' }}>
+                          <p style={{ margin: '0 0 0.08rem', fontSize: '1.5rem', fontWeight: 900, color: '#94a3b8' }}>{curScore}%</p>
+                          <p style={{ margin: 0, fontSize: '0.6rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Current</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', color: '#4b5563', fontSize: '1.2rem', paddingTop: '0.2rem' }}>→</div>
+                        <div style={{ textAlign: 'center' }}>
+                          <p style={{ margin: '0 0 0.08rem', fontSize: '1.5rem', fontWeight: 900, color: '#10b981', textShadow: '0 0 20px rgba(16,185,129,0.5)' }}>{targetScore}%</p>
+                          <p style={{ margin: 0, fontSize: '0.6rem', color: '#10b981', fontWeight: 700, textTransform: 'uppercase' }}>Target</p>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <p style={{ margin: '0 0 0.08rem', fontSize: '1.5rem', fontWeight: 900, color: '#f59e0b', textShadow: '0 0 16px rgba(245,158,11,0.5)' }}>+{gain}%</p>
+                          <p style={{ margin: 0, fontSize: '0.6rem', color: '#f59e0b', fontWeight: 700, textTransform: 'uppercase' }}>Improvement</p>
                         </div>
                       </div>
-                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <p style={{ margin: '0 0 0.05rem', fontSize: '1.2rem', fontWeight: 900, color: goal.color, textShadow: `0 0 12px ${goal.color}88` }}>{monthPct}%</p>
-                        <p style={{ margin: 0, fontSize: '0.58rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Done</p>
+                    </div>
+
+                    {/* AI Summary */}
+                    <div style={{ padding: '1rem 1.15rem', background: 'rgba(var(--primary-rgb),0.07)', border: '1px solid rgba(var(--primary-rgb),0.15)', borderRadius: '12px', marginBottom: '1.25rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.5rem' }}>
+                        <span style={{ fontSize: '0.85rem' }}>◈</span>
+                        <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>AI Summary</span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '0.88rem', color: '#cbd5e1', lineHeight: 1.7 }}>
+                        Based on your current performance, study habits, focus scores, quiz accuracy, and Digital Twin simulation, completing this 4-week roadmap can increase your predicted score from <strong style={{ color: '#94a3b8' }}>{curScore}%</strong> to approximately <strong style={{ color: '#10b981' }}>{targetScore}%</strong>.{smartPlan?.forecast ? ` ${smartPlan.forecast}` : ''}
+                      </p>
+                    </div>
+
+                    {/* Week progress dots */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0', marginBottom: '0.9rem' }}>
+                      {([1,2,3,4] as WeekNum[]).map((w, wi) => {
+                        const st = weekStatus(w);
+                        const dotColor = st === 'done' ? '#10b981' : st === 'current' ? 'var(--primary)' : '#374151';
+                        return (
+                          <div key={w} style={{ display: 'flex', alignItems: 'center', flex: wi < 3 ? 1 : 'none' }}>
+                            <div style={{ flexShrink: 0, width: '32px', height: '32px', borderRadius: '50%', background: st === 'done' ? 'rgba(16,185,129,0.15)' : st === 'current' ? 'rgba(var(--primary-rgb),0.15)' : 'rgba(255,255,255,0.04)', border: `2px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s' }}>
+                              {st === 'done' ? <span style={{ fontSize: '0.85rem' }}>✅</span> : <span style={{ fontSize: '0.7rem', fontWeight: 900, color: dotColor }}>W{w}</span>}
+                            </div>
+                            {wi < 3 && <div style={{ flex: 1, height: '2px', background: st === 'done' ? '#10b981' : 'rgba(255,255,255,0.08)', transition: 'background 0.3s' }} />}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Overall progress bar */}
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.32rem' }}>
+                        <span style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: 600 }}>Overall Monthly Progress</span>
+                        <span style={{ fontSize: '0.72rem', fontWeight: 900, color: monthPct >= 70 ? '#10b981' : 'var(--primary)' }}>{monthPct}%</span>
+                      </div>
+                      <div style={{ height: '10px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden', boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.45)' }}>
+                        <div style={{ height: '100%', width: `${monthPct}%`, background: monthPct >= 70 ? '#10b981' : 'linear-gradient(90deg,var(--primary),rgba(var(--primary-rgb),0.7))', borderRadius: '99px', transition: 'width 0.9s ease', boxShadow: '0 0 12px rgba(var(--primary-rgb),0.5)' }} />
                       </div>
                     </div>
-                    <div style={{ height: '6px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden', marginBottom: '0.8rem', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)' }}>
-                      <div style={{ height: '100%', width: `${monthPct}%`, background: goal.color, borderRadius: '99px', transition: 'width 0.8s ease', boxShadow: `0 0 10px ${goal.color}66` }} />
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                      {goal.weeklyFocus.map((f, wi) => (
-                        <div key={wi} style={{ display: 'flex', alignItems: 'center', gap: '0.42rem', padding: '0.32rem 0.52rem', background: wi < weekOfMonth() - 1 ? 'rgba(16,185,129,0.07)' : 'rgba(255,255,255,0.02)', borderRadius: '7px', border: `1px solid ${wi < weekOfMonth() - 1 ? 'rgba(16,185,129,0.18)' : 'rgba(255,255,255,0.05)'}` }}>
-                          <span style={{ fontSize: '0.68rem', flexShrink: 0, color: wi < weekOfMonth() - 1 ? '#34d399' : '#64748b', fontWeight: 700 }}>{wi < weekOfMonth() - 1 ? '✅' : `W${wi + 1}`}</span>
-                          <span style={{ fontSize: '0.7rem', color: wi < weekOfMonth() - 1 ? '#a7f3d0' : '#94a3b8' }}>{f}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
 
-              {/* AI Prediction */}
-              {smartPlan && (
-                <div style={{ background: 'rgba(4,8,22,0.90)', border: '1.5px solid rgba(var(--primary-rgb),0.22)', borderRadius: '18px', padding: '1.35rem 1.5rem', backdropFilter: 'blur(28px)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '1rem' }}>
-                    <span style={{ fontSize: '1.1rem' }}>◈</span>
-                    <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#f1f5f9' }}>Twin AI Performance Prediction</h3>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(150px,1fr))', gap: '0.7rem', marginBottom: '1rem' }}>
-                    {[
-                      { label: 'Current Score', value: `${smartPlan.current_score}%`, color: '#94a3b8' },
-                      { label: 'Target Score',  value: `${smartPlan.target_score}%`,  color: '#10b981' },
-                      { label: 'Daily Hours',   value: `${smartPlan.daily_hours}h`,   color: '#00D4FF' },
-                      { label: 'Expected Gain', value: `+${smartPlan.target_score - smartPlan.current_score}%`, color: '#f59e0b' },
-                    ].map(s => (
-                      <div key={s.label} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.07)' }}>
-                        <p style={{ margin: '0 0 0.12rem', fontSize: '1.3rem', fontWeight: 900, color: s.color, textShadow: `0 0 14px ${s.color}55` }}>{s.value}</p>
-                        <p style={{ margin: 0, fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <p style={{ margin: 0, fontSize: '0.83rem', color: '#cbd5e1', lineHeight: 1.65, padding: '0.85rem', background: 'rgba(var(--primary-rgb),0.06)', borderRadius: '10px', border: '1px solid rgba(var(--primary-rgb),0.12)' }}>
-                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>◈ Twin Forecast: </span>{smartPlan.forecast}
-                  </p>
-                </div>
-              )}
-
-              {/* Month week grid */}
-              <div style={{ background: 'rgba(4,8,22,0.90)', border: '1.5px solid rgba(var(--primary-rgb),0.18)', borderRadius: '18px', padding: '1.25rem', backdropFilter: 'blur(28px)' }}>
-                <h3 style={{ margin: '0 0 0.9rem', fontSize: '0.92rem', fontWeight: 800, color: '#f1f5f9' }}>Month Overview</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.6rem' }}>
-                  {([1,2,3,4] as WeekNum[]).map(w => {
-                    const isNow = w === weekOfMonth();
-                    return (
-                      <button key={w} onClick={() => { setSelectedWeek(w); setActiveTab('weekly'); }}
-                        style={{ padding: '0.85rem 0.65rem', background: isNow ? 'rgba(var(--primary-rgb),0.12)' : 'rgba(255,255,255,0.03)', border: `1.5px solid ${isNow ? 'rgba(var(--primary-rgb),0.35)' : 'rgba(255,255,255,0.07)'}`, borderRadius: '13px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', transition: 'all 0.18s' }}>
-                        <p style={{ margin: '0 0 0.1rem', fontSize: '0.68rem', color: isNow ? 'var(--primary)' : '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Week {w} {isNow ? '· Now' : ''}</p>
-                        <p style={{ margin: '0 0 0.4rem', fontSize: '0.62rem', color: '#64748b' }}>{getWeekStart(w).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>
-                        <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 800, color: '#f1f5f9' }}>View →</p>
+                    {!planner && (
+                      <button onClick={generateAIPlan} disabled={generating} style={{ marginTop: '1.25rem', width: '100%', padding: '0.7rem', background: 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', border: 'none', borderRadius: '11px', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 18px rgba(var(--primary-rgb),0.4)' }}>
+                        {generating ? '⟳ Generating your personalised plan…' : '✦ Generate My AI Study Plan'}
                       </button>
-                    );
-                  })}
+                    )}
+                  </div>
+
+                  {/* ── 4 WEEK ROADMAP ── */}
+                  <div>
+                    <h2 style={{ margin: '0 0 1rem', fontSize: '1.05rem', fontWeight: 800, color: '#f1f5f9' }}>4-Week Roadmap</h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      {WEEK_CARDS.map((wk, wi) => {
+                        const st = weekStatus(wk.num);
+                        const fromScore = wi === 0 ? curScore : milestones[wi - 1];
+                        const toScore   = milestones[wi];
+                        const isNow = st === 'current';
+                        const isDone = st === 'done';
+                        return (
+                          <div key={wk.num} style={{ background: isDone ? 'rgba(16,185,129,0.05)' : 'rgba(4,8,22,0.90)', border: `1.5px solid ${isDone ? 'rgba(16,185,129,0.25)' : isNow ? `${wk.color}35` : 'rgba(255,255,255,0.08)'}`, borderLeft: `4px solid ${isDone ? '#10b981' : wk.color}`, borderRadius: '18px', padding: '1.5rem', backdropFilter: 'blur(28px)', boxShadow: isNow ? `0 12px 40px rgba(0,0,0,0.6), 0 0 20px ${wk.color}10` : '0 8px 28px rgba(0,0,0,0.5)' }}>
+                            {/* Week header */}
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.9rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: isDone ? 'rgba(16,185,129,0.14)' : `${wk.color}18`, border: `1.5px solid ${isDone ? 'rgba(16,185,129,0.3)' : `${wk.color}35`}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', flexShrink: 0 }}>
+                                  {isDone ? '✅' : wk.icon}
+                                </div>
+                                <div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.1rem', flexWrap: 'wrap' }}>
+                                    <span style={{ fontSize: '0.65rem', fontWeight: 800, color: isDone ? '#10b981' : wk.color, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Week {wk.num}</span>
+                                    {isNow && <span style={{ fontSize: '0.6rem', padding: '0.08rem 0.45rem', background: `${wk.color}20`, color: wk.color, borderRadius: '99px', fontWeight: 700, border: `1px solid ${wk.color}35` }}>In Progress</span>}
+                                    {isDone && <span style={{ fontSize: '0.6rem', padding: '0.08rem 0.45rem', background: 'rgba(16,185,129,0.15)', color: '#34d399', borderRadius: '99px', fontWeight: 700 }}>Complete</span>}
+                                    {!isNow && !isDone && wk.num > weekOfMonth() && <span style={{ fontSize: '0.6rem', padding: '0.08rem 0.45rem', background: 'rgba(255,255,255,0.06)', color: '#64748b', borderRadius: '99px', fontWeight: 700 }}>Upcoming</span>}
+                                  </div>
+                                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: isDone ? '#a7f3d0' : '#f1f5f9' }}>{wk.label}</h3>
+                                </div>
+                              </div>
+                              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#94a3b8' }}>{fromScore}%</span>
+                                  <span style={{ color: '#4b5563' }}>→</span>
+                                  <span style={{ fontSize: '1.05rem', fontWeight: 900, color: isDone ? '#34d399' : wk.color, textShadow: `0 0 14px ${isDone ? '#10b981' : wk.color}66` }}>{toScore}%</span>
+                                </div>
+                                <p style={{ margin: '0.1rem 0 0', fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>Expected Improvement</p>
+                              </div>
+                            </div>
+
+                            {/* Goal */}
+                            <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.6, borderLeft: `2px solid ${wk.color}30`, paddingLeft: '0.75rem' }}><em>{wk.goal}</em></p>
+
+                            {/* Must Complete checklist */}
+                            <div style={{ marginBottom: '1rem' }}>
+                              <p style={{ margin: '0 0 0.55rem', fontSize: '0.72rem', fontWeight: 800, color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Must Complete</p>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.38rem' }}>
+                                {wk.mustComplete.map((item, ii) => (
+                                  <div key={ii} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.55rem', padding: '0.42rem 0.65rem', background: isDone ? 'rgba(16,185,129,0.06)' : 'rgba(255,255,255,0.03)', borderRadius: '8px', border: `1px solid ${isDone ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.06)'}` }}>
+                                    <span style={{ fontSize: '0.78rem', flexShrink: 0, color: isDone ? '#34d399' : wk.color, marginTop: '1px' }}>{isDone ? '✓' : '○'}</span>
+                                    <span style={{ fontSize: '0.82rem', color: isDone ? '#a7f3d0' : '#e2e8f0', lineHeight: 1.45 }}>{item}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Footer */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <span style={{ fontSize: '0.68rem', padding: '0.22rem 0.65rem', background: `${wk.color}12`, color: wk.color, borderRadius: '8px', fontWeight: 700, border: `1px solid ${wk.color}25` }}>📝 {wk.quizNote}</span>
+                                <span style={{ fontSize: '0.68rem', padding: '0.22rem 0.65rem', background: 'rgba(255,255,255,0.05)', color: '#94a3b8', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>{wk.mustComplete.length} tasks</span>
+                              </div>
+                              <button onClick={() => { setSelectedWeek(wk.num); setActiveTab('weekly'); }}
+                                style={{ fontSize: '0.75rem', fontWeight: 700, color: wk.color, background: `${wk.color}12`, border: `1px solid ${wk.color}28`, borderRadius: '8px', padding: '0.28rem 0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+                                {isNow ? 'View Today\'s Schedule →' : isDone ? 'View Week →' : 'Preview Week →'}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* ── SUBJECT TARGETS ── */}
+                  {subjects.length > 0 && (
+                    <div>
+                      <h2 style={{ margin: '0 0 1rem', fontSize: '1.05rem', fontWeight: 800, color: '#f1f5f9' }}>Subject Targets</h2>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '0.85rem' }}>
+                        {subjects.map((goal, gi) => {
+                          const color = MONTH_COLORS[gi % MONTH_COLORS.length];
+                          const topics = getTopicsFor(goal.subject).slice(0, 3);
+                          return (
+                            <div key={goal.id} style={{ background: 'rgba(4,8,22,0.90)', border: `1.5px solid ${color}28`, borderRadius: '16px', padding: '1.15rem', backdropFilter: 'blur(24px)', boxShadow: '0 8px 28px rgba(0,0,0,0.5)' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                                <h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#f1f5f9' }}>{goal.subject}</h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.42rem' }}>
+                                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 700 }}>{goal.fromScore}%</span>
+                                  <span style={{ color: '#4b5563', fontSize: '0.9rem' }}>→</span>
+                                  <span style={{ fontSize: '0.95rem', fontWeight: 900, color, textShadow: `0 0 12px ${color}66` }}>{goal.toScore}%</span>
+                                </div>
+                              </div>
+                              <div style={{ height: '5px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden', marginBottom: '0.85rem' }}>
+                                <div style={{ height: '100%', width: `${Math.round(goal.fromScore)}%`, background: color, borderRadius: '99px' }} />
+                              </div>
+                              <p style={{ margin: '0 0 0.45rem', fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Topics to Master</p>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.28rem' }}>
+                                {topics.map((t, ti) => (
+                                  <div key={ti} style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                    <span style={{ fontSize: '0.65rem', color: color, flexShrink: 0 }}>•</span>
+                                    <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>{t}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── AI INSIGHT PANEL ── */}
+                  <div style={{ background: 'rgba(4,8,22,0.90)', border: '1.5px solid rgba(var(--primary-rgb),0.22)', borderRadius: '18px', padding: '1.35rem 1.5rem', backdropFilter: 'blur(28px)', boxShadow: '0 12px 40px rgba(0,0,0,0.6)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.85rem' }}>
+                      <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(var(--primary-rgb),0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>◈</div>
+                      <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#f1f5f9' }}>AI Insight</span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#cbd5e1', lineHeight: 1.75, padding: '1rem 1.1rem', background: 'rgba(var(--primary-rgb),0.06)', borderRadius: '12px', border: '1px solid rgba(var(--primary-rgb),0.12)' }}>
+                      {biggestGap.length >= 2
+                        ? `Your biggest improvement opportunity is ${biggestGap[0].subject} and ${biggestGap[1].subject}. Focusing on these two subjects alone can contribute approximately ${Math.round((((biggestGap[0].toScore - biggestGap[0].fromScore) + (biggestGap[1].toScore - biggestGap[1].fromScore)) / (gain || 1)) * 100)}% of your expected monthly improvement. Prioritise these in Week 1 and Week 3 for maximum impact.`
+                        : `Your biggest opportunity this month is ${biggestGap[0]?.subject ?? 'core subjects'}. Completing the Week 1 foundation and Week 3 revision blocks for this subject will directly drive your score toward ${targetScore}%.`
+                      }
+                    </p>
+                    {weakSubjects.length > 0 && (
+                      <div style={{ marginTop: '0.85rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {weakSubjects.map((s, i) => (
+                          <span key={i} style={{ fontSize: '0.72rem', padding: '0.25rem 0.7rem', background: 'rgba(239,68,68,0.1)', color: '#f87171', borderRadius: '8px', fontWeight: 600, border: '1px solid rgba(239,68,68,0.2)' }}>⚠ Focus: {s.subject}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                 </div>
-              </div>
-            </div>
+              );
+            })()
 
           ) : activeTab === 'weekly' ? (
 
