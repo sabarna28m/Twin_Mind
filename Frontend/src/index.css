@@ -54,6 +54,17 @@
   --grad-rose:    linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
   --grad-cyan:    linear-gradient(135deg, #00D4FF 0%, #6366f1 100%);
 
+  /* ── Brand Identity Palette ── */
+  --brand-blue:       #3B82F6;
+  --brand-purple:     #A855F7;
+  --brand-cyan:       #22D3EE;
+  --brand-bg:         #050816;
+  --brand-rgb:        59,130,246;
+  --brand-purple-rgb: 168,85,247;
+  --grad-brand:       linear-gradient(135deg, #22D3EE 0%, #3B82F6 50%, #A855F7 100%);
+  --grad-brand-h:     linear-gradient(90deg,  #22D3EE 0%, #3B82F6 50%, #A855F7 100%);
+  --brand-glow:       0 0 40px rgba(59,130,246,0.3), 0 0 80px rgba(168,85,247,0.15);
+
   /* ── Glassmorphism ── */
   --glass-bg:     rgba(10, 16, 32, 0.75);
   --glass-border: rgba(255,255,255,0.08);
@@ -262,6 +273,15 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
 @keyframes hero-float {
   0%, 100% { transform: translateY(0px);  }
   50%       { transform: translateY(-8px); }
+}
+@keyframes splash-logo-in {
+  from { opacity: 0; transform: scale(0.88) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+@keyframes progress-slide {
+  0%   { transform: translateX(-100%); }
+  60%  { transform: translateX(20%);  }
+  100% { transform: translateX(110%); }
 }
 
 /* ══════════════════════════════

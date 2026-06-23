@@ -5,6 +5,11 @@ import api from '../services/api';
 import BackButton from '../components/BackButton';
 import { type GamificationProgress } from '../utils/gamification';
 import { BrainIcon } from '../components/TwinMindLogo';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import HumanVsTwinDashboard from '../components/HumanVsTwinDashboard';
 
 /* ═══════════════════════════════════════════════════════════════════════
    DPT PROFILE — persisted in localStorage
@@ -84,14 +89,35 @@ const INTERVIEW: IQ[] = [
 /* ═══════════════════════════════════════════════════════════════════════
    API INTERFACES
 ═══════════════════════════════════════════════════════════════════════ */
+interface HistoryPoint {
+  date: string; overall_score: number; twin_intelligence_score: number;
+  knowledge_growth: number; consistency_level: number; focus_quality: number;
+  study_hours: number; notes_created: number; quiz_accuracy: number | null;
+  focus_sessions: number; score_delta: number | null; ai_explanation: string;
+}
+interface CognitiveHeatmap {
+  knowledge_areas: number; memory_strength: number; focus_stability: number;
+  learning_speed: number; prediction_confidence: number;
+}
+interface EvolutionEvent { date: string; icon: string; description: string; }
+interface FutureTwin {
+  overall_score: number; consistency_score: number; wellness_score: number;
+  academic_score: number; risk_level: 'low'|'medium'|'high';
+  predicted_exam_score: number | null; motivational_message: string; tips: string[];
+}
 interface TwinState {
   overall_score: number; consistency_score: number; wellness_score: number; academic_score: number;
   risk_level: 'low'|'medium'|'high'; trend: 'improving'|'declining'|'stable';
   twin_age: number; data_points: number; strengths: string[]; areas_to_improve: string[];
   twin_intelligence_score: number; confidence_level: number; prediction_reliability: number;
   behavior_understanding: string; current_state_label: string; ai_insights: string[];
-  cognitive_heatmap?: { memory_strength?: number; learning_speed?: number; knowledge_areas?: number; prediction_confidence?: number; focus_stability?: number };
-  future_twin?: { predicted_exam_score: number | null } | null;
+  cognitive_heatmap?: CognitiveHeatmap | null;
+  future_twin?: FutureTwin | null;
+  future_twin_60?: FutureTwin | null;
+  future_twin_90?: FutureTwin | null;
+  history?: HistoryPoint[];
+  evolution_timeline?: EvolutionEvent[];
+  twin_maturity_level?: number;
 }
 interface SubjectAnalysis {
   weakest: { subject: string; avg_score: number; recommended_daily_minutes: number } | null;
@@ -361,7 +387,7 @@ function HeroSection({ fid, twin, user, onNavigate }: {
 /* ═══════════════════════════════════════════════════════════════════════
    TAB SYSTEM
 ═══════════════════════════════════════════════════════════════════════ */
-type DPTTab = 'overview' | 'identity' | 'persona' | 'memory' | 'graph' | 'intelligence' | 'privacy';
+type DPTTab = 'overview' | 'identity' | 'persona' | 'memory' | 'graph' | 'intelligence' | 'privacy' | 'evolution' | 'comparison';
 
 const TABS: {key:DPTTab; icon:string; label:string; color:string}[] = [
   {key:'overview',     icon:'◈',  label:'Overview',       color:'#6366f1'},
@@ -371,6 +397,8 @@ const TABS: {key:DPTTab; icon:string; label:string; color:string}[] = [
   {key:'graph',        icon:'🕸️', label:'Knowledge Graph',color:'#10b981'},
   {key:'intelligence', icon:'🔮', label:'Intelligence',   color:'#ec4899'},
   {key:'privacy',      icon:'🔒', label:'Privacy',        color:'#94a3b8'},
+  {key:'evolution',    icon:'📈', label:'Evolution',      color:'#818cf8'},
+  {key:'comparison',   icon:'⚖️', label:'Comparison',     color:'#34d399'},
 ];
 
 function TabBar({ active, setActive, sticky=false }: { active:DPTTab; setActive:(t:DPTTab)=>void; sticky?:boolean }) {
@@ -860,6 +888,368 @@ function IntelligenceTab({ profile, twin, subjects, burnout, streakData }:
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
+   EVOLUTION TAB COMPONENTS (ported from Twin.tsx)
+═══════════════════════════════════════════════════════════════════════ */
+
+const EVO_SCORE_GRADS = [
+  'linear-gradient(90deg,#6366f1,#8b5cf6)',
+  'linear-gradient(90deg,#3b82f6,#6366f1)',
+  'linear-gradient(90deg,#10b981,#06b6d4)',
+  'linear-gradient(90deg,#8b5cf6,#d946ef)',
+];
+const EVO_MSG_COLOR:  Record<string,string> = { improving:'#6ee7b7', declining:'#fca5a5', stable:'#fde68a' };
+const EVO_MSG_BG:     Record<string,string> = { improving:'rgba(16,185,129,0.08)', declining:'rgba(239,68,68,0.08)', stable:'rgba(245,158,11,0.08)' };
+const EVO_MSG_BORDER: Record<string,string> = { improving:'rgba(16,185,129,0.25)', declining:'rgba(239,68,68,0.25)', stable:'rgba(245,158,11,0.25)' };
+const EVO_MATURITY_LABELS = ['','Infant','Developing','Maturing','Advanced','Expert'];
+const EVO_MATURITY_COLORS = ['','#ef4444','#f59e0b','#06b6d4','#8b5cf6','#10b981'];
+
+type EvoTabDays = 30 | 60 | 90;
+const EVO_TAB_CFG: Record<EvoTabDays, { label:string; accent:string; examGrad:string; examBg:string; examBorder:string; tipArrow:string; activeGrad:string; activeBorder:string }> = {
+  30: { label:'+30 days', accent:'#6366f1', examGrad:'linear-gradient(135deg,#6366f1,#8b5cf6)', examBg:'rgba(99,102,241,0.08)', examBorder:'rgba(99,102,241,0.2)', tipArrow:'#6366f1', activeGrad:'linear-gradient(135deg,rgba(99,102,241,0.25),rgba(139,92,246,0.18))', activeBorder:'rgba(99,102,241,0.35)' },
+  60: { label:'+60 days', accent:'#3b82f6', examGrad:'linear-gradient(135deg,#3b82f6,#6366f1)', examBg:'rgba(59,130,246,0.08)', examBorder:'rgba(59,130,246,0.2)', tipArrow:'#3b82f6', activeGrad:'linear-gradient(135deg,rgba(59,130,246,0.22),rgba(99,102,241,0.15))', activeBorder:'rgba(59,130,246,0.35)' },
+  90: { label:'+90 days', accent:'#a855f7', examGrad:'linear-gradient(135deg,#a855f7,#d946ef)', examBg:'rgba(168,85,247,0.08)', examBorder:'rgba(168,85,247,0.2)', tipArrow:'#a855f7', activeGrad:'linear-gradient(135deg,rgba(168,85,247,0.22),rgba(217,70,239,0.12))', activeBorder:'rgba(168,85,247,0.35)' },
+};
+
+const EVO_LAYERS = [
+  { key: 'twin_intelligence_score' as const, label: 'Twin Intelligence', color: '#818cf8', desc: 'Composite score of all learning dimensions.' },
+  { key: 'knowledge_growth'        as const, label: 'Knowledge Growth',  color: '#34d399', desc: 'How much new knowledge you acquired this session.' },
+  { key: 'consistency_level'       as const, label: 'Consistency',       color: '#f59e0b', desc: 'Attendance and assignment completion regularity.' },
+  { key: 'focus_quality'           as const, label: 'Focus Quality',     color: '#06b6d4', desc: 'Study intensity balanced with stress levels.' },
+];
+type EvoLayerKey = typeof EVO_LAYERS[number]['key'];
+
+function EvoTooltip({ active, payload }: { active?: boolean; payload?: { name: string; value: number; color: string; payload: HistoryPoint }[] }) {
+  if (!active || !payload?.length) return null;
+  const pt = payload[0].payload;
+  return (
+    <div style={{ background:'rgba(8,13,26,0.97)', border:'1px solid rgba(129,140,248,0.3)', borderRadius:14, padding:'0.85rem 1rem', maxWidth:280, boxShadow:'0 8px 32px rgba(0,0,0,0.6)' }}>
+      <p style={{ margin:'0 0 0.55rem', fontSize:'0.78rem', fontWeight:800, color:'#818cf8' }}>{pt.date}</p>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.3rem 0.75rem', marginBottom:'0.6rem' }}>
+        {payload.map(l => (
+          <div key={l.name}>
+            <span style={{ fontSize:'0.62rem', color:'#475569', textTransform:'uppercase' as const, letterSpacing:'0.05em' }}>{EVO_LAYERS.find(x => x.key === l.name)?.label ?? l.name}</span>
+            <p style={{ margin:0, fontSize:'0.85rem', fontWeight:800, color:l.color }}>{Math.round(l.value)}</p>
+          </div>
+        ))}
+      </div>
+      <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:'0.5rem', marginBottom:'0.45rem' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.25rem 0.75rem', fontSize:'0.7rem' }}>
+          <span style={{ color:'#475569' }}>Study: <strong style={{ color:'#f1f5f9' }}>{pt.study_hours}h</strong></span>
+          <span style={{ color:'#475569' }}>Notes: <strong style={{ color:'#f1f5f9' }}>{pt.notes_created}</strong></span>
+          {pt.quiz_accuracy !== null && <span style={{ color:'#475569' }}>Quiz: <strong style={{ color:'#10b981' }}>{pt.quiz_accuracy?.toFixed(0)}%</strong></span>}
+          <span style={{ color:'#475569' }}>Sessions: <strong style={{ color:'#f1f5f9' }}>{pt.focus_sessions}</strong></span>
+        </div>
+      </div>
+      {pt.ai_explanation && (
+        <div style={{ padding:'0.45rem 0.6rem', background:'rgba(129,140,248,0.08)', borderRadius:8, border:'1px solid rgba(129,140,248,0.2)' }}>
+          <p style={{ margin:'0 0 0.2rem', fontSize:'0.6rem', fontWeight:700, color:'#818cf8', letterSpacing:'0.08em' }}>AI INSIGHT</p>
+          <p style={{ margin:0, fontSize:'0.7rem', color:'#94a3b8', lineHeight:1.5 }}>{pt.ai_explanation}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EvoHeatBar({ label, value, desc }: { label: string; value: number; desc: string }) {
+  const color = value >= 70 ? '#10b981' : value >= 45 ? '#f59e0b' : '#ef4444';
+  const band  = value >= 70 ? 'Strong' : value >= 45 ? 'Developing' : 'Needs Work';
+  return (
+    <div style={{ marginBottom:'0.85rem' }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.3rem' }}>
+        <div>
+          <span style={{ fontSize:'0.8rem', fontWeight:700, color:'#f1f5f9' }}>{label}</span>
+          <span style={{ marginLeft:'0.5rem', fontSize:'0.62rem', color:'#475569' }}>{desc}</span>
+        </div>
+        <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
+          <span style={{ fontSize:'0.68rem', fontWeight:700, padding:'0.12rem 0.5rem', borderRadius:99, background:`${color}18`, color, border:`1px solid ${color}30` }}>{band}</span>
+          <span style={{ fontSize:'0.88rem', fontWeight:800, color }}>{Math.round(value)}</span>
+        </div>
+      </div>
+      <div style={{ height:7, background:'rgba(255,255,255,0.06)', borderRadius:99, overflow:'hidden' }}>
+        <div className="score-bar-fill" style={{ width:`${value}%`, height:'100%', background:color, borderRadius:99, boxShadow:`0 0 8px ${color}60` }} />
+      </div>
+    </div>
+  );
+}
+
+function EvoFutureTwinCard({ twin }: { twin: TwinState }) {
+  const [evoTab, setEvoTab] = useState<EvoTabDays>(30);
+  const prevFt = useRef<FutureTwin | null>(null);
+  const ftMap: Record<EvoTabDays, FutureTwin|null> = { 30: twin.future_twin??null, 60: twin.future_twin_60??null, 90: twin.future_twin_90??null };
+  const ft = ftMap[evoTab] ?? prevFt.current;
+  if (ft) prevFt.current = ft;
+  if (!ft) return null;
+  const cfg = EVO_TAB_CFG[evoTab];
+  const metrics = [
+    { label:'Overall',     cur:twin.overall_score,     fut:ft.overall_score,     grad:EVO_SCORE_GRADS[0] },
+    { label:'Academic',    cur:twin.academic_score,    fut:ft.academic_score,    grad:EVO_SCORE_GRADS[1] },
+    { label:'Wellness',    cur:twin.wellness_score,    fut:ft.wellness_score,    grad:EVO_SCORE_GRADS[2] },
+    { label:'Consistency', cur:twin.consistency_score, fut:ft.consistency_score, grad:EVO_SCORE_GRADS[3] },
+  ];
+  return (
+    <div style={{ ...C, padding:'1.25rem 1.5rem' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1.1rem', flexWrap:'wrap' as const, gap:'0.6rem' }}>
+        <h3 style={{ fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9', margin:0 }}>Future Twin</h3>
+        <div style={{ display:'flex', gap:'0.25rem', padding:'3px', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:12 }}>
+          {([30,60,90] as EvoTabDays[]).map(days => {
+            const c = EVO_TAB_CFG[days]; const isA = evoTab === days;
+            return <button key={days} onClick={() => setEvoTab(days)} style={{ padding:'0.3rem 0.75rem', borderRadius:9, border:isA?`1px solid ${c.activeBorder}`:'1px solid transparent', background:isA?c.activeGrad:'transparent', color:isA?c.accent:'#475569', fontSize:'0.72rem', fontWeight:700, cursor:'pointer', transition:'all 0.18s', fontFamily:'inherit' }}>{c.label}</button>;
+          })}
+        </div>
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.6rem', marginBottom:'0.9rem' }}>
+        {metrics.map(m => {
+          const delta = m.fut - m.cur; const dc = delta >= 2 ? '#10b981' : delta <= -2 ? '#ef4444' : '#64748b';
+          return (
+            <div key={m.label} style={{ padding:'0.6rem 0.75rem', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.06)', borderRadius:10 }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.35rem' }}>
+                <span style={{ fontSize:'0.72rem', color:'#64748b', fontWeight:600, textTransform:'uppercase' as const, letterSpacing:'0.05em' }}>{m.label}</span>
+                <span style={{ fontSize:'0.72rem', fontWeight:700, color:dc }}>{delta >= 0 ? '+' : ''}{Math.round(delta)}</span>
+              </div>
+              <div style={{ display:'flex', alignItems:'baseline', gap:'0.3rem', marginBottom:'0.4rem' }}>
+                <span style={{ fontSize:'0.78rem', color:'#475569' }}>{Math.round(m.cur)}</span>
+                <span style={{ fontSize:'0.7rem', color:'#334155' }}>→</span>
+                <span style={{ fontSize:'1.1rem', fontWeight:800, color:'#f1f5f9' }}>{Math.round(m.fut)}</span>
+              </div>
+              <div style={{ height:4, background:'rgba(255,255,255,0.06)', borderRadius:99, overflow:'hidden' }}>
+                <div className="score-bar-fill" style={{ height:'100%', width:`${m.fut}%`, background: delta >= 0 ? m.grad : 'linear-gradient(90deg,#ef4444,#f87171)', borderRadius:99 }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns: ft.predicted_exam_score !== null ? '140px 1fr' : '1fr', gap:'0.6rem', marginBottom: ft.tips.length > 0 ? '0.75rem' : 0 }}>
+        {ft.predicted_exam_score !== null && (
+          <div style={{ padding:'0.6rem 0.75rem', background:cfg.examBg, border:`1px solid ${cfg.examBorder}`, borderRadius:10, display:'flex', flexDirection:'column', justifyContent:'center' }}>
+            <span style={{ fontSize:'0.68rem', color:'#64748b', fontWeight:600, textTransform:'uppercase' as const, letterSpacing:'0.05em', marginBottom:'0.2rem' }}>Exam Score</span>
+            <div style={{ display:'flex', alignItems:'baseline', gap:'0.2rem' }}>
+              <span key={evoTab} style={{ fontSize:'1.5rem', fontWeight:800, background:cfg.examGrad, WebkitBackgroundClip:'text', backgroundClip:'text', WebkitTextFillColor:'transparent' }}>{ft.predicted_exam_score}</span>
+              <span style={{ fontSize:'0.75rem', color:'#475569' }}>/100</span>
+            </div>
+          </div>
+        )}
+        <div style={{ padding:'0.6rem 0.75rem', background: EVO_MSG_BG[twin.trend] ?? 'rgba(245,158,11,0.08)', border:`1px solid ${EVO_MSG_BORDER[twin.trend] ?? 'rgba(245,158,11,0.25)'}`, borderRadius:10, display:'flex', alignItems:'center' }}>
+          <p style={{ margin:0, fontSize:'0.8rem', color: EVO_MSG_COLOR[twin.trend] ?? '#fde68a', lineHeight:1.5 }}>{ft.motivational_message}</p>
+        </div>
+      </div>
+      {ft.tips.length > 0 && (
+        <div style={{ display:'flex', flexDirection:'column', gap:'0.25rem' }}>
+          {ft.tips.map((tip, i) => (
+            <div key={i} style={{ display:'flex', gap:'0.5rem', alignItems:'flex-start' }}>
+              <span style={{ color:cfg.tipArrow, fontWeight:700, fontSize:'0.75rem', flexShrink:0, marginTop:'0.1rem' }}>→</span>
+              <p style={{ margin:0, fontSize:'0.78rem', color:'#64748b', lineHeight:1.5 }}>{tip}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EvoEvolutionDashboard({ twin }: { twin: TwinState }) {
+  const [activeLayers, setActiveLayers] = useState<Set<EvoLayerKey>>(new Set(EVO_LAYERS.map(l => l.key)));
+  const toggleLayer = (key: EvoLayerKey) => {
+    setActiveLayers(prev => { const next = new Set(prev); if (next.has(key)) { if (next.size > 1) next.delete(key); } else next.add(key); return next; });
+  };
+  const history = twin.history ?? [];
+  const evolutionTimeline = twin.evolution_timeline ?? [];
+  const matLevel = twin.twin_maturity_level ?? 1;
+  const matColor = EVO_MATURITY_COLORS[matLevel] || '#818cf8';
+  const hm = twin.cognitive_heatmap ?? null;
+  const hasHistory = history.length >= 2;
+  const tisDelta = history.length >= 2
+    ? history[history.length - 1].twin_intelligence_score - history[history.length - 2].twin_intelligence_score
+    : null;
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
+
+      {/* KPI row */}
+      <div style={{ ...C, padding:'1.5rem' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'1.25rem' }}>
+          <span style={{ fontSize:'1.1rem' }}>◈</span>
+          <h3 style={{ fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9', margin:0 }}>Digital Twin Evolution Dashboard</h3>
+          <span style={{ marginLeft:'auto', fontSize:'0.68rem', fontWeight:700, color:'#475569', padding:'0.18rem 0.55rem', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:99 }}>Real-time · {twin.data_points} data pts</span>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'0.75rem' }} className="mob-4-col">
+          <div style={{ padding:'1rem', background:'rgba(129,140,248,0.08)', border:'1px solid rgba(129,140,248,0.2)', borderRadius:14 }}>
+            <p style={{ margin:'0 0 0.2rem', fontSize:'0.62rem', fontWeight:700, color:'#818cf8', textTransform:'uppercase' as const, letterSpacing:'0.08em' }}>Twin Intelligence Score</p>
+            <div style={{ display:'flex', alignItems:'baseline', gap:'0.4rem' }}>
+              <span style={{ fontSize:'2rem', fontWeight:900, color:'#f1f5f9', lineHeight:1 }}>{Math.round(twin.twin_intelligence_score)}</span>
+              <span style={{ fontSize:'0.75rem', color:'#475569' }}>/100</span>
+              {tisDelta !== null && <span style={{ fontSize:'0.72rem', fontWeight:700, color:tisDelta >= 0 ? '#10b981' : '#ef4444' }}>{tisDelta >= 0 ? '+' : ''}{tisDelta.toFixed(1)}</span>}
+            </div>
+            <p style={{ margin:'0.35rem 0 0', fontSize:'0.65rem', color:'#475569', lineHeight:1.4 }}>A composite score measuring how well the twin understands your learning behavior.</p>
+          </div>
+          <div style={{ padding:'1rem', background:'rgba(6,182,212,0.07)', border:'1px solid rgba(6,182,212,0.2)', borderRadius:14 }}>
+            <p style={{ margin:'0 0 0.2rem', fontSize:'0.62rem', fontWeight:700, color:'#06b6d4', textTransform:'uppercase' as const, letterSpacing:'0.08em' }}>Confidence Level</p>
+            <div style={{ display:'flex', alignItems:'baseline', gap:'0.4rem' }}>
+              <span style={{ fontSize:'2rem', fontWeight:900, color:'#f1f5f9', lineHeight:1 }}>{Math.round(twin.confidence_level)}</span>
+              <span style={{ fontSize:'0.75rem', color:'#475569' }}>%</span>
+            </div>
+            <div style={{ height:4, background:'rgba(255,255,255,0.06)', borderRadius:99, overflow:'hidden', marginTop:'0.4rem' }}>
+              <div style={{ width:`${twin.confidence_level}%`, height:'100%', background:'#06b6d4', borderRadius:99, transition:'width 1s ease' }} />
+            </div>
+            <p style={{ margin:'0.3rem 0 0', fontSize:'0.65rem', color:'#475569' }}>How sure the twin is about its predictions based on your data density.</p>
+          </div>
+          <div style={{ padding:'1rem', background:`${matColor}0d`, border:`1px solid ${matColor}30`, borderRadius:14 }}>
+            <p style={{ margin:'0 0 0.2rem', fontSize:'0.62rem', fontWeight:700, color:matColor, textTransform:'uppercase' as const, letterSpacing:'0.08em' }}>Twin Maturity</p>
+            <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.4rem' }}>
+              <span style={{ fontSize:'1.75rem', fontWeight:900, color:'#f1f5f9', lineHeight:1 }}>L{matLevel}</span>
+              <span style={{ fontSize:'0.78rem', fontWeight:700, color:matColor }}>{EVO_MATURITY_LABELS[matLevel]}</span>
+            </div>
+            <div style={{ display:'flex', gap:3 }}>
+              {[1,2,3,4,5].map(l => <div key={l} style={{ flex:1, height:4, borderRadius:99, background: l <= matLevel ? matColor : 'rgba(255,255,255,0.06)' }} />)}
+            </div>
+            <p style={{ margin:'0.3rem 0 0', fontSize:'0.65rem', color:'#475569' }}>Grows as you log more data over time. Expert at Level 5.</p>
+          </div>
+          <div style={{ padding:'1rem', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:14 }}>
+            <p style={{ margin:'0 0 0.2rem', fontSize:'0.62rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase' as const, letterSpacing:'0.08em' }}>Current State</p>
+            <p style={{ margin:'0 0 0.35rem', fontSize:'1rem', fontWeight:800, color:'#f1f5f9', lineHeight:1.25 }}>{twin.current_state_label}</p>
+            <div style={{ display:'flex', gap:'0.4rem', flexWrap:'wrap' as const }}>
+              <span style={{ fontSize:'0.62rem', padding:'0.12rem 0.45rem', borderRadius:99, background:'rgba(139,92,246,0.12)', color:'#a78bfa', border:'1px solid rgba(139,92,246,0.2)' }}>Reliability {Math.round(twin.prediction_reliability)}%</span>
+              <span style={{ fontSize:'0.62rem', padding:'0.12rem 0.45rem', borderRadius:99, background:'rgba(99,102,241,0.1)', color:'#818cf8', border:'1px solid rgba(99,102,241,0.2)' }}>Behavior: {twin.behavior_understanding}</span>
+            </div>
+            <p style={{ margin:'0.3rem 0 0', fontSize:'0.65rem', color:'#475569' }}>The twin's assessment of your current academic mode.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Multi-layer evolution graph */}
+      <div style={C}>
+        <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:'1rem', flexWrap:'wrap' as const, gap:'0.75rem' }}>
+          <div>
+            <h3 style={{ fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9', margin:'0 0 0.2rem' }}>Multi-Layer Evolution Graph</h3>
+            <p style={{ margin:0, fontSize:'0.72rem', color:'#475569' }}>Each line is a different dimension of how your twin is evolving. Hover a point to see what drove the change.</p>
+          </div>
+          <div style={{ display:'flex', gap:'0.35rem', flexWrap:'wrap' as const }}>
+            {EVO_LAYERS.map(l => {
+              const on = activeLayers.has(l.key);
+              return <button key={l.key} onClick={() => toggleLayer(l.key)} style={{ padding:'0.25rem 0.65rem', borderRadius:99, fontSize:'0.65rem', fontWeight:700, cursor:'pointer', fontFamily:'inherit', transition:'all 0.15s', background: on ? `${l.color}20` : 'rgba(255,255,255,0.03)', color: on ? l.color : '#475569', border:`1px solid ${on ? l.color + '50' : 'rgba(255,255,255,0.08)'}` }}>{l.label}</button>;
+            })}
+          </div>
+        </div>
+        {!hasHistory ? (
+          <div style={{ textAlign:'center' as const, padding:'3rem 1rem', color:'#475569' }}>
+            <p style={{ fontSize:'1.5rem', margin:'0 0 0.5rem' }}>◈</p>
+            <p style={{ margin:0, fontSize:'0.85rem' }}>Log at least 2 check-ins to activate the evolution graph.</p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={history} margin={{ top:5, right:16, bottom:5, left:-20 }}>
+              <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+              <XAxis dataKey="date" tick={{ fill:'rgba(255,255,255,0.3)', fontSize:9 }} axisLine={false} tickLine={false} tickFormatter={d => { const p = d.split('-'); return p.length === 3 ? `${p[1]}/${p[2]}` : d; }} />
+              <YAxis domain={[0,100]} tick={{ fill:'rgba(255,255,255,0.3)', fontSize:9 }} axisLine={false} tickLine={false} />
+              <RechartsTooltip content={<EvoTooltip />} cursor={{ stroke:'rgba(255,255,255,0.08)' }} />
+              {EVO_LAYERS.filter(l => activeLayers.has(l.key)).map(l => (
+                <Line key={l.key} type="monotone" dataKey={l.key} stroke={l.color} strokeWidth={activeLayers.size === 1 ? 2.5 : 1.8} dot={{ fill:l.color, r:3, strokeWidth:0 }} activeDot={{ r:6, stroke:l.color, strokeWidth:2, fill:'#08131a' }} />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        )}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'0.4rem', marginTop:'0.85rem' }}>
+          {EVO_LAYERS.map(l => (
+            <div key={l.key} style={{ display:'flex', gap:'0.5rem', alignItems:'flex-start', opacity: activeLayers.has(l.key) ? 1 : 0.35, transition:'opacity 0.2s' }}>
+              <div style={{ width:12, height:3, background:l.color, borderRadius:99, marginTop:6, flexShrink:0 }} />
+              <div>
+                <span style={{ fontSize:'0.72rem', fontWeight:700, color:l.color }}>{l.label}</span>
+                <p style={{ margin:0, fontSize:'0.62rem', color:'#475569', lineHeight:1.4 }}>{l.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Evolution Timeline + Cognitive Heatmap */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.25rem' }} className="mob-twin-row">
+        <div style={C}>
+          <h3 style={{ fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9', marginBottom:'1.25rem' }}>Evolution Timeline</h3>
+          {evolutionTimeline.length === 0 ? (
+            <p style={{ color:'#475569', fontSize:'0.82rem' }}>Log more check-ins to build your evolution story.</p>
+          ) : (
+            <div style={{ display:'flex', flexDirection:'column', gap:0 }}>
+              {evolutionTimeline.map((ev, i) => (
+                <div key={i} style={{ display:'flex', gap:'0.75rem', paddingBottom: i < evolutionTimeline.length - 1 ? '0.9rem' : 0 }}>
+                  <div style={{ display:'flex', flexDirection:'column', alignItems:'center', flexShrink:0 }}>
+                    <div style={{ width:28, height:28, borderRadius:'50%', background:'rgba(129,140,248,0.12)', border:'1px solid rgba(129,140,248,0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.85rem', flexShrink:0 }}>{ev.icon}</div>
+                    {i < evolutionTimeline.length - 1 && <div style={{ width:1, flex:1, background:'rgba(255,255,255,0.06)', marginTop:4 }} />}
+                  </div>
+                  <div style={{ paddingTop:4 }}>
+                    <p style={{ margin:'0 0 0.2rem', fontSize:'0.65rem', fontWeight:700, color:'#818cf8', letterSpacing:'0.06em' }}>{ev.date}</p>
+                    <p style={{ margin:0, fontSize:'0.77rem', color:'#94a3b8', lineHeight:1.5 }}>{ev.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div style={C}>
+          <div style={{ marginBottom:'1rem' }}>
+            <h3 style={{ fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9', margin:'0 0 0.2rem' }}>Cognitive Heatmap</h3>
+            <p style={{ margin:0, fontSize:'0.72rem', color:'#475569' }}>How your brain's learning dimensions are performing.</p>
+          </div>
+          <div style={{ display:'flex', gap:'0.75rem', marginBottom:'1rem', flexWrap:'wrap' as const }}>
+            {([['#10b981','Strong ≥70'],['#f59e0b','Developing 45–69'],['#ef4444','Needs Work <45']] as [string,string][]).map(([cl, lb]) => (
+              <span key={lb} style={{ fontSize:'0.62rem', fontWeight:600, color:cl, display:'flex', alignItems:'center', gap:'0.3rem' }}>
+                <span style={{ width:7, height:7, borderRadius:'50%', background:cl, display:'inline-block' }} />{lb}
+              </span>
+            ))}
+          </div>
+          {hm ? (
+            <>
+              <EvoHeatBar label="Knowledge Areas"       value={hm.knowledge_areas}      desc="Academic depth across subjects" />
+              <EvoHeatBar label="Memory Strength"       value={hm.memory_strength}       desc="Quiz & assignment retention" />
+              <EvoHeatBar label="Focus Stability"       value={hm.focus_stability}       desc="Consistency of focused sessions" />
+              <EvoHeatBar label="Learning Speed"        value={hm.learning_speed}        desc="Rate of score improvement" />
+              <EvoHeatBar label="Prediction Confidence" value={hm.prediction_confidence} desc="Data density for reliable forecasts" />
+            </>
+          ) : (
+            <p style={{ color:'#475569', fontSize:'0.82rem' }}>Log check-ins to build your cognitive profile.</p>
+          )}
+        </div>
+      </div>
+
+      {/* AI Insights */}
+      {twin.ai_insights.length > 0 && (
+        <div style={C}>
+          <div style={{ marginBottom:'1rem' }}>
+            <h3 style={{ fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9', margin:'0 0 0.2rem' }}>AI Twin Insights</h3>
+            <p style={{ margin:0, fontSize:'0.72rem', color:'#475569' }}>Observations generated by your digital twin based on actual behavioral patterns.</p>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'0.7rem' }} className="mob-twin-row">
+            {twin.ai_insights.map((insight, i) => (
+              <div key={i} style={{ display:'flex', gap:'0.6rem', padding:'0.85rem', background:'rgba(129,140,248,0.06)', border:'1px solid rgba(129,140,248,0.15)', borderRadius:12 }}>
+                <span style={{ fontSize:'1rem', flexShrink:0, marginTop:1 }}>{i === 0 ? '🔮' : i === 1 ? '📊' : i === 2 ? '🎯' : '💡'}</span>
+                <p style={{ margin:0, fontSize:'0.8rem', color:'#94a3b8', lineHeight:1.6 }}>{insight}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Metrics Explanation */}
+      <div style={C}>
+        <h3 style={{ fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9', marginBottom:'1rem' }}>What These Metrics Mean</h3>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'0.7rem' }} className="mob-twin-row">
+          {[
+            { label:'Twin Intelligence Score', value:`${Math.round(twin.twin_intelligence_score)}/100`, color:'#818cf8', explain:'A composite score from your study hours, quiz performance, assignment completion, and focus quality. Higher = the twin knows you better.' },
+            { label:'Twin Maturity Level', value:`Level ${matLevel}/5 — ${EVO_MATURITY_LABELS[matLevel]}`, color:matColor, explain:'Grows as you log more data over longer periods. A mature twin makes more accurate predictions and generates deeper insights.' },
+            { label:'Prediction Reliability', value:`${Math.round(twin.prediction_reliability)}%`, color:'#a78bfa', explain:'How confident the twin is in its future predictions. Increases with more consistent and complete check-in data.' },
+            { label:'Behavior Understanding', value:twin.behavior_understanding, color:'#34d399', explain:'How deeply the twin understands your patterns. Ranges from Low (just started) to Expert (30+ data points with consistent logging).' },
+          ].map(m => (
+            <div key={m.label} style={{ padding:'0.85rem', background:`${m.color}08`, border:`1px solid ${m.color}20`, borderRadius:12 }}>
+              <p style={{ margin:'0 0 0.15rem', fontSize:'0.62rem', fontWeight:700, color:m.color, textTransform:'uppercase' as const, letterSpacing:'0.07em' }}>{m.label}</p>
+              <p style={{ margin:'0 0 0.4rem', fontSize:'0.95rem', fontWeight:800, color:'#f1f5f9' }}>{m.value}</p>
+              <p style={{ margin:0, fontSize:'0.73rem', color:'#64748b', lineHeight:1.5 }}>{m.explain}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    PRIVACY TAB
 ═══════════════════════════════════════════════════════════════════════ */
 function PrivacyTab({ profile, onReset }: { profile:DPTProfile; onReset:()=>void }) {
@@ -1044,6 +1434,15 @@ export default function DigitalPersonaTwin() {
               {activeTab==='graph'        && <KnowledgeGraphTab profile={profile} twin={twin} subjects={subjects} progress={progress} />}
               {activeTab==='intelligence' && <IntelligenceTab profile={profile} twin={twin} subjects={subjects} burnout={burnout} streakData={streak} />}
               {activeTab==='privacy'      && <PrivacyTab profile={profile} onReset={resetProfile} />}
+              {activeTab==='evolution'    && (twin ? (
+                <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
+                  <EvoEvolutionDashboard twin={twin} />
+                  <EvoFutureTwinCard twin={twin} />
+                </div>
+              ) : (
+                <div style={{ padding:'3rem', textAlign:'center' as const, color:'#475569' }}>No twin data yet — log check-ins to activate Evolution.</div>
+              ))}
+              {activeTab==='comparison'   && <HumanVsTwinDashboard />}
             </div>
           </>
         )}
