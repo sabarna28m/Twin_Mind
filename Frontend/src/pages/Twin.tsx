@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { BrainIcon } from '../components/TwinMindLogo';
 import { useWebSocket } from '../hooks/useWebSocket';
+import TwinHeroBanner from '../components/TwinHeroBanner';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
 import { getLevelColor, getLevelGradient, LEVEL_NAMES, LEVEL_COLORS, type GamificationProgress } from '../utils/gamification';
@@ -1507,9 +1508,12 @@ export default function Twin() {
       </header>
 
       <main style={s.main}>
-        <div style={{ marginBottom: '2rem' }} className="animate-slide-up">
-          <h1 style={s.pageTitle}>{t('twin_title')}</h1>
-          <p style={s.pageSub}>{t('twin_sub')}</p>
+        {/* ── Hero banner ── */}
+        <div className="animate-slide-up">
+          <TwinHeroBanner
+            fidelityScore={twin?.overall_score}
+            userName={user?.full_name}
+          />
         </div>
 
         {loading && (

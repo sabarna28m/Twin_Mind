@@ -250,6 +250,20 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
 .live-dot { animation: live-pulse 2s ease-in-out infinite; }
 .spin      { animation: ring-spin 0.9s linear infinite; }
 
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.8); }
+  50%       { opacity: 0.9;  transform: scale(1.3); }
+}
+@keyframes dot-ping {
+  0%   { transform: scale(1); opacity: 0.9; }
+  80%  { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-8px); }
+}
+
 /* ══════════════════════════════
    Premium Navbar
    ══════════════════════════════ */
@@ -821,6 +835,17 @@ html[data-theme="light"] .focus-ctrl-ghost {
 
   /* ── Heatmap already scrollable; ensure card wraps properly ── */
   .mob-heatmap-card { padding: 1rem 0.85rem !important; }
+
+  /* ── Twin hero banner ── */
+  .twin-hero-banner {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 20px 16px !important;
+    gap: 1.25rem !important;
+  }
+  .twin-hero-banner h2 { font-size: 1.45rem !important; }
+  .twin-hero-fid-card  { min-width: 0 !important; width: 100% !important; }
 
   /* ── Twin page layout ── */
   .mob-twin-row {
