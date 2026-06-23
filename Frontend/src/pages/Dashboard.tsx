@@ -370,9 +370,10 @@ export default function Dashboard() {
     {
       id: 'learning', label: 'Learning',
       items: [
-        { icon: FileText,      label: 'Notes',          desc: 'AI-enhanced note-taking',         to: '/notes'                       },
-        { icon: Brain,         label: 'Quiz',           desc: 'Adaptive practice quizzes',       to: '/quiz',       tour: 'quiz'    },
-        { icon: Zap,           label: 'Focus Session',  desc: 'Focus timer & study sessions',    to: '/sessions',   tour: 'sessions'},
+        { icon: FileText,      label: 'Notes',             desc: 'AI-enhanced note-taking',                    to: '/notes'                       },
+        { icon: Brain,         label: 'Quiz',              desc: 'Adaptive practice quizzes',                  to: '/quiz',       tour: 'quiz'    },
+        { icon: Zap,           label: 'Focus Session',     desc: 'Focus timer & study sessions',               to: '/sessions',   tour: 'sessions'},
+        { icon: Video,         label: 'Video Recommender', desc: 'AI-powered YouTube study recommendations',   to: '/videos'                      },
       ],
     },
     {
