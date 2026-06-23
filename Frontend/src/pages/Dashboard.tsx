@@ -368,38 +368,32 @@ export default function Dashboard() {
   /* ── NAV GROUPS ── */
   const navGroups = [
     {
-      id: 'learning', label: t('nav_group_learning'),
+      id: 'learning', label: 'Learning',
       items: [
-        { icon: BookOpen,      label: 'Subjects',           desc: 'Subject performance overview',       to: '/subjects'                        },
-        { icon: FileText,      label: 'Notes',              desc: 'AI-enhanced note-taking',            to: '/notes'                           },
-        { icon: Brain,         label: 'Quiz',               desc: 'Adaptive practice quizzes',          to: '/quiz',          tour: 'quiz'      },
-        { icon: Zap,           label: 'Focus Mode',         desc: 'Focus timer & study sessions',       to: '/sessions',      tour: 'sessions'  },
-        { icon: Layers,        label: 'Smart Notes',        desc: 'AI-powered note generation',         to: '/notes'                           },
+        { icon: BookOpen,      label: 'Subjects',       desc: 'Subject performance overview',    to: '/subjects'                    },
+        { icon: FileText,      label: 'Notes',          desc: 'AI-enhanced note-taking',         to: '/notes'                       },
+        { icon: Brain,         label: 'Quiz',           desc: 'Adaptive practice quizzes',       to: '/quiz',       tour: 'quiz'    },
+        { icon: Zap,           label: 'Focus Session',  desc: 'Focus timer & study sessions',    to: '/sessions',   tour: 'sessions'},
       ],
     },
     {
-      id: 'performance', label: t('nav_group_performance'),
+      id: 'performance', label: 'Performance',
       items: [
-        { icon: Layers,        label: 'Subject Analysis',     desc: 'AI subject performance analysis',      to: '/subjects'                        },
-        { icon: BarChart2,     label: 'Performance Analytics',desc: 'Full progress report',                 to: '/progress'                        },
-        { icon: Brain,         label: 'Quiz Performance',     desc: 'Quiz history & accuracy',              to: '/quiz'                            },
-        { icon: Shield,        label: 'Focus Score Analysis', desc: 'Monitor burnout & focus health',       to: '/burnout'                         },
-        { icon: TrendingUp,    label: 'Improvement Trends',   desc: 'AI score prediction & trends',         to: '/predict'                         },
-        { icon: Trophy,        label: t('nav_achievements'),  desc: 'Badges & milestones',                  to: '/achievements'                    },
+        { icon: Layers,        label: 'Subject Analysis',   desc: 'AI subject performance analysis', to: '/subjects'                },
+        { icon: BarChart2,     label: 'Progress Analytics', desc: 'Full progress report',            to: '/progress'                },
+        { icon: TrendingUp,    label: 'Performance Trends', desc: 'AI score prediction & trends',    to: '/predict'                 },
+        { icon: Trophy,        label: 'Reports',            desc: 'Achievements & milestones',       to: '/achievements'            },
       ],
     },
     {
-      id: 'ai', label: 'AI Twin',
+      id: 'ai', label: 'AI Tools',
       items: [
-        { icon: Layers,        label: 'Twin Intelligence',   desc: 'Your digital study twin',            to: '/twin',       tour: 'twin'     },
-        { icon: Zap,           label: 'Twin Simulation',     desc: 'Simulate exam performance',          to: '/simulate',   tour: 'simulate' },
-        { icon: BarChart2,     label: 'Weakness Analysis',   desc: 'AI subject performance analysis',    to: '/subjects'                    },
-        { icon: MessageCircle, label: 'AI Recommendations',  desc: 'Personalized AI mentor & guidance',  to: '/mentor',     tour: 'mentor'   },
-        { icon: Shield,        label: 'Burnout & Wellness',  desc: 'Monitor burnout and focus health',   to: '/burnout'                     },
-        { icon: TrendingUp,    label: 'Performance Forecast',desc: 'AI score prediction & trends',       to: '/predict'                     },
-        { icon: Rocket,        label: t('nav_career'),       desc: 'Career guidance & insights',         to: '/career'                      },
-        { icon: Mic2,          label: t('nav_comm_twin'),    desc: 'Communication practice',             to: '/comm-twin'                   },
-        { icon: Sword,         label: t('nav_battles'),      desc: 'Competitive quiz battles',           to: '/battles'                     },
+        { icon: Layers,        label: 'Twin Intelligence',   desc: 'Your digital study twin',         to: '/twin',     tour: 'twin'    },
+        { icon: Zap,           label: 'Twin Simulation',     desc: 'Simulate exam performance',       to: '/simulate', tour: 'simulate'},
+        { icon: BarChart2,     label: 'Weakness Analysis',   desc: 'AI subject weakness detection',   to: '/subjects'                },
+        { icon: TrendingUp,    label: 'Performance Forecast',desc: 'AI score prediction',             to: '/predict'                 },
+        { icon: Shield,        label: 'Burnout Analysis',    desc: 'Monitor burnout & focus health',  to: '/burnout'                 },
+        { icon: MessageCircle, label: 'AI Recommendations',  desc: 'Personalised AI mentor',          to: '/mentor',   tour: 'mentor' },
       ],
     },
   ];
@@ -482,21 +476,15 @@ export default function Dashboard() {
                 )}
               </div>
             );
-            if (gi === 1) {
+            if (gi === 2) {
               return [
+                dropdown,
                 <Link key="nav-planner" to="/study-planner" className="nav-link" style={s.navStandaloneLink}>
                   Study Planner
                 </Link>,
-                dropdown,
-              ];
-            }
-            if (gi === 2) {
-              return [
-                <Link key="nav-checkin" to="/checkin" className="nav-link" style={s.navStandaloneLink}
-                      data-tour="checkin">
+                <Link key="nav-checkin" to="/checkin" className="nav-link" style={s.navStandaloneLink} data-tour="checkin">
                   Check-in
                 </Link>,
-                dropdown,
               ];
             }
             return [dropdown];
