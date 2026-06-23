@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 80" width="380" height="80">
+<defs>
+  <linearGradient id="hlg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%"   stop-color="#00D4FF"/>
+    <stop offset="100%" stop-color="#0066FF"/>
+  </linearGradient>
+  <linearGradient id="hrg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%"   stop-color="#8B00FF"/>
+    <stop offset="100%" stop-color="#FF00CC"/>
+  </linearGradient>
+  <linearGradient id="tg" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#00D4FF"/>
+    <stop offset="60%"  stop-color="#818CF8"/>
+    <stop offset="100%" stop-color="#C084FC"/>
+  </linearGradient>
+</defs>
+<rect width="380" height="80" rx="12" fill="#0D0D1A"/>
+
+<!-- Brain icon: scale 512→64 (factor 0.125), place at (8,8) -->
+<g transform="translate(8,8) scale(0.125)">
+  <path d="M 256,108 C 238,91 208,81 177,87 C 142,93 108,116 89,155 C 65,202 68,260 87,304 C 106,348 141,373 179,383 C 209,391 234,389 256,382 Z"  fill="url(#hlg)" opacity="0.95"/>
+  <path d="M 256,108 C 274,91 304,81 335,87 C 370,93 404,116 423,155 C 447,202 444,260 425,304 C 406,348 371,373 333,383 C 303,391 278,389 256,382 Z" fill="url(#hrg)" opacity="0.95"/>
+  <line x1="256" y1="108" x2="256" y2="382"
+    stroke="rgba(255,255,255,0.38)" stroke-width="12" stroke-dasharray="35 25"/>
+</g>
+
+<!-- TwinMind wordmark -->
+<text x="84" y="46" font-family="'Segoe UI',system-ui,sans-serif"
+  font-size="28" font-weight="800" letter-spacing="-0.5"
+  fill="url(#tg)">TwinMind</text>
+<!-- Subtitle -->
+<text x="85" y="64" font-family="'Segoe UI',system-ui,sans-serif"
+  font-size="11" font-weight="500" letter-spacing="1.8"
+  fill="rgba(148,163,184,0.85)">AI LEARNING PLATFORM</text>
+</svg>
