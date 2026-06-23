@@ -370,7 +370,6 @@ export default function Dashboard() {
     {
       id: 'learning', label: 'Learning',
       items: [
-        { icon: BookOpen,      label: 'Subjects',       desc: 'Subject performance overview',    to: '/subjects'                    },
         { icon: FileText,      label: 'Notes',          desc: 'AI-enhanced note-taking',         to: '/notes'                       },
         { icon: Brain,         label: 'Quiz',           desc: 'Adaptive practice quizzes',       to: '/quiz',       tour: 'quiz'    },
         { icon: Zap,           label: 'Focus Session',  desc: 'Focus timer & study sessions',    to: '/sessions',   tour: 'sessions'},
