@@ -3,22 +3,17 @@ import { Link } from 'react-router-dom';
 import api from '../services/api';
 
 interface BurnoutEntry { burnout_score: number; risk_level: 'low' | 'medium' | 'high' }
-interface SubjectSummary { subject: string; avg_score: number; recommended_daily_minutes: number }
-interface SubjectAnalysis {
-  weakest: SubjectSummary | null;
-  focus_today: SubjectSummary | null;
-}
 
-function buildMessages(burnout: BurnoutEntry | null, subjects: SubjectAnalysis | null): string[] {
+const GENERAL_INSIGHTS = [
+  `📚 Regular spaced-repetition sessions improve long-term retention by up to 40%. Short daily sessions outperform long infrequent ones.`,
+  `🎯 Try a Focus Mode quiz to track your attention score in real time. Consistent scores above 75% signal strong readiness.`,
+  `🧠 Your Digital Twin improves its predictions each time you complete a session, quiz, or check-in. The more you study, the smarter it gets.`,
+  `⚡ Students who review study material within 24 hours of learning it retain 70% more. Schedule a quick revision after every session.`,
+  `📊 Open Subject Analysis under Performance to see your AI-ranked priority list and personalised recovery plans for each subject.`,
+];
+
+function buildMessages(burnout: BurnoutEntry | null): string[] {
   const msgs: string[] = [];
-
-  if (subjects?.weakest) {
-    const score = subjects.weakest.avg_score ?? null;
-    msgs.push(
-      `📉 Your ${subjects.weakest.subject} score is at ${score != null ? score.toFixed(0) : '?'}%. ` +
-      `I recommend ${subjects.weakest.recommended_daily_minutes ?? 30} min/day to recover it.`
-    );
-  }
 
   if (burnout?.risk_level === 'high') {
     msgs.push(
@@ -27,53 +22,38 @@ function buildMessages(burnout: BurnoutEntry | null, subjects: SubjectAnalysis |
     );
   } else if (burnout?.risk_level === 'medium') {
     msgs.push(
-      `🟡 Medium burnout detected. I recommend a 10-minute break after every study block.`
+      `🟡 Medium burnout detected. I recommend a 10-minute break after every study block and a rest day this week.`
+    );
+  } else if (burnout?.risk_level === 'low') {
+    msgs.push(
+      `✅ Your burnout score is healthy (${burnout.burnout_score}/100). You are in a good zone — maintain your current study rhythm.`
     );
   }
 
-  if (subjects?.focus_today) {
-    msgs.push(
-      `🎯 Based on your patterns, focus on ${subjects.focus_today.subject} today — ` +
-      `${subjects.focus_today.recommended_daily_minutes} min will make a measurable difference.`
-    );
+  const remaining = GENERAL_INSIGHTS.filter((_, i) => i < 3);
+  for (const insight of remaining) {
+    if (msgs.length >= 3) break;
+    msgs.push(insight);
   }
 
   if (msgs.length === 0) {
-    msgs.push(
-      `🤖 Log your daily check-in to help me understand your patterns and give smarter recommendations.`
-    );
-  }
-
-  if (msgs.length < 2) {
-    msgs.push(
-      `📚 Regular spaced-repetition sessions improve retention by up to 40%. ` +
-      `Start with a 25-minute Pomodoro session.`
-    );
-  }
-
-  if (msgs.length < 3) {
-    msgs.push(
-      `🎯 Try a Focus Mode quiz in the Quiz module to track your attention score in real time. Aim for above 75%.`
-    );
+    msgs.push(`🤖 Log your daily check-in to help me understand your patterns and give smarter recommendations.`);
+    msgs.push(GENERAL_INSIGHTS[0]);
+    msgs.push(GENERAL_INSIGHTS[1]);
   }
 
   return msgs.slice(0, 3);
 }
 
 export default function AITwinAssistant() {
-  const [burnout, setBurnout]   = useState<BurnoutEntry | null>(null);
-  const [subjects, setSubjects] = useState<SubjectAnalysis | null>(null);
-  const [loading, setLoading]   = useState(true);
-  const [visible, setVisible]   = useState(0);
+  const [burnout, setBurnout] = useState<BurnoutEntry | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [visible, setVisible] = useState(0);
 
   useEffect(() => {
-    Promise.all([
-      api.get('/burnout/latest').then(r => setBurnout(r.data)).catch(() => {}),
-      api.get('/subject-performance/analysis').then(r => setSubjects(r.data)).catch(() => {}),
-    ]).finally(() => setLoading(false));
+    api.get('/burnout/latest').then(r => setBurnout(r.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  // Reveal messages one-by-one after data loads
   useEffect(() => {
     if (loading) return;
     setVisible(1);
@@ -82,7 +62,7 @@ export default function AITwinAssistant() {
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [loading]);
 
-  const messages = buildMessages(burnout, subjects);
+  const messages = buildMessages(burnout);
 
   return (
     <div style={ta.wrap}>
@@ -128,9 +108,9 @@ export default function AITwinAssistant() {
 
       {/* Quick actions */}
       <div style={ta.actions}>
-        <Link to="/sessions"  style={ta.actionBtn}>▶ Start Session</Link>
-        <Link to="/mentor"    style={ta.actionBtn}>📋 Generate Plan</Link>
-        <Link to="/subjects"  style={ta.actionBtn}>📊 Weaknesses</Link>
+        <Link to="/sessions"       style={ta.actionBtn}>▶ Start Session</Link>
+        <Link to="/study-planner"  style={ta.actionBtn}>📋 Generate Study Plan</Link>
+        <Link to="/subjects"       style={ta.actionBtn}>📊 View Weaknesses</Link>
       </div>
     </div>
   );

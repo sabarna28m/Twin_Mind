@@ -21,7 +21,7 @@ import {
   type GamificationProgress,
 } from '../utils/gamification';
 import BurnoutWidget from '../components/BurnoutWidget';
-import SubjectWidgets from '../components/SubjectWidgets';
+
 import AICommandCenter from '../components/AICommandCenter';
 import AITwinAssistant from '../components/AITwinAssistant';
 import SmartDailyMission from '../components/SmartDailyMission';
@@ -379,10 +379,12 @@ export default function Dashboard() {
     {
       id: 'performance', label: t('nav_group_performance'),
       items: [
-        { icon: BarChart2,     label: t('nav_progress'),      desc: 'Track your progress',        to: '/progress'                        },
-        { icon: Trophy,        label: t('nav_achievements'),  desc: 'Badges & milestones',        to: '/achievements'                    },
-        { icon: TrendingUp,    label: t('nav_predict'),       desc: 'AI score prediction',        to: '/predict'                         },
-        { icon: Shield,        label: t('nav_burnout'),       desc: 'Monitor & prevent burnout',  to: '/burnout'                         },
+        { icon: Layers,        label: 'Subject Analysis',     desc: 'AI subject performance analysis',      to: '/subjects'                        },
+        { icon: BarChart2,     label: 'Performance Analytics',desc: 'Full progress report',                 to: '/progress'                        },
+        { icon: Brain,         label: 'Quiz Performance',     desc: 'Quiz history & accuracy',              to: '/quiz'                            },
+        { icon: Shield,        label: 'Focus Score Analysis', desc: 'Monitor burnout & focus health',       to: '/burnout'                         },
+        { icon: TrendingUp,    label: 'Improvement Trends',   desc: 'AI score prediction & trends',         to: '/predict'                         },
+        { icon: Trophy,        label: t('nav_achievements'),  desc: 'Badges & milestones',                  to: '/achievements'                    },
       ],
     },
     {
@@ -723,45 +725,33 @@ export default function Dashboard() {
         {/* ── S3: PERFORMANCE ANALYTICS ── */}
         <section className="dash-section">
           <SectionHeader badge="PERFORMANCE" title="Analytics & Insights" cta="Full Report" ctaTo="/progress" />
-          <div style={s.perfGrid} className="mob-mid-row">
-            {/* 7-day chart */}
-            <div style={s.panel} className="glass-panel">
-              <div style={s.panelHead}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>📈</span>
-                  <h3 style={s.panelTitle}>{t('chart_title') || '7-Day Study Activity'}</h3>
-                </div>
-                <Link to="/checkin" style={s.panelCta}>{t('chart_log_today') || 'Log Today'}</Link>
+          <div style={s.panel} className="glass-panel">
+            <div style={s.panelHead}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>📈</span>
+                <h3 style={s.panelTitle}>{t('chart_title') || '7-Day Study Activity'}</h3>
               </div>
-              {last7.some(d => d.hours > 0) ? (
-                <>
-                  <StudyChart data={last7} />
-                  <div style={s.chartFooter}>
-                    <span style={s.chartStat}>This Week&nbsp;<strong style={s.chartStatVal}>{weekHours.toFixed(1)}h</strong></span>
-                    <span style={s.chartStat}>Daily Avg&nbsp;<strong style={s.chartStatVal}>{(weekHours / 7).toFixed(1)}h</strong></span>
-                  </div>
-                </>
-              ) : (
-                <div style={s.emptyState}>
-                  <p style={s.emptyIcon}>📊</p>
-                  <p style={s.emptyText}>{t('no_data_title') || 'No Data Yet'}</p>
-                  <p style={s.emptySub}>{t('no_data_sub') || 'Log a check-in to activate your study chart'}</p>
-                  <Link to="/checkin" style={s.emptyBtn}>Log Check-in</Link>
-                </div>
-              )}
-            </div>
-
-            {/* Subject Intelligence */}
-            <div style={s.panel} className="glass-panel">
-              <div style={s.panelHead}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>📊</span>
-                  <h3 style={s.panelTitle}>Subject Intelligence</h3>
-                </div>
-                <Link to="/subjects" style={s.panelCta}>Full Analysis →</Link>
+              <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                <Link to="/subjects" style={{ ...s.panelCta, color: '#10b981', borderColor: 'rgba(16,185,129,0.25)', background: 'rgba(16,185,129,0.08)' }}>📊 Subject Analysis →</Link>
+                <Link to="/checkin"  style={s.panelCta}>{t('chart_log_today') || 'Log Today'}</Link>
               </div>
-              <SubjectWidgets />
             </div>
+            {last7.some(d => d.hours > 0) ? (
+              <>
+                <StudyChart data={last7} />
+                <div style={s.chartFooter}>
+                  <span style={s.chartStat}>This Week&nbsp;<strong style={s.chartStatVal}>{weekHours.toFixed(1)}h</strong></span>
+                  <span style={s.chartStat}>Daily Avg&nbsp;<strong style={s.chartStatVal}>{(weekHours / 7).toFixed(1)}h</strong></span>
+                </div>
+              </>
+            ) : (
+              <div style={s.emptyState}>
+                <p style={s.emptyIcon}>📊</p>
+                <p style={s.emptyText}>{t('no_data_title') || 'No Data Yet'}</p>
+                <p style={s.emptySub}>{t('no_data_sub') || 'Log a check-in to activate your study chart'}</p>
+                <Link to="/checkin" style={s.emptyBtn}>Log Check-in</Link>
+              </div>
+            )}
           </div>
         </section>
 

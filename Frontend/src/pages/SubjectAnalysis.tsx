@@ -37,6 +37,10 @@ interface FormState {
   subject: string; date: string; score: number; study_hours: number;
   confidence: number; source: string; notes: string;
 }
+interface SmartPlan {
+  current_score: number; target_score: number;
+  daily_hours: number; forecast: string;
+}
 
 /** Shape of a saved record returned by GET/POST/PUT /subject-performance/records */
 interface SubjectRecord {
@@ -501,6 +505,7 @@ export default function SubjectAnalysis() {
   const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
   const [records, setRecords]           = useState<SubjectRecord[]>([]);
   const [deletingId, setDeletingId]     = useState<number | null>(null);
+  const [smartPlan, setSmartPlan]       = useState<SmartPlan | null>(null);
 
   const load = async () => {
     try {
@@ -522,7 +527,13 @@ export default function SubjectAnalysis() {
     } catch { /* ignore */ }
   };
 
-  useEffect(() => { if (user) { load(); loadRecords(); } }, [user]);
+  useEffect(() => {
+    if (user) {
+      load();
+      loadRecords();
+      api.get('/smart-plan/current').then(r => setSmartPlan(r.data)).catch(() => {});
+    }
+  }, [user]);
 
   async function deleteRecord(id: number) {
     if (!confirm('Delete this record? This cannot be undone.')) return;
@@ -544,8 +555,21 @@ export default function SubjectAnalysis() {
   const selectedRecs  = selected ? (analysis?.recommendations[selected.subject] ?? []) : [];
   const selectedPlan  = selected ? ((analysis?.action_plans[selected.subject] ?? []) as ActionPlanDay[]) : [];
 
-  const weakSubjects  = analysis?.subjects.filter(s => s.score_history.length && s.risk_level === 'weak')    ?? [];
-  const withData      = analysis?.subjects.filter(s => s.score_history.length > 0) ?? [];
+  const weakSubjects    = analysis?.subjects.filter(s => s.score_history.length && s.risk_level === 'weak')    ?? [];
+  const withData        = analysis?.subjects.filter(s => s.score_history.length > 0) ?? [];
+  const fastestGrowing  = withData.length ? [...withData].sort((a, b) => (b.improvement ?? -999) - (a.improvement ?? -999))[0] : null;
+  const highestFocus    = withData.length ? [...withData].sort((a, b) => b.study_hours - a.study_hours)[0] : null;
+  const highestAccuracy = withData.length ? [...withData].sort((a, b) => b.avg_score - a.avg_score)[0] : null;
+
+  function targetScore(s: SubjectSummary): number {
+    if (smartPlan?.target_score) return Math.min(100, Math.round(s.avg_score + (smartPlan.target_score - (smartPlan.current_score || s.avg_score))));
+    return s.avg_score < 50 ? 75 : s.avg_score < 75 ? 85 : 92;
+  }
+  function statusLabel(s: SubjectSummary): { text: string; color: string } {
+    if (s.risk_level === 'weak') return { text: 'Needs Attention', color: '#ef4444' };
+    if (s.risk_level === 'average') return { text: 'On Track', color: '#f59e0b' };
+    return { text: 'Excellent', color: '#10b981' };
+  }
 
   return (
     <div style={p.page}>
@@ -578,65 +602,100 @@ export default function SubjectAnalysis() {
           </div>
         ) : analysis && withData.length > 0 ? (
           <>
-            {/* ── Focus Subject ── */}
-            {analysis.focus_today && (
-              <section style={{ ...p.card, background: `linear-gradient(135deg, ${scoreColor(analysis.focus_today.avg_score)}14, rgba(15,23,42,0.8))`, border: `1px solid ${scoreColor(analysis.focus_today.avg_score)}30` }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap' as const, gap: '0.75rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
-                    <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: `${scoreColor(analysis.focus_today.avg_score)}22`, border: `1px solid ${scoreColor(analysis.focus_today.avg_score)}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
-                      {SUBJECT_ICONS[analysis.focus_today.subject] ?? '📚'}
-                    </div>
-                    <div>
-                      <p style={{ margin: '0 0 0.2rem', fontSize: '0.72rem', fontWeight: 700, color: scoreColor(analysis.focus_today.avg_score), letterSpacing: '0.08em' }}>🎯 FOCUS SUBJECT TODAY</p>
-                      <h2 style={{ margin: '0 0 0.2rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-h)' }}>{analysis.focus_today.subject}</h2>
-                      <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text)', lineHeight: 1.5 }}>
-                        {analysis.focus_today.avg_score < 50
-                          ? `Lowest performance score (${analysis.focus_today.avg_score.toFixed(0)}%) and needs immediate attention.`
-                          : `Needs improvement — current score ${analysis.focus_today.avg_score.toFixed(0)}%, aim for 75%+.`}
-                        {analysis.focus_today.days_since_activity && analysis.focus_today.days_since_activity >= 3
-                          ? ` No revision in ${analysis.focus_today.days_since_activity} days.` : ''}
-                      </p>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <div style={{ textAlign: 'center' as const }}>
-                      <p style={{ margin: 0, fontSize: '2rem', fontWeight: 900, color: scoreColor(analysis.focus_today.avg_score) }}>{analysis.focus_today.avg_score.toFixed(0)}</p>
-                      <p style={{ margin: 0, fontSize: '0.65rem', color: 'var(--text)', opacity: 0.6 }}>% score</p>
-                    </div>
-                    <button style={{ ...p.detailBtn, borderColor: `${scoreColor(analysis.focus_today.avg_score)}50`, color: scoreColor(analysis.focus_today.avg_score) }} onClick={() => setSelected(analysis.focus_today!)}>
-                      View Details →
-                    </button>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.85rem', flexWrap: 'wrap' as const }}>
-                  <span style={{ ...p.statChip, color: '#f59e0b' }}>⏱ {analysis.focus_today.recommended_daily_minutes} min/day recommended</span>
-                  <span style={{ ...p.statChip, color: trendColor(analysis.focus_today.trend) }}>{trendIcon(analysis.focus_today.trend)} {analysis.focus_today.trend}</span>
-                  {analysis.focus_today.days_since_activity != null && (
-                    <span style={{ ...p.statChip, color: '#ef4444' }}>📅 {analysis.focus_today.days_since_activity}d ago</span>
-                  )}
-                </div>
-              </section>
-            )}
+            {/* ── AI SUMMARY CARD ── */}
+            <section style={{ background: 'rgba(4,8,22,0.93)', border: '1.5px solid rgba(99,102,241,0.28)', borderRadius: '20px', padding: '1.75rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 0% 0%, rgba(99,102,241,0.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.9rem' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'rgba(99,102,241,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.95rem' }}>◈</div>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#818cf8', textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>AI Summary</span>
+              </div>
+              <p style={{ margin: '0 0 1.1rem', fontSize: '0.92rem', color: '#cbd5e1', lineHeight: 1.75, padding: '1rem 1.15rem', background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.14)', borderRadius: '12px' }}>
+                Based on your study history, quizzes, focus sessions, revisions, and Digital Twin simulations, these are your current subject strengths and weaknesses. {analysis.weakest && `Your weakest area is ${analysis.weakest.subject} (${analysis.weakest.avg_score.toFixed(0)}%) — prioritising this subject will have the highest impact on your overall score.`} {analysis.most_improved && analysis.most_improved.improvement != null && ` ${analysis.most_improved.subject} shows the strongest recent improvement (+${analysis.most_improved.improvement.toFixed(0)}%).`}
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '0.6rem' }}>
+                <span style={{ ...p.statChip, color: '#ef4444' }}>🔴 Weakest: {analysis.weakest?.subject ?? '—'}</span>
+                <span style={{ ...p.statChip, color: '#10b981' }}>🟢 Strongest: {analysis.strongest?.subject ?? '—'}</span>
+                <span style={{ ...p.statChip, color: '#06b6d4' }}>📈 Most Improved: {analysis.most_improved?.subject ?? '—'}</span>
+                <span style={{ ...p.statChip, color: '#f59e0b' }}>⏰ Neglected: {analysis.neglected?.subject ?? '—'}</span>
+              </div>
+            </section>
 
-            {/* ── AI Detection cards ── */}
-            <div style={p.detectionGrid} className="subj-det-grid">
-              <DetectionCard icon="🔴" label="Weakest Subject"   color="#ef4444"
-                subject={analysis.weakest?.subject}   score={analysis.weakest?.avg_score}
+            {/* ── SUBJECT OVERVIEW ── */}
+            <section style={p.card}>
+              <h2 style={{ ...p.cardTitle, marginBottom: '1.1rem' }}>📚 Subject Overview</h2>
+              <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '1rem' }}>
+                {withData.map(s => {
+                  const c = scoreColor(s.avg_score);
+                  const tgt = targetScore(s);
+                  const st = statusLabel(s);
+                  return (
+                    <div key={s.subject} style={{ background: `${c}06`, border: `1.5px solid ${c}22`, borderLeft: `4px solid ${c}`, borderRadius: '16px', padding: '1.25rem', display: 'flex', flexDirection: 'column' as const, gap: '0.75rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap' as const, gap: '0.75rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: `${c}18`, border: `1.5px solid ${c}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', flexShrink: 0 }}>
+                            {SUBJECT_ICONS[s.subject] ?? '📚'}
+                          </div>
+                          <div>
+                            <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem', fontWeight: 800, color: 'var(--text-h)' }}>{s.subject}</h3>
+                            <span style={{ fontSize: '0.7rem', padding: '0.18rem 0.55rem', borderRadius: '99px', background: `${st.color}15`, color: st.color, border: `1px solid ${st.color}30`, fontWeight: 700 }}>{st.text}</span>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '1.25rem', flexShrink: 0 }}>
+                          <div style={{ textAlign: 'center' as const }}>
+                            <p style={{ margin: '0 0 0.05rem', fontSize: '1.35rem', fontWeight: 900, color: c }}>{s.avg_score.toFixed(0)}%</p>
+                            <p style={{ margin: 0, fontSize: '0.6rem', color: '#64748b', textTransform: 'uppercase' as const, fontWeight: 700 }}>Current Score</p>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', color: '#374151', fontSize: '1rem', paddingTop: '0.1rem' }}>→</div>
+                          <div style={{ textAlign: 'center' as const }}>
+                            <p style={{ margin: '0 0 0.05rem', fontSize: '1.35rem', fontWeight: 900, color: '#10b981' }}>{tgt}%</p>
+                            <p style={{ margin: 0, fontSize: '0.6rem', color: '#64748b', textTransform: 'uppercase' as const, fontWeight: 700 }}>Target Score</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' as const, alignItems: 'center' }}>
+                        {s.days_since_activity != null && (
+                          <span style={{ ...p.statChip, color: s.days_since_activity > 5 ? '#ef4444' : '#94a3b8' }}>📅 Last studied: {s.days_since_activity === 0 ? 'Today' : `${s.days_since_activity} day${s.days_since_activity === 1 ? '' : 's'} ago`}</span>
+                        )}
+                        <span style={{ ...p.statChip, color: '#f59e0b' }}>⏱ Study {s.recommended_daily_minutes} min/day for the next 5 days</span>
+                        <span style={{ ...p.statChip, color: trendColor(s.trend) }}>{trendIcon(s.trend)} {s.trend}</span>
+                      </div>
+                      <div style={{ paddingTop: '0.1rem', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'flex-end' }}>
+                        <button onClick={() => setSelected(s)} style={{ fontSize: '0.78rem', fontWeight: 700, color: c, background: `${c}10`, border: `1px solid ${c}25`, borderRadius: '8px', padding: '0.3rem 0.9rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+                          View Detailed Analysis →
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* ── IMPROVEMENT OPPORTUNITIES (6 cards) ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(170px,1fr))', gap: '0.85rem' }} className="subj-det-grid">
+              <DetectionCard icon="🔴" label="Weakest Subject" color="#ef4444"
+                subject={analysis.weakest?.subject} score={analysis.weakest?.avg_score}
                 detail={analysis.weakest ? `${analysis.weakest.study_hours.toFixed(1)}h studied` : 'No data'} />
-              <DetectionCard icon="🟢" label="Strongest Subject" color="#10b981"
-                subject={analysis.strongest?.subject} score={analysis.strongest?.avg_score}
-                detail={analysis.strongest ? `Trend: ${analysis.strongest.trend}` : 'No data'} />
-              <DetectionCard icon="📈" label="Most Improved"     color="#06b6d4"
+              <DetectionCard icon="📈" label="Most Improved" color="#06b6d4"
                 subject={analysis.most_improved?.subject}
                 detail={analysis.most_improved?.improvement != null ? `+${analysis.most_improved.improvement.toFixed(0)}% since last record` : 'No improvement data yet'} />
-              <DetectionCard icon="⏰" label="Neglected Subject" color="#f59e0b"
+              <DetectionCard icon="⏰" label="Most Neglected" color="#f59e0b"
                 subject={analysis.neglected?.subject}
                 detail={analysis.neglected?.days_since_activity != null ? `${analysis.neglected.days_since_activity} days without activity` : 'All subjects active'} />
+              <DetectionCard icon="🚀" label="Fastest Growing" color="#8b5cf6"
+                subject={fastestGrowing?.subject}
+                detail={fastestGrowing?.improvement != null ? `+${fastestGrowing.improvement.toFixed(0)}% recent gain` : 'Keep all subjects active'} />
+              <DetectionCard icon="🎯" label="Highest Accuracy" color="#10b981"
+                subject={highestAccuracy?.subject} score={highestAccuracy?.avg_score}
+                detail={highestAccuracy ? `Trend: ${highestAccuracy.trend}` : 'No data'} />
+              <DetectionCard icon="🧠" label="Most Focused" color="#ec4899"
+                subject={highestFocus?.subject}
+                detail={highestFocus ? `${highestFocus.study_hours.toFixed(1)}h total focused study` : 'Log sessions to track focus'} />
             </div>
 
-            {/* ── Priority Ranking ── */}
+            {/* ── SUBJECT PRIORITY RANKING ── */}
             <section style={p.card}>
-              <h2 style={p.cardTitle}>📋 Priority Ranking</h2>
+              <h2 style={p.cardTitle}>📋 Subject Priority Ranking</h2>
+              <p style={{ margin: '-0.4rem 0 0.9rem', fontSize: '0.78rem', color: '#64748b', lineHeight: 1.5 }}>AI-ranked by current score, days since last revision, quiz accuracy, focus time, and Digital Twin prediction.</p>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.45rem', marginTop: '0.85rem' }}>
                 {analysis.priority_ranking.map(item => {
                   const c = priorityColor(item.priority_label);
@@ -715,34 +774,129 @@ export default function SubjectAnalysis() {
               )}
             </section>
 
-            {/* ── AI Recommendations ── */}
-            {weakSubjects.length > 0 && (
+            {/* ── AI RECOMMENDATIONS ── */}
+            {withData.some(s => (analysis.recommendations[s.subject] ?? []).length > 0) && (
               <section style={p.card}>
                 <h2 style={p.cardTitle}>💡 AI Recommendations</h2>
-                <div style={p.recGrid} className="subj-rec-grid">
+                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.85rem', marginTop: '0.75rem' }}>
                   {withData.map(s => {
                     const recs = analysis.recommendations[s.subject] ?? [];
                     if (!recs.length) return null;
                     const c = scoreColor(s.avg_score);
                     return (
-                      <div key={s.subject} style={{ background: `${c}08`, border: `1px solid ${c}25`, borderRadius: '14px', padding: '1.1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.6rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.1rem' }}>
+                      <div key={s.subject} style={{ background: `${c}07`, border: `1px solid ${c}22`, borderRadius: '14px', padding: '1.15rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                           <span style={{ fontSize: '1.1rem' }}>{SUBJECT_ICONS[s.subject] ?? '📚'}</span>
-                          <span style={{ fontWeight: 800, fontSize: '0.87rem', color: 'var(--text-h)' }}>{s.subject}</span>
-                          <span style={{ marginLeft: 'auto', fontWeight: 800, color: c, fontSize: '0.85rem' }}>{s.avg_score.toFixed(0)}%</span>
+                          <span style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-h)', flex: 1 }}>{s.subject}</span>
+                          <span style={{ fontWeight: 800, color: c, fontSize: '0.85rem' }}>{s.avg_score.toFixed(0)}%</span>
                         </div>
-                        {recs.map((r, i) => (
-                          <div key={i} style={{ display: 'flex', gap: '0.45rem' }}>
-                            <span style={{ color: c, flexShrink: 0, fontSize: '0.78rem', marginTop: '1px' }}>→</span>
-                            <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text)', lineHeight: 1.6 }}>{r}</p>
-                          </div>
-                        ))}
+                        <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.45rem' }}>
+                          {recs.map((r, i) => (
+                            <div key={i} style={{ display: 'flex', gap: '0.5rem', padding: '0.55rem 0.75rem', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.14)', borderRadius: '9px' }}>
+                              <span style={{ color: c, flexShrink: 0, fontSize: '0.78rem', marginTop: '2px' }}>→</span>
+                              <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text)', lineHeight: 1.65 }}>{r}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     );
                   })}
                 </div>
               </section>
             )}
+
+            {/* ── TREND ANALYSIS ── */}
+            <section style={p.card}>
+              <h2 style={p.cardTitle}>📊 Trend Analysis</h2>
+              <p style={{ margin: '-0.4rem 0 1rem', fontSize: '0.78rem', color: '#64748b' }}>Score change from previous record to current performance.</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '0.85rem' }}>
+                {withData.map(s => {
+                  const c = scoreColor(s.avg_score);
+                  const hasPrev = s.previous_score != null;
+                  const delta = hasPrev ? s.avg_score - s.previous_score! : null;
+                  const deltaColor = delta == null ? '#94a3b8' : delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#94a3b8';
+                  return (
+                    <div key={s.subject} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid rgba(255,255,255,0.08)`, borderRadius: '14px', padding: '1.1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                        <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[s.subject] ?? '📚'}</span>
+                        <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-h)', flex: 1 }}>{s.subject}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{ textAlign: 'center' as const }}>
+                          <p style={{ margin: '0 0 0.06rem', fontSize: '1.25rem', fontWeight: 900, color: hasPrev ? scoreColor(s.previous_score!) : '#64748b' }}>
+                            {hasPrev ? `${s.previous_score!.toFixed(0)}%` : '—'}
+                          </p>
+                          <p style={{ margin: 0, fontSize: '0.58rem', color: '#64748b', textTransform: 'uppercase' as const, fontWeight: 700 }}>Previous</p>
+                        </div>
+                        <span style={{ color: '#374151', fontSize: '0.9rem' }}>→</span>
+                        <div style={{ textAlign: 'center' as const }}>
+                          <p style={{ margin: '0 0 0.06rem', fontSize: '1.25rem', fontWeight: 900, color: c }}>{s.avg_score.toFixed(0)}%</p>
+                          <p style={{ margin: 0, fontSize: '0.58rem', color: '#64748b', textTransform: 'uppercase' as const, fontWeight: 700 }}>Current</p>
+                        </div>
+                        {delta != null && (
+                          <div style={{ marginLeft: 'auto', textAlign: 'center' as const }}>
+                            <p style={{ margin: '0 0 0.06rem', fontSize: '1.1rem', fontWeight: 900, color: deltaColor }}>
+                              {delta > 0 ? '+' : ''}{delta.toFixed(0)}%
+                            </p>
+                            <p style={{ margin: 0, fontSize: '0.58rem', color: deltaColor, textTransform: 'uppercase' as const, fontWeight: 700 }}>{delta > 0 ? '↑ Up' : delta < 0 ? '↓ Down' : '→ Same'}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* ── DIGITAL TWIN IMPACT ── */}
+            <section style={{ background: 'rgba(4,8,22,0.93)', border: '1.5px solid rgba(99,102,241,0.25)', borderRadius: '20px', padding: '1.75rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 100% 100%, rgba(99,102,241,0.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
+                <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(99,102,241,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>◈</div>
+                <h2 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: 'var(--text-h)' }}>Digital Twin Impact</h2>
+              </div>
+              <p style={{ margin: '0 0 1.25rem', fontSize: '0.8rem', color: '#64748b', lineHeight: 1.5 }}>
+                Predicted score improvement after completing recommended study for each subject. Based on Digital Twin simulations.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: '0.85rem' }}>
+                {withData.map(s => {
+                  const c = scoreColor(s.avg_score);
+                  const tgt = targetScore(s);
+                  return (
+                    <div key={s.subject} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${c}22`, borderRadius: '14px', padding: '1.1rem', position: 'relative', overflow: 'hidden' }}>
+                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: c, opacity: 0.7, borderRadius: '14px 14px 0 0' }} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.85rem' }}>
+                        <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[s.subject] ?? '📚'}</span>
+                        <span style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-h)' }}>{s.subject}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', marginBottom: '0.55rem' }}>
+                        <div>
+                          <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 900, color: c }}>{s.avg_score.toFixed(0)}%</p>
+                          <p style={{ margin: 0, fontSize: '0.58rem', color: '#64748b', textTransform: 'uppercase' as const, fontWeight: 700 }}>Current</p>
+                        </div>
+                        <div style={{ color: '#374151', fontSize: '1.2rem', paddingBottom: '0.8rem' }}>→</div>
+                        <div>
+                          <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 900, color: '#10b981', textShadow: '0 0 16px rgba(16,185,129,0.4)' }}>{tgt}%</p>
+                          <p style={{ margin: 0, fontSize: '0.58rem', color: '#10b981', textTransform: 'uppercase' as const, fontWeight: 700 }}>After Study</p>
+                        </div>
+                        <div style={{ marginLeft: 'auto', textAlign: 'center' as const }}>
+                          <p style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#10b981' }}>+{tgt - Math.round(s.avg_score)}%</p>
+                          <p style={{ margin: 0, fontSize: '0.55rem', color: '#10b981', fontWeight: 700 }}>GAIN</p>
+                        </div>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b' }}>Study {s.recommended_daily_minutes} min/day for 5 days</p>
+                    </div>
+                  );
+                })}
+              </div>
+              {smartPlan && (
+                <div style={{ marginTop: '1.1rem', padding: '0.9rem 1.1rem', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.18)', borderRadius: '12px' }}>
+                  <p style={{ margin: 0, fontSize: '0.83rem', color: '#cbd5e1', lineHeight: 1.65 }}>
+                    <span style={{ fontWeight: 700, color: '#818cf8' }}>◈ Twin Forecast: </span>{smartPlan.forecast || `Following this plan could raise your overall score from ${smartPlan.current_score}% to ${smartPlan.target_score}% this month.`}
+                  </p>
+                </div>
+              )}
+            </section>
 
             {/* ── Action Plans ── */}
             {Object.keys(analysis.action_plans).length > 0 && (
