@@ -25,7 +25,7 @@ import BurnoutWidget from '../components/BurnoutWidget';
 import AICommandCenter from '../components/AICommandCenter';
 
 import SmartDailyMission from '../components/SmartDailyMission';
-import HeroPriorityCard from '../components/HeroPriorityCard';
+import HeroDigitalTwinCard from '../components/HeroDigitalTwinCard';
 import StreakShieldCard from '../components/StreakShieldCard';
 import WeeklyChallengesModal from '../components/WeeklyChallengesModal';
 
@@ -698,9 +698,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* RIGHT: AI Priority */}
+          {/* RIGHT: Digital Twin */}
           <div style={s.heroPriority} className="mob-hero-priority">
-            <HeroPriorityCard />
+            <HeroDigitalTwinCard />
           </div>
         </section>
 
