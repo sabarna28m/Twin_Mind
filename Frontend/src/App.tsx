@@ -51,6 +51,7 @@ import Predict from './pages/Predict';
 import Simulate from './pages/Simulate';
 import Mentor from './pages/Mentor';
 import Twin from './pages/Twin';
+import DigitalPersonaTwin from './pages/DigitalPersonaTwin';
 import Achievements from './pages/Achievements';
 import Quiz from './pages/Quiz';
 import Battles from './pages/Battles';
@@ -150,6 +151,14 @@ export default function App() {
           />
           <Route
             path="/twin"
+            element={
+              <ProtectedRoute>
+                <DigitalPersonaTwin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/twin-legacy"
             element={
               <ProtectedRoute>
                 <Twin />
