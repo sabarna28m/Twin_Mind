@@ -65,6 +65,7 @@ import SmartNotes from './pages/SmartNotes';
 import SkillTree from './pages/SkillTree';
 import Shop from './pages/Shop';
 import StudyPlanner from './pages/StudyPlanner';
+import ShieldCenter from './pages/ShieldCenter';
 
 export default function App() {
   return (
@@ -258,6 +259,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <StudyPlanner />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/shield"
+            element={
+              <ProtectedRoute>
+                <ShieldCenter />
               </ProtectedRoute>
             }
           />

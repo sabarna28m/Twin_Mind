@@ -3,9 +3,8 @@ import { Link } from 'react-router-dom';
 import {
   BookOpen, FileText, BarChart2, Trophy, Brain, Zap,
   MessageCircle, Layers, Menu, Rocket, Mic2, ChevronDown, Video,
-  Shield, TrendingUp, Sword, ShoppingBag, Dumbbell,
+  Shield, TrendingUp, Sword, Dumbbell,
 } from 'lucide-react';
-import XPShopModal from '../components/XPShopModal';
 import { XPStoreProvider } from '../contexts/XPStoreContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -26,7 +25,6 @@ import AICommandCenter from '../components/AICommandCenter';
 
 import SmartDailyMission from '../components/SmartDailyMission';
 import HeroDigitalTwinCard from '../components/HeroDigitalTwinCard';
-import StreakShieldCard from '../components/StreakShieldCard';
 import WeeklyChallengesModal from '../components/WeeklyChallengesModal';
 
 const BACKEND = BACKEND_URL;
@@ -280,7 +278,6 @@ export default function Dashboard() {
   const [calEvents,         setCalEvents]         = useState<CalEvent[]>([]);
   const [gamProgress,     setGamProgress]     = useState<GamificationProgress | null>(null);
   const [drawerOpen,      setDrawerOpen]      = useState(false);
-  const [shopOpen,        setShopOpen]        = useState(false);
   const [challengeOpen,   setChallengeOpen]   = useState(false);
   const [profileDropOpen, setProfileDropOpen] = useState(false);
   const profileDropRef = useRef<HTMLDivElement>(null);
@@ -401,7 +398,6 @@ export default function Dashboard() {
   return (
     <XPStoreProvider>
     <div style={s.shell}>
-      <XPShopModal isOpen={shopOpen} onClose={() => setShopOpen(false)} />
       <WeeklyChallengesModal isOpen={challengeOpen} onClose={() => setChallengeOpen(false)} />
       <MobileNav
         isOpen={drawerOpen}
@@ -508,21 +504,20 @@ export default function Dashboard() {
           >
             <Dumbbell size={16} />
           </button>
-          <button
-            onClick={() => setShopOpen(true)}
-            className="nav-shop-btn"
-            title="XP Shop"
-            aria-label="Open XP Shop"
+          <Link
+            to="/shield"
+            title="Shield Center"
+            aria-label="Shield Center"
             style={{
               background: 'none', border: '1px solid rgba(var(--primary-rgb),0.2)',
-              borderRadius: '9px', width: '34px', height: '34px', cursor: 'pointer',
+              borderRadius: '9px', width: '34px', height: '34px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: 'var(--primary)', transition: 'border-color 0.2s, box-shadow 0.2s',
-              fontFamily: 'inherit',
+              textDecoration: 'none',
             }}
           >
-            <ShoppingBag size={16} />
-          </button>
+            <Shield size={16} />
+          </Link>
           <span className="mob-hide-mobile"><NotificationBell /></span>
           {/* ── Profile avatar + dropdown ── */}
           <div ref={profileDropRef} style={{ position: 'relative' }} data-tour="profile">
@@ -751,12 +746,6 @@ export default function Dashboard() {
         <section className="dash-section">
           <SectionHeader badge="AI INTELLIGENCE" title="Live Performance Monitor" />
           <AICommandCenter brainReadiness={health.pct} streak={streak} level={gamProgress?.level} />
-        </section>
-
-        {/* ── S5: STREAK PROTECTION ── */}
-        <section className="dash-section">
-          <SectionHeader badge="STREAK PROTECTION" title="Streak Shield System" cta="XP Shop" ctaTo="/shop" />
-          <StreakShieldCard />
         </section>
 
         {/* ── S6: WELLNESS CENTER ── */}

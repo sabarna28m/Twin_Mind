@@ -52,7 +52,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
       {/* Header */}
       <div style={s.header}>
         <span style={s.title}>Streak Protection</span>
-        <Link to="/shop" style={s.shopLink}>🛒 XP Shop</Link>
+        <Link to="/shield" style={s.shopLink}>🛒 XP Shop</Link>
       </div>
 
       {/* Main stats row */}
@@ -150,7 +150,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
 
       {/* Footer links */}
       <div style={s.footer}>
-        <Link to="/shop" style={s.footerLink}>🛡️ Buy Shield ({100} XP)</Link>
+        <Link to="/shield" style={s.footerLink}>🛡️ Buy Shield ({100} XP)</Link>
         <Link to="/checkin" style={s.footerLink}>📋 Log Check-in</Link>
       </div>
     </div>
