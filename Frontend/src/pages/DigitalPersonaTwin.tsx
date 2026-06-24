@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import HumanVsTwinDashboard from '../components/HumanVsTwinDashboard';
+import DecisionSimulator from '../components/DecisionSimulator';
 
 /* ═══════════════════════════════════════════════════════════════════════
    DPT PROFILE — persisted in localStorage
@@ -387,7 +388,7 @@ function HeroSection({ fid, twin, user, onNavigate }: {
 /* ═══════════════════════════════════════════════════════════════════════
    TAB SYSTEM
 ═══════════════════════════════════════════════════════════════════════ */
-type DPTTab = 'overview' | 'identity' | 'persona' | 'memory' | 'graph' | 'intelligence' | 'privacy' | 'evolution' | 'comparison';
+type DPTTab = 'overview' | 'identity' | 'persona' | 'memory' | 'graph' | 'intelligence' | 'privacy' | 'evolution' | 'comparison' | 'simulator';
 
 const TABS: {key:DPTTab; icon:string; label:string; color:string}[] = [
   {key:'overview',     icon:'◈',  label:'Overview',       color:'#6366f1'},
@@ -399,6 +400,7 @@ const TABS: {key:DPTTab; icon:string; label:string; color:string}[] = [
   {key:'privacy',      icon:'🔒', label:'Privacy',        color:'#D1D5DB'},
   {key:'evolution',    icon:'📈', label:'Evolution',      color:'#818cf8'},
   {key:'comparison',   icon:'⚖️', label:'Comparison',     color:'#34d399'},
+  {key:'simulator',    icon:'🎯', label:'Decision Sim',   color:'#a78bfa'},
 ];
 
 function TabBar({ active, setActive, sticky=false }: { active:DPTTab; setActive:(t:DPTTab)=>void; sticky?:boolean }) {
@@ -1443,6 +1445,7 @@ export default function DigitalPersonaTwin() {
                 <div style={{ padding:'3rem', textAlign:'center' as const, color:'#9CA3AF' }}>No twin data yet — log check-ins to activate Evolution.</div>
               ))}
               {activeTab==='comparison'   && <HumanVsTwinDashboard />}
+              {activeTab==='simulator'    && <DecisionSimulator twin={twin} subjects={subjects} progress={progress} />}
             </div>
           </>
         )}
