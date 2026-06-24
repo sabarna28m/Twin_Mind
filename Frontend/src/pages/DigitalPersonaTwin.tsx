@@ -344,7 +344,7 @@ function HeroSection({ fid, twin, user, onNavigate }: {
             <button onClick={()=>onNavigate('overview')} style={{ padding:'0.65rem 1.2rem', borderRadius:12, background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.28)', color:'#818cf8', fontWeight:700, fontSize:'0.82rem', cursor:'pointer', fontFamily:'inherit' }}>
               🏗️ Build My Twin
             </button>
-            <Link to="/twin-legacy" style={{ padding:'0.65rem 1.2rem', borderRadius:12, background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', color:'#D1D5DB', fontWeight:600, fontSize:'0.82rem', textDecoration:'none', display:'flex', alignItems:'center', gap:'0.35rem' }}>
+            <Link to="/twin" style={{ padding:'0.65rem 1.2rem', borderRadius:12, background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', color:'#D1D5DB', fontWeight:600, fontSize:'0.82rem', textDecoration:'none', display:'flex', alignItems:'center', gap:'0.35rem' }}>
               📊 Evolution Dashboard
             </Link>
           </div>
@@ -1286,7 +1286,7 @@ function PrivacyTab({ profile, onReset }: { profile:DPTProfile; onReset:()=>void
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:'0.6rem' }}>
             <button onClick={exportProfile} style={{ padding:'0.65rem 1rem', borderRadius:11, background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.22)', color:'#818cf8', fontWeight:700, fontSize:'0.8rem', cursor:'pointer', fontFamily:'inherit', textAlign:'left' as const }}>📥 Export DPT Profile (JSON)</button>
-            <a href="/twin-legacy" style={{ padding:'0.65rem 1rem', borderRadius:11, background:'rgba(129,140,248,0.1)', border:'1px solid rgba(129,140,248,0.25)', color:'#a5b4fc', fontWeight:700, fontSize:'0.8rem', textDecoration:'none', display:'block' }}>📊 Legacy Analytics Dashboard →</a>
+            <a href="/twin" style={{ padding:'0.65rem 1rem', borderRadius:11, background:'rgba(129,140,248,0.1)', border:'1px solid rgba(129,140,248,0.25)', color:'#a5b4fc', fontWeight:700, fontSize:'0.8rem', textDecoration:'none', display:'block' }}>📊 Evolution Dashboard →</a>
             {!confirm?(
               <button onClick={()=>setConfirm(true)} style={{ padding:'0.65rem 1rem', borderRadius:11, background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', color:'#f87171', fontWeight:700, fontSize:'0.8rem', cursor:'pointer', fontFamily:'inherit', textAlign:'left' as const }}>🗑️ Reset DPT Profile</button>
             ):(

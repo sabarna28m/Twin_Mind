@@ -154,6 +154,14 @@ export default function App() {
             path="/twin"
             element={
               <ProtectedRoute>
+                <Twin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/twin-profile"
+            element={
+              <ProtectedRoute>
                 <DigitalPersonaTwin />
               </ProtectedRoute>
             }
@@ -162,7 +170,7 @@ export default function App() {
             path="/twin-legacy"
             element={
               <ProtectedRoute>
-                <Twin />
+                <DigitalPersonaTwin />
               </ProtectedRoute>
             }
           />

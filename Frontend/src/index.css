@@ -506,8 +506,8 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
    ══════════════════════════════ */
 
 .score-bar-track {
-  height: 7px;
-  background: rgba(255,255,255,0.06);
+  height: 9px;
+  background: rgba(255,255,255,0.10);
   border-radius: 99px;
   overflow: hidden;
 }
