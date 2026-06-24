@@ -1,13 +1,13 @@
 """
 Exam score predictor — XGBoost edition.
 
-Trains an XGBRegressor on synthetic data encoding realistic academic-performance
-correlations, then persists the model via joblib.  The model is retrained once
-on first import if no saved model is found (or if the saved model is from the
-old sklearn-GBR era, detected by a missing feature_importances_ attribute).
+Model loading priority:
+  1. Backend/model.pkl  (trained by train_model.py on real student data)
+  2. Re-trains from Backend/StudentPerformanceFactors.csv if pkl missing
+  3. Falls back to synthetic data if CSV is also missing
 
-Feature importance is read directly from XGBoost's built-in gain-based
-importance, normalised to percentages, and returned alongside every prediction.
+Feature order (must stay stable — model was trained on this exact order):
+  study_hours, attendance_pct, completion_pct, quiz_score, stress, sleep
 """
 from __future__ import annotations
 
@@ -21,65 +21,108 @@ from xgboost import XGBRegressor
 
 logger = logging.getLogger(__name__)
 
-MODEL_PATH = Path(__file__).parent / "model.joblib"
+# Backend/model.pkl — produced by train_model.py
+_BACKEND_ROOT = Path(__file__).parent.parent.parent   # Backend/
+MODEL_PATH = _BACKEND_ROOT / "model.pkl"
+CSV_PATH   = _BACKEND_ROOT / "StudentPerformanceFactors.csv"
 
-# Internal feature order used when building X arrays
+# Internal feature order — must match train_model.py FEATURES
 FEATURES = ["study_hours", "attendance_pct", "completion_pct", "quiz_score", "stress", "sleep"]
 
-# Public keys used in API responses (match existing frontend FEATURE_LABELS)
+# Public keys returned in API responses (match frontend FEATURE_LABELS)
 FEATURE_KEYS = ["study_hours", "attendance", "assignment_completion", "quiz_scores", "stress", "sleep"]
 
-N_TRAIN      = 5000
 RANDOM_STATE = 42
 
 
-# ── Synthetic training data ────────────────────────────────────────────────
+# ── Real-data training (mirrors train_model.py logic) ─────────────────────
+
+def _train_from_csv() -> XGBRegressor:
+    import pandas as pd
+
+    logger.info("Training XGBoost on real data from %s …", CSV_PATH)
+    df = pd.read_csv(CSV_PATH)
+
+    out = pd.DataFrame()
+    out["study_hours"]    = pd.to_numeric(df["Hours_Studied"],   errors="coerce")
+    out["attendance_pct"] = pd.to_numeric(df["Attendance"],      errors="coerce")
+    out["sleep"]          = pd.to_numeric(df["Sleep_Hours"],     errors="coerce")
+    out["quiz_score"]     = pd.to_numeric(df["Previous_Scores"], errors="coerce")
+    out["exam_score"]     = pd.to_numeric(df["Exam_Score"],      errors="coerce")
+
+    motivation_base = df["Motivation_Level"].map({"Low": 45.0, "Medium": 68.0, "High": 88.0}).fillna(65.0)
+    tutoring        = pd.to_numeric(df["Tutoring_Sessions"], errors="coerce").fillna(0.0)
+    out["completion_pct"] = np.clip(motivation_base + tutoring * 2.5, 0.0, 95.0)
+
+    stress = np.full(len(df), 5.0)
+    phys   = pd.to_numeric(df["Physical_Activity"], errors="coerce").fillna(2.0)
+    stress -= np.clip((phys - 2.0) * 0.3, 0.0, 2.5)
+    stress += df["Peer_Influence"].map({"Positive": -1.5, "Neutral": 0.0, "Negative": 2.0}).fillna(0.0).values
+    stress += (df["Learning_Disabilities"] == "Yes").astype(float).values * 1.5
+    stress += df["Family_Income"].map({"Low": 1.0, "Medium": 0.0, "High": -0.5}).fillna(0.0).values
+    out["stress"] = np.clip(stress, 1.0, 10.0).round()
+
+    out = out[FEATURES + ["exam_score"]].dropna()
+    X = out[FEATURES].values
+    y = out["exam_score"].values
+
+    model = _build_model()
+    model.fit(X, y)
+    joblib.dump(model, MODEL_PATH)
+    logger.info("Model trained on %d real rows and saved to %s", len(out), MODEL_PATH)
+    return model
+
+
+# ── Synthetic fallback (kept for environments without the CSV) ─────────────
 
 def _sleep_quality(sleep: np.ndarray) -> np.ndarray:
-    """Parabolic quality curve — peaks at 7.5 h, drops off either side."""
     return np.clip(100 - np.abs(sleep - 7.5) * 13, 0, 100)
 
 
-def _generate_training_data() -> Tuple[np.ndarray, np.ndarray]:
-    rng = np.random.default_rng(RANDOM_STATE)
+def _generate_synthetic_data() -> Tuple[np.ndarray, np.ndarray]:
+    rng     = np.random.default_rng(RANDOM_STATE)
+    n       = 5000
+    study   = rng.uniform(0, 12, n)
+    attend  = rng.uniform(40, 100, n)
+    complet = rng.uniform(30, 100, n)
+    quiz    = rng.uniform(20, 100, n)
+    stress  = rng.integers(1, 11, n).astype(float)
+    sleep   = rng.uniform(3, 10, n)
 
-    study   = rng.uniform(0, 12, N_TRAIN)
-    attend  = rng.uniform(40, 100, N_TRAIN)
-    complet = rng.uniform(30, 100, N_TRAIN)
-    quiz    = rng.uniform(20, 100, N_TRAIN)
-    stress  = rng.integers(1, 11, N_TRAIN).astype(float)
-    sleep   = rng.uniform(3, 10, N_TRAIN)
-
-    study_score  = np.clip(study / 8.0, 0, 1) * 100
-    stress_score = (10 - stress) / 9.0 * 100
-    sleep_score  = _sleep_quality(sleep)
-
-    exam = (
-        0.30 * study_score  +
-        0.20 * attend       +
-        0.20 * complet      +
-        0.15 * quiz         +
-        0.10 * sleep_score  +
-        0.05 * stress_score +
-        rng.normal(0, 4, N_TRAIN)
+    exam = np.clip(
+        0.30 * np.clip(study / 8.0, 0, 1) * 100 +
+        0.20 * attend +
+        0.20 * complet +
+        0.15 * quiz +
+        0.10 * _sleep_quality(sleep) +
+        0.05 * ((10 - stress) / 9.0 * 100) +
+        rng.normal(0, 4, n),
+        0, 100,
     )
-    exam = np.clip(exam, 0, 100)
-
-    X = np.column_stack([study, attend, complet, quiz, stress, sleep])
-    return X, exam
+    return np.column_stack([study, attend, complet, quiz, stress, sleep]), exam
 
 
-# ── Model construction & persistence ──────────────────────────────────────
+def _train_synthetic() -> XGBRegressor:
+    logger.warning("CSV not found — training on synthetic data (lower accuracy).")
+    X, y = _generate_synthetic_data()
+    model = _build_model()
+    model.fit(X, y)
+    joblib.dump(model, MODEL_PATH)
+    logger.info("Synthetic model saved to %s", MODEL_PATH)
+    return model
+
+
+# ── Model construction ─────────────────────────────────────────────────────
 
 def _build_model() -> XGBRegressor:
     return XGBRegressor(
-        n_estimators=400,
+        n_estimators=500,
         max_depth=5,
-        learning_rate=0.05,
+        learning_rate=0.04,
         subsample=0.85,
         colsample_bytree=0.85,
         min_child_weight=3,
-        reg_alpha=0.1,
+        reg_alpha=0.10,
         reg_lambda=1.0,
         random_state=RANDOM_STATE,
         verbosity=0,
@@ -88,49 +131,42 @@ def _build_model() -> XGBRegressor:
     )
 
 
-def _train_and_save() -> XGBRegressor:
-    logger.info("Training XGBoost exam-score prediction model…")
-    X, y = _generate_training_data()
-    model = _build_model()
-    model.fit(X, y)
-    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump(model, MODEL_PATH)
-    logger.info("XGBoost model trained and saved to %s", MODEL_PATH)
-    return model
-
-
-def _is_xgboost_model(obj) -> bool:
-    return isinstance(obj, XGBRegressor)
-
-
 # ── Singleton ──────────────────────────────────────────────────────────────
 _model: XGBRegressor | None = None
 
 
 def get_model() -> XGBRegressor:
     global _model
-    if _model is None:
-        if MODEL_PATH.exists():
+    if _model is not None:
+        return _model
+
+    if MODEL_PATH.exists():
+        try:
             loaded = joblib.load(MODEL_PATH)
-            if _is_xgboost_model(loaded):
-                logger.info("Loading saved XGBoost model from %s", MODEL_PATH)
+            if isinstance(loaded, XGBRegressor):
+                logger.info("Loaded model from %s", MODEL_PATH)
                 _model = loaded
-            else:
-                logger.info("Saved model is not XGBoost — retraining.")
-                MODEL_PATH.unlink(missing_ok=True)
-                _model = _train_and_save()
-        else:
-            _model = _train_and_save()
+                return _model
+            logger.warning("Saved file is not XGBRegressor — retraining.")
+        except Exception as exc:
+            logger.warning("Failed to load model.pkl (%s) — retraining.", exc)
+        MODEL_PATH.unlink(missing_ok=True)
+
+    if CSV_PATH.exists():
+        _model = _train_from_csv()
+    else:
+        _model = _train_synthetic()
     return _model
 
 
+# ── Feature importance ─────────────────────────────────────────────────────
+
 def _get_feature_importance(model: XGBRegressor) -> dict[str, float]:
-    """Return XGBoost gain-based importances normalised to sum to 100%."""
-    raw = model.feature_importances_          # ndarray, shape (n_features,)
+    raw   = model.feature_importances_
     total = raw.sum() or 1.0
-    pct = (raw / total * 100).round(1)
-    unsorted = {key: round(float(pct[i]), 1) for i, key in enumerate(FEATURE_KEYS)}
-    return dict(sorted(unsorted.items(), key=lambda kv: kv[1], reverse=True))
+    pct   = (raw / total * 100).round(1)
+    raw_d = {key: round(float(pct[i]), 1) for i, key in enumerate(FEATURE_KEYS)}
+    return dict(sorted(raw_d.items(), key=lambda kv: kv[1], reverse=True))
 
 
 # ── Public prediction interface ────────────────────────────────────────────
@@ -146,7 +182,6 @@ def predict(
     """Return predicted exam score, risk level, recommendations, and feature importances."""
     model = get_model()
 
-    # Impute missing quiz score
     if quiz_scores is None:
         quiz_scores = float(np.clip(
             attendance_percentage * 0.4 + assignment_completion_rate * 0.4 +
@@ -165,12 +200,10 @@ def predict(
     raw   = float(model.predict(X)[0])
     score = round(float(np.clip(raw, 0, 100)), 1)
 
-    # Confidence interval — ±6 pts (tighter than GBR; XGBoost residuals smaller)
-    margin    = 6.0
+    margin    = 5.0
     conf_low  = round(max(0.0,   score - margin), 1)
     conf_high = round(min(100.0, score + margin), 1)
 
-    # Risk classification
     if score >= 70:
         risk_level, risk_label = "low",    "Low risk — on track for a good result"
     elif score >= 50:
@@ -178,10 +211,8 @@ def predict(
     else:
         risk_level, risk_label = "high",   "High risk — significant improvement needed"
 
-    # XGBoost feature importances (global model importance, %)
     feature_importance = _get_feature_importance(model)
 
-    # Personalised per-input contributions (kept for backward compatibility)
     study_norm  = min(study_hours / 8.0, 1.0)
     sleep_norm  = float(np.clip(100 - abs(sleep_duration - 7.5) * 13, 0, 100)) / 100
     stress_norm = (10 - stress_level) / 9.0
@@ -194,7 +225,6 @@ def predict(
         "stress":                round(stress_norm *  5, 1),
     }
 
-    # Personalised recommendations
     recs: list[str] = []
     if study_hours < 3:
         recs.append("Increase daily study time to at least 4–5 hours to improve retention.")
@@ -232,11 +262,11 @@ def predict(
         recs.append("Excellent habits across all dimensions — keep up the great work!")
 
     return {
-        "predicted_score":      score,
-        "risk_level":           risk_level,
-        "risk_label":           risk_label,
-        "confidence_range":     [conf_low, conf_high],
-        "recommendations":      recs,
+        "predicted_score":       score,
+        "risk_level":            risk_level,
+        "risk_label":            risk_label,
+        "confidence_range":      [conf_low, conf_high],
+        "recommendations":       recs,
         "feature_contributions": feature_contributions,
-        "feature_importance":   feature_importance,
+        "feature_importance":    feature_importance,
     }
