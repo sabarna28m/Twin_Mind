@@ -2,9 +2,10 @@ import type { CSSProperties } from 'react';
 
 /* ═══════════════════════════════════════════════════════════════════════
    TwinMind Brain SVG — the core logo mark
-   Left half:  electric blue / cyan  (#00D4FF → #0055CC)
-   Right half: purple / magenta      (#8B5CF6 → #EC4899)
-   Interior:   circuit-board traces + glowing AI nodes
+   Left half:  cyan → blue   (#00D4FF → #4F7CFF)
+   Right half: purple → pink (#A855F7 → #EC4899)
+   Interior:   circuit-board traces + glowing AI nodes + corpus callosum
+   Hover:      CSS class "brain-logo-icon" — glow amplifies on hover
 ═══════════════════════════════════════════════════════════════════════ */
 export function BrainIcon({ size = 32, className, style }: { size?: number; className?: string; style?: CSSProperties }) {
   return (
@@ -14,159 +15,156 @@ export function BrainIcon({ size = 32, className, style }: { size?: number; clas
       viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      style={style}
+      className={`brain-logo-icon${className ? ` ${className}` : ''}`}
+      style={{ overflow: 'visible', ...style }}
       aria-label="TwinMind logo"
       role="img"
     >
       <defs>
-        {/* Left hemisphere gradient — electric blue */}
-        <linearGradient id="tm-lg" x1="4" y1="8" x2="30" y2="64" gradientUnits="userSpaceOnUse">
+        {/* Left gradient — cyan → blue */}
+        <linearGradient id="tm-lg" x1="3" y1="9" x2="32" y2="63" gradientUnits="userSpaceOnUse">
           <stop offset="0%"   stopColor="#00D4FF" />
-          <stop offset="55%"  stopColor="#0077DD" />
-          <stop offset="100%" stopColor="#003899" />
+          <stop offset="100%" stopColor="#4F7CFF" />
         </linearGradient>
-        {/* Right hemisphere gradient — purple → magenta */}
-        <linearGradient id="tm-rg" x1="60" y1="8" x2="34" y2="64" gradientUnits="userSpaceOnUse">
-          <stop offset="0%"   stopColor="#C084FC" />
-          <stop offset="50%"  stopColor="#8B5CF6" />
-          <stop offset="100%" stopColor="#D946EF" />
+        {/* Right gradient — purple → pink */}
+        <linearGradient id="tm-rg" x1="61" y1="9" x2="32" y2="63" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stopColor="#A855F7" />
+          <stop offset="100%" stopColor="#EC4899" />
         </linearGradient>
-        {/* Inner shadow overlay for depth */}
-        <radialGradient id="tm-li" cx="70%" cy="20%" r="80%">
-          <stop offset="0%"   stopColor="#00D4FF" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+        {/* Inner highlight — left (lighter sheen near top-inner edge) */}
+        <radialGradient id="tm-lh" cx="65%" cy="22%" r="70%">
+          <stop offset="0%"   stopColor="#FFFFFF" stopOpacity="0.16" />
+          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
         </radialGradient>
-        <radialGradient id="tm-ri" cx="30%" cy="20%" r="80%">
-          <stop offset="0%"   stopColor="#C084FC" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+        {/* Inner highlight — right */}
+        <radialGradient id="tm-rh" cx="35%" cy="22%" r="70%">
+          <stop offset="0%"   stopColor="#FFFFFF" stopOpacity="0.16" />
+          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
         </radialGradient>
-        {/* Clip paths so circuit lines stay inside each hemisphere */}
+        {/* Node glow — applies blur + merge for glowing dots */}
+        <filter id="tm-ng" x="-120%" y="-120%" width="340%" height="340%">
+          <feGaussianBlur stdDeviation="2.2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        {/* Border stroke glow */}
+        <filter id="tm-bg" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.8" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        {/* Clip paths — keep traces inside each hemisphere */}
         <clipPath id="tm-lc">
-          <path d="M 30,12 C 24,5 11,7 5,17 C 1,26 2,40 7,50 C 11,60 22,64 30,62 L 30,12 Z" />
+          <path d="M 32,9 C 26,5 12,6 5,16 C 0,25 1,39 5,50 C 9,59 20,64 28,63 L 32,63 L 32,9 Z" />
         </clipPath>
         <clipPath id="tm-rc">
-          <path d="M 34,12 C 40,5 53,7 59,17 C 63,26 62,40 57,50 C 53,60 42,64 34,62 L 34,12 Z" />
+          <path d="M 32,9 C 38,5 52,6 59,16 C 64,25 63,39 59,50 C 55,59 44,64 36,63 L 32,63 L 32,9 Z" />
         </clipPath>
       </defs>
 
       {/* ── LEFT HEMISPHERE ── */}
       <path
-        d="M 30,12 C 24,5 11,7 5,17 C 1,26 2,40 7,50 C 11,60 22,64 30,62 L 30,12 Z"
+        d="M 32,9 C 26,5 12,6 5,16 C 0,25 1,39 5,50 C 9,59 20,64 28,63 L 32,63 L 32,9 Z"
         fill="url(#tm-lg)"
-        opacity="0.9"
       />
-      {/* Inner highlight */}
       <path
-        d="M 30,12 C 24,5 11,7 5,17 C 1,26 2,40 7,50 C 11,60 22,64 30,62 L 30,12 Z"
-        fill="url(#tm-li)"
+        d="M 32,9 C 26,5 12,6 5,16 C 0,25 1,39 5,50 C 9,59 20,64 28,63 L 32,63 L 32,9 Z"
+        fill="url(#tm-lh)"
       />
-      {/* Outer glow border — cyan */}
+      {/* Glowing left border */}
       <path
-        d="M 30,12 C 24,5 11,7 5,17 C 1,26 2,40 7,50 C 11,60 22,64 30,62"
-        fill="none"
-        stroke="#00D4FF"
-        strokeWidth="1.4"
-        strokeOpacity="0.85"
-        strokeLinecap="round"
-        style={{ filter: 'drop-shadow(0 0 3px #00D4FF)' }}
+        d="M 32,9 C 26,5 12,6 5,16 C 0,25 1,39 5,50 C 9,59 20,64 28,63 L 32,63"
+        fill="none" stroke="#00D4FF" strokeWidth="1.3" strokeOpacity="0.9" strokeLinecap="round"
+        filter="url(#tm-bg)"
       />
 
-      {/* Left circuit traces */}
+      {/* Left circuit traces + nodes */}
       <g clipPath="url(#tm-lc)">
-        <g stroke="#22D3EE" strokeWidth="0.9" strokeOpacity="0.9" strokeLinecap="round">
-          {/* Horizontal lines */}
-          <line x1="10" y1="22" x2="28" y2="22" />
-          <line x1="7"  y1="36" x2="28" y2="36" />
-          <line x1="10" y1="50" x2="28" y2="50" />
-          {/* Vertical connectors */}
-          <line x1="16" y1="22" x2="16" y2="50" />
-          <line x1="22" y1="22" x2="22" y2="36" />
+        <g stroke="#22D3EE" strokeWidth="0.85" strokeOpacity="0.85" strokeLinecap="round">
+          <line x1="8"  y1="21" x2="30" y2="21" />
+          <line x1="5"  y1="34" x2="30" y2="34" />
+          <line x1="8"  y1="47" x2="30" y2="47" />
+          <line x1="14" y1="21" x2="14" y2="47" />
+          <line x1="22" y1="21" x2="22" y2="34" />
+          <line x1="22" y1="34" x2="30" y2="21" />
         </g>
-        {/* Circuit nodes — glowing cyan */}
-        <g fill="#00EEFF" style={{ filter: 'drop-shadow(0 0 2.5px #00D4FF)' }}>
-          <circle cx="10" cy="22" r="1.6" />
-          <circle cx="16" cy="22" r="2.1" />
-          <circle cx="22" cy="22" r="1.6" />
-          <circle cx="28" cy="22" r="1.3" />
-          <circle cx="7"  cy="36" r="1.6" />
-          <circle cx="16" cy="36" r="2.1" />
-          <circle cx="22" cy="36" r="1.6" />
-          <circle cx="28" cy="36" r="1.3" />
-          <circle cx="10" cy="50" r="1.6" />
-          <circle cx="16" cy="50" r="2.1" />
-          <circle cx="28" cy="50" r="1.3" />
+        <g filter="url(#tm-ng)">
+          <circle cx="8"  cy="21" r="1.4" fill="#00EEFF" />
+          <circle cx="14" cy="21" r="2.0" fill="#00D4FF" />
+          <circle cx="22" cy="21" r="1.6" fill="#4FC3F7" />
+          <circle cx="30" cy="21" r="1.1" fill="#00EEFF" />
+          <circle cx="5"  cy="34" r="1.4" fill="#00EEFF" />
+          <circle cx="14" cy="34" r="2.0" fill="#00D4FF" />
+          <circle cx="22" cy="34" r="1.6" fill="#4FC3F7" />
+          <circle cx="30" cy="34" r="1.1" fill="#00EEFF" />
+          <circle cx="8"  cy="47" r="1.4" fill="#00EEFF" />
+          <circle cx="14" cy="47" r="2.0" fill="#00D4FF" />
+          <circle cx="30" cy="47" r="1.1" fill="#00EEFF" />
         </g>
       </g>
 
       {/* ── RIGHT HEMISPHERE ── */}
       <path
-        d="M 34,12 C 40,5 53,7 59,17 C 63,26 62,40 57,50 C 53,60 42,64 34,62 L 34,12 Z"
+        d="M 32,9 C 38,5 52,6 59,16 C 64,25 63,39 59,50 C 55,59 44,64 36,63 L 32,63 L 32,9 Z"
         fill="url(#tm-rg)"
-        opacity="0.9"
       />
-      {/* Inner highlight */}
       <path
-        d="M 34,12 C 40,5 53,7 59,17 C 63,26 62,40 57,50 C 53,60 42,64 34,62 L 34,12 Z"
-        fill="url(#tm-ri)"
+        d="M 32,9 C 38,5 52,6 59,16 C 64,25 63,39 59,50 C 55,59 44,64 36,63 L 32,63 L 32,9 Z"
+        fill="url(#tm-rh)"
       />
-      {/* Outer glow border — purple */}
+      {/* Glowing right border */}
       <path
-        d="M 34,12 C 40,5 53,7 59,17 C 63,26 62,40 57,50 C 53,60 42,64 34,62"
-        fill="none"
-        stroke="#A855F7"
-        strokeWidth="1.4"
-        strokeOpacity="0.85"
-        strokeLinecap="round"
-        style={{ filter: 'drop-shadow(0 0 3px #8B5CF6)' }}
+        d="M 32,9 C 38,5 52,6 59,16 C 64,25 63,39 59,50 C 55,59 44,64 36,63 L 32,63"
+        fill="none" stroke="#A855F7" strokeWidth="1.3" strokeOpacity="0.9" strokeLinecap="round"
+        filter="url(#tm-bg)"
       />
 
-      {/* Right circuit traces (mirror) */}
+      {/* Right circuit traces + nodes */}
       <g clipPath="url(#tm-rc)">
-        <g stroke="#A78BFA" strokeWidth="0.9" strokeOpacity="0.9" strokeLinecap="round">
-          {/* Horizontal lines */}
-          <line x1="36" y1="22" x2="54" y2="22" />
-          <line x1="36" y1="36" x2="57" y2="36" />
-          <line x1="36" y1="50" x2="54" y2="50" />
-          {/* Vertical connectors */}
-          <line x1="48" y1="22" x2="48" y2="50" />
-          <line x1="42" y1="22" x2="42" y2="36" />
+        <g stroke="#C084FC" strokeWidth="0.85" strokeOpacity="0.85" strokeLinecap="round">
+          <line x1="34" y1="21" x2="56" y2="21" />
+          <line x1="34" y1="34" x2="59" y2="34" />
+          <line x1="34" y1="47" x2="56" y2="47" />
+          <line x1="50" y1="21" x2="50" y2="47" />
+          <line x1="42" y1="21" x2="42" y2="34" />
+          <line x1="42" y1="34" x2="34" y2="21" />
         </g>
-        {/* Circuit nodes — glowing violet */}
-        <g fill="#C4B5FD" style={{ filter: 'drop-shadow(0 0 2.5px #8B5CF6)' }}>
-          <circle cx="36" cy="22" r="1.3" />
-          <circle cx="42" cy="22" r="1.6" />
-          <circle cx="48" cy="22" r="2.1" />
-          <circle cx="54" cy="22" r="1.6" />
-          <circle cx="36" cy="36" r="1.3" />
-          <circle cx="42" cy="36" r="1.6" />
-          <circle cx="48" cy="36" r="2.1" />
-          <circle cx="57" cy="36" r="1.6" />
-          <circle cx="36" cy="50" r="1.3" />
-          <circle cx="48" cy="50" r="2.1" />
-          <circle cx="54" cy="50" r="1.6" />
+        <g filter="url(#tm-ng)">
+          <circle cx="34" cy="21" r="1.1" fill="#E879F9" />
+          <circle cx="42" cy="21" r="1.6" fill="#C084FC" />
+          <circle cx="50" cy="21" r="2.0" fill="#A855F7" />
+          <circle cx="56" cy="21" r="1.4" fill="#E879F9" />
+          <circle cx="34" cy="34" r="1.1" fill="#E879F9" />
+          <circle cx="42" cy="34" r="1.6" fill="#C084FC" />
+          <circle cx="50" cy="34" r="2.0" fill="#A855F7" />
+          <circle cx="59" cy="34" r="1.4" fill="#E879F9" />
+          <circle cx="34" cy="47" r="1.1" fill="#E879F9" />
+          <circle cx="50" cy="47" r="2.0" fill="#A855F7" />
+          <circle cx="56" cy="47" r="1.4" fill="#E879F9" />
         </g>
       </g>
 
       {/* ── CENTER DIVIDER (corpus callosum) ── */}
       <line
-        x1="32" y1="12" x2="32" y2="62"
-        stroke="rgba(255,255,255,0.18)"
+        x1="32" y1="9" x2="32" y2="63"
+        stroke="rgba(255,255,255,0.22)"
         strokeWidth="1.5"
-        strokeDasharray="3 3"
-      />
-
-      {/* Top highlight — where the two hemispheres meet */}
-      <ellipse cx="32" cy="13" rx="4" ry="2.5" fill="rgba(255,255,255,0.12)" />
-
-      {/* Bottom connection — brainstem hint */}
-      <path
-        d="M 28,61 C 29,64 31,66 32,66 C 33,66 35,64 36,61"
-        fill="none"
-        stroke="rgba(255,255,255,0.15)"
-        strokeWidth="1"
+        strokeDasharray="2.5 2.5"
         strokeLinecap="round"
       />
+
+      {/* Central synapse node — corpus callosum connection point */}
+      <g filter="url(#tm-ng)">
+        <circle cx="32" cy="36" r="3.2" fill="#FFFFFF" fillOpacity="0.8" />
+        <circle cx="32" cy="36" r="1.6" fill="#FFFFFF" />
+      </g>
+
+      {/* Top bridge highlight */}
+      <ellipse cx="32" cy="9.5" rx="3.5" ry="1.8" fill="rgba(255,255,255,0.18)" />
     </svg>
   );
 }

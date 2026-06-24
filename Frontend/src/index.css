@@ -288,6 +288,25 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
    Premium Navbar
    ══════════════════════════════ */
 
+/* ══════════════════════════════
+   Brain Logo Icon — hover glow
+   ══════════════════════════════ */
+
+.brain-logo-icon {
+  filter:
+    drop-shadow(0 0 4px rgba(0,212,255,0.45))
+    drop-shadow(0 0 4px rgba(168,85,247,0.35));
+  transition: filter 0.28s ease, transform 0.22s ease;
+  flex-shrink: 0;
+}
+.brain-logo-icon:hover {
+  filter:
+    drop-shadow(0 0 10px rgba(0,212,255,0.9))
+    drop-shadow(0 0 10px rgba(168,85,247,0.75))
+    drop-shadow(0 0 22px rgba(99,102,241,0.45));
+  transform: scale(1.10);
+}
+
 .nav-premium {
   background: var(--glass-bg) !important;
   backdrop-filter: blur(28px) saturate(200%) !important;
