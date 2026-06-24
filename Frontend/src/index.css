@@ -868,6 +868,10 @@ html[data-theme="light"] .focus-ctrl-ghost {
   .twin-hero-fid-card  { min-width: 0 !important; width: 100% !important; }
 
   /* ── Twin page layout ── */
+  .mob-4-col {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.65rem !important;
+  }
   .mob-twin-row {
     grid-template-columns: 1fr !important;
     gap: 1rem !important;
@@ -916,6 +920,7 @@ html[data-theme="light"] .focus-ctrl-ghost {
   .mob-panel { padding: 0.9rem !important; }
   .mob-nav { padding: 0 0.75rem !important; }
   .mob-twin-row { gap: 0.75rem !important; }
+  .mob-4-col { grid-template-columns: 1fr !important; gap: 0.6rem !important; }
 }
 
 /* ══════════════════════════════
