@@ -1,12 +1,30 @@
 import type { CSSProperties } from 'react';
 
 /* ═══════════════════════════════════════════════════════════════════════
-   TwinMind Brain SVG — the core logo mark
+   TwinMind Brain SVG — proper brain silhouette with dual lobe profile
    Left half:  cyan → blue   (#00D4FF → #4F7CFF)
    Right half: purple → pink (#A855F7 → #EC4899)
-   Interior:   circuit-board traces + glowing AI nodes + corpus callosum
+   Shape:      bumpy frontal + parietal lobes, organic outer curve, brainstem
+   Interior:   circuit traces + glowing nodes  (no central synapse dot)
    Hover:      CSS class "brain-logo-icon" — glow amplifies on hover
+
+   Brain outline (64×64 viewBox, centred on x=32):
+     LEFT  — counterclockwise from (32,8):
+       arc UP-LEFT  → frontal lobe peak ≈ (22, 1)
+       sulcus dip   ≈ (13, 9)
+       UP again     → parietal bump ≈ (7, 5)
+       sweep down   → left outer edge → temporal base → (32,57)
+       straight L   → center line back to (32,8)
+     RIGHT — perfect mirror of left.
 ═══════════════════════════════════════════════════════════════════════ */
+
+/* shared path data — defined outside JSX for clarity */
+const LP  = 'M 32,8 C 28,2 22,0 18,4 C 15,7 13,10 11,9 C 9,8 6,4 4,9 C 1,14 1,22 3,30 C 5,38 6,44 9,48 C 12,53 17,57 22,58 C 26,59 30,59 32,57 L 32,8 Z';
+const RP  = 'M 32,8 C 36,2 42,0 46,4 C 49,7 51,10 53,9 C 55,8 58,4 60,9 C 63,14 63,22 61,30 C 59,38 58,44 55,48 C 52,53 47,57 42,58 C 38,59 34,59 32,57 L 32,8 Z';
+/* open-arc versions (omit closing center-line segment) for border strokes */
+const LA  = 'M 32,8 C 28,2 22,0 18,4 C 15,7 13,10 11,9 C 9,8 6,4 4,9 C 1,14 1,22 3,30 C 5,38 6,44 9,48 C 12,53 17,57 22,58 C 26,59 30,59 32,57';
+const RA  = 'M 32,8 C 36,2 42,0 46,4 C 49,7 51,10 53,9 C 55,8 58,4 60,9 C 63,14 63,22 61,30 C 59,38 58,44 55,48 C 52,53 47,57 42,58 C 38,59 34,59 32,57';
+
 export function BrainIcon({ size = 32, className, style }: { size?: number; className?: string; style?: CSSProperties }) {
   return (
     <svg
@@ -21,150 +39,162 @@ export function BrainIcon({ size = 32, className, style }: { size?: number; clas
       role="img"
     >
       <defs>
-        {/* Left gradient — cyan → blue */}
-        <linearGradient id="tm-lg" x1="3" y1="9" x2="32" y2="63" gradientUnits="userSpaceOnUse">
+        {/* ── Hemisphere fills ── */}
+        <linearGradient id="tm-lg" x1="3" y1="2" x2="30" y2="59" gradientUnits="userSpaceOnUse">
           <stop offset="0%"   stopColor="#00D4FF" />
           <stop offset="100%" stopColor="#4F7CFF" />
         </linearGradient>
-        {/* Right gradient — purple → pink */}
-        <linearGradient id="tm-rg" x1="61" y1="9" x2="32" y2="63" gradientUnits="userSpaceOnUse">
+        <linearGradient id="tm-rg" x1="61" y1="2" x2="34" y2="59" gradientUnits="userSpaceOnUse">
           <stop offset="0%"   stopColor="#A855F7" />
           <stop offset="100%" stopColor="#EC4899" />
         </linearGradient>
-        {/* Inner highlight — left (lighter sheen near top-inner edge) */}
-        <radialGradient id="tm-lh" cx="65%" cy="22%" r="70%">
-          <stop offset="0%"   stopColor="#FFFFFF" stopOpacity="0.16" />
-          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+
+        {/* ── Specular sheen overlays ── */}
+        <radialGradient id="tm-lh" cx="68%" cy="18%" r="65%">
+          <stop offset="0%"   stopColor="#FFFFFF" stopOpacity="0.20" />
+          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0"    />
         </radialGradient>
-        {/* Inner highlight — right */}
-        <radialGradient id="tm-rh" cx="35%" cy="22%" r="70%">
-          <stop offset="0%"   stopColor="#FFFFFF" stopOpacity="0.16" />
-          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+        <radialGradient id="tm-rh" cx="32%" cy="18%" r="65%">
+          <stop offset="0%"   stopColor="#FFFFFF" stopOpacity="0.20" />
+          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0"    />
         </radialGradient>
-        {/* Node glow — applies blur + merge for glowing dots */}
-        <filter id="tm-ng" x="-120%" y="-120%" width="340%" height="340%">
-          <feGaussianBlur stdDeviation="2.2" result="blur" />
+
+        {/* ── SVG glow filters ── */}
+        {/* Circuit nodes */}
+        <filter id="tm-ng" x="-150%" y="-150%" width="400%" height="400%">
+          <feGaussianBlur stdDeviation="2.4" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        {/* Border stroke glow */}
-        <filter id="tm-bg" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="1.8" result="blur" />
+        {/* Outer border stroke */}
+        <filter id="tm-bg" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="2.0" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        {/* Clip paths — keep traces inside each hemisphere */}
-        <clipPath id="tm-lc">
-          <path d="M 32,9 C 26,5 12,6 5,16 C 0,25 1,39 5,50 C 9,59 20,64 28,63 L 32,63 L 32,9 Z" />
-        </clipPath>
-        <clipPath id="tm-rc">
-          <path d="M 32,9 C 38,5 52,6 59,16 C 64,25 63,39 59,50 C 55,59 44,64 36,63 L 32,63 L 32,9 Z" />
-        </clipPath>
+
+        {/* ── Clip paths — circuit traces stay inside each lobe ── */}
+        <clipPath id="tm-lc"><path d={LP} /></clipPath>
+        <clipPath id="tm-rc"><path d={RP} /></clipPath>
       </defs>
 
-      {/* ── LEFT HEMISPHERE ── */}
-      <path
-        d="M 32,9 C 26,5 12,6 5,16 C 0,25 1,39 5,50 C 9,59 20,64 28,63 L 32,63 L 32,9 Z"
-        fill="url(#tm-lg)"
-      />
-      <path
-        d="M 32,9 C 26,5 12,6 5,16 C 0,25 1,39 5,50 C 9,59 20,64 28,63 L 32,63 L 32,9 Z"
-        fill="url(#tm-lh)"
-      />
-      {/* Glowing left border */}
-      <path
-        d="M 32,9 C 26,5 12,6 5,16 C 0,25 1,39 5,50 C 9,59 20,64 28,63 L 32,63"
-        fill="none" stroke="#00D4FF" strokeWidth="1.3" strokeOpacity="0.9" strokeLinecap="round"
-        filter="url(#tm-bg)"
-      />
+      {/* ══════════════════════════════════════════
+          LEFT HEMISPHERE
+      ══════════════════════════════════════════ */}
 
-      {/* Left circuit traces + nodes */}
+      {/* Solid gradient fill */}
+      <path d={LP} fill="url(#tm-lg)" />
+      {/* Specular sheen */}
+      <path d={LP} fill="url(#tm-lh)" />
+      {/* Glowing outer border (arc only, not the straight center edge) */}
+      <path d={LA} fill="none"
+            stroke="#00D4FF" strokeWidth="1.6" strokeOpacity="0.95" strokeLinecap="round"
+            filter="url(#tm-bg)" />
+
+      {/* Left neural-circuit network */}
       <g clipPath="url(#tm-lc)">
-        <g stroke="#22D3EE" strokeWidth="0.85" strokeOpacity="0.85" strokeLinecap="round">
-          <line x1="8"  y1="21" x2="30" y2="21" />
-          <line x1="5"  y1="34" x2="30" y2="34" />
-          <line x1="8"  y1="47" x2="30" y2="47" />
-          <line x1="14" y1="21" x2="14" y2="47" />
-          <line x1="22" y1="21" x2="22" y2="34" />
-          <line x1="22" y1="34" x2="30" y2="21" />
+        {/* Trace lines */}
+        <g stroke="#22D3EE" strokeWidth="0.9" strokeOpacity="0.82" strokeLinecap="round">
+          {/* Three horizontal rails */}
+          <line x1="9"  y1="20" x2="29" y2="20" />
+          <line x1="6"  y1="32" x2="29" y2="32" />
+          <line x1="9"  y1="45" x2="29" y2="45" />
+          {/* Vertical spine */}
+          <line x1="15" y1="20" x2="15" y2="45" />
+          {/* Upper branch */}
+          <line x1="23" y1="20" x2="23" y2="32" />
+          {/* Diagonal — inner to mid (gives neural branching feel) */}
+          <line x1="23" y1="32" x2="29" y2="20" />
+          {/* Lower branch diagonal */}
+          <line x1="15" y1="32" x2="9"  y2="45" />
         </g>
+        {/* Glowing circular nodes at intersections + endpoints */}
         <g filter="url(#tm-ng)">
-          <circle cx="8"  cy="21" r="1.4" fill="#00EEFF" />
-          <circle cx="14" cy="21" r="2.0" fill="#00D4FF" />
-          <circle cx="22" cy="21" r="1.6" fill="#4FC3F7" />
-          <circle cx="30" cy="21" r="1.1" fill="#00EEFF" />
-          <circle cx="5"  cy="34" r="1.4" fill="#00EEFF" />
-          <circle cx="14" cy="34" r="2.0" fill="#00D4FF" />
-          <circle cx="22" cy="34" r="1.6" fill="#4FC3F7" />
-          <circle cx="30" cy="34" r="1.1" fill="#00EEFF" />
-          <circle cx="8"  cy="47" r="1.4" fill="#00EEFF" />
-          <circle cx="14" cy="47" r="2.0" fill="#00D4FF" />
-          <circle cx="30" cy="47" r="1.1" fill="#00EEFF" />
+          <circle cx="9"  cy="20" r="1.4" fill="#00EEFF" />
+          <circle cx="15" cy="20" r="2.2" fill="#00D4FF" />
+          <circle cx="23" cy="20" r="1.7" fill="#4FC3F7" />
+          <circle cx="29" cy="20" r="1.1" fill="#00EEFF" />
+          <circle cx="6"  cy="32" r="1.4" fill="#00EEFF" />
+          <circle cx="15" cy="32" r="2.2" fill="#00D4FF" />
+          <circle cx="23" cy="32" r="1.7" fill="#4FC3F7" />
+          <circle cx="29" cy="32" r="1.1" fill="#00EEFF" />
+          <circle cx="9"  cy="45" r="1.5" fill="#00EEFF" />
+          <circle cx="15" cy="45" r="2.2" fill="#00D4FF" />
+          <circle cx="29" cy="45" r="1.1" fill="#00EEFF" />
         </g>
       </g>
 
-      {/* ── RIGHT HEMISPHERE ── */}
-      <path
-        d="M 32,9 C 38,5 52,6 59,16 C 64,25 63,39 59,50 C 55,59 44,64 36,63 L 32,63 L 32,9 Z"
-        fill="url(#tm-rg)"
-      />
-      <path
-        d="M 32,9 C 38,5 52,6 59,16 C 64,25 63,39 59,50 C 55,59 44,64 36,63 L 32,63 L 32,9 Z"
-        fill="url(#tm-rh)"
-      />
-      {/* Glowing right border */}
-      <path
-        d="M 32,9 C 38,5 52,6 59,16 C 64,25 63,39 59,50 C 55,59 44,64 36,63 L 32,63"
-        fill="none" stroke="#A855F7" strokeWidth="1.3" strokeOpacity="0.9" strokeLinecap="round"
-        filter="url(#tm-bg)"
-      />
+      {/* ══════════════════════════════════════════
+          RIGHT HEMISPHERE (exact mirror)
+      ══════════════════════════════════════════ */}
 
-      {/* Right circuit traces + nodes */}
+      <path d={RP} fill="url(#tm-rg)" />
+      <path d={RP} fill="url(#tm-rh)" />
+      <path d={RA} fill="none"
+            stroke="#A855F7" strokeWidth="1.6" strokeOpacity="0.95" strokeLinecap="round"
+            filter="url(#tm-bg)" />
+
       <g clipPath="url(#tm-rc)">
-        <g stroke="#C084FC" strokeWidth="0.85" strokeOpacity="0.85" strokeLinecap="round">
-          <line x1="34" y1="21" x2="56" y2="21" />
-          <line x1="34" y1="34" x2="59" y2="34" />
-          <line x1="34" y1="47" x2="56" y2="47" />
-          <line x1="50" y1="21" x2="50" y2="47" />
-          <line x1="42" y1="21" x2="42" y2="34" />
-          <line x1="42" y1="34" x2="34" y2="21" />
+        <g stroke="#C084FC" strokeWidth="0.9" strokeOpacity="0.82" strokeLinecap="round">
+          <line x1="35" y1="20" x2="55" y2="20" />
+          <line x1="35" y1="32" x2="58" y2="32" />
+          <line x1="35" y1="45" x2="55" y2="45" />
+          <line x1="49" y1="20" x2="49" y2="45" />
+          <line x1="41" y1="20" x2="41" y2="32" />
+          <line x1="41" y1="32" x2="35" y2="20" />
+          <line x1="49" y1="32" x2="55" y2="45" />
         </g>
         <g filter="url(#tm-ng)">
-          <circle cx="34" cy="21" r="1.1" fill="#E879F9" />
-          <circle cx="42" cy="21" r="1.6" fill="#C084FC" />
-          <circle cx="50" cy="21" r="2.0" fill="#A855F7" />
-          <circle cx="56" cy="21" r="1.4" fill="#E879F9" />
-          <circle cx="34" cy="34" r="1.1" fill="#E879F9" />
-          <circle cx="42" cy="34" r="1.6" fill="#C084FC" />
-          <circle cx="50" cy="34" r="2.0" fill="#A855F7" />
-          <circle cx="59" cy="34" r="1.4" fill="#E879F9" />
-          <circle cx="34" cy="47" r="1.1" fill="#E879F9" />
-          <circle cx="50" cy="47" r="2.0" fill="#A855F7" />
-          <circle cx="56" cy="47" r="1.4" fill="#E879F9" />
+          <circle cx="35" cy="20" r="1.1" fill="#E879F9" />
+          <circle cx="41" cy="20" r="1.7" fill="#C084FC" />
+          <circle cx="49" cy="20" r="2.2" fill="#A855F7" />
+          <circle cx="55" cy="20" r="1.4" fill="#E879F9" />
+          <circle cx="35" cy="32" r="1.1" fill="#E879F9" />
+          <circle cx="41" cy="32" r="1.7" fill="#C084FC" />
+          <circle cx="49" cy="32" r="2.2" fill="#A855F7" />
+          <circle cx="58" cy="32" r="1.4" fill="#E879F9" />
+          <circle cx="35" cy="45" r="1.1" fill="#E879F9" />
+          <circle cx="49" cy="45" r="2.2" fill="#A855F7" />
+          <circle cx="55" cy="45" r="1.5" fill="#E879F9" />
         </g>
       </g>
 
-      {/* ── CENTER DIVIDER (corpus callosum) ── */}
-      <line
-        x1="32" y1="9" x2="32" y2="63"
-        stroke="rgba(255,255,255,0.22)"
-        strokeWidth="1.5"
-        strokeDasharray="2.5 2.5"
-        strokeLinecap="round"
-      />
+      {/* ══════════════════════════════════════════
+          ANATOMICAL DETAILS
+      ══════════════════════════════════════════ */}
 
-      {/* Central synapse node — corpus callosum connection point */}
-      <g filter="url(#tm-ng)">
-        <circle cx="32" cy="36" r="3.2" fill="#FFFFFF" fillOpacity="0.8" />
-        <circle cx="32" cy="36" r="1.6" fill="#FFFFFF" />
-      </g>
+      {/* Interhemispheric fissure — dashed center split */}
+      <line x1="32" y1="8" x2="32" y2="57"
+            stroke="rgba(255,255,255,0.28)"
+            strokeWidth="1.4" strokeDasharray="3 2.5" strokeLinecap="round" />
 
-      {/* Top bridge highlight */}
-      <ellipse cx="32" cy="9.5" rx="3.5" ry="1.8" fill="rgba(255,255,255,0.18)" />
+      {/* Gyri fold hints — short arc marks on outer lobe edges */}
+      {/* Left frontal lobe fold */}
+      <path d="M 20,3 C 19.5,2 18.5,1.5 17.5,2.5"
+            fill="none" stroke="#22D3EE" strokeWidth="0.8"
+            strokeOpacity="0.6" strokeLinecap="round" />
+      {/* Left parietal lobe fold */}
+      <path d="M 11,8 C 10.5,7 9.5,6.5 8.5,7.5"
+            fill="none" stroke="#22D3EE" strokeWidth="0.8"
+            strokeOpacity="0.5" strokeLinecap="round" />
+      {/* Right frontal lobe fold (mirror) */}
+      <path d="M 44,3 C 44.5,2 45.5,1.5 46.5,2.5"
+            fill="none" stroke="#C084FC" strokeWidth="0.8"
+            strokeOpacity="0.6" strokeLinecap="round" />
+      {/* Right parietal lobe fold (mirror) */}
+      <path d="M 53,8 C 53.5,7 54.5,6.5 55.5,7.5"
+            fill="none" stroke="#C084FC" strokeWidth="0.8"
+            strokeOpacity="0.5" strokeLinecap="round" />
+
+      {/* Brainstem — narrow rounded stem at bottom center */}
+      <path d="M 29.5,57 C 29,59 29.5,62 32,63 C 34.5,62 35,59 34.5,57"
+            fill="none"
+            stroke="rgba(255,255,255,0.22)"
+            strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
