@@ -34,17 +34,24 @@ FEATURE_KEYS = ["study_hours", "attendance", "assignment_completion", "quiz_scor
 
 RANDOM_STATE = 42
 
+# Scaler state — populated by get_model(); model.pkl stores y_min / y_max
+# so the scaled output (0-100) is the final score — no inverse transform needed.
+_y_min: float | None = None
+_y_max: float | None = None
+
 
 # ── Real-data training (mirrors train_model.py logic) ─────────────────────
 
 def _train_from_csv() -> XGBRegressor:
     import pandas as pd
+    global _y_min, _y_max
 
-    logger.info("Training XGBoost on real data from %s …", CSV_PATH)
+    logger.info("Training XGBoost on real data from %s", CSV_PATH)
     df = pd.read_csv(CSV_PATH)
 
     out = pd.DataFrame()
-    out["study_hours"]    = pd.to_numeric(df["Hours_Studied"],   errors="coerce")
+    # Hours_Studied is weekly in CSV; divide by 5 to match API's daily-hour scale
+    out["study_hours"]    = pd.to_numeric(df["Hours_Studied"],   errors="coerce") / 5.0
     out["attendance_pct"] = pd.to_numeric(df["Attendance"],      errors="coerce")
     out["sleep"]          = pd.to_numeric(df["Sleep_Hours"],     errors="coerce")
     out["quiz_score"]     = pd.to_numeric(df["Previous_Scores"], errors="coerce")
@@ -63,13 +70,23 @@ def _train_from_csv() -> XGBRegressor:
     out["stress"] = np.clip(stress, 1.0, 10.0).round()
 
     out = out[FEATURES + ["exam_score"]].dropna()
-    X = out[FEATURES].values
-    y = out["exam_score"].values
+    X   = out[FEATURES].values
+    y   = out["exam_score"].values
+
+    # Percentile-rank scaling to 0-100 (uniform label distribution)
+    _y_min = float(y.min())
+    _y_max = float(y.max())
+    order    = np.argsort(y, kind="stable")
+    y_scaled = np.empty(len(y), dtype=float)
+    y_scaled[order] = np.linspace(0.0, 100.0, len(y))
 
     model = _build_model()
-    model.fit(X, y)
-    joblib.dump(model, MODEL_PATH)
-    logger.info("Model trained on %d real rows and saved to %s", len(out), MODEL_PATH)
+    model.fit(X, y_scaled)
+
+    bundle = {"model": model, "y_min": _y_min, "y_max": _y_max}
+    joblib.dump(bundle, MODEL_PATH)
+    logger.info("Model trained on %d rows (scaled %.1f-%.1f -> 0-100), saved to %s",
+                len(out), _y_min, _y_max, MODEL_PATH)
     return model
 
 
@@ -103,11 +120,18 @@ def _generate_synthetic_data() -> Tuple[np.ndarray, np.ndarray]:
 
 
 def _train_synthetic() -> XGBRegressor:
+    global _y_min, _y_max
     logger.warning("CSV not found — training on synthetic data (lower accuracy).")
     X, y = _generate_synthetic_data()
+
+    # Synthetic data is already 0-100; still store scaler metadata for consistency
+    _y_min = float(y.min())
+    _y_max = float(y.max())
+
     model = _build_model()
     model.fit(X, y)
-    joblib.dump(model, MODEL_PATH)
+    bundle = {"model": model, "y_min": _y_min, "y_max": _y_max}
+    joblib.dump(bundle, MODEL_PATH)
     logger.info("Synthetic model saved to %s", MODEL_PATH)
     return model
 
@@ -136,18 +160,26 @@ _model: XGBRegressor | None = None
 
 
 def get_model() -> XGBRegressor:
-    global _model
+    global _model, _y_min, _y_max
     if _model is not None:
         return _model
 
     if MODEL_PATH.exists():
         try:
             loaded = joblib.load(MODEL_PATH)
-            if isinstance(loaded, XGBRegressor):
-                logger.info("Loaded model from %s", MODEL_PATH)
+            # Accept both bundle dict (new format) and bare XGBRegressor (legacy)
+            if isinstance(loaded, dict) and "model" in loaded:
+                _model = loaded["model"]
+                _y_min = loaded.get("y_min")
+                _y_max = loaded.get("y_max")
+                logger.info("Loaded model bundle from %s  (y_min=%.1f, y_max=%.1f)",
+                            MODEL_PATH, _y_min or 0, _y_max or 100)
+                return _model
+            elif isinstance(loaded, XGBRegressor):
+                logger.info("Loaded legacy model from %s — no scaler metadata", MODEL_PATH)
                 _model = loaded
                 return _model
-            logger.warning("Saved file is not XGBRegressor — retraining.")
+            logger.warning("Unrecognised model.pkl format — retraining.")
         except Exception as exc:
             logger.warning("Failed to load model.pkl (%s) — retraining.", exc)
         MODEL_PATH.unlink(missing_ok=True)
@@ -204,9 +236,10 @@ def predict(
     conf_low  = round(max(0.0,   score - margin), 1)
     conf_high = round(min(100.0, score + margin), 1)
 
-    if score >= 70:
+    # Percentile-scale thresholds: top 35% = low, next 35% = medium, bottom 30% = high
+    if score >= 65:
         risk_level, risk_label = "low",    "Low risk — on track for a good result"
-    elif score >= 50:
+    elif score >= 30:
         risk_level, risk_label = "medium", "Moderate risk — some areas need attention"
     else:
         risk_level, risk_label = "high",   "High risk — significant improvement needed"
