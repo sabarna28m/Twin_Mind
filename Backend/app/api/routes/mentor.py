@@ -47,23 +47,34 @@ def _get_client() -> Groq:
 GROQ_MODEL = "llama-3.3-70b-versatile"
 
 
-def _analyze_image_with_gemini(image_bytes: bytes, mime_type: str) -> Optional[str]:
-    """
-    Step 1 — Call Gemini 2.0 Flash via the REST API using requests.
-    Step 2 — Extract and return the plain-text description.
-    Returns None when quota is exhausted or the API key is missing.
-    Raises RuntimeError on any other failure so the caller can surface it.
-    """
-    if not settings.gemini_api_key:
-        logger.warning("GEMINI_API_KEY is not configured — image analysis unavailable")
-        return None
+# Models tried in order; next one is used when the current returns 503 overloaded.
+_GEMINI_MODELS = [
+    "gemini-3.5-flash",
+    "gemini-3.1-pro",
+    "gemini-3.1-flash-lite",
+]
 
-    import requests  # standard HTTP library
+_GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models"
-        f"/gemini-2.0-flash:generateContent?key={settings.gemini_api_key}"
-    )
+# Status codes that mean "this model is busy — try the next one"
+_RETRY_STATUSES = {503}
+
+
+def _call_gemini_model(
+    model: str,
+    image_bytes: bytes,
+    mime_type: str,
+    api_key: str,
+) -> tuple[bool, Optional[str]]:
+    """
+    Call a single Gemini model.
+    Returns (should_try_next, description_or_None).
+      should_try_next=True  → caller should fall through to the next model
+      should_try_next=False → either succeeded (description set) or hard-failed
+    """
+    import requests
+
+    url  = f"{_GEMINI_BASE}/{model}:generateContent?key={api_key}"
     body = {
         "contents": [{
             "parts": [
@@ -78,37 +89,69 @@ def _analyze_image_with_gemini(image_bytes: bytes, mime_type: str) -> Optional[s
         }]
     }
 
-    logger.info(
-        "Gemini request → model=gemini-2.0-flash  mime_type=%s  size=%d bytes",
-        mime_type, len(image_bytes),
-    )
+    logger.info("Gemini request  model=%s  mime=%s  size=%d B", model, mime_type, len(image_bytes))
 
     try:
         resp = requests.post(url, json=body, timeout=30)
     except Exception as exc:
-        logger.error("Gemini HTTP request failed: %s", exc, exc_info=True)
-        raise RuntimeError(f"Could not reach Gemini API: {exc}") from exc
+        logger.error("Gemini network error (model=%s): %s", model, exc)
+        # Network error — skip to next model
+        return True, None
 
-    logger.info("Gemini response → status=%d  body=%s", resp.status_code, resp.text[:400])
+    logger.info("Gemini response  model=%s  status=%d", model, resp.status_code)
+
+    if resp.status_code in _RETRY_STATUSES:
+        logger.warning("Gemini model %s returned %d (overloaded) — trying next model",
+                       model, resp.status_code)
+        return True, None
 
     if resp.status_code == 429:
-        logger.warning("Gemini quota exceeded (429)")
-        return None
+        logger.warning("Gemini quota exceeded (model=%s, 429) — trying next model", model)
+        return True, None
 
     if not resp.ok:
-        raise RuntimeError(f"Gemini API error {resp.status_code}: {resp.text[:300]}")
+        logger.error("Gemini hard error  model=%s  status=%d  body=%s",
+                     model, resp.status_code, resp.text[:300])
+        # Non-retryable error — stop the chain
+        return False, None
 
     data = resp.json()
-    logger.info("Gemini parsed response → %s", json.dumps(data)[:400])
+    logger.info("Gemini success  model=%s  body=%s", model, json.dumps(data)[:400])
 
     try:
         description = data["candidates"][0]["content"]["parts"][0]["text"]
     except (KeyError, IndexError) as exc:
-        logger.error("Unexpected Gemini response shape: %s", json.dumps(data))
-        raise RuntimeError(f"Could not parse Gemini response: {exc}") from exc
+        logger.error("Unexpected Gemini response shape (model=%s): %s", model, json.dumps(data))
+        # Unexpected shape — try next model
+        return True, None
 
-    logger.info("Gemini description extracted — length=%d chars", len(description))
-    return description
+    logger.info("Gemini description ready  model=%s  length=%d chars", model, len(description))
+    return False, description
+
+
+def _analyze_image_with_gemini(image_bytes: bytes, mime_type: str) -> Optional[str]:
+    """
+    Try each model in _GEMINI_MODELS in order.
+    Falls through to the next model on 503 overloaded, 429 quota, or network error.
+    Returns None when all models are exhausted or the API key is missing.
+    """
+    if not settings.gemini_api_key:
+        logger.warning("GEMINI_API_KEY not configured — image analysis unavailable")
+        return None
+
+    for model in _GEMINI_MODELS:
+        should_try_next, description = _call_gemini_model(
+            model, image_bytes, mime_type, settings.gemini_api_key
+        )
+        if description is not None:
+            return description
+        if not should_try_next:
+            # Hard failure — no point trying remaining models
+            break
+        logger.info("Falling back from %s to next Gemini model", model)
+
+    logger.error("All Gemini models exhausted — image analysis unavailable")
+    return None
 
 
 _LANGUAGE_NAMES: dict[str, str] = {
@@ -409,7 +452,7 @@ async def analyze_image(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Step 1: receive image, call Gemini 2.0 Flash for description.
+    Step 1: receive image, call Gemini 3.5 Flash for description.
     Step 2: extract description text.
     Step 3: return a groq_context string already formatted for Groq:
             "The user uploaded an image. Here is what it contains: {desc}.
