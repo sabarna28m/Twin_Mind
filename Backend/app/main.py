@@ -289,7 +289,7 @@ with engine.connect() as _conn:
             _conn.execute(text(_sql))
             _conn.commit()
         except Exception:
-            pass  # column already exists
+            _conn.rollback()  # required on PostgreSQL to clear the aborted-transaction state
 
 app = FastAPI(
     title=settings.app_name,
