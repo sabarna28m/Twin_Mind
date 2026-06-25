@@ -1922,7 +1922,7 @@ async def upload_certificate(
         import base64, requests as req
         if not settings.gemini_api_key:
             raise HTTPException(415, "Image certificates require GEMINI_API_KEY. Please upload as PDF or paste text.")
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={settings.gemini_api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={settings.gemini_api_key}"
         mime = "image/jpeg" if fname.endswith((".jpg",".jpeg")) else "image/png" if fname.endswith(".png") else "image/webp"
         body = {"contents": [{"parts": [{"inline_data": {"mime_type": mime, "data": base64.b64encode(content).decode()}}, {"text": "Extract all text from this certificate or achievement document. Include name, issuer, date, skills, and any other relevant information."}]}]}
         try:

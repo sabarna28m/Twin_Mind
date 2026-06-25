@@ -1,6 +1,6 @@
 """
 Debug endpoint — POST /api/v1/test-image
-Accepts a base64 image string, calls Gemini 2.0 Flash directly,
+Accepts a base64 image string, calls Gemini 3.5 Flash directly,
 and returns the full raw response so we can see exactly what's failing.
 Remove this file once image analysis is confirmed working.
 """
@@ -39,7 +39,7 @@ def test_image(payload: TestImageRequest):
     # ── 2. Build request ──────────────────────────────────────────────────
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models"
-        f"/gemini-2.0-flash:generateContent?key={key}"
+        f"/gemini-3.5-flash:generateContent?key={key}"
     )
     body = {
         "contents": [{
@@ -56,7 +56,7 @@ def test_image(payload: TestImageRequest):
     }
 
     print(f"[TEST-IMAGE] Calling Gemini URL (key hidden): "
-          f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+          f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
           flush=True, file=sys.stdout)
     print(f"[TEST-IMAGE] mime_type={payload.mime_type}  "
           f"base64_length={len(payload.image_base64)}", flush=True, file=sys.stdout)

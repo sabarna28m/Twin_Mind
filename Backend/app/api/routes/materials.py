@@ -86,7 +86,7 @@ def _describe_with_gemini(image_bytes: bytes, mime_type: str, prompt: str) -> st
         return ""
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models"
-        f"/gemini-2.0-flash:generateContent?key={settings.gemini_api_key}"
+        f"/gemini-3.5-flash:generateContent?key={settings.gemini_api_key}"
     )
     body = {
         "contents": [{
