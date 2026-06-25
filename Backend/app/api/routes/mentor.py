@@ -60,6 +60,12 @@ _GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 _RETRY_STATUSES = {503}
 
 
+def _dbg(msg: str) -> None:
+    """Print to stdout with flush so every line appears immediately in uvicorn terminal."""
+    import sys
+    print(f"[GEMINI-DBG] {msg}", flush=True, file=sys.stdout)
+
+
 def _call_gemini_model(
     model: str,
     image_bytes: bytes,
@@ -74,14 +80,21 @@ def _call_gemini_model(
     """
     import requests
 
-    url  = f"{_GEMINI_BASE}/{model}:generateContent?key={api_key}"
+    # ── Build request ────────────────────────────────────────────────────
+    url_public = f"{_GEMINI_BASE}/{model}:generateContent?key=***"
+    url        = f"{_GEMINI_BASE}/{model}:generateContent?key={api_key}"
+
+    b64_data   = base64.b64encode(image_bytes).decode("utf-8")
+    b64_len    = len(b64_data)
+    b64_preview = b64_data[:60] + "..." if b64_len > 60 else b64_data
+
     body = {
         "contents": [{
             "parts": [
                 {
                     "inline_data": {
                         "mime_type": mime_type,
-                        "data": base64.b64encode(image_bytes).decode("utf-8"),
+                        "data": b64_data,
                     }
                 },
                 {"text": "Describe what you see in this image in detail"},
@@ -89,44 +102,82 @@ def _call_gemini_model(
         }]
     }
 
-    logger.info("Gemini request  model=%s  mime=%s  size=%d B", model, mime_type, len(image_bytes))
+    # ── Debug: request summary ───────────────────────────────────────────
+    _dbg("=" * 60)
+    _dbg(f"TRYING MODEL : {model}")
+    _dbg(f"URL          : {url_public}")
+    _dbg(f"MIME TYPE    : {mime_type}")
+    _dbg(f"IMAGE BYTES  : {len(image_bytes):,} bytes")
+    _dbg(f"BASE64 LENGTH: {b64_len:,} chars")
+    _dbg(f"BASE64 PREFIX: {b64_preview}")
+    _dbg(f"BASE64 VALID : {'YES' if b64_len > 0 else 'NO — empty!'}")
+    _dbg(f"BODY KEYS    : {list(body.keys())}")
+    _dbg(f"BODY PARTS   : [inline_data(mime={mime_type}, data=<{b64_len} chars>), text prompt]")
+    _dbg("Sending POST request ...")
 
+    # ── Send ─────────────────────────────────────────────────────────────
     try:
         resp = requests.post(url, json=body, timeout=30)
     except Exception as exc:
+        _dbg(f"NETWORK ERROR: {exc}")
         logger.error("Gemini network error (model=%s): %s", model, exc)
-        # Network error — skip to next model
         return True, None
 
-    logger.info("Gemini response  model=%s  status=%d", model, resp.status_code)
+    # ── Debug: response summary ───────────────────────────────────────────
+    _dbg(f"HTTP STATUS  : {resp.status_code}")
+    _dbg(f"RESPONSE BODY (full):")
+    _dbg(resp.text if resp.text else "(empty body)")
+    _dbg("-" * 60)
 
+    # ── Handle retryable statuses ─────────────────────────────────────────
     if resp.status_code in _RETRY_STATUSES:
+        _dbg(f"RESULT: {resp.status_code} overloaded — will try next model")
         logger.warning("Gemini model %s returned %d (overloaded) — trying next model",
                        model, resp.status_code)
         return True, None
 
     if resp.status_code == 429:
+        _dbg(f"RESULT: 429 quota exceeded — will try next model")
         logger.warning("Gemini quota exceeded (model=%s, 429) — trying next model", model)
         return True, None
 
+    # ── Handle hard failure ───────────────────────────────────────────────
     if not resp.ok:
+        _dbg(f"RESULT: HARD FAILURE {resp.status_code} — stopping chain")
         logger.error("Gemini hard error  model=%s  status=%d  body=%s",
-                     model, resp.status_code, resp.text[:300])
-        # Non-retryable error — stop the chain
+                     model, resp.status_code, resp.text[:500])
         return False, None
 
-    data = resp.json()
-    logger.info("Gemini success  model=%s  body=%s", model, json.dumps(data)[:400])
-
+    # ── Parse success response ────────────────────────────────────────────
     try:
-        description = data["candidates"][0]["content"]["parts"][0]["text"]
-    except (KeyError, IndexError) as exc:
-        logger.error("Unexpected Gemini response shape (model=%s): %s", model, json.dumps(data))
-        # Unexpected shape — try next model
+        data = resp.json()
+    except Exception as exc:
+        _dbg(f"JSON PARSE ERROR: {exc}")
+        logger.error("Gemini response is not valid JSON (model=%s): %s", model, resp.text[:300])
         return True, None
 
-    logger.info("Gemini description ready  model=%s  length=%d chars", model, len(description))
-    return False, description
+    _dbg(f"PARSED JSON KEYS: {list(data.keys())}")
+
+    try:
+        candidates = data.get("candidates", [])
+        _dbg(f"CANDIDATES COUNT: {len(candidates)}")
+        if candidates:
+            parts = candidates[0].get("content", {}).get("parts", [])
+            _dbg(f"PARTS COUNT: {len(parts)}")
+            for i, part in enumerate(parts):
+                _dbg(f"  part[{i}] keys: {list(part.keys())}")
+
+        description = data["candidates"][0]["content"]["parts"][0]["text"]
+        _dbg(f"RESULT: SUCCESS — extracted {len(description)} chars")
+        _dbg(f"DESCRIPTION PREVIEW: {description[:200]}")
+        logger.info("Gemini description ready  model=%s  length=%d chars", model, len(description))
+        return False, description
+
+    except (KeyError, IndexError) as exc:
+        _dbg(f"PARSE ERROR: could not extract text — {exc}")
+        _dbg(f"FULL JSON: {json.dumps(data)}")
+        logger.error("Unexpected Gemini response shape (model=%s): %s", model, json.dumps(data))
+        return True, None
 
 
 def _analyze_image_with_gemini(image_bytes: bytes, mime_type: str) -> Optional[str]:
@@ -135,21 +186,38 @@ def _analyze_image_with_gemini(image_bytes: bytes, mime_type: str) -> Optional[s
     Falls through to the next model on 503 overloaded, 429 quota, or network error.
     Returns None when all models are exhausted or the API key is missing.
     """
-    if not settings.gemini_api_key:
+    _dbg("=" * 60)
+    _dbg("IMAGE ANALYSIS STARTED")
+    _dbg(f"IMAGE SIZE   : {len(image_bytes):,} bytes")
+    _dbg(f"MIME TYPE    : {mime_type}")
+
+    key = settings.gemini_api_key or ""
+    _dbg(f"API KEY SET  : {'YES' if key else 'NO — GEMINI_API_KEY missing!'}")
+    if key:
+        _dbg(f"API KEY PREVIEW: {key[:8]}...{key[-4:]}")
+
+    if not key:
+        _dbg("ABORT: no API key — returning None")
         logger.warning("GEMINI_API_KEY not configured — image analysis unavailable")
         return None
 
-    for model in _GEMINI_MODELS:
+    _dbg(f"MODEL CHAIN  : {' -> '.join(_GEMINI_MODELS)}")
+
+    for i, model in enumerate(_GEMINI_MODELS):
+        _dbg(f"ATTEMPT {i+1}/{len(_GEMINI_MODELS)}: {model}")
         should_try_next, description = _call_gemini_model(
-            model, image_bytes, mime_type, settings.gemini_api_key
+            model, image_bytes, mime_type, key
         )
         if description is not None:
+            _dbg(f"CHAIN RESULT: SUCCESS with {model}")
             return description
         if not should_try_next:
-            # Hard failure — no point trying remaining models
+            _dbg(f"CHAIN RESULT: HARD FAILURE on {model} — aborting chain")
             break
-        logger.info("Falling back from %s to next Gemini model", model)
+        if i < len(_GEMINI_MODELS) - 1:
+            _dbg(f"CHAIN: falling back from {model} to {_GEMINI_MODELS[i+1]}")
 
+    _dbg("CHAIN RESULT: ALL MODELS EXHAUSTED — returning None")
     logger.error("All Gemini models exhausted — image analysis unavailable")
     return None
 
