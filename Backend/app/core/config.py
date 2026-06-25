@@ -12,9 +12,15 @@ class Settings(BaseSettings):
         "http://localhost:5174",
     ]
 
-    # Database — SQLite for local dev, PostgreSQL for production
-    # Set DATABASE_URL=postgresql://user:pass@host:port/dbname on Render
+    # Database
+    # Local dev  : sqlite:///./twinmind.db
+    # Supabase   : postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
     database_url: str = "sqlite:///./twinmind.db"
+
+    # Supabase — Settings → API in your Supabase dashboard
+    supabase_url:        str = ""   # https://[ref].supabase.co
+    supabase_anon_key:   str = ""   # public anon key
+    supabase_jwt_secret: str = ""   # JWT secret (Settings → API → JWT Settings)
 
     secret_key: str = "change-me-in-production-use-a-long-random-string"
     algorithm: str = "HS256"

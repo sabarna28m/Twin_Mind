@@ -52,6 +52,7 @@ Base.metadata.create_all(bind=engine)
 with engine.connect() as _conn:
     for _sql in [
         "ALTER TABLE users ADD COLUMN avatar_url TEXT",
+        "ALTER TABLE users ADD COLUMN supabase_uid VARCHAR(255) UNIQUE",
         "ALTER TABLE student_profiles ADD COLUMN subjects TEXT DEFAULT ''",
         (
             "CREATE TABLE IF NOT EXISTS notifications ("

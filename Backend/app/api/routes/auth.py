@@ -43,10 +43,56 @@ def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer),
     db: Session = Depends(get_db),
 ) -> User:
-    payload = decode_token(credentials.credentials)
+    token = credentials.credentials
+
+    # ── Supabase JWT (if configured) ─────────────────────────────────────────
+    if settings.supabase_jwt_secret:
+        try:
+            from jose import jwt as _jwt, JWTError as _JWTError
+            supabase_payload = _jwt.decode(
+                token,
+                settings.supabase_jwt_secret,
+                algorithms=["HS256"],
+                options={"verify_aud": False},
+            )
+            supabase_uid = supabase_payload.get("sub")
+            if supabase_uid:
+                user = db.query(User).filter(User.supabase_uid == supabase_uid).first()
+                if not user:
+                    # Auto-provision a local user record for this Supabase identity
+                    email = supabase_payload.get("email", "")
+                    meta  = supabase_payload.get("user_metadata") or {}
+                    name  = meta.get("full_name") or meta.get("name") or (email.split("@")[0] if email else "User")
+                    # Avoid duplicate email (existing account pre-dates Supabase migration)
+                    user = db.query(User).filter(User.email == email).first()
+                    if user:
+                        user.supabase_uid = supabase_uid
+                    else:
+                        user = User(
+                            email=email,
+                            full_name=name,
+                            hashed_password=None,
+                            oauth_provider="supabase",
+                            supabase_uid=supabase_uid,
+                            is_active=True,
+                        )
+                        db.add(user)
+                    db.commit()
+                    db.refresh(user)
+                if user.is_active:
+                    return user
+        except Exception:
+            pass  # not a Supabase JWT — fall through to custom JWT
+
+    # ── Custom JWT (original flow) ────────────────────────────────────────────
+    payload = decode_token(token)
     if not payload:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
-    user = db.query(User).filter(User.id == int(payload["sub"])).first()
+    try:
+        user_id = int(payload["sub"])
+    except (KeyError, ValueError, TypeError):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+    user = db.query(User).filter(User.id == user_id).first()
     if not user or not user.is_active:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user

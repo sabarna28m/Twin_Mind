@@ -17,3 +17,6 @@ class User(Base):
     # Google OAuth fields
     oauth_provider  = Column(String, nullable=True)   # e.g. "google"
     oauth_id        = Column(String, nullable=True)   # Google "sub" claim
+
+    # Supabase Auth — UUID of the corresponding auth.users row
+    supabase_uid    = Column(String, nullable=True, unique=True, index=True)
