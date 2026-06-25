@@ -480,15 +480,65 @@ async def upload_file(
         except UnicodeDecodeError:
             text = content.decode("latin-1")
     else:
+        # ── Step 1: pypdf text extraction (works for all text-based PDFs) ──
         try:
             import pypdf
             reader = pypdf.PdfReader(BytesIO(content))
             pages_text = [page.extract_text() or "" for page in reader.pages]
             text = "\n".join(pages_text).strip()
-            if not text:
-                text = "[Could not extract text from this PDF — it may be image-based or scanned. Try converting to .txt first.]"
         except Exception as exc:
             raise HTTPException(status_code=422, detail=f"Failed to read PDF: {exc}")
+
+        # ── Step 2: OCR fallback for scanned / image-based PDFs ────────────
+        if not text:
+            logger.info("pypdf found no text in %s — attempting OCR fallback", filename)
+            try:
+                import fitz          # PyMuPDF — renders PDF pages to images
+                import pytesseract   # Tesseract wrapper
+                from PIL import Image
+                import io as _io
+
+                doc = fitz.open(stream=content, filetype="pdf")
+                ocr_pages: list[str] = []
+                for page_num, page in enumerate(doc):
+                    # 300 DPI gives good OCR accuracy (PDF native = 72 pt/inch)
+                    mat = fitz.Matrix(300 / 72, 300 / 72)
+                    pix = page.get_pixmap(matrix=mat, colorspace=fitz.csRGB)
+                    img = Image.open(_io.BytesIO(pix.tobytes("png")))
+                    page_text = pytesseract.image_to_string(img)
+                    ocr_pages.append(page_text)
+                    logger.info("OCR page %d/%d of %s", page_num + 1, len(doc), filename)
+                doc.close()
+
+                text = "\n\n".join(ocr_pages).strip()
+                if text:
+                    logger.info("OCR extracted %d chars from %s", len(text), filename)
+                else:
+                    text = (
+                        "[OCR ran but could not extract readable text. "
+                        "The PDF may be too low resolution, encrypted, or in an unsupported language.]"
+                    )
+
+            except ImportError as imp_exc:
+                logger.warning("OCR dependency missing: %s", imp_exc)
+                text = (
+                    "[This PDF appears to be image-based and requires OCR to read. "
+                    "OCR is not available on this server. "
+                    "Please convert the PDF to a text-based format and re-upload.]"
+                )
+            except Exception as ocr_exc:
+                # Covers TesseractNotFoundError (Tesseract binary missing) and all other failures
+                err = str(ocr_exc)
+                if "tesseract" in err.lower() and "not found" in err.lower():
+                    logger.warning("Tesseract binary not installed: %s", ocr_exc)
+                    text = (
+                        "[This PDF is image-based and needs OCR, but the Tesseract OCR engine "
+                        "is not installed on this server. "
+                        "Please convert the PDF to text format or contact support.]"
+                    )
+                else:
+                    logger.error("OCR fallback failed for %s: %s", filename, ocr_exc)
+                    text = f"[OCR extraction failed: {ocr_exc}]"
 
     # Truncate to stay within Groq's context window
     if len(text) > MAX_FILE_CHARS:
