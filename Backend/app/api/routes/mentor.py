@@ -39,10 +39,18 @@ _client: Optional[Groq] = None
 
 MAX_FILE_CHARS = 12_000   # ~3 000 tokens — keeps Groq well within context limit
 
-# Server-side PDF cache: user_id -> {"filename": str, "text": str}
+# Server-side PDF cache: user_id -> {"filename": str, "text": str, "ok": bool}
 # Populated by /upload-file; consumed by /chat to inject content into Groq's context.
-# Survives the request boundary so the next /chat call can access the uploaded text.
 _pdf_cache: dict[int, dict] = {}
+
+# ── Per-session upload limits ────────────────────────────────────────────────
+MAX_PDF_PAGES       = 5   # pages per PDF
+MAX_PDF_PER_SESSION = 2   # PDF uploads per chat session
+MAX_IMG_PER_SESSION = 3   # image uploads per chat session
+
+# Counters reset when the user archives their chat (POST /sessions = "New Chat")
+_pdf_upload_count: dict[int, int] = {}   # user_id -> PDFs uploaded this session
+_img_upload_count: dict[int, int] = {}   # user_id -> images uploaded this session
 
 
 def _get_client() -> Groq:
@@ -593,6 +601,52 @@ async def upload_file(
             text = content.decode("latin-1")
     else:
         _pdf_dbg(f"FILE: {filename}")
+
+        # ── Validate session PDF count ────────────────────────────────────
+        pdf_count = _pdf_upload_count.get(current_user.id, 0)
+        if pdf_count >= MAX_PDF_PER_SESSION:
+            _pdf_dbg(
+                f"REJECTED {filename}: user {current_user.id} already uploaded "
+                f"{pdf_count}/{MAX_PDF_PER_SESSION} PDFs this session"
+            )
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Maximum {MAX_PDF_PER_SESSION} PDF files allowed per session. "
+                    "Start a new chat to upload more."
+                ),
+            )
+
+        # ── Validate page count before any processing ─────────────────────
+        import fitz as _fitz_val
+        try:
+            _doc_val = _fitz_val.open(stream=content, filetype="pdf")
+            num_pages = len(_doc_val)
+            _doc_val.close()
+        except Exception as exc:
+            _pdf_dbg(f"Page-count check failed: {exc}")
+            raise HTTPException(status_code=422, detail=f"Could not read PDF: {exc}")
+
+        _pdf_dbg(f"Page count check: {num_pages} pages (limit: {MAX_PDF_PAGES})")
+        if num_pages > MAX_PDF_PAGES:
+            _pdf_dbg(
+                f"REJECTED {filename}: {num_pages} pages exceeds limit of {MAX_PDF_PAGES}"
+            )
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"PDF exceeds maximum allowed page limit ({MAX_PDF_PAGES} pages). "
+                    f"This file has {num_pages} pages."
+                ),
+            )
+
+        # ── All checks passed — extract text ─────────────────────────────
+        _pdf_upload_count[current_user.id] = pdf_count + 1
+        _pdf_dbg(
+            f"PDF accepted: {filename} | {num_pages} pages | "
+            f"session count now {pdf_count + 1}/{MAX_PDF_PER_SESSION}"
+        )
+
         text = extract_text_from_pdf(content)
         extraction_ok = True
         _pdf_dbg(f"FINAL TEXT   : {len(text)} chars")
@@ -627,10 +681,30 @@ async def analyze_image(
              Now respond to their question about it."
     Falls back gracefully when Gemini quota is exhausted or key is missing.
     """
-    filename = file.filename or "image"
+    filename  = file.filename or "image"
     mime_type = file.content_type or "image/jpeg"
     if not mime_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Only image files are supported")
+
+    # ── Validate session image count ──────────────────────────────────────
+    img_count = _img_upload_count.get(current_user.id, 0)
+    if img_count >= MAX_IMG_PER_SESSION:
+        logger.warning(
+            "analyze-image REJECTED %s for user %d: session limit %d reached",
+            filename, current_user.id, MAX_IMG_PER_SESSION,
+        )
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Maximum {MAX_IMG_PER_SESSION} images allowed per session. "
+                "Start a new chat to upload more."
+            ),
+        )
+    _img_upload_count[current_user.id] = img_count + 1
+    logger.info(
+        "analyze-image accepted %s for user %d — session count %d/%d",
+        filename, current_user.id, img_count + 1, MAX_IMG_PER_SESSION,
+    )
 
     image_bytes = await file.read()
     logger.info("analyze-image: filename=%s  mime=%s  size=%d", filename, mime_type, len(image_bytes))
@@ -702,6 +776,12 @@ def archive_chat(
     ).delete()
     db.commit()
     db.refresh(session)
+
+    # Reset per-session upload counters so the new chat starts fresh
+    _pdf_upload_count.pop(current_user.id, None)
+    _img_upload_count.pop(current_user.id, None)
+    logger.info("Upload counters reset for user %d (new session)", current_user.id)
+
     return session
 
 
