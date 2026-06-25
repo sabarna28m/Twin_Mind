@@ -484,6 +484,12 @@ async def upload_file(
         except UnicodeDecodeError:
             text = content.decode("latin-1")
     else:
+        import os as _os
+
+        # Windows system-binary paths — set these here so they're easy to change
+        TESSERACT_EXE = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+        POPPLER_BIN   = r"C:\poppler\Library\bin"
+
         # ── Step 1: pypdf text extraction (works for all text-based PDFs) ──
         _pdf_dbg("=" * 60)
         _pdf_dbg(f"FILE         : {filename}")
@@ -493,7 +499,7 @@ async def upload_file(
             import pypdf
             reader    = pypdf.PdfReader(BytesIO(content))
             num_pages = len(reader.pages)
-            _pdf_dbg(f"PAGES FOUND  : {num_pages}")
+            _pdf_dbg(f"PDF pages detected: {num_pages}")
 
             pages_text: list[str] = []
             for i, page in enumerate(reader.pages):
@@ -502,68 +508,106 @@ async def upload_file(
                 _pdf_dbg(f"  page {i+1}/{num_pages}: {len(page_text)} chars extracted")
 
             text = "\n".join(pages_text).strip()
-            _pdf_dbg(f"PYPDF TOTAL  : {len(text)} chars")
+            _pdf_dbg(f"Text extracted normally: {len(text)} chars")
         except Exception as exc:
-            _pdf_dbg(f"PYPDF ERROR  : {exc}")
+            _pdf_dbg(f"PYPDF ERROR: {exc}")
             raise HTTPException(status_code=422, detail=f"Failed to read PDF: {exc}")
 
-        # ── Step 2: OCR fallback when pypdf yields < 100 chars ─────────────
-        # Threshold of 100 catches scanned PDFs that return only whitespace or
-        # a handful of characters (page numbers, headers, etc.)
-        if len(text) < 100:
-            _pdf_dbg(f"PYPDF text too short ({len(text)} chars < 100) — starting OCR fallback")
-            _pdf_dbg("OCR STARTED")
-            try:
-                import fitz          # PyMuPDF — renders PDF pages to images (no Poppler needed)
-                import pytesseract   # Tesseract OCR wrapper
-                from PIL import Image
-                import io as _io
+        # ── Step 2: OCR fallback when pypdf yields empty or < 100 chars ────
+        if not text or len(text.strip()) < 100:
+            _pdf_dbg(f"Normal extraction failed — only {len(text.strip())} chars (threshold: 100)")
+            _pdf_dbg("Starting OCR fallback")
 
-                doc       = fitz.open(stream=content, filetype="pdf")
+            # ── Pre-flight: verify Tesseract is installed ────────────────
+            if not _os.path.isfile(TESSERACT_EXE):
+                _pdf_dbg(f"TESSERACT NOT FOUND at: {TESSERACT_EXE}")
+                _pdf_dbg("Install Tesseract OCR from: https://github.com/UB-Mannheim/tesseract/wiki")
+                raise HTTPException(
+                    status_code=503,
+                    detail=(
+                        f"Tesseract OCR is not installed or path is incorrect. "
+                        f"Install Tesseract OCR from: https://github.com/UB-Mannheim/tesseract/wiki "
+                        f"(expected at: {TESSERACT_EXE})"
+                    ),
+                )
+
+            # ── Pre-flight: verify Poppler is installed ──────────────────
+            poppler_check = _os.path.join(POPPLER_BIN, "pdftoppm.exe")
+            if not _os.path.isfile(poppler_check):
+                _pdf_dbg(f"POPPLER NOT FOUND at: {POPPLER_BIN}")
+                _pdf_dbg(
+                    "Install Poppler for Windows: "
+                    "https://github.com/oschwartz10612/poppler-windows/releases — "
+                    f"extract so that pdftoppm.exe is at: {poppler_check}"
+                )
+                raise HTTPException(
+                    status_code=503,
+                    detail=(
+                        f"Poppler is not installed or path is incorrect. "
+                        f"Download from: https://github.com/oschwartz10612/poppler-windows/releases "
+                        f"and extract so that the bin folder is at: {POPPLER_BIN}"
+                    ),
+                )
+
+            # ── Both binaries present — run OCR ─────────────────────────
+            try:
+                import pytesseract
+                from pdf2image import convert_from_bytes
+
+                # Tell pytesseract exactly where tesseract.exe lives on Windows
+                pytesseract.pytesseract.tesseract_cmd = TESSERACT_EXE
+                _pdf_dbg(f"Tesseract path set: {TESSERACT_EXE}")
+                _pdf_dbg(f"Poppler path set  : {POPPLER_BIN}")
+
+                _pdf_dbg("Converting PDF pages to images (300 DPI) ...")
+                images = convert_from_bytes(
+                    content,
+                    dpi=300,
+                    poppler_path=POPPLER_BIN,
+                )
+                _pdf_dbg(f"Converted {len(images)} pages to images")
+
                 ocr_pages: list[str] = []
-                for page_num, page in enumerate(doc):
-                    # 300 DPI gives good OCR accuracy (PDF native resolution = 72 pt/inch)
-                    mat = fitz.Matrix(300 / 72, 300 / 72)
-                    pix = page.get_pixmap(matrix=mat, colorspace=fitz.csRGB)
-                    img = Image.open(_io.BytesIO(pix.tobytes("png")))
+                for i, img in enumerate(images):
                     page_ocr = pytesseract.image_to_string(img)
                     ocr_pages.append(page_ocr)
-                    _pdf_dbg(f"  OCR page {page_num+1}/{len(doc)}: {len(page_ocr)} chars")
-                doc.close()
+                    _pdf_dbg(f"  OCR page {i+1}/{len(images)}: {len(page_ocr)} chars")
 
                 ocr_text = "\n\n".join(ocr_pages).strip()
-                _pdf_dbg(f"OCR TOTAL    : {len(ocr_text)} chars")
+                _pdf_dbg(f"Total OCR text extracted: {len(ocr_text)} chars")
 
                 if ocr_text:
                     text          = ocr_text
                     extraction_ok = True
                     _pdf_dbg("OCR SUCCESS — using OCR text")
                 else:
-                    text = (
-                        "[OCR ran but could not extract readable text. "
-                        "The PDF may be too low resolution, encrypted, or in an unsupported language.]"
+                    _pdf_dbg("OCR returned empty text")
+                    raise HTTPException(
+                        status_code=422,
+                        detail=(
+                            "OCR ran but could not extract any readable text from this PDF. "
+                            "The file may be too low resolution, encrypted, or contain "
+                            "unsupported handwriting."
+                        ),
                     )
-                    _pdf_dbg("OCR returned empty text — storing error notice")
 
+            except HTTPException:
+                raise   # propagate the 422 above unchanged
             except ImportError as imp_exc:
                 _pdf_dbg(f"OCR IMPORT ERROR: {imp_exc}")
-                text = (
-                    "[This PDF appears to be image-based and requires OCR to read. "
-                    "OCR support (pymupdf / pytesseract) is not installed on this server. "
-                    "Please convert the PDF to a text-based format and re-upload.]"
+                raise HTTPException(
+                    status_code=503,
+                    detail=(
+                        f"Required OCR Python package missing: {imp_exc}. "
+                        "Run: pip install pdf2image pytesseract pillow"
+                    ),
                 )
             except Exception as ocr_exc:
-                err = str(ocr_exc)
-                if "tesseract" in err.lower() and "not found" in err.lower():
-                    _pdf_dbg(f"TESSERACT NOT INSTALLED: {ocr_exc}")
-                    text = (
-                        "[This PDF is image-based and needs OCR, but the Tesseract OCR engine "
-                        "is not installed on this server. "
-                        "Please convert the PDF to text format or contact support.]"
-                    )
-                else:
-                    _pdf_dbg(f"OCR FAILED: {ocr_exc}")
-                    text = f"[OCR extraction failed: {ocr_exc}]"
+                _pdf_dbg(f"OCR FAILED: {ocr_exc}")
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"OCR extraction failed: {ocr_exc}",
+                )
         else:
             extraction_ok = True
             _pdf_dbg("PYPDF SUCCESS — text is sufficient, skipping OCR")
