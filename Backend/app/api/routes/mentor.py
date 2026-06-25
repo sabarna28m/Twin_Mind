@@ -39,6 +39,11 @@ _client: Optional[Groq] = None
 
 MAX_FILE_CHARS = 12_000   # ~3 000 tokens — keeps Groq well within context limit
 
+# Server-side PDF cache: user_id -> {"filename": str, "text": str}
+# Populated by /upload-file; consumed by /chat to inject content into Groq's context.
+# Survives the request boundary so the next /chat call can access the uploaded text.
+_pdf_cache: dict[int, dict] = {}
+
 
 def _get_client() -> Groq:
     global _client
@@ -490,6 +495,10 @@ async def upload_file(
         omitted = len(text) - MAX_FILE_CHARS
         text = text[:MAX_FILE_CHARS] + f"\n\n[... {omitted:,} characters omitted — file too large to include in full ...]"
 
+    # Cache extracted text so the next /chat call can inject it into Groq's context.
+    _pdf_cache[current_user.id] = {"filename": filename, "text": text}
+    logger.info("PDF cached for user %d: %s (%d chars)", current_user.id, filename, len(text))
+
     return {"filename": filename, "text": text}
 
 
@@ -631,6 +640,18 @@ def mentor_chat(
     profile, entries, prediction = _fetch_user_data(current_user.id, db)
     system_prompt = _build_system_prompt(current_user, profile, entries, prediction, payload.language or 'en')
 
+    # Inject cached PDF/TXT content into the system prompt so Groq can answer about it.
+    pdf_ctx = _pdf_cache.get(current_user.id)
+    if pdf_ctx:
+        system_prompt += (
+            f"\n\n## Uploaded Document: {pdf_ctx['filename']}\n"
+            f"The user has uploaded a document. Here is its full content:\n\n"
+            f"{pdf_ctx['text']}\n\n"
+            f"When the user asks questions, answer based on this document content whenever relevant. "
+            f"Never say you cannot read or access files — the extracted text is provided above."
+        )
+        logger.info("PDF context injected for user %d: %s", current_user.id, pdf_ctx['filename'])
+
     # Save user message immediately
     user_msg = MentorConversation(
         user_id=current_user.id,
@@ -644,8 +665,8 @@ def mentor_chat(
     for m in payload.history:
         messages.append({"role": m.role, "content": m.content})
 
-    # Image and file context is pre-processed by the frontend before reaching here;
-    # payload.message already contains any extracted text or image description.
+    # Image context is injected by the frontend into payload.message via groq_context from /analyze-image.
+    # PDF context is injected server-side via _pdf_cache above.
     messages.append({"role": "user", "content": payload.message})
     user_id = current_user.id
 
