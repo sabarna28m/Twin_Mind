@@ -12,10 +12,9 @@ class Settings(BaseSettings):
         "http://localhost:5174",
     ]
 
-    # Database
-    # Local dev  : sqlite:///./twinmind.db
-    # Supabase   : postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
-    database_url: str = "sqlite:///./twinmind.db"
+    # Supabase PostgreSQL connection string
+    # Get from: Supabase Dashboard → Settings → Database → Transaction pooler
+    database_url: str = ""
 
     # Supabase — Settings → API in your Supabase dashboard
     supabase_url:        str = ""   # https://[ref].supabase.co
