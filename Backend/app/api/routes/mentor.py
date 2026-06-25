@@ -68,6 +68,10 @@ def _dbg(msg: str) -> None:
     print(f"[GEMINI-DBG] {msg}", flush=True, file=sys.stdout)
 
 
+def _pdf_dbg(msg: str) -> None:
+    print(f"[PDF-DBG] {msg}", flush=True, file=sys.stdout)
+
+
 def _analyze_image_with_gemini(image_bytes: bytes, mime_type: str) -> Optional[str]:
     """
     Try each model in GEMINI_MODELS with up to 2 retries per model.
@@ -481,73 +485,104 @@ async def upload_file(
             text = content.decode("latin-1")
     else:
         # ── Step 1: pypdf text extraction (works for all text-based PDFs) ──
+        _pdf_dbg("=" * 60)
+        _pdf_dbg(f"FILE         : {filename}")
+        _pdf_dbg(f"SIZE         : {len(content):,} bytes")
+        extraction_ok = False
         try:
             import pypdf
-            reader = pypdf.PdfReader(BytesIO(content))
-            pages_text = [page.extract_text() or "" for page in reader.pages]
+            reader    = pypdf.PdfReader(BytesIO(content))
+            num_pages = len(reader.pages)
+            _pdf_dbg(f"PAGES FOUND  : {num_pages}")
+
+            pages_text: list[str] = []
+            for i, page in enumerate(reader.pages):
+                page_text = page.extract_text() or ""
+                pages_text.append(page_text)
+                _pdf_dbg(f"  page {i+1}/{num_pages}: {len(page_text)} chars extracted")
+
             text = "\n".join(pages_text).strip()
+            _pdf_dbg(f"PYPDF TOTAL  : {len(text)} chars")
         except Exception as exc:
+            _pdf_dbg(f"PYPDF ERROR  : {exc}")
             raise HTTPException(status_code=422, detail=f"Failed to read PDF: {exc}")
 
-        # ── Step 2: OCR fallback for scanned / image-based PDFs ────────────
-        if not text:
-            logger.info("pypdf found no text in %s — attempting OCR fallback", filename)
+        # ── Step 2: OCR fallback when pypdf yields < 100 chars ─────────────
+        # Threshold of 100 catches scanned PDFs that return only whitespace or
+        # a handful of characters (page numbers, headers, etc.)
+        if len(text) < 100:
+            _pdf_dbg(f"PYPDF text too short ({len(text)} chars < 100) — starting OCR fallback")
+            _pdf_dbg("OCR STARTED")
             try:
-                import fitz          # PyMuPDF — renders PDF pages to images
-                import pytesseract   # Tesseract wrapper
+                import fitz          # PyMuPDF — renders PDF pages to images (no Poppler needed)
+                import pytesseract   # Tesseract OCR wrapper
                 from PIL import Image
                 import io as _io
 
-                doc = fitz.open(stream=content, filetype="pdf")
+                doc       = fitz.open(stream=content, filetype="pdf")
                 ocr_pages: list[str] = []
                 for page_num, page in enumerate(doc):
-                    # 300 DPI gives good OCR accuracy (PDF native = 72 pt/inch)
+                    # 300 DPI gives good OCR accuracy (PDF native resolution = 72 pt/inch)
                     mat = fitz.Matrix(300 / 72, 300 / 72)
                     pix = page.get_pixmap(matrix=mat, colorspace=fitz.csRGB)
                     img = Image.open(_io.BytesIO(pix.tobytes("png")))
-                    page_text = pytesseract.image_to_string(img)
-                    ocr_pages.append(page_text)
-                    logger.info("OCR page %d/%d of %s", page_num + 1, len(doc), filename)
+                    page_ocr = pytesseract.image_to_string(img)
+                    ocr_pages.append(page_ocr)
+                    _pdf_dbg(f"  OCR page {page_num+1}/{len(doc)}: {len(page_ocr)} chars")
                 doc.close()
 
-                text = "\n\n".join(ocr_pages).strip()
-                if text:
-                    logger.info("OCR extracted %d chars from %s", len(text), filename)
+                ocr_text = "\n\n".join(ocr_pages).strip()
+                _pdf_dbg(f"OCR TOTAL    : {len(ocr_text)} chars")
+
+                if ocr_text:
+                    text          = ocr_text
+                    extraction_ok = True
+                    _pdf_dbg("OCR SUCCESS — using OCR text")
                 else:
                     text = (
                         "[OCR ran but could not extract readable text. "
                         "The PDF may be too low resolution, encrypted, or in an unsupported language.]"
                     )
+                    _pdf_dbg("OCR returned empty text — storing error notice")
 
             except ImportError as imp_exc:
-                logger.warning("OCR dependency missing: %s", imp_exc)
+                _pdf_dbg(f"OCR IMPORT ERROR: {imp_exc}")
                 text = (
                     "[This PDF appears to be image-based and requires OCR to read. "
-                    "OCR is not available on this server. "
+                    "OCR support (pymupdf / pytesseract) is not installed on this server. "
                     "Please convert the PDF to a text-based format and re-upload.]"
                 )
             except Exception as ocr_exc:
-                # Covers TesseractNotFoundError (Tesseract binary missing) and all other failures
                 err = str(ocr_exc)
                 if "tesseract" in err.lower() and "not found" in err.lower():
-                    logger.warning("Tesseract binary not installed: %s", ocr_exc)
+                    _pdf_dbg(f"TESSERACT NOT INSTALLED: {ocr_exc}")
                     text = (
                         "[This PDF is image-based and needs OCR, but the Tesseract OCR engine "
                         "is not installed on this server. "
                         "Please convert the PDF to text format or contact support.]"
                     )
                 else:
-                    logger.error("OCR fallback failed for %s: %s", filename, ocr_exc)
+                    _pdf_dbg(f"OCR FAILED: {ocr_exc}")
                     text = f"[OCR extraction failed: {ocr_exc}]"
+        else:
+            extraction_ok = True
+            _pdf_dbg("PYPDF SUCCESS — text is sufficient, skipping OCR")
+
+        _pdf_dbg(f"FINAL TEXT   : {len(text)} chars  |  extraction_ok={extraction_ok}")
+        _pdf_dbg(f"PREVIEW      : {text[:200].replace(chr(10), ' ')}")
+        _pdf_dbg("=" * 60)
 
     # Truncate to stay within Groq's context window
     if len(text) > MAX_FILE_CHARS:
         omitted = len(text) - MAX_FILE_CHARS
         text = text[:MAX_FILE_CHARS] + f"\n\n[... {omitted:,} characters omitted — file too large to include in full ...]"
+        _pdf_dbg(f"TRUNCATED to {MAX_FILE_CHARS} chars ({omitted:,} chars omitted)")
 
-    # Cache extracted text so the next /chat call can inject it into Groq's context.
-    _pdf_cache[current_user.id] = {"filename": filename, "text": text}
-    logger.info("PDF cached for user %d: %s (%d chars)", current_user.id, filename, len(text))
+    # Cache for subsequent /chat calls.
+    # ok=True only when real content was extracted — prevents error strings from
+    # being injected into Groq's system prompt and confusing the LLM.
+    _pdf_cache[current_user.id] = {"filename": filename, "text": text, "ok": extraction_ok}
+    _pdf_dbg(f"CACHED for user {current_user.id}: {filename} | ok={extraction_ok}")
 
     return {"filename": filename, "text": text}
 
@@ -690,17 +725,30 @@ def mentor_chat(
     profile, entries, prediction = _fetch_user_data(current_user.id, db)
     system_prompt = _build_system_prompt(current_user, profile, entries, prediction, payload.language or 'en')
 
-    # Inject cached PDF/TXT content into the system prompt so Groq can answer about it.
+    # Inject cached PDF/TXT into the system prompt for follow-up questions.
+    # Only inject when extraction succeeded (ok=True) — prevents error notices from
+    # being mistaken by Groq as document content.
     pdf_ctx = _pdf_cache.get(current_user.id)
-    if pdf_ctx:
+    if pdf_ctx and pdf_ctx.get("ok"):
         system_prompt += (
-            f"\n\n## Uploaded Document: {pdf_ctx['filename']}\n"
-            f"The user has uploaded a document. Here is its full content:\n\n"
+            f"\n\n## Uploaded Document\n"
+            f"The user uploaded a PDF file named \"{pdf_ctx['filename']}\". "
+            f"Here is the content:\n\n"
             f"{pdf_ctx['text']}\n\n"
-            f"When the user asks questions, answer based on this document content whenever relevant. "
-            f"Never say you cannot read or access files — the extracted text is provided above."
+            f"Please answer the user's question based on this document. "
+            f"Never say you cannot read or access files — the full extracted text is provided above."
         )
-        logger.info("PDF context injected for user %d: %s", current_user.id, pdf_ctx['filename'])
+        print(
+            f"[PDF-DBG] system prompt injected for user {current_user.id}: "
+            f"{pdf_ctx['filename']} ({len(pdf_ctx['text'])} chars)",
+            flush=True, file=sys.stdout,
+        )
+    elif pdf_ctx and not pdf_ctx.get("ok"):
+        print(
+            f"[PDF-DBG] skipping system injection for user {current_user.id}: "
+            f"extraction failed for {pdf_ctx['filename']}",
+            flush=True, file=sys.stdout,
+        )
 
     # Save user message immediately
     user_msg = MentorConversation(

@@ -336,7 +336,10 @@ export default function Mentor() {
     let apiMessage = text.trim();
 
     if (hasFile && attachedFile) {
-      const prefix = `[Attached file: ${attachedFile.name}]\n\n${attachedFile.content}\n\n---\n\n`;
+      const prefix =
+        `The user uploaded a PDF file named "${attachedFile.name}". ` +
+        `Here is the content:\n\n${attachedFile.content}\n\n` +
+        `Please answer the user's question based on this document.\n\n`;
       apiMessage = prefix + (apiMessage || 'Please analyse this file and summarise the key points for me.');
     }
 
