@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, JSON
 from sqlalchemy.sql import func
 from app.core.database import Base
 
@@ -20,3 +20,9 @@ class User(Base):
 
     # Supabase Auth — UUID of the corresponding auth.users row
     supabase_uid    = Column(String, nullable=True, unique=True, index=True)
+
+    # Two-Factor Authentication (TOTP)
+    twofa_secret       = Column(String, nullable=True)             # Fernet-encrypted TOTP secret
+    twofa_enabled      = Column(Boolean, nullable=False, default=False, server_default="false")
+    twofa_backup_codes = Column(JSON, nullable=True)               # list[str] bcrypt hashes (single-use)
+    twofa_setup_at     = Column(DateTime(timezone=True), nullable=True)

@@ -103,14 +103,8 @@ export default function BurnoutWidget() {
 const w: Record<string, React.CSSProperties> = {
   wrap: {
     position: 'relative',
-    background: 'var(--glass-bg, rgba(255,255,255,0.04))',
-    backdropFilter: 'blur(24px)',
-    border: '1px solid var(--glass-border, rgba(255,255,255,0.08))',
-    borderRadius: '18px',
-    padding: '1.25rem',
-    overflow: 'hidden',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
     height: '100%',
+    padding: '0.25rem',
   },
   glow: {
     position: 'absolute', top: '-20%', right: '-20%',
@@ -122,7 +116,7 @@ const w: Record<string, React.CSSProperties> = {
     marginBottom: '0.5rem',
   },
   label: {
-    fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-h)',
+    fontSize: '0.78rem', fontWeight: 700, color: '#0f172a',
     marginBottom: '0.4rem', letterSpacing: '0.02em',
   },
   badge: {
@@ -130,9 +124,9 @@ const w: Record<string, React.CSSProperties> = {
     borderRadius: '99px', fontSize: '0.68rem', fontWeight: 700,
   },
   spinnerWrap: { display: 'flex', alignItems: 'center', justifyContent: 'center', width: '80px', height: '80px' },
-  spinner: { width: '24px', height: '24px', border: '2px solid rgba(99,102,241,0.2)', borderTop: '2px solid #818cf8', borderRadius: '50%' },
-  noData: { width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: 'var(--text)', opacity: 0.3 },
-  sub: { margin: '0 0 0.85rem', fontSize: '0.7rem', color: 'var(--text)', opacity: 0.5 },
+  spinner: { width: '24px', height: '24px', border: '2px solid #e2e8f0', borderTop: '2px solid #6366f1', borderRadius: '50%' },
+  noData: { width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#94a3b8', opacity: 0.3 },
+  sub: { margin: '0 0 0.85rem', fontSize: '0.7rem', color: '#64748b' },
   cta: {
     display: 'inline-block', fontSize: '0.78rem', fontWeight: 700,
     color: '#818cf8', textDecoration: 'none',

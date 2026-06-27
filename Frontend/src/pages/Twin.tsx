@@ -414,7 +414,7 @@ function EvoTooltip({ active, payload, label }: {
   label?: string;
 }) {
   if (!active || !payload?.length) return null;
-  const pt = (payload[0] as { payload: HistoryPoint }).payload;
+  const pt = (payload[0] as unknown as { payload: HistoryPoint }).payload;
   return (
     <div style={{
       background: 'rgba(8,13,26,0.97)', border: '1px solid rgba(129,140,248,0.3)',

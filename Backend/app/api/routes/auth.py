@@ -1,9 +1,12 @@
+import logging
+import shutil
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, UploadFile, File
+from sqlalchemy import or_
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from sqlalchemy.orm import Session
@@ -14,14 +17,50 @@ MAX_SIZE = 5 * 1024 * 1024  # 5 MB
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.security import hash_password, verify_password, create_access_token, decode_token
+from app.core.security import (
+    hash_password, verify_password, create_access_token, decode_token,
+    create_2fa_challenge, decode_2fa_challenge,
+    encrypt_totp_secret, decrypt_totp_secret,
+    generate_totp_secret, get_totp_uri, verify_totp_code, get_qr_code_base64,
+    generate_backup_codes, verify_backup_code,
+)
 from app.models.user import User
 from app.models.password_reset import PasswordResetToken
+from app.models.session import Session as StudySession
+from app.models.note import Note
+from app.models.note_history import NoteHistory
+from app.models.note_version import NoteVersion
+from app.models.smart_note import SmartNote
+from app.models.material import Material
+from app.models.student_profile import StudentProfile
+from app.models.learning_data import LearningData
+from app.models.achievement import UserAchievement
+from app.models.burnout import BurnoutEntry
+from app.models.career_twin import CareerTwin
+from app.models.comm_twin import CommTwin
+from app.models.chat_session import ChatSession
+from app.models.mentor_conversation import MentorConversation
+from app.models.notification import Notification
+from app.models.google_token import GoogleToken
+from app.models.quiz import QuizSession
+from app.models.skill_tree import NodeProgress, XPTransaction, SkillTreeAchievement
+from app.models.smart_plan_record import SmartPlanRecord
+from app.models.streak_shield import StreakShield
+from app.models.study_plan import StudyPlan
+from app.models.subject_performance import SubjectRecord
+from app.models.weekly_challenge import WeeklyChallenge
+from app.models.battle import Battle
 from app.api.schemas.auth import (
-    RegisterRequest, LoginRequest, TokenResponse, UserResponse,
+    RegisterRequest, LoginRequest, LoginResponse, TokenResponse, UserResponse,
     UpdateProfileRequest, ForgotPasswordRequest, ResetPasswordRequest,
     GoogleLoginRequest,
+    TwoFASetupResponse, TwoFAEnableRequest, TwoFAEnableResponse,
+    TwoFAVerifyLoginRequest, TwoFADisableRequest, TwoFAStatusResponse,
+    DeleteAccountRequest,
 )
+
+logger = logging.getLogger(__name__)
+_MATERIALS_DIR = Path(__file__).resolve().parents[3] / "uploads"
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 bearer = HTTPBearer()
@@ -59,11 +98,9 @@ def get_current_user(
             if supabase_uid:
                 user = db.query(User).filter(User.supabase_uid == supabase_uid).first()
                 if not user:
-                    # Auto-provision a local user record for this Supabase identity
                     email = supabase_payload.get("email", "")
                     meta  = supabase_payload.get("user_metadata") or {}
                     name  = meta.get("full_name") or meta.get("name") or (email.split("@")[0] if email else "User")
-                    # Avoid duplicate email (existing account pre-dates Supabase migration)
                     user = db.query(User).filter(User.email == email).first()
                     if user:
                         user.supabase_uid = supabase_uid
@@ -113,12 +150,11 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     return user
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login", response_model=LoginResponse)
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-    # OAuth-only accounts have no password — guide the user to sign in with Google
     if not user.hashed_password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -126,23 +162,23 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         )
     if not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+
+    # ── 2FA gating ────────────────────────────────────────────────────────────
+    if user.twofa_enabled:
+        challenge = create_2fa_challenge(user.id)
+        return LoginResponse(requires_2fa=True, challenge_token=challenge)
+
     token = create_access_token({"sub": str(user.id), "email": user.email})
-    return {"access_token": token, "token_type": "bearer"}
+    return LoginResponse(access_token=token)
 
 
 @router.post("/google-login", response_model=TokenResponse)
 def google_login(payload: GoogleLoginRequest, db: Session = Depends(get_db)):
-    """
-    Verify a Google ID token issued by the Google Identity Services button,
-    then find-or-create a TwinMind user and return a JWT session token.
-    """
     if not settings.google_client_id:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Google authentication is not configured on this server.",
         )
-
-    # Verify the Google ID token using Google's public keys
     try:
         from google.oauth2 import id_token as google_id_token
         from google.auth.transport import requests as google_requests
@@ -152,23 +188,17 @@ def google_login(payload: GoogleLoginRequest, db: Session = Depends(get_db)):
             settings.google_client_id,
         )
     except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid Google token: {exc}",
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid Google token: {exc}")
 
-    google_sub   = idinfo["sub"]          # unique Google user ID
+    google_sub   = idinfo["sub"]
     google_email = idinfo.get("email", "")
     google_name  = idinfo.get("name", google_email.split("@")[0])
 
     if not google_email:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Google account has no email address.")
 
-    # Find existing user by email (handles linking email/password + Google accounts)
     user = db.query(User).filter(User.email == google_email).first()
-
     if user:
-        # Existing user — update OAuth info if it was an email-only account
         if not user.oauth_provider:
             user.oauth_provider = "google"
             user.oauth_id       = google_sub
@@ -176,15 +206,10 @@ def google_login(payload: GoogleLoginRequest, db: Session = Depends(get_db)):
         if not user.is_active:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is deactivated.")
     else:
-        # New user — create account automatically (no email verification needed;
-        # Google already verified the email)
         user = User(
-            email           = google_email,
-            full_name       = google_name,
-            hashed_password = None,   # OAuth-only — no local password
-            oauth_provider  = "google",
-            oauth_id        = google_sub,
-            is_active       = True,
+            email=google_email, full_name=google_name,
+            hashed_password=None, oauth_provider="google",
+            oauth_id=google_sub, is_active=True,
         )
         db.add(user)
         db.commit()
@@ -257,11 +282,9 @@ async def forgot_password(
     db: Session = Depends(get_db),
 ):
     user = db.query(User).filter(User.email == payload.email).first()
-    # Always return success to avoid email enumeration
     if not user:
         return {"message": "If that email is registered, a reset link has been sent."}
 
-    # Invalidate any existing unused tokens for this user
     db.query(PasswordResetToken).filter(
         PasswordResetToken.user_id == user.id,
         PasswordResetToken.used == False,  # noqa: E712
@@ -292,7 +315,6 @@ def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db))
 
     now = datetime.now(timezone.utc)
     expires = record.expires_at
-    # Make expires_at timezone-aware if stored as naive UTC
     if expires.tzinfo is None:
         from datetime import timezone as tz
         expires = expires.replace(tzinfo=tz.utc)
@@ -325,8 +347,7 @@ async def upload_avatar(
 
     content = await file.read()
     if len(content) > MAX_SIZE:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="File too large (max 5 MB)")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File too large (max 5 MB)")
 
     ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else "jpg"
     filename = f"{uuid.uuid4().hex}.{ext}"
@@ -334,7 +355,6 @@ async def upload_avatar(
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     (UPLOAD_DIR / filename).write_bytes(content)
 
-    # Delete old avatar file
     if current_user.avatar_url:
         old_name = current_user.avatar_url.rsplit("/", 1)[-1]
         old_file = UPLOAD_DIR / old_name
@@ -345,3 +365,241 @@ async def upload_avatar(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ACCOUNT DELETION
+# ══════════════════════════════════════════════════════════════════════════════
+
+@router.delete("/me", status_code=status.HTTP_200_OK)
+def delete_account(
+    payload: DeleteAccountRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Permanently delete the authenticated user's account and all associated data."""
+    # OAuth-only accounts have no password — reject with a clear message
+    if not current_user.hashed_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This account was created via Google OAuth and has no password set. "
+                   "Contact support to delete your account.",
+        )
+    if not verify_password(payload.password, current_user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect password.")
+
+    user_id   = current_user.id
+    user_email = current_user.email
+    avatar_url = current_user.avatar_url
+
+    # ── Delete child rows in FK-safe order ───────────────────────────────────
+    # 1. note_versions before smart_notes (has FK to smart_notes.id)
+    db.query(NoteVersion).filter(NoteVersion.user_id == user_id).delete(synchronize_session=False)
+    # 2. note_history (soft-deleted notes archive)
+    db.query(NoteHistory).filter(NoteHistory.user_id == user_id).delete(synchronize_session=False)
+    # 3. smart_notes
+    db.query(SmartNote).filter(SmartNote.user_id == user_id).delete(synchronize_session=False)
+    # 4. quiz sessions
+    db.query(QuizSession).filter(QuizSession.user_id == user_id).delete(synchronize_session=False)
+    # 5. AI chat sessions
+    db.query(ChatSession).filter(ChatSession.user_id == user_id).delete(synchronize_session=False)
+    # 6. mentor conversations
+    db.query(MentorConversation).filter(MentorConversation.user_id == user_id).delete(synchronize_session=False)
+    # 7. notifications
+    db.query(Notification).filter(Notification.user_id == user_id).delete(synchronize_session=False)
+    # 8. password reset tokens
+    db.query(PasswordResetToken).filter(PasswordResetToken.user_id == user_id).delete(synchronize_session=False)
+    # 9. Google OAuth tokens
+    db.query(GoogleToken).filter(GoogleToken.user_id == user_id).delete(synchronize_session=False)
+    # 10. burnout entries
+    db.query(BurnoutEntry).filter(BurnoutEntry.user_id == user_id).delete(synchronize_session=False)
+    # 11. career twin state
+    db.query(CareerTwin).filter(CareerTwin.user_id == user_id).delete(synchronize_session=False)
+    # 12. comm twin state
+    db.query(CommTwin).filter(CommTwin.user_id == user_id).delete(synchronize_session=False)
+    # 13. skill tree progress + XP transactions + skill tree achievements
+    db.query(NodeProgress).filter(NodeProgress.user_id == user_id).delete(synchronize_session=False)
+    db.query(XPTransaction).filter(XPTransaction.user_id == user_id).delete(synchronize_session=False)
+    db.query(SkillTreeAchievement).filter(SkillTreeAchievement.user_id == user_id).delete(synchronize_session=False)
+    # 14. gamification achievements
+    db.query(UserAchievement).filter(UserAchievement.user_id == user_id).delete(synchronize_session=False)
+    # 15. battles (user may be challenger, opponent, or winner)
+    db.query(Battle).filter(
+        or_(Battle.challenger_id == user_id, Battle.opponent_id == user_id)
+    ).delete(synchronize_session=False)
+    # 16. weekly challenges
+    db.query(WeeklyChallenge).filter(WeeklyChallenge.user_id == user_id).delete(synchronize_session=False)
+    # 17. streak shield
+    db.query(StreakShield).filter(StreakShield.user_id == user_id).delete(synchronize_session=False)
+    # 18. smart plan records
+    db.query(SmartPlanRecord).filter(SmartPlanRecord.user_id == user_id).delete(synchronize_session=False)
+    # 19. study plans
+    db.query(StudyPlan).filter(StudyPlan.user_id == user_id).delete(synchronize_session=False)
+    # 20. learning data check-ins
+    db.query(LearningData).filter(LearningData.user_id == user_id).delete(synchronize_session=False)
+    # 21. subject performance records
+    db.query(SubjectRecord).filter(SubjectRecord.user_id == user_id).delete(synchronize_session=False)
+    # 22. study sessions
+    db.query(StudySession).filter(StudySession.user_id == user_id).delete(synchronize_session=False)
+    # 23. uploaded materials (DB rows — files cleaned up below)
+    db.query(Material).filter(Material.user_id == user_id).delete(synchronize_session=False)
+    # 24. notes
+    db.query(Note).filter(Note.user_id == user_id).delete(synchronize_session=False)
+    # 25. student profile
+    db.query(StudentProfile).filter(StudentProfile.user_id == user_id).delete(synchronize_session=False)
+    # 26. the user row itself
+    db.delete(current_user)
+    db.commit()
+
+    # ── Delete files from disk ────────────────────────────────────────────────
+    # Uploaded materials live at uploads/{user_id}/
+    user_uploads = _MATERIALS_DIR / str(user_id)
+    if user_uploads.exists():
+        try:
+            shutil.rmtree(user_uploads)
+        except OSError as exc:
+            logger.warning("Could not remove uploads for user %s: %s", user_id, exc)
+
+    # Avatar lives at uploads/avatars/{filename}
+    if avatar_url:
+        avatar_name = avatar_url.rsplit("/", 1)[-1]
+        avatar_file = UPLOAD_DIR / avatar_name
+        if avatar_file.exists():
+            try:
+                avatar_file.unlink()
+            except OSError as exc:
+                logger.warning("Could not remove avatar for user %s: %s", user_id, exc)
+
+    logger.info("ACCOUNT_DELETED user_id=%s email=%s", user_id, user_email)
+    return {"deleted": True, "message": "Account permanently deleted."}
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TWO-FACTOR AUTHENTICATION ENDPOINTS
+# ══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/2fa/status", response_model=TwoFAStatusResponse)
+def get_2fa_status(current_user: User = Depends(get_current_user)):
+    """Return the current 2FA state for the authenticated user."""
+    codes = current_user.twofa_backup_codes or []
+    return TwoFAStatusResponse(
+        enabled=current_user.twofa_enabled,
+        setup_at=current_user.twofa_setup_at,
+        backup_codes_remaining=len(codes),
+    )
+
+
+@router.post("/2fa/setup", response_model=TwoFASetupResponse)
+def setup_2fa(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Generate a new TOTP secret and QR code for the user.
+
+    Calling this multiple times regenerates the secret (idempotent until /enable
+    is called). It does NOT enable 2FA — the user must verify a code first.
+    """
+    secret = generate_totp_secret()
+    uri    = get_totp_uri(secret, current_user.email)
+    qr_b64 = get_qr_code_base64(uri)
+
+    # Store encrypted secret but leave twofa_enabled=False until verified
+    current_user.twofa_secret = encrypt_totp_secret(secret)
+    db.commit()
+
+    # Format manual key with spaces every 4 characters for readability
+    manual_key = " ".join(secret[i:i+4] for i in range(0, len(secret), 4))
+
+    return TwoFASetupResponse(secret=manual_key, qr_code=qr_b64, uri=uri)
+
+
+@router.post("/2fa/enable", response_model=TwoFAEnableResponse)
+def enable_2fa(
+    payload: TwoFAEnableRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Verify the TOTP code then activate 2FA and issue backup codes."""
+    if current_user.twofa_enabled:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="2FA is already enabled")
+    if not current_user.twofa_secret:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Call /2fa/setup first to generate a secret")
+
+    raw_secret = decrypt_totp_secret(current_user.twofa_secret)
+    if not verify_totp_code(raw_secret, payload.code):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Invalid verification code. Check your authenticator app and try again.")
+
+    plaintext_codes, hashed_codes = generate_backup_codes()
+
+    current_user.twofa_enabled      = True
+    current_user.twofa_backup_codes = hashed_codes
+    current_user.twofa_setup_at     = datetime.now(timezone.utc)
+    db.commit()
+
+    return TwoFAEnableResponse(enabled=True, backup_codes=plaintext_codes)
+
+
+@router.post("/2fa/disable")
+def disable_2fa(
+    payload: TwoFADisableRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Disable 2FA after confirming the account password."""
+    if not current_user.twofa_enabled:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="2FA is not enabled")
+    if not current_user.hashed_password:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Cannot verify password for OAuth-only accounts")
+    if not verify_password(payload.password, current_user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect password")
+
+    current_user.twofa_enabled      = False
+    current_user.twofa_secret       = None
+    current_user.twofa_backup_codes = None
+    current_user.twofa_setup_at     = None
+    db.commit()
+
+    return {"disabled": True, "message": "Two-factor authentication has been disabled"}
+
+
+@router.post("/2fa/verify-login", response_model=TokenResponse)
+def verify_2fa_login(
+    payload: TwoFAVerifyLoginRequest,
+    db: Session = Depends(get_db),
+):
+    """Exchange a valid 2FA challenge token + TOTP/backup code for a full session JWT."""
+    user_id = decode_2fa_challenge(payload.challenge_token)
+    if user_id is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Invalid or expired verification session. Please log in again.")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or not user.is_active:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    if not user.twofa_enabled or not user.twofa_secret:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="2FA is not configured for this account")
+
+    raw_secret = decrypt_totp_secret(user.twofa_secret)
+    code = payload.code.strip()
+
+    # Try TOTP code first
+    if verify_totp_code(raw_secret, code):
+        access_token = create_access_token({"sub": str(user.id), "email": user.email})
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    # Try backup code (handles both XXXX-XXXX and XXXXXXXX formats)
+    codes = user.twofa_backup_codes or []
+    valid, remaining = verify_backup_code(code, codes)
+    if valid:
+        user.twofa_backup_codes = remaining
+        db.commit()
+        access_token = create_access_token({"sub": str(user.id), "email": user.email})
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid authentication code. Check your app or use a backup code.",
+    )

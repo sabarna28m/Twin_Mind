@@ -44,11 +44,12 @@ function MetricCard({
 const mc: Record<string, React.CSSProperties> = {
   card: {
     position: 'relative', overflow: 'hidden',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
     borderRadius: '16px', padding: '1.1rem 1rem',
     cursor: 'pointer',
     display: 'flex', flexDirection: 'column' as const, gap: '0.22rem',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
   },
   glow: {
     position: 'absolute', top: '-40%', right: '-30%',
@@ -62,14 +63,14 @@ const mc: Record<string, React.CSSProperties> = {
   },
   label: {
     margin: 0, fontSize: '0.57rem', fontWeight: 700,
-    color: 'rgba(148,163,184,0.55)', letterSpacing: '0.09em',
+    color: '#64748b', letterSpacing: '0.09em',
     textTransform: 'uppercase' as const,
   },
   value: {
     margin: 0, fontSize: '1.25rem', fontWeight: 900, lineHeight: 1.1,
   },
   sub: {
-    margin: 0, fontSize: '0.65rem', color: 'rgba(148,163,184,0.5)',
+    margin: 0, fontSize: '0.65rem', color: '#94a3b8',
     lineHeight: 1.35,
   },
 };
@@ -179,24 +180,16 @@ export default function AICommandCenter({ brainReadiness, streak, level = 1 }: P
 const cc: Record<string, React.CSSProperties> = {
   wrap: {
     position: 'relative', overflow: 'hidden',
-    background: 'linear-gradient(135deg, rgba(0,8,24,0.97) 0%, rgba(12,4,32,0.97) 50%, rgba(0,10,24,0.97) 100%)',
-    border: '1px solid rgba(0,212,255,0.18)',
-    borderRadius: '24px',
+    background: 'rgba(255, 255, 255, 0.75)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    border: '1px solid rgba(226, 232, 240, 0.9)',
+    borderRadius: '1.5rem',
     padding: '1.75rem',
-    boxShadow: '0 0 0 1px rgba(0,212,255,0.04), 0 8px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(0,212,255,0.07)',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
   },
-  orb1: {
-    position: 'absolute', width: '500px', height: '500px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(0,212,255,0.07) 0%, transparent 60%)',
-    top: '-180px', right: '-100px', pointerEvents: 'none',
-    animation: 'orb-drift-1 18s ease-in-out infinite',
-  },
-  orb2: {
-    position: 'absolute', width: '350px', height: '350px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(124,58,237,0.09) 0%, transparent 60%)',
-    bottom: '-120px', left: '5%', pointerEvents: 'none',
-    animation: 'orb-drift-2 14s ease-in-out infinite',
-  },
+  orb1: { display: 'none' },
+  orb2: { display: 'none' },
   header: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     marginBottom: '1.25rem', position: 'relative', zIndex: 1,
@@ -210,13 +203,12 @@ const cc: Record<string, React.CSSProperties> = {
   },
   aiTag: {
     fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.15em',
-    color: '#00D4FF', opacity: 0.65,
+    color: '#6366f1', opacity: 0.85,
   },
-  sep: { color: 'rgba(148,163,184,0.3)', fontSize: '0.9rem' },
+  sep: { color: '#cbd5e1', fontSize: '0.9rem' },
   title: {
     margin: 0, fontSize: '1.05rem', fontWeight: 900,
-    background: 'linear-gradient(135deg, #f8fafc 0%, #c7d2fe 50%, #00D4FF 100%)',
-    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+    color: '#0f172a',
   },
   liveChip: {
     display: 'flex', alignItems: 'center', gap: '0.35rem',
@@ -238,8 +230,8 @@ const cc: Record<string, React.CSSProperties> = {
   },
   statsBar: {
     display: 'flex', gap: '0.5rem',
-    background: 'rgba(255,255,255,0.03)',
-    border: '1px solid rgba(255,255,255,0.06)',
+    background: '#f8fafc',
+    border: '1px solid #e2e8f0',
     borderRadius: '14px', padding: '0.75rem 1rem',
     position: 'relative', zIndex: 1,
   },
@@ -249,7 +241,7 @@ const cc: Record<string, React.CSSProperties> = {
   },
   statItemLabel: {
     margin: 0, fontSize: '0.6rem',
-    color: 'rgba(148,163,184,0.5)', fontWeight: 600, letterSpacing: '0.04em',
+    color: '#64748b', fontWeight: 600, letterSpacing: '0.04em',
   },
   statItemValue: {
     margin: 0, fontSize: '0.8rem', fontWeight: 700,

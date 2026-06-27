@@ -68,6 +68,7 @@ import Shop from './pages/Shop';
 import StudyPlanner from './pages/StudyPlanner';
 import ShieldCenter from './pages/ShieldCenter';
 import About from './pages/About';
+import Home from './pages/Home';
 
 export default function App() {
   return (
@@ -81,12 +82,13 @@ export default function App() {
         <ThemeEngine />
         <ParticleEngine />
         <Routes>
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route
-            path="/"
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />

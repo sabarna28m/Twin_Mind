@@ -27,3 +27,9 @@ Backend/uploads/
 !.env.example
 
 .vercel
+
+# Claude Code internal files
+.claude/
+.agents/
+skills-lock.json
+Frontend/.hallmark/

@@ -163,7 +163,7 @@ function SkillTreeSVG({
 
   const endDrag = useCallback(() => { dragging.current = null; }, []);
 
-  const edges: JSX.Element[] = [];
+  const edges: React.ReactNode[] = [];
   for (const n of nodes) {
     if (!n.parent_id) continue;
     const p = nodeMap[n.parent_id];

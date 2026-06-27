@@ -67,7 +67,11 @@ def get_status(
 ):
     configured = bool(settings.google_client_id and settings.google_client_secret)
     token = db.query(GoogleToken).filter(GoogleToken.user_id == current_user.id).first()
-    return {"configured": configured, "connected": token is not None}
+    return {
+        "configured": configured,
+        "connected": token is not None,
+        "connected_at": token.created_at.isoformat() if token and token.created_at else None,
+    }
 
 
 @router.get("/auth-url")

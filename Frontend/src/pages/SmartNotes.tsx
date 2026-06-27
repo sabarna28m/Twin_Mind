@@ -148,7 +148,7 @@ function AIResultPanel({ action, result, onClose }: { action: AIAction; result: 
         <span style={{ color, fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: 1 }}>{icon} {label}</span>
         <button onClick={onClose} style={{ background: 'none', border: 'none', color: DIM, cursor: 'pointer', fontSize: '0.9rem' }}>✕</button>
       </div>
-      <div style={{ overflowY: 'auto', flex: 1 }}
+      <div
         dangerouslySetInnerHTML={{ __html: renderMarkdown(result) }}
         style={{ overflowY: 'auto', flex: 1, fontSize: '0.82rem', lineHeight: 1.7, color: MUTED }}
       />

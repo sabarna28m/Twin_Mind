@@ -130,7 +130,7 @@ function MissionRow({
         <p style={{
           ...mr.title,
           textDecoration: mission.completed ? 'line-through' : 'none',
-          color: mission.completed ? 'rgba(226,232,240,0.55)' : 'rgba(226,232,240,0.92)',
+          color: mission.completed ? '#94a3b8' : '#0f172a',
         }}>
           {mission.title}
         </p>
@@ -194,6 +194,7 @@ const mr: Record<string, React.CSSProperties> = {
   item: {
     display: 'flex', alignItems: 'flex-start', gap: '0.75rem',
     padding: '0.8rem 0.85rem',
+    background: '#ffffff',
     border: '1px solid', borderRadius: '13px',
     transition: 'border-color 0.35s, background 0.35s, opacity 0.35s',
   },
@@ -209,10 +210,10 @@ const mr: Record<string, React.CSSProperties> = {
     margin: '0 0 0.18rem', fontSize: '0.82rem', fontWeight: 700, lineHeight: 1.35,
     transition: 'color 0.3s, text-decoration 0.3s',
   },
-  desc: { margin: '0 0 0.45rem', fontSize: '0.68rem', color: 'rgba(148,163,184,0.5)', lineHeight: 1.45 },
+  desc: { margin: '0 0 0.45rem', fontSize: '0.68rem', color: '#64748b', lineHeight: 1.45 },
   barWrap: { display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.22rem' },
   barTrack: {
-    flex: 1, height: '4px', background: 'rgba(255,255,255,0.08)',
+    flex: 1, height: '4px', background: '#e2e8f0',
     borderRadius: '99px', overflow: 'hidden',
   },
   barFill: {
@@ -222,7 +223,7 @@ const mr: Record<string, React.CSSProperties> = {
   barPct: { fontSize: '0.6rem', fontWeight: 800, flexShrink: 0, minWidth: '26px', textAlign: 'right' },
   progText: {
     margin: '0 0 0.4rem', fontSize: '0.62rem',
-    color: 'rgba(148,163,184,0.4)', fontWeight: 600,
+    color: '#94a3b8', fontWeight: 600,
   },
   metaRow: { display: 'flex', alignItems: 'center', gap: '0.3rem', flexWrap: 'wrap' },
   catBadge: {
@@ -504,49 +505,44 @@ export default function SmartDailyMission() {
 const dm: Record<string, React.CSSProperties> = {
   wrap: {
     position: 'relative', overflow: 'hidden',
-    background: 'linear-gradient(135deg, rgba(4,12,24,0.97) 0%, rgba(10,6,22,0.97) 100%)',
-    border: '1px solid rgba(245,158,11,0.22)',
-    borderRadius: '20px', padding: '1.5rem',
+    background: 'rgba(255, 255, 255, 0.75)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    border: '1px solid rgba(226, 232, 240, 0.9)',
+    borderRadius: '1.5rem', padding: '1.5rem',
     display: 'flex', flexDirection: 'column', gap: '0.85rem',
-    boxShadow: '0 4px 40px rgba(245,158,11,0.07)',
+    boxShadow: '0 20px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01)',
   },
-  orb: {
-    position: 'absolute', width: '230px', height: '230px', borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%)',
-    top: '-80px', right: '-60px', pointerEvents: 'none',
-    animation: 'orb-drift-1 16s ease-in-out infinite',
-  },
+  orb: { display: 'none' },
   header: {
     display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
     position: 'relative', zIndex: 1,
   },
   tagRow:  { display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.25rem' },
-  tag:     { fontSize: '0.57rem', fontWeight: 800, letterSpacing: '0.13em', color: '#f59e0b', opacity: 0.7 },
+  tag:     { fontSize: '0.57rem', fontWeight: 800, letterSpacing: '0.13em', color: '#f59e0b', opacity: 0.9 },
   title:   {
     margin: 0, fontSize: '1rem', fontWeight: 900,
-    background: 'linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%)',
-    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+    color: '#0f172a',
   },
   xpCard: {
     padding: '0.5rem 0.75rem',
-    background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.22)',
+    background: '#fffbeb', border: '1px solid #fde68a',
     borderRadius: '12px', textAlign: 'right',
   },
-  xpLabel: { margin: 0, fontSize: '0.57rem', color: 'rgba(148,163,184,0.5)', fontWeight: 600 },
-  xpValue: { margin: 0, fontSize: '0.9rem', fontWeight: 800, color: '#fbbf24' },
-  xpTotal: { fontSize: '0.72rem', fontWeight: 600, color: 'rgba(148,163,184,0.45)' },
+  xpLabel: { margin: 0, fontSize: '0.57rem', color: '#d97706', fontWeight: 600 },
+  xpValue: { margin: 0, fontSize: '0.9rem', fontWeight: 800, color: '#b45309' },
+  xpTotal: { fontSize: '0.72rem', fontWeight: 600, color: '#d97706' },
 
   progTrack: {
-    height: '4px', background: 'rgba(255,255,255,0.08)',
+    height: '4px', background: '#e2e8f0',
     borderRadius: '99px', overflow: 'hidden', position: 'relative', zIndex: 1,
   },
   progFill: {
     height: '100%', background: 'linear-gradient(90deg, #f59e0b, #fbbf24)',
     borderRadius: '99px', transition: 'width 0.6s ease',
-    boxShadow: '0 0 10px rgba(245,158,11,0.5)',
   },
   progLabel: {
-    margin: 0, fontSize: '0.62rem', color: 'rgba(148,163,184,0.4)',
+    margin: 0, fontSize: '0.62rem', color: '#64748b',
     fontWeight: 600, position: 'relative', zIndex: 1,
   },
 
@@ -570,8 +566,8 @@ const dm: Record<string, React.CSSProperties> = {
   },
   skeleton: {
     height: '100px', borderRadius: '13px',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.06)',
+    background: '#f8fafc',
+    border: '1px solid #e2e8f0',
     animation: 'fade-in 1.2s ease infinite alternate',
   },
 

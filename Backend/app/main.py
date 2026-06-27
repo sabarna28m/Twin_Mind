@@ -47,6 +47,24 @@ from app.ml.predictor import get_model  # warm up model at startup
 
 Base.metadata.create_all(bind=engine)
 
+# Idempotent migration — adds 2FA columns to existing users table if absent
+def _run_2fa_migration() -> None:
+    try:
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("""
+                ALTER TABLE users
+                    ADD COLUMN IF NOT EXISTS twofa_secret       TEXT,
+                    ADD COLUMN IF NOT EXISTS twofa_enabled      BOOLEAN NOT NULL DEFAULT FALSE,
+                    ADD COLUMN IF NOT EXISTS twofa_backup_codes JSONB,
+                    ADD COLUMN IF NOT EXISTS twofa_setup_at     TIMESTAMPTZ;
+            """))
+            conn.commit()
+    except Exception:
+        pass  # columns already exist or DB not yet available
+
+_run_2fa_migration()
+
 app = FastAPI(
     title=settings.app_name,
     debug=settings.debug,

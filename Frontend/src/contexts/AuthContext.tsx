@@ -8,6 +8,7 @@ interface User {
   full_name: string;
   is_active: boolean;
   avatar_url?: string | null;
+  twofa_enabled?: boolean;
 }
 
 export interface StudentProfile {
@@ -21,13 +22,24 @@ export interface StudentProfile {
   subjects: string[];
 }
 
+interface LoginResponse {
+  access_token?: string;
+  token_type?: string;
+  requires_2fa?: boolean;
+  challenge_token?: string;
+}
+
 interface AuthContextValue {
   user: User | null;
   token: string | null;
   studentProfile: StudentProfile | null;
   profileLoaded: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  // 2FA challenge state
+  twoFARequired: boolean;
+  login: (email: string, password: string) => Promise<boolean>; // returns true if 2FA is required
   loginWithGoogle: (credential: string) => Promise<void>;
+  completeTwoFALogin: (code: string) => Promise<void>;
+  clearTwoFAChallenge: () => void;
   register: (email: string, fullName: string, password: string) => Promise<void>;
   logout: () => void;
   refreshStudentProfile: () => Promise<void>;
@@ -37,10 +49,12 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
-  const [user, setUser] = useState<User | null>(null);
-  const [studentProfile, setStudentProfile] = useState<StudentProfile | null>(null);
-  const [profileLoaded, setProfileLoaded] = useState(false);
+  const [token, setToken]                     = useState<string | null>(() => localStorage.getItem('token'));
+  const [user, setUser]                       = useState<User | null>(null);
+  const [studentProfile, setStudentProfile]   = useState<StudentProfile | null>(null);
+  const [profileLoaded, setProfileLoaded]     = useState(false);
+  const [twoFARequired, setTwoFARequired]     = useState(false);
+  const [twoFAChallengeToken, setTwoFAChallengeToken] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -93,11 +107,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function login(email: string, password: string) {
-    const { data } = await api.post<{ access_token: string }>('/auth/login', { email, password });
+  async function login(email: string, password: string): Promise<boolean> {
+    const { data } = await api.post<LoginResponse>('/auth/login', { email, password });
+    if (data.requires_2fa && data.challenge_token) {
+      // Store challenge token in React state only — never in localStorage
+      setTwoFAChallengeToken(data.challenge_token);
+      setTwoFARequired(true);
+      return true;
+    }
+    if (data.access_token) {
+      localStorage.setItem('token', data.access_token);
+      setProfileLoaded(false);
+      setToken(data.access_token);
+    }
+    return false;
+  }
+
+  async function completeTwoFALogin(code: string) {
+    const { data } = await api.post<{ access_token: string; token_type: string }>(
+      '/auth/2fa/verify-login',
+      { challenge_token: twoFAChallengeToken!, code },
+    );
     localStorage.setItem('token', data.access_token);
+    setTwoFARequired(false);
+    setTwoFAChallengeToken(null);
     setProfileLoaded(false);
     setToken(data.access_token);
+  }
+
+  function clearTwoFAChallenge() {
+    setTwoFARequired(false);
+    setTwoFAChallengeToken(null);
   }
 
   /** Exchange a Google credential (ID token) for a TwinMind session token. */
@@ -118,10 +158,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setStudentProfile(null);
     setProfileLoaded(false);
+    setTwoFARequired(false);
+    setTwoFAChallengeToken(null);
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, studentProfile, profileLoaded, login, loginWithGoogle, register, logout, refreshStudentProfile, refreshUser }}>
+    <AuthContext.Provider value={{
+      user, token, studentProfile, profileLoaded,
+      twoFARequired,
+      login, loginWithGoogle, completeTwoFALogin, clearTwoFAChallenge,
+      register, logout,
+      refreshStudentProfile, refreshUser,
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -990,7 +990,6 @@ export default function CommTwin() {
       case 'tasks':     return <TasksSection />;
       case 'grammar':   return <GrammarSection />;
       case 'vocab':     return <VocabSection />;
-      case 'interview': return <InterviewSection />;
       case 'analytics': return <AnalyticsSection />;
       case 'coach':     return <CoachSection />;
       default:          return null;
