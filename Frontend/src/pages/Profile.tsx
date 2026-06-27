@@ -56,7 +56,7 @@ function Section({ title, icon, children }: { title: string; icon: string; child
     <div>
       <div style={{ display:'flex', alignItems:'center', gap:'0.7rem', marginBottom:'1.6rem' }}>
         <div style={{ width:'38px', height:'38px', borderRadius:'11px', background:'rgba(var(--primary-rgb),0.18)', border:'1px solid rgba(var(--primary-rgb),0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.05rem', flexShrink:0, boxShadow:'0 4px 12px rgba(var(--primary-rgb),0.15)' }}>{icon}</div>
-        <h2 style={{ margin:0, fontSize:'1.2rem', fontWeight:800, color:'#f1f5f9', letterSpacing:'-0.3px' }}>{title}</h2>
+        <h2 style={{ margin:0, fontSize:'1.2rem', fontWeight:800, color: '#0f172a', letterSpacing:'-0.3px' }}>{title}</h2>
       </div>
       <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>{children}</div>
     </div>
@@ -67,13 +67,13 @@ function Section({ title, icon, children }: { title: string; icon: string; child
 function GCard({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
     <div className="prof-gcard" style={{
-      background:'rgba(4,8,22,0.91)',
-      border:'1.5px solid rgba(var(--primary-rgb),0.22)',
-      borderRadius:'18px',
+      background: '#ffffff',
+      border: '1px solid #e2e8f0',
+      borderRadius: '24px',
       padding:'1.35rem 1.5rem',
-      backdropFilter:'blur(32px)',
-      WebkitBackdropFilter:'blur(32px)',
-      boxShadow:'0 16px 56px rgba(0,0,0,0.75), 0 0 0 1px rgba(var(--primary-rgb),0.07)',
+      backdropFilter: 'none',
+      WebkitBackdropFilter: 'none',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
       transition:'transform 0.2s ease, box-shadow 0.2s ease',
       ...style,
     }}>
@@ -86,15 +86,15 @@ function GCard({ children, style }: { children: React.ReactNode; style?: React.C
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label style={{ display:'flex', flexDirection:'column', gap:'0.38rem' }}>
-      <span style={{ fontSize:'0.72rem', fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.07em' }}>{label}</span>
+      <span style={{ fontSize:'0.72rem', fontWeight:700, color: '#64748b', textTransform:'uppercase', letterSpacing:'0.07em' }}>{label}</span>
       {children}
     </label>
   );
 }
 
-const inp: React.CSSProperties = { padding:'0.65rem 0.9rem', border:'1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius:'10px', fontSize:'0.9rem', color:'#f1f5f9', background:'rgba(0,0,0,0.42)', outline:'none', width:'100%', boxSizing:'border-box' as const, fontFamily:'inherit', transition:'border-color 0.18s, box-shadow 0.18s' };
-const pri: React.CSSProperties = { padding:'0.58rem 1.4rem', background:'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.75))', color:'#fff', border:'none', borderRadius:'10px', fontSize:'0.88rem', fontWeight:700, cursor:'pointer', fontFamily:'inherit', alignSelf:'flex-start', boxShadow:'0 4px 18px rgba(var(--primary-rgb),0.4)' };
-const sec: React.CSSProperties = { padding:'0.52rem 1.1rem', background:'rgba(255,255,255,0.07)', color:'#e2e8f0', border:'1.5px solid rgba(255,255,255,0.15)', borderRadius:'10px', fontSize:'0.82rem', fontWeight:600, cursor:'pointer', fontFamily:'inherit', alignSelf:'flex-start' };
+const inp: React.CSSProperties = { padding:'0.65rem 0.9rem', border:'1px solid #e2e8f0', borderRadius:'99px', fontSize:'0.9rem', color: '#0f172a', background:'#f8f9fa', outline:'none', width:'100%', boxSizing:'border-box' as const, fontFamily:'inherit', transition:'border-color 0.18s, box-shadow 0.18s' };
+const pri: React.CSSProperties = { padding:'0.58rem 1.4rem', background:'#0052cc', color:'#fff', border:'none', borderRadius:'99px', fontSize:'0.88rem', fontWeight:700, cursor:'pointer', fontFamily:'inherit', alignSelf:'flex-start', boxShadow:'0 4px 12px rgba(0,82,204,0.2)' };
+const sec: React.CSSProperties = { padding:'0.52rem 1.1rem', background:'#f8f9fa', color: '#475569', border:'1px solid #e2e8f0', borderRadius:'99px', fontSize:'0.82rem', fontWeight:600, cursor:'pointer', fontFamily:'inherit', alignSelf:'flex-start' };
 const msgOk: React.CSSProperties  = { margin:'0.5rem 0 0', padding:'0.5rem 0.9rem', background:'rgba(16,185,129,0.14)', border:'1px solid rgba(16,185,129,0.4)', borderRadius:'9px', color:'#34d399', fontSize:'0.82rem', fontWeight:500 };
 const msgErr: React.CSSProperties = { margin:'0.5rem 0 0', padding:'0.5rem 0.9rem', background:'rgba(239,68,68,0.12)', border:'1px solid rgba(239,68,68,0.4)', borderRadius:'9px', color:'#f87171', fontSize:'0.82rem', fontWeight:500 };
 
@@ -128,6 +128,7 @@ export default function Profile() {
   const [institution,    setInstitution]   = useState(studentProfile?.institution ?? '');
   const [semester,       setSemester]      = useState(studentProfile?.semester ?? '');
   const [academicGoals,  setAcademicGoals] = useState(studentProfile?.academic_goals ?? '');
+  const [subjectsStr,    setSubjectsStr]   = useState((studentProfile?.subjects ?? []).join(', '));
   const [careerGoal,     setCareerGoal]    = useState(() => LS.get('career_goal'));
   const [learningStyle,  setLearningStyle] = useState(() => LS.get('learning_style', 'Visual'));
   const [dailyGoal,      setDailyGoal]     = useState(() => LS.get('daily_goal', '2'));
@@ -205,6 +206,7 @@ export default function Profile() {
     setInstitution(studentProfile.institution ?? '');
     setSemester(studentProfile.semester ?? '');
     setAcademicGoals(studentProfile.academic_goals ?? '');
+    setSubjectsStr((studentProfile.subjects ?? []).join(', '));
   }, [studentProfile]);
 
   useEffect(() => { setFullName(user?.full_name ?? ''); }, [user]);
@@ -280,7 +282,8 @@ export default function Profile() {
     e.preventDefault(); setLearnMsg(null); setLearnSaving(true);
     LS.set('career_goal', careerGoal); LS.set('learning_style', learningStyle);
     LS.set('daily_goal', dailyGoal); LS.set('weekly_goal', weeklyGoal); LS.set('target_score', targetScore);
-    const payload = { institution, course, semester, academic_goals: academicGoals, learning_preferences: learningStyle, subjects: studentProfile?.subjects ?? [] };
+    const parsedSubjects = subjectsStr.split(',').map(s => s.trim()).filter(Boolean);
+    const payload = { institution, course, semester, academic_goals: academicGoals, learning_preferences: learningStyle, subjects: parsedSubjects };
     try {
       if (studentProfile) await api.put('/student-profile', payload, { headers: { Authorization: `Bearer ${token}` } });
       else await api.post('/student-profile', payload, { headers: { Authorization: `Bearer ${token}` } });
@@ -360,23 +363,23 @@ export default function Profile() {
   const LEARNING_STYLES = ['Visual', 'Reading/Writing', 'Audio', 'Practical'];
 
   return (
-    <div style={{ minHeight:'100svh', background:'var(--bg)', display:'flex', flexDirection:'column', fontFamily:"'Inter', sans-serif", position:'relative' }}>
+    <div style={{ minHeight:'100svh', background:'#f8f9fa', display:'flex', flexDirection:'column', fontFamily:"'Inter', sans-serif", position:'relative' }}>
       <div className="prof-scrim" />
       <div className="prof-above-scrim">
       <style>{`
         /* ── Scrim: darken particle bg behind profile content ── */
-        .prof-scrim { position: fixed; inset: 0; background: rgba(2,4,15,0.55); z-index: 0; pointer-events: none; }
+        .prof-scrim { position: fixed; inset: 0; background: transparent; z-index: 0; pointer-events: none; }
         .prof-above-scrim { position: relative; z-index: 1; display: flex; flex-direction: column; flex: 1; }
 
         /* ── Sidebar nav ── */
-        .prof-nav-item { color: rgba(203,213,225,0.82) !important; }
-        .prof-nav-item:hover { background: rgba(var(--primary-rgb),0.13) !important; color: #f1f5f9 !important; }
+        .prof-nav-item { color: #64748b !important; }
+        .prof-nav-item:hover { background: #eff6ff !important; color: #0052cc !important; }
 
         /* ── Cards: hover elevation ── */
-        .prof-gcard:hover { transform: translateY(-2px); box-shadow: 0 22px 65px rgba(0,0,0,0.82), 0 0 0 1px rgba(var(--primary-rgb),0.22) !important; }
+        .prof-gcard:hover { transform: translateY(-2px); box-shadow: 0 12px 48px rgba(0,0,0,0.08) !important; }
 
         /* ── Inputs ── */
-        .prof-inp::placeholder { color: rgba(148,163,184,0.55) !important; }
+        .prof-inp::placeholder { color: #94a3b8 !important; }
         .prof-inp:focus { border-color: rgba(var(--primary-rgb),0.6) !important; box-shadow: 0 0 0 3px rgba(var(--primary-rgb),0.12) !important; background: rgba(0,0,0,0.5) !important; }
 
         /* ── Theme picker ── */
@@ -398,30 +401,30 @@ export default function Profile() {
       `}</style>
 
       {/* ── Top nav bar ── */}
-      <header style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 1.5rem', height:'58px', borderBottom:'1px solid var(--card-border)', background:'rgba(var(--bg-rgb,4,8,22),0.92)', backdropFilter:'blur(20px)', position:'sticky', top:0, zIndex:30, flexShrink:0 }}>
+      <header style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 1.5rem', height:'58px', borderBottom:'1px solid var(--card-border)', background: '#ffffff', backdropFilter: 'none', position:'sticky', top:0, zIndex:30, flexShrink:0 }}>
         <div style={{ display:'flex', alignItems:'center', gap:'0.65rem' }}>
           <BrainIcon size={24} />
           <Link to="/" style={{ fontSize:'1.05rem', fontWeight:900, color:'var(--primary)', textDecoration:'none', letterSpacing:'-0.5px' }}>TwinMind</Link>
           <span style={{ width:'1px', height:'16px', background:'rgba(255,255,255,0.1)' }} />
           <span style={{ fontSize:'0.82rem', fontWeight:600, color:'rgba(203,213,225,0.8)' }}>Profile & Settings</span>
         </div>
-        <Link to="/" style={{ fontSize:'0.78rem', fontWeight:700, color:'var(--primary)', textDecoration:'none', padding:'0.32rem 0.85rem', border:'1px solid rgba(var(--primary-rgb),0.25)', borderRadius:'8px', transition:'all 0.18s' }}>← Dashboard</Link>
+        <Link to="/dashboard" style={{ fontSize:'0.78rem', fontWeight:700, color:'var(--primary)', textDecoration:'none', padding:'0.32rem 0.85rem', border:'1px solid rgba(var(--primary-rgb),0.25)', borderRadius:'8px', transition:'all 0.18s' }}>← Dashboard</Link>
       </header>
 
       {/* ── Profile completion banner ── */}
-      <div style={{ padding:'0.9rem 1.5rem', background:'rgba(4,8,22,0.82)', borderBottom:'1.5px solid rgba(var(--primary-rgb),0.15)', flexShrink:0, backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)' }}>
+      <div style={{ padding:'0.9rem 1.5rem', background: '#ffffff', borderBottom:'1.5px solid rgba(var(--primary-rgb),0.15)', flexShrink:0, backdropFilter: 'none', WebkitBackdropFilter: 'none' }}>
         <div style={{ maxWidth:'1100px', margin:'0 auto', display:'flex', alignItems:'center', gap:'1.5rem' }}>
           <div style={{ flexShrink:0, minWidth:'80px' }}>
-            <span style={{ fontSize:'0.65rem', fontWeight:800, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.1em', display:'block' }}>Profile Strength</span>
+            <span style={{ fontSize:'0.65rem', fontWeight:800, color: '#64748b', textTransform:'uppercase', letterSpacing:'0.1em', display:'block' }}>Profile Strength</span>
             <div style={{ display:'flex', alignItems:'center', gap:'0.55rem', marginTop:'0.2rem' }}>
               <span style={{ fontSize:'1.6rem', fontWeight:900, color:completionColor, lineHeight:1, textShadow:`0 0 18px ${completionColor}88` }}>{completionPct}%</span>
               {completionPct === 100 && <span style={{ fontSize:'0.72rem', background:'linear-gradient(135deg,#ffd700,#f59e0b)', padding:'0.15rem 0.6rem', borderRadius:'99px', color:'#0f172a', fontWeight:800, boxShadow:'0 0 14px rgba(255,215,0,0.45)' }}>✨ Complete</span>}
             </div>
           </div>
-          <div style={{ flex:1, height:'10px', background:'rgba(255,255,255,0.07)', borderRadius:'99px', overflow:'hidden', boxShadow:'inset 0 1px 4px rgba(0,0,0,0.45)' }}>
+          <div style={{ flex:1, height:'10px', background:'#f8f9fa', borderRadius:'99px', overflow:'hidden', boxShadow:'inset 0 1px 4px rgba(0,0,0,0.45)' }}>
             <div style={{ height:'100%', width:`${completionPct}%`, background: completionPct===100?'linear-gradient(90deg,#ffd700,#f59e0b)':completionPct>=70?'linear-gradient(90deg,#10b981,#34d399)':completionPct>=40?'linear-gradient(90deg,#f59e0b,#fbbf24)':'linear-gradient(90deg,#ef4444,#f97316)', borderRadius:'99px', transition:'width 0.7s ease', boxShadow: completionPct===100?'0 0 16px rgba(255,215,0,0.65)':completionPct>=70?'0 0 12px rgba(16,185,129,0.55)':'0 0 10px rgba(245,158,11,0.5)' }} />
           </div>
-          <span style={{ fontSize:'0.75rem', color:'#94a3b8', flexShrink:0, fontWeight:600 }}>{completionFields.filter(Boolean).length}<span style={{ color:'rgba(148,163,184,0.5)' }}>/{completionFields.length}</span></span>
+          <span style={{ fontSize:'0.75rem', color: '#64748b', flexShrink:0, fontWeight:600 }}>{completionFields.filter(Boolean).length}<span style={{ color:'rgba(148,163,184,0.5)' }}>/{completionFields.length}</span></span>
         </div>
       </div>
 
@@ -429,7 +432,7 @@ export default function Profile() {
       <div className="prof-layout" style={{ flex:1, display:'flex', maxWidth:'1100px', width:'100%', margin:'0 auto', alignItems:'flex-start' }}>
 
         {/* ── Sidebar ── */}
-        <nav className="prof-sidebar" style={{ width:'230px', flexShrink:0, borderRight:'1.5px solid rgba(var(--primary-rgb),0.12)', padding:'1.25rem 0.75rem', display:'flex', flexDirection:'column', gap:'0.25rem', position:'sticky', top:'58px', maxHeight:'calc(100svh - 58px - 63px)', overflowY:'auto', background:'rgba(2,4,15,0.45)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)' }}>
+        <nav className="prof-sidebar" style={{ width:'230px', flexShrink:0, borderRight:'1px solid #e2e8f0', padding:'1.25rem 0.75rem', display:'flex', flexDirection:'column', gap:'0.25rem', position:'sticky', top:'58px', maxHeight:'calc(100svh - 58px - 63px)', overflowY:'auto', background:'#ffffff', backdropFilter: 'none', WebkitBackdropFilter: 'none' }}>
           {SECTIONS.map(sec => {
             const active = activeSection === sec.id;
             return (
@@ -466,7 +469,7 @@ export default function Profile() {
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ display:'flex', alignItems:'center', gap:'0.65rem', flexWrap:'wrap', marginBottom:'0.3rem' }}>
-                      <h3 style={{ margin:0, fontSize:'1.4rem', fontWeight:900, color:'#ffffff' }}>{user?.full_name || 'Your Name'}</h3>
+                      <h3 style={{ margin:0, fontSize:'1.4rem', fontWeight:900, color: '#0f172a' }}>{user?.full_name || 'Your Name'}</h3>
                       {gamProgress && (
                         <div style={{ display:'flex', alignItems:'center', gap:'0.35rem', padding:'0.2rem 0.65rem', background:getLevelGradient(gamProgress.level), borderRadius:'99px', boxShadow:`0 0 12px ${getLevelColor(gamProgress.level)}44` }}>
                           <span style={{ fontSize:'0.68rem', fontWeight:900, color:'#fff' }}>Lv.{gamProgress.level}</span>
@@ -474,17 +477,17 @@ export default function Profile() {
                         </div>
                       )}
                     </div>
-                    <p style={{ margin:'0 0 0.45rem', fontSize:'0.88rem', color:'#cbd5e1', fontWeight:500 }}>{user?.email}</p>
+                    <p style={{ margin:'0 0 0.45rem', fontSize:'0.88rem', color: '#475569', fontWeight:500 }}>{user?.email}</p>
                     {studentProfile?.course && <p style={{ margin:'0 0 0.2rem', fontSize:'0.82rem', color:'var(--primary)', fontWeight:700 }}>{studentProfile.course}{studentProfile.semester ? ` · ${studentProfile.semester}` : ''}</p>}
-                    {studentProfile?.institution && <p style={{ margin:0, fontSize:'0.78rem', color:'#94a3b8', fontWeight:500 }}>🏛 {studentProfile.institution}</p>}
+                    {studentProfile?.institution && <p style={{ margin:0, fontSize:'0.78rem', color: '#64748b', fontWeight:500 }}>🏛 {studentProfile.institution}</p>}
                     {avatarMsg && <p style={avatarMsg.ok ? msgOk : msgErr}>{avatarMsg.text}</p>}
                   </div>
                   <div style={{ display:'flex', flexDirection:'column', gap:'0.4rem', alignItems:'flex-end', flexShrink:0 }}>
                     <div style={{ textAlign:'right' }}>
                       <p style={{ margin:'0 0 0.06rem', fontSize:'1.6rem', fontWeight:900, color:completionColor, lineHeight:1, textShadow:`0 0 16px ${completionColor}66` }}>{completionPct}%</p>
-                      <p style={{ margin:0, fontSize:'0.62rem', color:'#94a3b8', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>Profile Complete</p>
+                      <p style={{ margin:0, fontSize:'0.62rem', color: '#64748b', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>Profile Complete</p>
                     </div>
-                    <p style={{ margin:0, fontSize:'0.7rem', color:'#94a3b8' }}>Joined {joinDate}</p>
+                    <p style={{ margin:0, fontSize:'0.7rem', color: '#64748b' }}>Joined {joinDate}</p>
                   </div>
                 </GCard>
 
@@ -501,14 +504,14 @@ export default function Profile() {
                     <GCard key={s.label} style={{ textAlign:'center', padding:'1rem 0.75rem', border:`1.5px solid ${s.color}44`, boxShadow:`0 8px 28px rgba(0,0,0,0.6), 0 0 0 1px ${s.color}18, 0 0 20px ${s.color}12` }}>
                       <p style={{ margin:'0 0 0.28rem', fontSize:'1.3rem' }}>{s.icon}</p>
                       <p style={{ margin:'0 0 0.12rem', fontSize:'1.45rem', fontWeight:900, color:s.color, lineHeight:1, textShadow:`0 0 14px ${s.color}88` }}>{s.value}</p>
-                      <p style={{ margin:0, fontSize:'0.62rem', color:'#94a3b8', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>{s.label}</p>
+                      <p style={{ margin:0, fontSize:'0.62rem', color: '#64748b', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>{s.label}</p>
                     </GCard>
                   ))}
                 </div>
 
                 {/* Edit name + personal */}
                 <GCard>
-                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>Personal Information</h3>
+                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Personal Information</h3>
                   <form onSubmit={saveName} style={{ display:'flex', flexDirection:'column', gap:'0.85rem' }}>
                     <div className="prof-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
                       <Field label="Full Name">
@@ -561,9 +564,14 @@ export default function Profile() {
                         <input className="prof-inp" value={careerGoal} onChange={e=>setCareerGoal(e.target.value)} style={inp} placeholder="Software Engineer at Google" />
                       </Field>
                     </div>
-                    <Field label="Academic Goals">
-                      <textarea className="prof-inp" value={academicGoals} onChange={e=>setAcademicGoals(e.target.value)} style={{ ...inp, minHeight:'72px', resize:'vertical' }} placeholder="Describe your academic goals…" />
-                    </Field>
+                    <div className="prof-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
+                      <Field label="Academic Goals">
+                        <textarea className="prof-inp" value={academicGoals} onChange={e=>setAcademicGoals(e.target.value)} style={{ ...inp, minHeight:'72px', resize:'vertical' }} placeholder="Describe your academic goals…" />
+                      </Field>
+                      <Field label="Subjects (comma separated)">
+                        <textarea className="prof-inp" value={subjectsStr} onChange={e=>setSubjectsStr(e.target.value)} style={{ ...inp, minHeight:'72px', resize:'vertical' }} placeholder="e.g. Mathematics, Physics, Computer Science" />
+                      </Field>
+                    </div>
 
                     {/* Learning style */}
                     <div>
@@ -610,7 +618,7 @@ export default function Profile() {
                       <div style={{ display:'flex', alignItems:'center', gap:'1rem', marginBottom:'1rem' }}>
                         <div style={{ width:'56px', height:'56px', borderRadius:'14px', background:getLevelGradient(gamProgress.level), display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.5rem', fontWeight:900, color:'#fff', flexShrink:0, boxShadow:`0 8px 24px ${getLevelColor(gamProgress.level)}44` }}>{gamProgress.level}</div>
                         <div style={{ flex:1 }}>
-                          <p style={{ margin:'0 0 0.08rem', fontSize:'1.15rem', fontWeight:900, color:'#f1f5f9' }}>{gamProgress.level_name}</p>
+                          <p style={{ margin:'0 0 0.08rem', fontSize:'1.15rem', fontWeight:900, color: '#0f172a' }}>{gamProgress.level_name}</p>
                           <p style={{ margin:0, fontSize:'0.75rem', color:'rgba(203,213,225,0.8)' }}>{gamProgress.xp.toLocaleString()} XP total · {gamProgress.xp_to_next > 0 ? `${gamProgress.xp_to_next} to next level` : 'Max level!'}</p>
                         </div>
                         <div style={{ textAlign:'right', flexShrink:0 }}>
@@ -618,14 +626,14 @@ export default function Profile() {
                           <p style={{ margin:0, fontSize:'0.65rem', color:'rgba(203,213,225,0.72)' }}>to Lv.{gamProgress.level+1}</p>
                         </div>
                       </div>
-                      <div style={{ height:'8px', background:'rgba(255,255,255,0.07)', borderRadius:'99px', overflow:'hidden' }}>
+                      <div style={{ height:'8px', background:'#f8f9fa', borderRadius:'99px', overflow:'hidden' }}>
                         <div style={{ height:'100%', width:`${gamProgress.progress_pct}%`, background:getLevelGradient(gamProgress.level), borderRadius:'99px', transition:'width 0.8s ease', boxShadow:`0 0 10px ${getLevelColor(gamProgress.level)}66` }} />
                       </div>
                     </GCard>
 
                     {/* XP Breakdown */}
                     <GCard>
-                      <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>XP Breakdown</h3>
+                      <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>XP Breakdown</h3>
                       <div style={{ display:'flex', flexDirection:'column', gap:'0.65rem' }}>
                         {Object.entries(gamProgress.breakdown).map(([key, val]) => {
                           const pct = gamProgress.xp > 0 ? Math.round((val/gamProgress.xp)*100) : 0;
@@ -635,7 +643,7 @@ export default function Profile() {
                           return (
                             <div key={key}>
                               <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'0.28rem' }}>
-                                <span style={{ fontSize:'0.8rem', color:'#e2e8f0', fontWeight:500 }}>{labels[key] ?? key}</span>
+                                <span style={{ fontSize:'0.8rem', color: '#475569', fontWeight:500 }}>{labels[key] ?? key}</span>
                                 <span style={{ fontSize:'0.78rem', fontWeight:700, color:c }}>{val.toLocaleString()} XP ({pct}%)</span>
                               </div>
                               <div style={{ height:'7px', background:'rgba(255,255,255,0.09)', borderRadius:'99px', overflow:'hidden', boxShadow:'inset 0 1px 3px rgba(0,0,0,0.35)' }}>
@@ -658,7 +666,7 @@ export default function Profile() {
                         <GCard key={s.label} style={{ textAlign:'center', padding:'1.1rem 0.75rem', border:`1.5px solid ${s.color}44`, boxShadow:`0 8px 28px rgba(0,0,0,0.6), 0 0 18px ${s.color}14` }}>
                           <p style={{ margin:'0 0 0.3rem', fontSize:'1.5rem' }}>{s.icon}</p>
                           <p style={{ margin:'0 0 0.12rem', fontSize:'1.45rem', fontWeight:900, color:s.color, lineHeight:1, textShadow:`0 0 14px ${s.color}88` }}>{s.value}</p>
-                          <p style={{ margin:0, fontSize:'0.63rem', color:'#94a3b8', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>{s.label}</p>
+                          <p style={{ margin:0, fontSize:'0.63rem', color: '#64748b', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>{s.label}</p>
                         </GCard>
                       ))}
                     </div>
@@ -681,7 +689,7 @@ export default function Profile() {
                     <div style={{ display:'flex', alignItems:'center', gap:'0.85rem' }}>
                       <div style={{ width:'44px', height:'44px', borderRadius:'12px', background:'rgba(66,133,244,0.1)', flexShrink:0 }} />
                       <div style={{ flex:1 }}>
-                        <div style={{ height:'14px', width:'140px', borderRadius:'6px', background:'rgba(255,255,255,0.07)', marginBottom:'6px' }} />
+                        <div style={{ height:'14px', width:'140px', borderRadius:'6px', background:'#f8f9fa', marginBottom:'6px' }} />
                         <div style={{ height:'11px', width:'90px', borderRadius:'6px', background:'rgba(255,255,255,0.05)' }} />
                       </div>
                       <div style={{ fontSize:'0.72rem', color:'rgba(203,213,225,0.5)' }}>Loading…</div>
@@ -695,9 +703,9 @@ export default function Profile() {
                     <div style={{ display:'flex', alignItems:'flex-start', gap:'0.85rem' }}>
                       <div style={{ width:'44px', height:'44px', borderRadius:'12px', background:'rgba(66,133,244,0.1)', border:'1px solid rgba(66,133,244,0.18)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.35rem', flexShrink:0 }}>📅</div>
                       <div>
-                        <p style={{ margin:'0 0 0.25rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>Google Calendar</p>
+                        <p style={{ margin:'0 0 0.25rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Google Calendar</p>
                         <p style={{ margin:0, fontSize:'0.78rem', color:'rgba(203,213,225,0.65)', lineHeight:1.55 }}>
-                          Google Calendar integration is not configured on this server. Add <code style={{ background:'rgba(255,255,255,0.07)', padding:'1px 5px', borderRadius:'4px', fontSize:'0.75rem' }}>GOOGLE_CLIENT_ID</code> and <code style={{ background:'rgba(255,255,255,0.07)', padding:'1px 5px', borderRadius:'4px', fontSize:'0.75rem' }}>GOOGLE_CLIENT_SECRET</code> to the backend environment.
+                          Google Calendar integration is not configured on this server. Add <code style={{ background:'#f8f9fa', padding:'1px 5px', borderRadius:'4px', fontSize:'0.75rem' }}>GOOGLE_CLIENT_ID</code> and <code style={{ background:'#f8f9fa', padding:'1px 5px', borderRadius:'4px', fontSize:'0.75rem' }}>GOOGLE_CLIENT_SECRET</code> to the backend environment.
                         </p>
                       </div>
                     </div>
@@ -712,7 +720,7 @@ export default function Profile() {
                       <div style={{ width:'48px', height:'48px', borderRadius:'14px', background:'rgba(66,133,244,0.12)', border:'1px solid rgba(66,133,244,0.22)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.4rem', flexShrink:0 }}>📅</div>
                       <div style={{ flex:1 }}>
                         <div style={{ display:'flex', alignItems:'center', gap:'0.55rem', marginBottom:'0.18rem' }}>
-                          <p style={{ margin:0, fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9' }}>Google Calendar</p>
+                          <p style={{ margin:0, fontSize:'0.95rem', fontWeight:700, color: '#0f172a' }}>Google Calendar</p>
                           <span style={{ fontSize:'0.68rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:'99px', background:'rgba(148,163,184,0.1)', border:'1px solid rgba(148,163,184,0.2)', color:'rgba(148,163,184,0.7)' }}>Not Connected</span>
                         </div>
                         <p style={{ margin:0, fontSize:'0.75rem', color:'rgba(203,213,225,0.65)' }}>Connect to sync your TwinMind schedule automatically</p>
@@ -729,10 +737,10 @@ export default function Profile() {
                           { icon:'🎤', label:'Interview Schedules',  desc:'Mock interview bookings' },
                           { icon:'📌', label:'Learning Deadlines',   desc:'Assignment & goal due dates' },
                         ].map(f => (
-                          <div key={f.label} style={{ display:'flex', alignItems:'flex-start', gap:'0.55rem', padding:'0.65rem 0.75rem', background:'rgba(255,255,255,0.03)', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.06)' }}>
+                          <div key={f.label} style={{ display:'flex', alignItems:'flex-start', gap:'0.55rem', padding:'0.65rem 0.75rem', background:'rgba(255,255,255,0.03)', borderRadius:'99px', border:'1px solid rgba(255,255,255,0.06)' }}>
                             <span style={{ fontSize:'1rem', flexShrink:0, marginTop:'1px' }}>{f.icon}</span>
                             <div>
-                              <p style={{ margin:'0 0 0.08rem', fontSize:'0.8rem', fontWeight:600, color:'#e2e8f0' }}>{f.label}</p>
+                              <p style={{ margin:'0 0 0.08rem', fontSize:'0.8rem', fontWeight:600, color: '#475569' }}>{f.label}</p>
                               <p style={{ margin:0, fontSize:'0.68rem', color:'rgba(148,163,184,0.6)' }}>{f.desc}</p>
                             </div>
                           </div>
@@ -755,7 +763,7 @@ export default function Profile() {
                         <div style={{ width:'48px', height:'48px', borderRadius:'14px', background:'rgba(16,185,129,0.1)', border:'1px solid rgba(16,185,129,0.22)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.4rem', flexShrink:0 }}>📅</div>
                         <div>
                           <div style={{ display:'flex', alignItems:'center', gap:'0.55rem', marginBottom:'0.18rem' }}>
-                            <p style={{ margin:0, fontSize:'0.95rem', fontWeight:700, color:'#f1f5f9' }}>Google Calendar</p>
+                            <p style={{ margin:0, fontSize:'0.95rem', fontWeight:700, color: '#0f172a' }}>Google Calendar</p>
                             <span style={{ fontSize:'0.68rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:'99px', background:'rgba(16,185,129,0.12)', border:'1px solid rgba(16,185,129,0.3)', color:'#34d399' }}>● Connected</span>
                           </div>
                           <p style={{ margin:0, fontSize:'0.73rem', color:'rgba(148,163,184,0.65)' }}>
@@ -792,7 +800,7 @@ export default function Profile() {
                     {/* Last sync row */}
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.75rem 0', borderTop:'1px solid rgba(255,255,255,0.06)', borderBottom:'1px solid rgba(255,255,255,0.06)', marginBottom:'1.1rem', gap:'1rem', flexWrap:'wrap' }}>
                       <div>
-                        <p style={{ margin:'0 0 0.08rem', fontSize:'0.78rem', fontWeight:600, color:'#e2e8f0' }}>Last synced</p>
+                        <p style={{ margin:'0 0 0.08rem', fontSize:'0.78rem', fontWeight:600, color: '#475569' }}>Last synced</p>
                         <p style={{ margin:0, fontSize:'0.72rem', color:'rgba(148,163,184,0.65)' }}>
                           {lastSync
                             ? new Date(lastSync).toLocaleString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
@@ -806,7 +814,7 @@ export default function Profile() {
 
                     {/* Add Reminder */}
                     <form onSubmit={addReminder} style={{ display:'flex', flexDirection:'column', gap:'0.65rem' }}>
-                      <h4 style={{ margin:0, fontSize:'0.82rem', fontWeight:700, color:'#f1f5f9' }}>Add Study Reminder</h4>
+                      <h4 style={{ margin:0, fontSize:'0.82rem', fontWeight:700, color: '#0f172a' }}>Add Study Reminder</h4>
                       <input className="prof-inp" style={inp} placeholder="Reminder title" value={remTitle} onChange={e=>setRemTitle(e.target.value)} required />
                       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.6rem' }}>
                         <input className="prof-inp" type="date" style={inp} value={remDate} onChange={e=>setRemDate(e.target.value)} required />
@@ -827,7 +835,7 @@ export default function Profile() {
             <div key="notifications" className="prof-section-anim">
               <Section title="Notification Settings" icon="🔔">
                 <GCard>
-                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>In-App Notifications</h3>
+                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>In-App Notifications</h3>
                   <div style={{ display:'flex', flexDirection:'column', gap:'0' }}>
                     {[
                       { key:'notif_study',     label:'Daily Study Reminders',     desc:'Get reminded to study at your scheduled time', val:notifStudy,     set:setNotifStudy     },
@@ -838,7 +846,7 @@ export default function Profile() {
                     ].map((item, i) => (
                       <div key={item.key} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 0', borderTop: i>0?'1px solid rgba(255,255,255,0.08)':'none', gap:'1rem' }}>
                         <div style={{ minWidth:0 }}>
-                          <p style={{ margin:'0 0 0.1rem', fontSize:'0.87rem', fontWeight:600, color:'#f1f5f9' }}>{item.label}</p>
+                          <p style={{ margin:'0 0 0.1rem', fontSize:'0.87rem', fontWeight:600, color: '#0f172a' }}>{item.label}</p>
                           <p style={{ margin:0, fontSize:'0.72rem', color:'rgba(203,213,225,0.75)' }}>{item.desc}</p>
                         </div>
                         <Toggle on={item.val} onChange={v => { item.set(v); LS.setBool(item.key, v); }} />
@@ -847,7 +855,7 @@ export default function Profile() {
                   </div>
                 </GCard>
                 <GCard>
-                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>Channel Preferences</h3>
+                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Channel Preferences</h3>
                   <div style={{ display:'flex', flexDirection:'column', gap:'0' }}>
                     {[
                       { key:'notif_email', label:'Email Notifications', desc:'Receive weekly summaries and alerts via email', val:notifEmail, set:setNotifEmail },
@@ -855,7 +863,7 @@ export default function Profile() {
                     ].map((item, i) => (
                       <div key={item.key} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 0', borderTop: i>0?'1px solid rgba(255,255,255,0.08)':'none', gap:'1rem' }}>
                         <div style={{ minWidth:0 }}>
-                          <p style={{ margin:'0 0 0.1rem', fontSize:'0.87rem', fontWeight:600, color:'#f1f5f9' }}>{item.label}</p>
+                          <p style={{ margin:'0 0 0.1rem', fontSize:'0.87rem', fontWeight:600, color: '#0f172a' }}>{item.label}</p>
                           <p style={{ margin:0, fontSize:'0.72rem', color:'rgba(203,213,225,0.75)' }}>{item.desc}</p>
                         </div>
                         <Toggle on={item.val} onChange={v => { item.set(v); LS.setBool(item.key, v); }} />
@@ -872,7 +880,7 @@ export default function Profile() {
             <div key="appearance" className="prof-section-anim">
               <Section title="Appearance" icon="🎨">
                 <GCard>
-                  <h3 style={{ margin:'0 0 0.25rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>Theme</h3>
+                  <h3 style={{ margin:'0 0 0.25rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Theme</h3>
                   <p style={{ margin:'0 0 1rem', fontSize:'0.78rem', color:'rgba(203,213,225,0.75)' }}>Choose a visual theme that transforms your entire TwinMind experience.</p>
                   <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(190px,1fr))', gap:'0.7rem' }}>
                     {THEMES.map(t => {
@@ -886,7 +894,7 @@ export default function Profile() {
                           </div>
                           <div style={{ display:'flex', alignItems:'center', gap:'0.35rem', marginBottom:'0.2rem' }}>
                             <span style={{ fontSize:'1rem' }}>{t.icon}</span>
-                            <span style={{ fontWeight:700, fontSize:'0.82rem', color:'#f1f5f9' }}>{t.name}</span>
+                            <span style={{ fontWeight:700, fontSize:'0.82rem', color: '#0f172a' }}>{t.name}</span>
                           </div>
                           <p style={{ margin:0, fontSize:'0.67rem', color:'rgba(203,213,225,0.75)', lineHeight:1.45 }}>{t.description}</p>
                         </button>
@@ -896,7 +904,7 @@ export default function Profile() {
                 </GCard>
 
                 <GCard>
-                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>Interface Preferences</h3>
+                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Interface Preferences</h3>
                   <div style={{ display:'flex', flexDirection:'column', gap:'0' }}>
                     {[
                       { key:'compact',    label:'Compact Mode',       desc:'Reduce spacing for a denser information layout',  val:compactMode, set:setCompactMode },
@@ -905,7 +913,7 @@ export default function Profile() {
                     ].map((item, i) => (
                       <div key={item.key} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 0', borderTop:i>0?'1px solid rgba(255,255,255,0.05)':'none', gap:'1rem' }}>
                         <div>
-                          <p style={{ margin:'0 0 0.1rem', fontSize:'0.87rem', fontWeight:600, color:'#f1f5f9' }}>{item.label}</p>
+                          <p style={{ margin:'0 0 0.1rem', fontSize:'0.87rem', fontWeight:600, color: '#0f172a' }}>{item.label}</p>
                           <p style={{ margin:0, fontSize:'0.72rem', color:'rgba(203,213,225,0.75)' }}>{item.desc}</p>
                         </div>
                         <Toggle on={item.val} onChange={v => { item.set(v); LS.setBool(item.key, v); }} />
@@ -923,25 +931,25 @@ export default function Profile() {
               <Section title="Security" icon="🔒">
 
                 {/* Account security overview */}
-                <GCard style={{ background:'linear-gradient(135deg,rgba(var(--primary-rgb),0.06),rgba(0,0,0,0))', border:'1.5px solid rgba(var(--primary-rgb),0.2)' }}>
-                  <h3 style={{ margin:'0 0 1.1rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>Account Security</h3>
+                <GCard style={{ background:'linear-gradient(135deg,rgba(var(--primary-rgb),0.06),rgba(0,0,0,0))', border:'1px solid #e2e8f0' }}>
+                  <h3 style={{ margin:'0 0 1.1rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Account Security</h3>
                   <div style={{ display:'flex', flexDirection:'column', gap:'0' }}>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.8rem 0', borderBottom:'1px solid rgba(255,255,255,0.07)', gap:'1rem' }}>
                       <div>
-                        <p style={{ margin:'0 0 0.08rem', fontSize:'0.85rem', fontWeight:600, color:'#f1f5f9' }}>Email address</p>
+                        <p style={{ margin:'0 0 0.08rem', fontSize:'0.85rem', fontWeight:600, color: '#0f172a' }}>Email address</p>
                         <p style={{ margin:0, fontSize:'0.75rem', color:'rgba(203,213,225,0.75)' }}>{user?.email ?? '—'}</p>
                       </div>
                       <span style={{ fontSize:'0.7rem', fontWeight:700, padding:'0.2rem 0.6rem', borderRadius:'99px', background:'rgba(16,185,129,0.10)', border:'1.5px solid rgba(16,185,129,0.3)', color:'#34d399', flexShrink:0 }}>● Verified</span>
                     </div>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.8rem 0', borderBottom:'1px solid rgba(255,255,255,0.07)', gap:'1rem' }}>
                       <div>
-                        <p style={{ margin:'0 0 0.08rem', fontSize:'0.85rem', fontWeight:600, color:'#f1f5f9' }}>Member since</p>
+                        <p style={{ margin:'0 0 0.08rem', fontSize:'0.85rem', fontWeight:600, color: '#0f172a' }}>Member since</p>
                         <p style={{ margin:0, fontSize:'0.75rem', color:'rgba(203,213,225,0.75)' }}>{joinDate}</p>
                       </div>
                     </div>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.8rem 0', gap:'1rem' }}>
                       <div>
-                        <p style={{ margin:'0 0 0.08rem', fontSize:'0.85rem', fontWeight:600, color:'#f1f5f9' }}>Active sessions</p>
+                        <p style={{ margin:'0 0 0.08rem', fontSize:'0.85rem', fontWeight:600, color: '#0f172a' }}>Active sessions</p>
                         <p style={{ margin:0, fontSize:'0.72rem', color:'rgba(203,213,225,0.7)' }}>Sign out from all devices and active sessions immediately</p>
                       </div>
                       <button style={{ ...sec, color:'#fca5a5', border:'1px solid rgba(239,68,68,0.3)', background:'rgba(239,68,68,0.1)', flexShrink:0 }} onClick={logout}>Sign Out All</button>
@@ -951,7 +959,7 @@ export default function Profile() {
 
                 {/* Change password */}
                 <GCard>
-                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>Change Password</h3>
+                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Change Password</h3>
                   <form onSubmit={savePassword} style={{ display:'flex', flexDirection:'column', gap:'0.75rem' }}>
                     <Field label="Current Password">
                       <input className="prof-inp" type="password" value={currentPw} onChange={e=>setCurrentPw(e.target.value)} style={inp} placeholder="••••••••" required />
@@ -964,7 +972,7 @@ export default function Profile() {
                         <input className="prof-inp" type="password" value={confirmPw} onChange={e=>setConfirmPw(e.target.value)} style={inp} placeholder="Repeat new password" required />
                       </Field>
                     </div>
-                    <div style={{ display:'flex', flexWrap:'wrap', gap:'0.4rem 0.65rem', padding:'0.65rem 0.85rem', background:'rgba(255,255,255,0.03)', borderRadius:'10px', border:'1px solid rgba(255,255,255,0.07)' }}>
+                    <div style={{ display:'flex', flexWrap:'wrap', gap:'0.4rem 0.65rem', padding:'0.65rem 0.85rem', background:'rgba(255,255,255,0.03)', borderRadius:'99px', border:'1px solid rgba(255,255,255,0.07)' }}>
                       {[
                         { label:'8+ characters',   met: newPw.length >= 8       },
                         { label:'Uppercase letter', met: /[A-Z]/.test(newPw)     },
@@ -987,7 +995,7 @@ export default function Profile() {
                   <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'1.25rem', flexWrap:'wrap' }}>
                     <div style={{ flex:1, minWidth:'200px' }}>
                       <div style={{ display:'flex', alignItems:'center', gap:'0.6rem', marginBottom:'0.5rem' }}>
-                        <p style={{ margin:0, fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>Two-Factor Authentication</p>
+                        <p style={{ margin:0, fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Two-Factor Authentication</p>
                         {twoFAStatus === null && (
                           <span style={{ fontSize:'0.68rem', padding:'0.15rem 0.55rem', borderRadius:'99px', background:'rgba(255,255,255,0.06)', color:'rgba(148,163,184,0.6)', border:'1px solid rgba(255,255,255,0.1)' }}>loading…</span>
                         )}
@@ -1082,7 +1090,7 @@ export default function Profile() {
                       <p style={{ margin:0, fontSize:'0.72rem', color:'rgba(148,163,184,0.5)' }}>This action cannot be undone.</p>
                     </div>
                     <button
-                      style={{ padding:'0.52rem 1.1rem', background:'rgba(239,68,68,0.1)', color:'#f87171', border:'1.5px solid rgba(239,68,68,0.3)', borderRadius:'10px', fontSize:'0.82rem', fontWeight:700, cursor:'pointer', fontFamily:'inherit', flexShrink:0, alignSelf:'flex-start' }}
+                      style={{ padding:'0.52rem 1.1rem', background:'rgba(239,68,68,0.1)', color:'#f87171', border:'1.5px solid rgba(239,68,68,0.3)', borderRadius:'99px', fontSize:'0.82rem', fontWeight:700, cursor:'pointer', fontFamily:'inherit', flexShrink:0, alignSelf:'flex-start' }}
                       onClick={() => setShowDeleteModal(true)}
                     >
                       Delete Account
@@ -1131,7 +1139,7 @@ export default function Profile() {
                     <GCard key={s.label} style={{ textAlign:'center', padding:'1.1rem 0.75rem', border:`1.5px solid ${s.color}44`, boxShadow:`0 8px 28px rgba(0,0,0,0.6), 0 0 18px ${s.color}14` }}>
                       <p style={{ margin:'0 0 0.28rem', fontSize:'1.35rem' }}>{s.icon}</p>
                       <p style={{ margin:'0 0 0.12rem', fontSize:'1.45rem', fontWeight:900, color:s.color, lineHeight:1, textShadow:`0 0 14px ${s.color}88` }}>{s.value}</p>
-                      <p style={{ margin:0, fontSize:'0.62rem', color:'#94a3b8', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>{s.label}</p>
+                      <p style={{ margin:0, fontSize:'0.62rem', color: '#64748b', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>{s.label}</p>
                     </GCard>
                   ))}
                 </div>
@@ -1139,7 +1147,7 @@ export default function Profile() {
                 {/* AI predicted performance */}
                 {gamProgress && (
                   <GCard style={{ background:'linear-gradient(135deg,rgba(var(--primary-rgb),0.06),rgba(0,0,0,0))' }}>
-                    <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>AI Performance Prediction</h3>
+                    <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>AI Performance Prediction</h3>
                     <div style={{ display:'flex', flexDirection:'column', gap:'0.65rem' }}>
                       {[
                         { label:'Brain Readiness',      value: Math.min(100, Math.round(totalHours / 2)), color:'#00D4FF' },
@@ -1149,7 +1157,7 @@ export default function Profile() {
                       ].map(m => (
                         <div key={m.label}>
                           <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'0.28rem' }}>
-                            <span style={{ fontSize:'0.8rem', color:'#e2e8f0', fontWeight:500 }}>{m.label}</span>
+                            <span style={{ fontSize:'0.8rem', color: '#475569', fontWeight:500 }}>{m.label}</span>
                             <span style={{ fontSize:'0.78rem', fontWeight:700, color:m.color }}>{m.value}%</span>
                           </div>
                           <div style={{ height:'7px', background:'rgba(255,255,255,0.09)', borderRadius:'99px', overflow:'hidden', boxShadow:'inset 0 1px 3px rgba(0,0,0,0.35)' }}>
@@ -1164,7 +1172,7 @@ export default function Profile() {
                 {/* Subjects breakdown */}
                 {studentProfile?.subjects && studentProfile.subjects.length > 0 && (
                   <GCard>
-                    <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color:'#f1f5f9' }}>Subjects</h3>
+                    <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Subjects</h3>
                     <div style={{ display:'flex', flexWrap:'wrap', gap:'0.45rem' }}>
                       {studentProfile.subjects.map((sub, i) => (
                         <span key={i} style={{ padding:'0.28rem 0.75rem', borderRadius:'99px', background:'rgba(var(--primary-rgb),0.1)', border:'1px solid rgba(var(--primary-rgb),0.2)', color:'var(--primary)', fontSize:'0.78rem', fontWeight:600 }}>{sub}</span>

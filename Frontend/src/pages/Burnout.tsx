@@ -296,7 +296,7 @@ export default function Burnout() {
           <span style={p.topIcon}>🧠</span>
           <h1 style={p.pageTitle}>{t('burnout_title')}</h1>
         </div>
-        <Link to="/" style={p.homeLink}>{t('back_dashboard')}</Link>
+        <Link to="/dashboard" style={p.homeLink}>{t('back_dashboard')}</Link>
       </div>
 
       <div style={p.content}>

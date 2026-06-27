@@ -118,7 +118,7 @@ export default function SessionTimer({ subjects, onComplete }: Props) {
   const { h: rH, m: rM, s: rS } = toHMS(remainingSec);
 
   const statusColor: Record<Status, string> = {
-    ready: '#94a3b8', running: '#00D4FF', paused: '#F59E0B', completed: '#10B981',
+    ready: '#64748b', running: '#00D4FF', paused: '#F59E0B', completed: '#10B981',
   };
   const arcColor = statusColor[status];
 
@@ -278,7 +278,7 @@ export default function SessionTimer({ subjects, onComplete }: Props) {
               <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
             </filter>
           </defs>
-          <circle cx={100} cy={100} r={RADIUS} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={9} />
+          <circle cx={100} cy={100} r={RADIUS} fill="none" stroke="#e2e8f0" strokeWidth={9} />
           <circle cx={100} cy={100} r={RADIUS}
             fill="none"
             stroke={arcColor}
@@ -372,7 +372,7 @@ const tf: Record<string, React.CSSProperties> = {
   wrap:  { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' },
   label: { fontSize: '0.6rem', fontWeight: 700, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.08em' },
   adj:   { width: '32px', height: '22px', background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.18)', borderRadius: '5px', color: '#00D4FF', fontSize: '0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' },
-  input: { width: '56px', textAlign: 'center', padding: '0.38rem 0.2rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '9px', color: 'var(--text-h)', fontSize: '1.2rem', fontWeight: 700, fontFamily: 'ui-monospace,Consolas,monospace', outline: 'none' },
+  input: { width: '56px', textAlign: 'center', padding: '0.38rem 0.2rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '9px', color: 'var(--text-h)', fontSize: '1.2rem', fontWeight: 700, fontFamily: 'ui-monospace,Consolas,monospace', outline: 'none' },
 };
 
 const s: Record<string, React.CSSProperties> = {
@@ -382,7 +382,7 @@ const s: Record<string, React.CSSProperties> = {
     border: '1px solid rgba(0,212,255,0.12)',
     borderRadius: '22px', padding: '1.5rem 1.25rem',
     backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
-    boxShadow: '0 8px 48px rgba(0,0,0,0.5)',
+    boxShadow: '0 8px 48px rgba(0,0,0,0.1)',
     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.1rem',
   },
   orb1: { position: 'absolute', top: '-50px', right: '-50px', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 70%)', pointerEvents: 'none' },
@@ -398,7 +398,7 @@ const s: Record<string, React.CSSProperties> = {
   metaRow: { display: 'flex', flexDirection: 'column', gap: '0.55rem', width: '100%', position: 'relative', zIndex: 2, transition: 'opacity 0.3s' },
   metaInput: {
     width: '100%', boxSizing: 'border-box', padding: '0.55rem 0.85rem',
-    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+    background: '#f8fafc', border: '1px solid #e2e8f0',
     borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.82rem', fontFamily: 'inherit',
     outline: 'none',
   },
@@ -423,7 +423,7 @@ const s: Record<string, React.CSSProperties> = {
   },
 
   barWrap: { display: 'flex', alignItems: 'center', gap: '0.6rem', width: '100%' },
-  barTrack: { flex: 1, height: '6px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden' },
+  barTrack: { flex: 1, height: '6px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' },
   barFill:  { height: '100%', borderRadius: '99px', minWidth: 0 },
   barPct:   { fontSize: '0.68rem', fontWeight: 700, color: 'var(--text)', minWidth: '30px', textAlign: 'right' },
 
@@ -438,10 +438,10 @@ const s: Record<string, React.CSSProperties> = {
   btnAmber:   { background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', color: '#fff', boxShadow: '0 4px 16px rgba(245,158,11,0.25)' },
   btnDanger:  { background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5' },
   btnSuccess: { background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', color: '#fff', boxShadow: '0 4px 16px rgba(16,185,129,0.3)' },
-  btnGhost:   { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text)' },
+  btnGhost:   { background: '#ffffff', border: '1px solid #e2e8f0', color: 'var(--text)' },
 
   coach: {
-    width: '100%', padding: '0.85rem', borderRadius: '14px',
+    width: '100%', padding: '0.85rem', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
     background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)',
     display: 'flex', flexDirection: 'column', gap: '0.5rem', position: 'relative', zIndex: 1,
   },
@@ -452,7 +452,7 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     fontSize: '1rem', color: '#fff', boxShadow: '0 0 16px rgba(99,102,241,0.35)',
   },
-  coachName: { margin: 0, fontSize: '0.78rem', fontWeight: 700, color: '#e2e8f0' },
+  coachName: { margin: 0, fontSize: '0.78rem', fontWeight: 700, color: '#334155' },
   coachDot:  { display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', marginLeft: '0.3rem' },
   coachMsg:  { margin: 0, fontSize: '0.78rem', color: 'rgba(226,232,240,0.82)', lineHeight: 1.55, fontStyle: 'italic' },
 };

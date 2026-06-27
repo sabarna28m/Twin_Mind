@@ -121,8 +121,8 @@ const s: Record<string, React.CSSProperties> = {
   wrap: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   panel: {
     padding: '1.25rem',
-    background: 'rgba(10,16,32,0.75)', border: '1px solid rgba(255,255,255,0.07)',
-    borderRadius: '18px', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    background: 'rgba(10,16,32,0.75)', border: '1px solid #e2e8f0',
+    borderRadius: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.04)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
   },
   panelHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' },
   panelTitle:{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-h)', margin: 0 },
@@ -131,18 +131,18 @@ const s: Record<string, React.CSSProperties> = {
   chart: { display: 'flex', alignItems: 'flex-end', gap: '0.5rem', height: '100px', marginBottom: '0.75rem' },
   bar:   { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', height: '100%' },
   barVal:  { fontSize: '0.55rem', color: 'var(--text)', fontWeight: 600, minHeight: '14px', textAlign: 'center' },
-  barTrack:{ flex: 1, width: '100%', display: 'flex', alignItems: 'flex-end', background: 'rgba(255,255,255,0.04)', borderRadius: '4px 4px 0 0', overflow: 'hidden' },
+  barTrack:{ flex: 1, width: '100%', display: 'flex', alignItems: 'flex-end', background: '#ffffff', borderRadius: '4px 4px 0 0', overflow: 'hidden' },
   barFill: { width: '100%', borderRadius: '4px 4px 0 0', transition: 'height 0.8s ease, box-shadow 0.4s ease', minHeight: 0 },
   barLabel:{ fontSize: '0.62rem', fontWeight: 500 },
 
-  quickStats: { display: 'flex', gap: '1.5rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.06)' },
+  quickStats: { display: 'flex', gap: '1.5rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0' },
   qStat: { display: 'flex', flexDirection: 'column', gap: '0.15rem', alignItems: 'center' },
   qVal:  { fontSize: '1.1rem', fontWeight: 800 },
   qLbl:  { fontSize: '0.6rem', color: 'var(--text)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' },
 
   subRow:   { display: 'flex', alignItems: 'center', gap: '0.65rem' },
   subName:  { width: '90px', flexShrink: 0, fontSize: '0.78rem', color: 'var(--text-h)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-  subTrack: { flex: 1, height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' },
+  subTrack: { flex: 1, height: '6px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' },
   subFill:  { height: '100%', borderRadius: '99px', transition: 'width 0.8s ease' },
   subTime:  { width: '38px', textAlign: 'right', fontSize: '0.72rem', fontWeight: 700, flexShrink: 0 },
 };

@@ -303,7 +303,7 @@ export default function PracticeQuiz({ onBack }: Props) {
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1.5rem' }}>
               <button onClick={reset} style={p.nextBtn}>{t('quiz_take_another_btn')}</button>
               <button onClick={onBack} style={{ ...p.nextBtn, background: 'var(--bg-surface)', color: 'var(--text-h)', border: '1px solid var(--border)' }}>← Change Mode</button>
-              <Link to="/" style={{ ...p.nextBtn, background: 'var(--bg-surface)', color: 'var(--text-h)', border: '1px solid var(--border)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>Dashboard</Link>
+              <Link to="/dashboard" style={{ ...p.nextBtn, background: 'var(--bg-surface)', color: 'var(--text-h)', border: '1px solid var(--border)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>Dashboard</Link>
             </div>
           </div>
           <div style={p.reviewSection}>
@@ -450,15 +450,15 @@ export default function PracticeQuiz({ onBack }: Props) {
 }
 
 const p: Record<string, React.CSSProperties> = {
-  shell:    { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' },
-  nav:      { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', height: '56px', borderBottom: '1px solid var(--border)', background: 'var(--bg)', position: 'sticky', top: 0, zIndex: 50 },
+  shell:    { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: '#f8f9fa' },
+  nav:      { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', height: '56px', borderBottom: '1px solid var(--border)', background: '#f8f9fa', position: 'sticky', top: 0, zIndex: 50 },
   navLeft:  { display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 100 },
   navTitle: { fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-h)' },
   backBtn:  { padding: '0.35rem 0.8rem', borderRadius: '8px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-h)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' },
   modeBadge:{ padding: '0.22rem 0.7rem', borderRadius: '99px', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', color: '#818cf8', fontSize: '0.72rem', fontWeight: 700 },
   main:     { flex: 1, padding: '2rem 1.5rem 3rem', maxWidth: '960px', width: '100%', margin: '0 auto', boxSizing: 'border-box' as const },
   setupGrid:  { display: 'grid', gridTemplateColumns: '1fr 360px', gap: '1.5rem', alignItems: 'start' },
-  configCard: { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '18px', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' },
+  configCard: { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' },
   cardHead:   { display: 'flex', alignItems: 'center', gap: '0.75rem' },
   cardIcon:   { fontSize: '2rem', lineHeight: 1 },
   cardTitle:  { margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-h)' },
@@ -472,10 +472,10 @@ const p: Record<string, React.CSSProperties> = {
   diffBtn:    { display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: '10px', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' },
   diffDot:    { width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0 },
   generateBtn:{ padding: '0.9rem', borderRadius: '12px', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: '0.95rem', fontWeight: 700, letterSpacing: '0.01em', transition: 'opacity 0.15s' },
-  histCard:    { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '18px', padding: '1.5rem', maxHeight: '640px', overflowY: 'auto' as const },
+  histCard:    { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '1.5rem', maxHeight: '640px', overflowY: 'auto' as const },
   histTitle:   { margin: '0 0 1rem', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-h)' },
   histEmpty:   { color: 'var(--text)', fontSize: '0.83rem', margin: 0 },
-  histItem:    { background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.85rem 1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' },
+  histItem:    { background: '#f8f9fa', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.85rem 1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' },
   histSubject: { margin: 0, fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-h)' },
   histMeta:    { margin: 0, fontSize: '0.72rem', color: 'var(--text)' },
   histScore:   { margin: 0, fontSize: '1.1rem', fontWeight: 800 },
@@ -486,7 +486,7 @@ const p: Record<string, React.CSSProperties> = {
   spinner:   { width: '48px', height: '48px', border: '4px solid var(--border)', borderTop: '4px solid #6366f1', borderRadius: '50%' },
   genTitle:  { margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-h)' },
   genSub:    { margin: 0, fontSize: '0.85rem', color: 'var(--text)', maxWidth: '320px' },
-  quizCard:     { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '18px', padding: '2rem' },
+  quizCard:     { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '2rem' },
   progressRow:  { display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' },
   progressLabel:{ fontSize: '0.78rem', color: 'var(--text)', flexShrink: 0, fontWeight: 500 },
   progressTrack:{ flex: 1, height: '6px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' },
@@ -495,7 +495,7 @@ const p: Record<string, React.CSSProperties> = {
   questionText: { fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-h)', lineHeight: 1.55, margin: '0 0 1.5rem' },
   optionsGrid:  { display: 'flex', flexDirection: 'column', gap: '0.65rem' },
   optionBtn:    { display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '0.85rem 1rem', borderRadius: '12px', fontFamily: 'inherit', fontSize: '0.9rem', textAlign: 'left' as const, transition: 'all 0.15s', width: '100%' },
-  optionLetter: { width: '26px', height: '26px', borderRadius: '50%', background: 'rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 },
+  optionLetter: { width: '26px', height: '26px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 },
   optionText:   { flex: 1 },
   nextBtn:      { padding: '0.75rem 1.5rem', borderRadius: '10px', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: '0.88rem', fontWeight: 700, cursor: 'pointer', transition: 'opacity 0.15s' },
   timerBadge:   { padding: '0.28rem 0.7rem', borderRadius: '99px', fontSize: '0.82rem', fontWeight: 700, border: '1px solid', fontVariantNumeric: 'tabular-nums' as const },
@@ -509,12 +509,12 @@ const p: Record<string, React.CSSProperties> = {
   retakeBtn:    { padding: '0.42rem 0.9rem', borderRadius: '8px', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' },
   reviewSection:{ marginTop: '1.5rem' },
   reviewTitle:  { fontSize: '1rem', fontWeight: 700, color: 'var(--text-h)', margin: '0 0 1rem' },
-  reviewCard:   { background: 'var(--bg-surface)', border: '1px solid', borderRadius: '14px', padding: '1.1rem 1.25rem' },
+  reviewCard:   { background: 'var(--bg-surface)', border: '1px solid', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', padding: '1.1rem 1.25rem' },
   reviewHeader: { display: 'flex', alignItems: 'flex-start', gap: '0.75rem' },
   reviewNum:    { padding: '0.2rem 0.55rem', borderRadius: '99px', fontSize: '0.72rem', fontWeight: 700, flexShrink: 0, marginTop: '2px' },
   reviewQ:      { margin: 0, fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-h)', lineHeight: 1.5 },
   reviewOpt:    { display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.5rem 0.75rem', borderRadius: '8px', fontSize: '0.82rem' },
-  reviewLetter: { width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 700, flexShrink: 0 },
+  reviewLetter: { width: '20px', height: '20px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 700, flexShrink: 0 },
   explanationBox: { display: 'flex', alignItems: 'flex-start', gap: '0.55rem', marginTop: '0.65rem', padding: '0.65rem 0.85rem', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '8px' },
   explanationIcon:{ fontSize: '0.9rem', flexShrink: 0, marginTop: '1px' },
   explanationText:{ margin: 0, fontSize: '0.8rem', color: 'var(--text-h)', lineHeight: 1.55 },

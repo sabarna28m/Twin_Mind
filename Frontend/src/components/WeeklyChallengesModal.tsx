@@ -117,14 +117,14 @@ function Ring({ pct, size=120, stroke=11, color='#00D4FF' }: { pct:number; size?
   return (
     <div style={{position:'relative',width:size,height:size,flexShrink:0}}>
       <svg width={size} height={size} style={{transform:'rotate(-90deg)',display:'block'}}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={stroke}/>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#e2e8f0" strokeWidth={stroke}/>
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke}
           strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
           style={{transition:'stroke-dashoffset 0.9s ease',filter:`drop-shadow(0 0 6px ${color}88)`}}/>
       </svg>
       <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'0.1rem'}}>
-        <span style={{fontSize:size<100?'0.85rem':'1.35rem',fontWeight:900,color:'#f1f5f9',lineHeight:1}}>{Math.round(pct)}%</span>
-        <span style={{fontSize:'0.55rem',color:'rgba(148,163,184,0.45)',fontWeight:600,letterSpacing:'0.05em'}}>DONE</span>
+        <span style={{fontSize:size<100?'0.85rem':'1.35rem',fontWeight:900,color:'#0f172a',lineHeight:1}}>{Math.round(pct)}%</span>
+        <span style={{fontSize:'0.55rem',color:'#64748b',fontWeight:600,letterSpacing:'0.05em'}}>DONE</span>
       </div>
     </div>
   );
@@ -138,32 +138,32 @@ function GoalCard({ g, cur, pct, status, onRemove }: { g:GoalTemplate; cur:numbe
     ? { label:'Completed ✓', color:'#10b981', bg:'rgba(16,185,129,0.12)' }
     : status==='in_progress'
     ? { label:'In Progress',  color:'#f59e0b', bg:'rgba(245,158,11,0.1)'  }
-    : { label:'Not Started',  color:'rgba(148,163,184,0.45)', bg:'rgba(255,255,255,0.04)' };
+    : { label:'Not Started',  color:'#64748b', bg:'#f1f5f9' };
   return (
-    <div style={{padding:'1rem 1.1rem',background:status==='completed'?'rgba(16,185,129,0.06)':'rgba(255,255,255,0.03)',border:`1px solid ${status==='completed'?'rgba(16,185,129,0.3)':status==='in_progress'?cat.color+'40':'rgba(255,255,255,0.07)'}`,borderRadius:'16px',transition:'all 0.25s'}}>
+    <div style={{padding:'1rem 1.1rem',background:status==='completed'?'rgba(16,185,129,0.06)':'#f8fafc',border:`1px solid ${status==='completed'?'rgba(16,185,129,0.3)':status==='in_progress'?cat.color+'40':'#e2e8f0'}`,borderRadius:'16px',transition:'all 0.25s'}}>
       <div style={{display:'flex',alignItems:'flex-start',gap:'0.75rem',marginBottom:'0.7rem'}}>
         <div style={{width:'38px',height:'38px',borderRadius:'10px',background:`${cat.color}18`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.1rem',flexShrink:0,border:`1px solid ${cat.color}30`}}>{g.icon}</div>
         <div style={{flex:1,minWidth:0}}>
-          <p style={{margin:'0 0 0.2rem',fontSize:'0.84rem',fontWeight:700,color:status==='completed'?'#10b981':'#e2e8f0',lineHeight:1.3}}>{g.text}</p>
+          <p style={{margin:'0 0 0.2rem',fontSize:'0.84rem',fontWeight:700,color:status==='completed'?'#10b981':'#334155',lineHeight:1.3}}>{g.text}</p>
           <div style={{display:'flex',alignItems:'center',gap:'0.45rem',flexWrap:'wrap'}}>
             <span style={{fontSize:'0.62rem',fontWeight:700,padding:'0.12rem 0.45rem',borderRadius:'99px',background:sm.bg,color:sm.color,border:`1px solid ${sm.color}45`}}>{sm.label}</span>
             <span style={{fontSize:'0.62rem',color:cat.color,fontWeight:600}}>{cat.icon} {cat.label}</span>
             <span style={{fontSize:'0.63rem',color:'#f59e0b',fontWeight:700}}>+{g.xp} XP</span>
           </div>
         </div>
-        <button onClick={onRemove} style={{background:'none',border:'none',color:'rgba(148,163,184,0.22)',cursor:'pointer',padding:'0.15rem 0.25rem',borderRadius:'5px',fontSize:'0.78rem',flexShrink:0,lineHeight:1,fontFamily:'inherit'}}>✕</button>
+        <button onClick={onRemove} style={{background:'none',border:'none',color:'#cbd5e1',cursor:'pointer',padding:'0.15rem 0.25rem',borderRadius:'5px',fontSize:'0.78rem',flexShrink:0,lineHeight:1,fontFamily:'inherit'}}>✕</button>
       </div>
       <div>
         <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.28rem'}}>
-          <span style={{fontSize:'0.68rem',color:'rgba(148,163,184,0.45)',fontWeight:500}}>{meta.label}</span>
-          <span style={{fontSize:'0.7rem',fontWeight:700,color:status==='completed'?'#10b981':'#94a3b8'}}>{cur}{meta.unit} / {g.target}{meta.unit}</span>
+          <span style={{fontSize:'0.68rem',color:'#64748b',fontWeight:500}}>{meta.label}</span>
+          <span style={{fontSize:'0.7rem',fontWeight:700,color:status==='completed'?'#10b981':'#64748b'}}>{cur}{meta.unit} / {g.target}{meta.unit}</span>
         </div>
-        <div style={{height:'6px',background:'rgba(255,255,255,0.07)',borderRadius:'99px',overflow:'hidden'}}>
+        <div style={{height:'6px',background:'#e2e8f0',borderRadius:'99px',overflow:'hidden'}}>
           <div style={{height:'100%',width:`${pct}%`,borderRadius:'99px',transition:'width 0.8s ease',
-            background:status==='completed'?'linear-gradient(90deg,#10b981,#34d399)':status==='in_progress'?`linear-gradient(90deg,${cat.color},${cat.color}bb)`:'rgba(255,255,255,0.08)',
+            background:status==='completed'?'linear-gradient(90deg,#10b981,#34d399)':status==='in_progress'?`linear-gradient(90deg,${cat.color},${cat.color}bb)`:'#e2e8f0',
             boxShadow:status==='completed'?'0 0 8px rgba(16,185,129,0.5)':undefined}}/>
         </div>
-        <p style={{margin:'0.22rem 0 0',fontSize:'0.62rem',color:'rgba(148,163,184,0.32)',fontWeight:500}}>{pct}% complete</p>
+        <p style={{margin:'0.22rem 0 0',fontSize:'0.62rem',color:'#64748b',fontWeight:500}}>{pct}% complete</p>
       </div>
     </div>
   );
@@ -350,12 +350,12 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
       {/* ── Celebration popup ── */}
       {celebrating && (
         <div style={{position:'fixed',inset:0,display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000,pointerEvents:'none'}}>
-          <div style={{background:'rgba(4,8,22,0.97)',border:'1px solid rgba(0,212,255,0.45)',borderRadius:'28px',padding:'2.25rem 3rem',textAlign:'center',backdropFilter:'blur(32px)',boxShadow:'0 0 80px rgba(0,212,255,0.2),0 24px 64px rgba(0,0,0,0.7)',animation:'cel-pop 0.45s cubic-bezier(0.175,0.885,0.32,1.275) forwards',maxWidth:'360px',width:'90%'}}>
+          <div style={{background:'#ffffff',border:'1px solid rgba(0,212,255,0.45)',borderRadius:'28px',padding:'2.25rem 3rem',textAlign:'center',backdropFilter:'blur(32px)',boxShadow:'0 0 80px rgba(0,212,255,0.2),0 24px 64px rgba(0,0,0,0.1)',animation:'cel-pop 0.45s cubic-bezier(0.175,0.885,0.32,1.275) forwards',maxWidth:'360px',width:'90%'}}>
             <div style={{fontSize:'3.5rem',marginBottom:'0.6rem'}}>🎉</div>
-            <p style={{margin:'0 0 0.2rem',fontSize:'1.05rem',fontWeight:900,color:'#f1f5f9',letterSpacing:'-0.2px'}}>Weekly Challenge Completed!</p>
-            <p style={{margin:'0 0 0.65rem',fontSize:'0.85rem',color:'rgba(148,163,184,0.65)',lineHeight:1.45}}>{celebMsg}</p>
+            <p style={{margin:'0 0 0.2rem',fontSize:'1.05rem',fontWeight:900,color:'#0f172a',letterSpacing:'-0.2px'}}>Weekly Challenge Completed!</p>
+            <p style={{margin:'0 0 0.65rem',fontSize:'0.85rem',color:'#475569',lineHeight:1.45}}>{celebMsg}</p>
             <p style={{margin:'0 0 0.2rem',fontSize:'1.25rem',fontWeight:900,color:'#00D4FF'}}>+{celebXP} XP</p>
-            <p style={{margin:0,fontSize:'0.78rem',color:'rgba(148,163,184,0.5)'}}>🏆 Badge Unlocked · Keep going!</p>
+            <p style={{margin:0,fontSize:'0.78rem',color:'#64748b'}}>🏆 Badge Unlocked · Keep going!</p>
           </div>
         </div>
       )}
@@ -363,45 +363,45 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
       {/* ── Notification stack ── */}
       <div style={{position:'fixed',top:'76px',right:'1rem',display:'flex',flexDirection:'column',gap:'0.45rem',zIndex:600,pointerEvents:'none'}}>
         {notifs.map(n=>(
-          <div key={n.id} style={{display:'flex',alignItems:'center',gap:'0.65rem',background:'rgba(4,8,22,0.97)',border:'1px solid rgba(0,212,255,0.25)',borderRadius:'14px',padding:'0.65rem 1rem',backdropFilter:'blur(20px)',boxShadow:'0 8px 32px rgba(0,0,0,0.5)',animation:'notif-in 4.5s ease forwards',minWidth:'240px',maxWidth:'310px'}}>
+          <div key={n.id} style={{display:'flex',alignItems:'center',gap:'0.65rem',background:'#ffffff',border:'1px solid rgba(0,212,255,0.25)',borderRadius:'14px',padding:'0.65rem 1rem',backdropFilter:'blur(20px)',boxShadow:'0 8px 32px rgba(0,0,0,0.1)',animation:'notif-in 4.5s ease forwards',minWidth:'240px',maxWidth:'310px'}}>
             <span style={{fontSize:'1.25rem',flexShrink:0}}>{n.icon}</span>
             <div style={{minWidth:0}}>
-              <p style={{margin:0,fontSize:'0.8rem',fontWeight:700,color:'#f1f5f9',lineHeight:1.2}}>{n.title}</p>
-              <p style={{margin:'0.1rem 0 0',fontSize:'0.7rem',color:'rgba(148,163,184,0.6)',lineHeight:1.3,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{n.body}</p>
+              <p style={{margin:0,fontSize:'0.8rem',fontWeight:700,color:'#0f172a',lineHeight:1.2}}>{n.title}</p>
+              <p style={{margin:'0.1rem 0 0',fontSize:'0.7rem',color:'#475569',lineHeight:1.3,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{n.body}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* ── Modal ── */}
-      <div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.78)',backdropFilter:'blur(10px)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
-        <div onClick={e=>e.stopPropagation()} style={{background:'rgba(4,8,22,0.97)',border:'1px solid rgba(0,212,255,0.16)',borderRadius:'28px',width:'100%',maxWidth:'840px',maxHeight:'88vh',display:'flex',flexDirection:'column',backdropFilter:'blur(32px) saturate(200%)',boxShadow:'0 0 0 1px rgba(0,212,255,0.06),0 32px 80px rgba(0,0,0,0.75)',animation:'wc-enter 0.28s ease forwards'}}>
+      <div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.4)',backdropFilter:'blur(10px)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
+        <div onClick={e=>e.stopPropagation()} style={{background:'#ffffff',border:'1px solid rgba(0,212,255,0.3)',borderRadius:'28px',width:'100%',maxWidth:'840px',maxHeight:'88vh',display:'flex',flexDirection:'column',backdropFilter:'blur(32px)',boxShadow:'0 0 0 1px rgba(0,212,255,0.15),0 32px 80px rgba(0,0,0,0.15)',animation:'wc-enter 0.28s ease forwards'}}>
 
           {/* Header */}
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'1.25rem 1.75rem',borderBottom:'1px solid rgba(255,255,255,0.07)',flexShrink:0}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'1.25rem 1.75rem',borderBottom:'1px solid #e2e8f0',flexShrink:0}}>
             <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}>
               <div style={{width:'40px',height:'40px',borderRadius:'11px',flexShrink:0,background:'linear-gradient(135deg,#00D4FF,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.15rem',boxShadow:'0 4px 18px rgba(0,212,255,0.35)'}}>🏋️</div>
               <div>
-                <h2 style={{margin:0,fontSize:'1.05rem',fontWeight:900,color:'#f1f5f9',letterSpacing:'-0.3px'}}>Weekly Challenges</h2>
-                <p style={{margin:0,fontSize:'0.67rem',color:'rgba(148,163,184,0.42)',fontWeight:500}}>{weekLabel} · Fully Automated Tracking</p>
+                <h2 style={{margin:0,fontSize:'1.05rem',fontWeight:900,color:'#0f172a',letterSpacing:'-0.3px'}}>Weekly Challenges</h2>
+                <p style={{margin:0,fontSize:'0.67rem',color:'#64748b',fontWeight:500}}>{weekLabel} · Fully Automated Tracking</p>
               </div>
               {completedGoals.length>0 && (
                 <span style={{padding:'0.2rem 0.65rem',background:'rgba(16,185,129,0.12)',border:'1px solid rgba(16,185,129,0.3)',borderRadius:'99px',fontSize:'0.68rem',fontWeight:700,color:'#10b981'}}>{completedGoals.length}/{totalGoals} done · +{totalXPEarned} XP</span>
               )}
             </div>
             <div style={{display:'flex',alignItems:'center',gap:'0.6rem'}}>
-              <button onClick={loadData} disabled={loading} style={{background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'8px',color:'rgba(148,163,184,0.6)',fontSize:'0.7rem',fontWeight:600,cursor:'pointer',padding:'0.26rem 0.6rem',fontFamily:'inherit',transition:'all 0.18s'}}>{loading?'⟳ Syncing…':'⟳ Refresh'}</button>
-              <button onClick={onClose} style={{background:'transparent',border:'none',color:'rgba(148,163,184,0.5)',fontSize:'1.3rem',cursor:'pointer',padding:'0.25rem 0.45rem',borderRadius:'8px',lineHeight:1,fontFamily:'inherit'}}>✕</button>
+              <button onClick={loadData} disabled={loading} style={{background:'#f1f5f9',border:'1px solid #e2e8f0',borderRadius:'8px',color:'#475569',fontSize:'0.7rem',fontWeight:600,cursor:'pointer',padding:'0.26rem 0.6rem',fontFamily:'inherit',transition:'all 0.18s'}}>{loading?'⟳ Syncing…':'⟳ Refresh'}</button>
+              <button onClick={onClose} style={{background:'transparent',border:'none',color:'#64748b',fontSize:'1.3rem',cursor:'pointer',padding:'0.25rem 0.45rem',borderRadius:'8px',lineHeight:1,fontFamily:'inherit'}}>✕</button>
             </div>
           </div>
 
           {/* Tabs */}
-          <div style={{display:'flex',gap:'0.25rem',padding:'0.65rem 1.75rem',borderBottom:'1px solid rgba(255,255,255,0.06)',flexShrink:0}}>
+          <div style={{display:'flex',gap:'0.25rem',padding:'0.65rem 1.75rem',borderBottom:'1px solid #e2e8f0',flexShrink:0}}>
             {(['week','catalog','rewards'] as const).map((k,i)=>{
               const m=[['📊','This Week'],['➕','Add Goals'],['🏆','Rewards']][i];
               const active=tab===k;
               return (
-                <button key={k} onClick={()=>setTab(k)} style={{display:'flex',alignItems:'center',gap:'0.4rem',padding:'0.4rem 0.88rem',borderRadius:'10px',background:active?'rgba(0,212,255,0.12)':'transparent',border:active?'1px solid rgba(0,212,255,0.35)':'1px solid transparent',color:active?'#00D4FF':'rgba(148,163,184,0.52)',fontSize:'0.8rem',fontWeight:active?700:500,cursor:'pointer',fontFamily:'inherit',transition:'all 0.18s'}}>
+                <button key={k} onClick={()=>setTab(k)} style={{display:'flex',alignItems:'center',gap:'0.4rem',padding:'0.4rem 0.88rem',borderRadius:'10px',background:active?'rgba(0,212,255,0.12)':'transparent',border:active?'1px solid rgba(0,212,255,0.35)':'1px solid transparent',color:active?'#00D4FF':'#64748b',fontSize:'0.8rem',fontWeight:active?700:500,cursor:'pointer',fontFamily:'inherit',transition:'all 0.18s'}}>
                   <span>{m[0]}</span><span>{m[1]}</span>
                 </button>
               );
@@ -415,7 +415,7 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
             {tab==='week' && (
               <>
                 {/* Summary hero */}
-                <div style={{display:'flex',alignItems:'center',gap:'1.75rem',padding:'1.4rem 1.6rem',background:'rgba(255,255,255,0.025)',border:`1px solid ${ringColor}22`,borderRadius:'22px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'1.75rem',padding:'1.4rem 1.6rem',background:'#f8fafc',border:`1px solid ${ringColor}22`,borderRadius:'22px'}}>
                   <Ring pct={overallPct} size={128} stroke={12} color={ringColor} />
                   <div style={{flex:1,display:'flex',flexDirection:'column',gap:'0.85rem'}}>
                     <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'0.65rem'}}>
@@ -424,10 +424,10 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                         {icon:'⭐',v:`+${totalXPEarned}`,                      l:'XP Earned',   c:'#f59e0b'},
                         {icon:'🔥',v:`${inProgressGoals.length}`,              l:'In Progress', c:'#00D4FF'},
                       ].map(s=>(
-                        <div key={s.l} style={{textAlign:'center',padding:'0.55rem 0.4rem',background:'rgba(255,255,255,0.03)',borderRadius:'12px',border:`1px solid ${s.c}22`}}>
+                        <div key={s.l} style={{textAlign:'center',padding:'0.55rem 0.4rem',background:'#f8fafc',borderRadius:'12px',border:`1px solid ${s.c}22`}}>
                           <p style={{margin:'0 0 0.15rem',fontSize:'0.95rem'}}>{s.icon}</p>
                           <p style={{margin:'0 0 0.08rem',fontSize:'1.05rem',fontWeight:900,color:s.c}}>{s.v}</p>
-                          <p style={{margin:0,fontSize:'0.6rem',color:'rgba(148,163,184,0.42)',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.06em'}}>{s.l}</p>
+                          <p style={{margin:0,fontSize:'0.6rem',color:'#64748b',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.06em'}}>{s.l}</p>
                         </div>
                       ))}
                     </div>
@@ -436,9 +436,9 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                       {REWARD_TIERS.map(r=>{
                         const unlocked=overallPct>=r.pct;
                         return (
-                          <div key={r.label} title={`${r.label}: complete ${r.pct}% of goals · +${r.xp} XP`} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'0.18rem',padding:'0.4rem 0.2rem',borderRadius:'10px',background:unlocked?`${r.color}14`:'rgba(255,255,255,0.03)',border:`1px solid ${unlocked?r.color+'45':'rgba(255,255,255,0.07)'}`,transition:'all 0.35s',cursor:'default'}}>
-                            <span style={{fontSize:'1.05rem',filter:unlocked?'none':'grayscale(1) opacity(0.3)'}}>{r.icon}</span>
-                            <span style={{fontSize:'0.58rem',fontWeight:700,color:unlocked?r.color:'rgba(148,163,184,0.3)'}}>{r.label}</span>
+                          <div key={r.label} title={`${r.label}: complete ${r.pct}% of goals · +${r.xp} XP`} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'0.18rem',padding:'0.4rem 0.2rem',borderRadius:'10px',background:unlocked?`${r.color}14`:'#f8fafc',border:`1px solid ${unlocked?r.color+'45':'#e2e8f0'}`,transition:'all 0.35s',cursor:'default'}}>
+                            <span style={{fontSize:'1.05rem',filter:unlocked?'none':'grayscale(1) opacity(0.4)'}}>{r.icon}</span>
+                            <span style={{fontSize:'0.58rem',fontWeight:700,color:unlocked?r.color:'#64748b'}}>{r.label}</span>
                           </div>
                         );
                       })}
@@ -450,8 +450,8 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                 {totalGoals===0 && (
                   <div style={{textAlign:'center',padding:'2.5rem 1rem'}}>
                     <p style={{fontSize:'2.5rem',margin:'0 0 0.65rem'}}>🏋️</p>
-                    <p style={{margin:'0 0 0.35rem',fontSize:'0.9rem',fontWeight:700,color:'rgba(148,163,184,0.65)'}}>No active challenges</p>
-                    <p style={{margin:'0 0 1.1rem',fontSize:'0.78rem',color:'rgba(148,163,184,0.38)'}}>All progress is tracked automatically — just add goals from the catalog</p>
+                    <p style={{margin:'0 0 0.35rem',fontSize:'0.9rem',fontWeight:700,color:'#475569'}}>No active challenges</p>
+                    <p style={{margin:'0 0 1.1rem',fontSize:'0.78rem',color:'#64748b'}}>All progress is tracked automatically — just add goals from the catalog</p>
                     <button onClick={()=>setTab('catalog')} style={{padding:'0.52rem 1.4rem',background:'linear-gradient(135deg,#00D4FF,#7C3AED)',border:'none',borderRadius:'12px',color:'#fff',fontSize:'0.82rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit',boxShadow:'0 4px 18px rgba(0,212,255,0.3)'}}>Browse Goal Catalog →</button>
                   </div>
                 )}
@@ -517,7 +517,7 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                       const pct      = Math.min(100,Math.round((cur/g.target)*100));
                       const done     = cur>=g.target;
                       return (
-                        <div key={g.id} style={{padding:'1.1rem',background:'rgba(255,255,255,0.03)',border:`1px solid ${done?'rgba(16,185,129,0.35)':isActive?cat.color+'40':cat.color+'22'}`,borderRadius:'16px',display:'flex',flexDirection:'column',gap:'0.55rem',transition:'border-color 0.2s'}}>
+                        <div key={g.id} style={{padding:'1.1rem',background:'#f8fafc',border:`1px solid ${done?'rgba(16,185,129,0.35)':isActive?cat.color+'40':cat.color+'22'}`,borderRadius:'16px',display:'flex',flexDirection:'column',gap:'0.55rem',transition:'border-color 0.2s'}}>
                           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
                             <div style={{display:'flex',alignItems:'center',gap:'0.4rem'}}>
                               <span style={{fontSize:'1rem'}}>{g.icon}</span>
@@ -525,19 +525,19 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                             </div>
                             <span style={{fontSize:'0.7rem',fontWeight:700,color:'#f59e0b'}}>+{g.xp} XP</span>
                           </div>
-                          <p style={{margin:0,fontSize:'0.82rem',fontWeight:600,color:'#e2e8f0',lineHeight:1.4,flex:1}}>{g.text}</p>
+                          <p style={{margin:0,fontSize:'0.82rem',fontWeight:600,color:'#334155',lineHeight:1.4,flex:1}}>{g.text}</p>
                           {isActive && (
                             <>
-                              <div style={{height:'4px',background:'rgba(255,255,255,0.07)',borderRadius:'99px',overflow:'hidden'}}>
+                              <div style={{height:'4px',background:'#e2e8f0',borderRadius:'99px',overflow:'hidden'}}>
                                 <div style={{height:'100%',width:`${pct}%`,background:done?'#10b981':cat.color,borderRadius:'99px',transition:'width 0.7s ease'}}/>
                               </div>
-                              <p style={{margin:0,fontSize:'0.65rem',color:'rgba(148,163,184,0.42)'}}>{cur}{TRACKER_META[g.tracker].unit} / {g.target}{TRACKER_META[g.tracker].unit} · {pct}%</p>
+                              <p style={{margin:0,fontSize:'0.65rem',color:'#64748b'}}>{cur}{TRACKER_META[g.tracker].unit} / {g.target}{TRACKER_META[g.tracker].unit} · {pct}%</p>
                             </>
                           )}
                           <button onClick={()=>addGoal(g)} disabled={isActive} style={{padding:'0.32rem 0.75rem',borderRadius:'8px',fontSize:'0.72rem',fontWeight:700,cursor:isActive?'default':'pointer',fontFamily:'inherit',alignSelf:'flex-start',transition:'all 0.18s',
-                            background:done?'rgba(16,185,129,0.1)':isActive?'rgba(255,255,255,0.04)':`${cat.color}1c`,
-                            border:`1px solid ${done?'rgba(16,185,129,0.3)':isActive?'rgba(255,255,255,0.1)':cat.color+'45'}`,
-                            color:done?'#10b981':isActive?'rgba(148,163,184,0.4)':cat.color}}>
+                            background:done?'rgba(16,185,129,0.1)':isActive?'#f1f5f9':`${cat.color}1c`,
+                            border:`1px solid ${done?'rgba(16,185,129,0.3)':isActive?'#e2e8f0':cat.color+'45'}`,
+                            color:done?'#10b981':isActive?'#64748b':cat.color}}>
                             {done?'✓ Completed':isActive?'✓ Tracking':'+ Track This Goal'}
                           </button>
                         </div>
@@ -552,10 +552,10 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
             {tab==='rewards' && (
               <>
                 {/* Big ring */}
-                <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'0.65rem',padding:'1.5rem',background:'rgba(255,255,255,0.025)',border:`1px solid ${ringColor}22`,borderRadius:'22px'}}>
+                <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'0.65rem',padding:'1.5rem',background:'#f8fafc',border:`1px solid ${ringColor}22`,borderRadius:'22px'}}>
                   <Ring pct={overallPct} size={160} stroke={14} color={ringColor}/>
-                  <p style={{margin:0,fontSize:'1rem',fontWeight:800,color:'#f1f5f9'}}>{completedGoals.length} of {totalGoals} challenges completed</p>
-                  <p style={{margin:0,fontSize:'0.8rem',color:'rgba(148,163,184,0.5)'}}>+{totalXPEarned} XP earned this week</p>
+                  <p style={{margin:0,fontSize:'1rem',fontWeight:800,color:'#0f172a'}}>{completedGoals.length} of {totalGoals} challenges completed</p>
+                  <p style={{margin:0,fontSize:'0.8rem',color:'#64748b'}}>+{totalXPEarned} XP earned this week</p>
                 </div>
 
                 {/* Tier cards */}
@@ -566,15 +566,15 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                       const unlocked = overallPct>=r.pct;
                       const tierPct  = Math.min(100,Math.round((overallPct/r.pct)*100));
                       return (
-                        <div key={r.label} style={{padding:'1rem 1.1rem',background:unlocked?`${r.color}0e`:'rgba(255,255,255,0.03)',border:`1px solid ${unlocked?r.color+'40':'rgba(255,255,255,0.07)'}`,borderRadius:'16px',display:'flex',alignItems:'center',gap:'1rem',transition:'all 0.3s'}}>
-                          <span style={{fontSize:'1.9rem',filter:unlocked?'none':'grayscale(1) opacity(0.28)',flexShrink:0}}>{r.icon}</span>
+                        <div key={r.label} style={{padding:'1rem 1.1rem',background:unlocked?`${r.color}0e`:'#f8fafc',border:`1px solid ${unlocked?r.color+'40':'#e2e8f0'}`,borderRadius:'16px',display:'flex',alignItems:'center',gap:'1rem',transition:'all 0.3s'}}>
+                          <span style={{fontSize:'1.9rem',filter:unlocked?'none':'grayscale(1) opacity(0.3)',flexShrink:0}}>{r.icon}</span>
                           <div style={{flex:1,minWidth:0}}>
                             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'0.35rem'}}>
-                              <p style={{margin:0,fontSize:'0.87rem',fontWeight:700,color:unlocked?r.color:'#e2e8f0'}}>{r.label} Reward</p>
+                              <p style={{margin:0,fontSize:'0.87rem',fontWeight:700,color:unlocked?r.color:'#334155'}}>{r.label} Reward</p>
                               <span style={{fontSize:'0.75rem',fontWeight:700,color:'#f59e0b'}}>+{r.xp} XP</span>
                             </div>
-                            <p style={{margin:'0 0 0.45rem',fontSize:'0.7rem',color:'rgba(148,163,184,0.45)'}}>Complete {r.pct}% of your goals this week</p>
-                            <div style={{height:'6px',background:'rgba(255,255,255,0.07)',borderRadius:'99px',overflow:'hidden'}}>
+                            <p style={{margin:'0 0 0.45rem',fontSize:'0.7rem',color:'#64748b'}}>Complete {r.pct}% of your goals this week</p>
+                            <div style={{height:'6px',background:'#e2e8f0',borderRadius:'99px',overflow:'hidden'}}>
                               <div style={{height:'100%',width:`${unlocked?100:tierPct}%`,background:unlocked?r.color:`linear-gradient(90deg,${r.color},${r.color}88)`,borderRadius:'99px',transition:'width 0.7s ease',boxShadow:unlocked?`0 0 8px ${r.color}55`:undefined}}/>
                             </div>
                           </div>
@@ -596,10 +596,10 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                         {icon:'✅',l:'Check-ins',    v:progressData.checkin_days, u:' days', c:'#10b981'},
                         {icon:'🔥',l:'Streak',       v:progressData.streak_days,  u:' days', c:'#f59e0b'},
                       ].map(m=>(
-                        <div key={m.l} style={{padding:'0.85rem',background:'rgba(255,255,255,0.03)',border:`1px solid ${m.c}22`,borderRadius:'12px',textAlign:'center'}}>
+                        <div key={m.l} style={{padding:'0.85rem',background:'#f8fafc',border:`1px solid ${m.c}22`,borderRadius:'12px',textAlign:'center'}}>
                           <p style={{margin:'0 0 0.2rem',fontSize:'1.1rem'}}>{m.icon}</p>
                           <p style={{margin:'0 0 0.08rem',fontSize:'1.25rem',fontWeight:900,color:m.c}}>{m.v}{m.u}</p>
-                          <p style={{margin:0,fontSize:'0.63rem',color:'rgba(148,163,184,0.42)',fontWeight:600}}>{m.l}</p>
+                          <p style={{margin:0,fontSize:'0.63rem',color:'#64748b',fontWeight:600}}>{m.l}</p>
                         </div>
                       ))}
                     </div>
@@ -616,6 +616,6 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
 }
 
 // ── Shared micro-styles ───────────────────────────────────────────────────────
-const sLbl:      React.CSSProperties = { margin:0, fontSize:'0.62rem', fontWeight:800, letterSpacing:'0.1em', textTransform:'uppercase', color:'rgba(148,163,184,0.3)' };
-const chip:      React.CSSProperties = { padding:'0.3rem 0.7rem', borderRadius:'99px', background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', color:'rgba(148,163,184,0.52)', fontSize:'0.72rem', fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'all 0.18s' };
+const sLbl:      React.CSSProperties = { margin:0, fontSize:'0.62rem', fontWeight:800, letterSpacing:'0.1em', textTransform:'uppercase', color:'#64748b' };
+const chip:      React.CSSProperties = { padding:'0.3rem 0.7rem', borderRadius:'99px', background:'#f1f5f9', border:'1px solid #e2e8f0', color:'#64748b', fontSize:'0.72rem', fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'all 0.18s' };
 const activeChip:React.CSSProperties = { background:'rgba(0,212,255,0.12)', border:'1px solid rgba(0,212,255,0.35)', color:'#00D4FF' };

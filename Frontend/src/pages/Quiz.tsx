@@ -33,7 +33,7 @@ export default function Quiz() {
         <div style={s.topBarInner}>
           {/* Back + breadcrumb row */}
           <div style={s.navRow}>
-            <button onClick={() => navigate('/')} style={s.backBtn}>
+            <button onClick={() => navigate('/dashboard')} style={s.backBtn}>
               {t('back_dashboard')}
             </button>
             <nav style={s.breadcrumb} aria-label="breadcrumb">
@@ -111,7 +111,7 @@ export default function Quiz() {
               </button>
 
               {/* Focus Mode */}
-              <button onClick={() => setView('focus')} style={{ ...s.modeCard, borderColor: 'rgba(0,212,255,0.2)' }}>
+              <button onClick={() => setView('focus')} style={{ ...s.modeCard, borderColor: '#e2e8f0' }}>
                 <div style={{ ...s.modeCardGlow, background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 65%)' }} />
                 <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#00D4FF,#7c3aed)' }}>👁</div>
                 <p style={{ ...s.modeTitle, color: '#00D4FF' }}>{t('quiz_focus_title')}</p>
@@ -142,7 +142,7 @@ export default function Quiz() {
                 }}>
                   <span style={{ fontSize: '1.4rem' }}>{item.icon}</span>
                   <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 600,
-                    color: 'rgba(226,232,240,0.78)', lineHeight: 1.4 }}>
+                    color: '#475569', lineHeight: 1.4 }}>
                     {item.label}
                   </p>
                   <span style={{ fontSize: '0.65rem', color: item.color, fontWeight: 700, marginTop: 'auto' }}>
@@ -163,26 +163,26 @@ export default function Quiz() {
 
 const s: Record<string, React.CSSProperties> = {
   shell: {
-    minHeight: '100svh', background: 'var(--bg)',
+    minHeight: '100svh', background: '#f8f9fa',
     display: 'flex', flexDirection: 'column', fontFamily: "'Inter', sans-serif",
   },
   topBar: {
-    borderBottom: '1px solid rgba(255,255,255,0.07)',
-    background: 'rgba(6,11,24,0.92)', backdropFilter: 'blur(24px)',
+    borderBottom: '1px solid #e2e8f0',
+    background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(24px)',
     WebkitBackdropFilter: 'blur(24px)', position: 'sticky', top: 0, zIndex: 20,
   },
   topBarInner: { maxWidth: '960px', margin: '0 auto', padding: '0.65rem 1.25rem',
     display: 'flex', flexDirection: 'column', gap: '0.4rem' },
   navRow:   { display: 'flex', alignItems: 'center', gap: '0.75rem' },
   backBtn:  {
-    padding: '0.3rem 0.75rem', background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px',
+    padding: '0.3rem 0.75rem', background: '#e2e8f0',
+    border: '1px solid #cbd5e1', borderRadius: '8px',
     color: 'rgba(148,163,184,0.75)', fontSize: '0.75rem', fontWeight: 700,
     cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0,
     transition: 'background 0.15s, color 0.15s',
   },
   breadcrumb: { display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' as const },
-  bcDim:    { fontSize: '0.68rem', color: 'rgba(148,163,184,0.35)', fontWeight: 500 },
+  bcDim:    { fontSize: '0.68rem', color: '#64748b', fontWeight: 500 },
   bcSep:    { fontSize: '0.68rem', color: 'rgba(148,163,184,0.25)' },
   bcActive: { fontSize: '0.68rem', color: '#00D4FF', fontWeight: 700 },
   brandRow: { display: 'flex', alignItems: 'center', gap: '0.6rem' },
@@ -190,10 +190,10 @@ const s: Record<string, React.CSSProperties> = {
   brandName:{ margin: '0 0 0.05rem', fontWeight: 900, fontSize: '0.92rem',
     background: 'linear-gradient(135deg,#00D4FF,#a78bfa)',
     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' },
-  brandSub: { margin: 0, fontSize: '0.6rem', color: 'rgba(148,163,184,0.4)' },
+  brandSub: { margin: 0, fontSize: '0.6rem', color: '#64748b' },
   tabRailWrap: {
-    borderBottom: '1px solid rgba(255,255,255,0.06)',
-    background: 'rgba(6,11,24,0.6)',
+    borderBottom: '1px solid #e2e8f0',
+    background: 'rgba(255,255,255,0.6)',
   },
   tabRail: {
     display: 'flex', overflowX: 'auto' as const, gap: '0.25rem',
@@ -215,13 +215,13 @@ const s: Record<string, React.CSSProperties> = {
   main:        { flex: 1, maxWidth: '960px', width: '100%', margin: '0 auto', boxSizing: 'border-box' as const },
   modesWrap:   { padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' },
   sectionLabel:{ margin: 0, fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' as const,
-    letterSpacing: '0.08em', color: 'rgba(148,163,184,0.38)' },
+    letterSpacing: '0.08em', color: '#64748b' },
   modesGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.85rem' },
   modeCard: {
     position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
     gap: '0.6rem', padding: '1.5rem 1.25rem',
-    background: 'rgba(255,255,255,0.03)', border: '1.5px solid rgba(99,102,241,0.2)',
-    borderRadius: '18px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const,
+    background: '#ffffff', border: '1px solid #e2e8f0',
+    borderRadius: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.04)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const,
     transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden',
   },
   modeCardGlow: {
@@ -233,22 +233,22 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
   modeTitle: { margin: '0.1rem 0 0', fontWeight: 800, fontSize: '1rem', color: '#818cf8' },
-  modeDesc:  { margin: 0, fontSize: '0.78rem', color: 'rgba(148,163,184,0.65)', lineHeight: 1.5 },
+  modeDesc:  { margin: 0, fontSize: '0.78rem', color: '#475569', lineHeight: 1.5 },
   modeFeats: { display: 'flex', flexDirection: 'column' as const, gap: '0.25rem', width: '100%' },
   modeFeat:  { display: 'flex', alignItems: 'center', gap: '0.45rem' },
   featDot:   { width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0 },
-  featLabel: { fontSize: '0.72rem', color: 'rgba(148,163,184,0.7)', fontWeight: 500 },
+  featLabel: { fontSize: '0.72rem', color: '#475569', fontWeight: 500 },
   modeCTA: {
     marginTop: '0.3rem', width: '100%', padding: '0.6rem',
     borderRadius: '10px', border: 'none', color: '#fff',
     fontWeight: 800, fontSize: '0.82rem', textAlign: 'center' as const,
-    boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.08)', borderRadius: '99px',
   },
   quickRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.6rem' },
   quickCard: {
     display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.45rem',
-    padding: '0.9rem 1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid',
-    borderRadius: '14px', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const,
+    padding: '0.9rem 1rem', background: '#ffffff', border: '1px solid',
+    borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const,
     transition: 'background 0.18s', minHeight: '110px',
   },
 };

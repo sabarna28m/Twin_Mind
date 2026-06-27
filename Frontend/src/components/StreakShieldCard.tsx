@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import type { StreakShieldStatus } from '../utils/gamification';
@@ -45,10 +45,10 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
   }
 
   const shieldBarW = `${(status.shield_count / MAX_SHIELDS) * 100}%`;
-  const streakColor = status.streak_days >= 30 ? '#f59e0b' : status.streak_days >= 7 ? '#f97316' : '#00D4FF';
+  const streakColor = status.streak_days >= 30 ? '#d97706' : status.streak_days >= 7 ? '#ea580c' : '#0052cc';
 
   return (
-    <div style={s.card} className="glass-panel">
+    <div style={s.card}>
       {/* Header */}
       <div style={s.header}>
         <span style={s.title}>Streak Protection</span>
@@ -71,7 +71,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
           <span style={s.statIcon}>🛡️</span>
           <div>
             <p style={s.statLabel}>Shields</p>
-            <p style={{ ...s.statValue, color: '#a78bfa' }}>
+            <p style={{ ...s.statValue, color: '#7c3aed' }}>
               {status.shield_count} / {MAX_SHIELDS}
             </p>
           </div>
@@ -82,7 +82,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
           <span style={s.statIcon}>📅</span>
           <div>
             <p style={s.statLabel}>Last Check-in</p>
-            <p style={{ ...s.statValue, color: '#94a3b8', fontSize: '0.82rem' }}>
+            <p style={{ ...s.statValue, color: '#64748b', fontSize: '0.85rem' }}>
               {status.last_checkin
                 ? new Date(status.last_checkin + 'T00:00:00').toLocaleDateString('en', { month: 'short', day: 'numeric' })
                 : 'Never'}
@@ -95,7 +95,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
           <span style={s.statIcon}>⚡</span>
           <div>
             <p style={s.statLabel}>Recovery</p>
-            <p style={{ ...s.statValue, color: status.can_recover ? '#10b981' : '#64748b', fontSize: '0.82rem' }}>
+            <p style={{ ...s.statValue, color: status.can_recover ? '#059669' : '#64748b', fontSize: '0.85rem' }}>
               {status.can_recover ? 'Available' : status.recovery_used_this_month ? 'Used' : 'N/A'}
             </p>
           </div>
@@ -118,7 +118,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
         <div style={s.milestone}>
           <span style={s.milestoneIcon}>🎯</span>
           <span style={s.milestoneText}>
-            <strong>{daysToMilestone} day{daysToMilestone !== 1 ? 's' : ''}</strong> to {nextMilestone}-day streak
+            <strong style={{color: '#0f172a'}}>{daysToMilestone} day{daysToMilestone !== 1 ? 's' : ''}</strong> to {nextMilestone}-day streak
             {nextMilestone === 7 && ' → +1 Shield'}
             {nextMilestone === 30 && ' → +2 Shields'}
             {nextMilestone === 100 && ' → +3 Shields'}
@@ -146,7 +146,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
         </div>
       )}
 
-      {msg && <p style={{ ...s.msg, color: msg.includes('!') ? '#10b981' : '#ef4444' }}>{msg}</p>}
+      {msg && <p style={{ ...s.msg, color: msg.includes('!') ? '#059669' : '#b91c1c' }}>{msg}</p>}
 
       {/* Footer links */}
       <div style={s.footer}>
@@ -159,89 +159,92 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
 
 const s: Record<string, React.CSSProperties> = {
   card: {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(var(--primary-rgb),0.18)',
-    borderRadius: 'var(--card-radius,18px)',
-    padding: '1.25rem 1.4rem',
-    display: 'flex', flexDirection: 'column', gap: '0.85rem',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '24px',
+    padding: '2rem',
+    display: 'flex', flexDirection: 'column', gap: '1rem',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.03)',
   },
   header: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    marginBottom: '0.5rem',
   },
   title: {
-    fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.08em',
-    textTransform: 'uppercase', color: 'var(--text-h)',
+    fontSize: '0.9rem', fontWeight: 800, letterSpacing: '0.08em',
+    textTransform: 'uppercase', color: '#0f172a',
   },
   shopLink: {
-    fontSize: '0.72rem', fontWeight: 700, color: 'var(--primary)',
-    textDecoration: 'none', opacity: 0.85,
+    fontSize: '0.8rem', fontWeight: 700, color: '#0052cc',
+    textDecoration: 'none',
   },
   statsRow: {
-    display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.5rem',
+    display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.75rem',
   },
   stat: {
-    display: 'flex', alignItems: 'center', gap: '0.45rem',
-    background: 'rgba(255,255,255,0.04)', borderRadius: '10px',
-    padding: '0.55rem 0.6rem',
+    display: 'flex', alignItems: 'center', gap: '0.5rem',
+    background: '#f8f9fa', borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    padding: '0.75rem',
   },
-  statIcon: { fontSize: '1.1rem', flexShrink: 0 },
+  statIcon: { fontSize: '1.25rem', flexShrink: 0 },
   statLabel: {
-    margin: 0, fontSize: '0.56rem', fontWeight: 700, letterSpacing: '0.05em',
-    textTransform: 'uppercase', color: 'rgba(148,163,184,0.5)',
+    margin: 0, fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.05em',
+    textTransform: 'uppercase', color: '#64748b',
   },
-  statValue: { margin: 0, fontSize: '0.9rem', fontWeight: 800, lineHeight: 1.2 },
+  statValue: { margin: 0, fontSize: '1rem', fontWeight: 800, lineHeight: 1.2 },
 
-  barWrap: { display: 'flex', alignItems: 'center', gap: '0.6rem' },
+  barWrap: { display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem' },
   barTrack: {
-    flex: 1, height: '6px', borderRadius: '3px',
-    background: 'rgba(255,255,255,0.08)', position: 'relative', overflow: 'visible',
+    flex: 1, height: '8px', borderRadius: '4px',
+    background: '#e2e8f0', position: 'relative', overflow: 'visible',
   },
   barFill: {
-    height: '100%', borderRadius: '3px',
-    background: 'linear-gradient(90deg,#6366f1,#a78bfa)',
+    height: '100%', borderRadius: '4px',
+    background: 'linear-gradient(90deg, #0052cc, #6366f1)',
     transition: 'width 0.4s ease',
-    boxShadow: '0 0 8px rgba(99,102,241,0.5)',
   },
   barTick: {
-    position: 'absolute', top: '-2px', width: '1px', height: '10px',
-    background: 'rgba(255,255,255,0.15)', transform: 'translateX(-50%)',
+    position: 'absolute', top: '-2px', width: '2px', height: '12px',
+    background: '#ffffff', transform: 'translateX(-50%)', borderRadius: '1px'
   },
-  barLabel: { fontSize: '0.68rem', color: 'rgba(148,163,184,0.5)', whiteSpace: 'nowrap', fontWeight: 600 },
+  barLabel: { fontSize: '0.75rem', color: '#64748b', whiteSpace: 'nowrap', fontWeight: 700 },
 
   milestone: {
-    display: 'flex', alignItems: 'center', gap: '0.5rem',
-    background: 'rgba(var(--primary-rgb),0.07)',
-    border: '1px solid rgba(var(--primary-rgb),0.14)',
-    borderRadius: '10px', padding: '0.5rem 0.75rem',
+    display: 'flex', alignItems: 'center', gap: '0.75rem',
+    background: '#f8f9fa',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px', padding: '0.75rem 1rem',
   },
-  milestoneIcon: { fontSize: '0.9rem' },
-  milestoneText: { fontSize: '0.76rem', color: 'var(--text)', lineHeight: 1.4 },
+  milestoneIcon: { fontSize: '1.1rem' },
+  milestoneText: { fontSize: '0.85rem', color: '#475569', lineHeight: 1.4 },
 
   recoveryBox: {
-    display: 'flex', alignItems: 'center', gap: '0.75rem',
-    background: 'rgba(16,185,129,0.07)',
-    border: '1px solid rgba(16,185,129,0.2)',
-    borderRadius: '12px', padding: '0.65rem 0.85rem',
+    display: 'flex', alignItems: 'center', gap: '1rem',
+    background: '#ecfdf5',
+    border: '1px solid #a7f3d0',
+    borderRadius: '16px', padding: '1rem 1.25rem',
   },
   recoveryInfo: { flex: 1 },
-  recoveryTitle: { margin: 0, fontSize: '0.78rem', fontWeight: 800, color: '#10b981' },
-  recoverySub: { margin: 0, fontSize: '0.68rem', color: 'rgba(148,163,184,0.6)' },
+  recoveryTitle: { margin: 0, fontSize: '0.9rem', fontWeight: 800, color: '#059669' },
+  recoverySub: { margin: '0.2rem 0 0', fontSize: '0.8rem', color: '#047857' },
   recoverBtn: {
-    padding: '0.42rem 0.85rem', borderRadius: '9px', fontFamily: 'inherit',
-    background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.35)',
-    color: '#10b981', fontSize: '0.74rem', fontWeight: 700, cursor: 'pointer',
-    whiteSpace: 'nowrap', transition: 'background 0.18s',
+    padding: '0.6rem 1.2rem', borderRadius: '99px', fontFamily: 'inherit',
+    background: '#10b981', border: 'none',
+    color: '#ffffff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer',
+    whiteSpace: 'nowrap', transition: 'background 0.18s, transform 0.18s',
   },
 
-  msg: { margin: 0, fontSize: '0.75rem', fontWeight: 600 },
+  msg: { margin: 0, fontSize: '0.85rem', fontWeight: 600 },
 
-  footer: { display: 'flex', gap: '0.75rem' },
+  footer: { display: 'flex', gap: '0.75rem', marginTop: '0.5rem' },
   footerLink: {
-    fontSize: '0.72rem', fontWeight: 700, color: 'var(--primary)',
-    textDecoration: 'none', opacity: 0.75,
-    padding: '0.3rem 0.65rem',
-    background: 'rgba(var(--primary-rgb),0.07)',
-    border: '1px solid rgba(var(--primary-rgb),0.15)',
-    borderRadius: '8px',
+    fontSize: '0.8rem', fontWeight: 700, color: '#0f172a',
+    textDecoration: 'none',
+    padding: '0.5rem 1rem',
+    background: '#f8f9fa',
+    border: '1px solid #e2e8f0',
+    borderRadius: '99px',
+    transition: 'background 0.2s',
   },
 };

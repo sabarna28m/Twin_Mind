@@ -63,7 +63,7 @@ function QuestionCard({
   q: QuizQuestion; index: number; total: number;
   answer: string | undefined; onAnswer: (a: string) => void;
 }) {
-  const diffColor = DIFF_COLORS[q.difficulty] ?? '#94a3b8';
+  const diffColor = DIFF_COLORS[q.difficulty] ?? '#64748b';
   return (
     <div style={qc.wrap}>
       {/* Header */}
@@ -88,8 +88,8 @@ function QuestionCard({
             return (
               <button key={oi} onClick={() => onAnswer(letter)} style={{
                 ...qc.optBtn,
-                background: selected ? 'rgba(0,212,255,0.15)' : 'rgba(255,255,255,0.03)',
-                borderColor: selected ? 'rgba(0,212,255,0.5)' : 'rgba(255,255,255,0.1)',
+                background: selected ? 'rgba(0,212,255,0.15)' : '#ffffff',
+                borderColor: selected ? 'rgba(0,212,255,0.5)' : '#e2e8f0',
                 color: selected ? '#00D4FF' : 'rgba(226,232,240,0.78)',
               }}>
                 {opt}
@@ -104,8 +104,8 @@ function QuestionCard({
           {['True', 'False'].map(v => (
             <button key={v} onClick={() => onAnswer(v)} style={{
               ...qc.tfBtn,
-              background: answer === v ? (v === 'True' ? 'rgba(52,211,153,0.15)' : 'rgba(248,113,113,0.15)') : 'rgba(255,255,255,0.03)',
-              borderColor: answer === v ? (v === 'True' ? 'rgba(52,211,153,0.5)' : 'rgba(248,113,113,0.5)') : 'rgba(255,255,255,0.1)',
+              background: answer === v ? (v === 'True' ? 'rgba(52,211,153,0.15)' : 'rgba(248,113,113,0.15)') : '#ffffff',
+              borderColor: answer === v ? (v === 'True' ? 'rgba(52,211,153,0.5)' : 'rgba(248,113,113,0.5)') : '#e2e8f0',
               color: answer === v ? (v === 'True' ? '#34d399' : '#f87171') : 'rgba(148,163,184,0.7)',
             }}>{v}</button>
           ))}
@@ -135,17 +135,17 @@ function QuestionCard({
   );
 }
 const qc: Record<string, React.CSSProperties> = {
-  wrap:      { display: 'flex', flexDirection: 'column', gap: '0.85rem', padding: '1.25rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px' },
+  wrap:      { display: 'flex', flexDirection: 'column', gap: '0.85rem', padding: '1.25rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px' },
   head:      { display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' as const },
-  qNum:      { fontSize: '0.7rem', fontWeight: 800, color: 'rgba(148,163,184,0.5)' },
+  qNum:      { fontSize: '0.7rem', fontWeight: 800, color: '#64748b' },
   diffChip:  { padding: '0.12rem 0.4rem', borderRadius: '99px', fontSize: '0.63rem', fontWeight: 700, border: '1px solid' },
   topicChip: { padding: '0.12rem 0.4rem', borderRadius: '99px', fontSize: '0.63rem', fontWeight: 600, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', color: '#a78bfa' },
   marksChip: { marginLeft: 'auto', padding: '0.12rem 0.4rem', borderRadius: '99px', fontSize: '0.63rem', fontWeight: 700, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#fbbf24' },
   qText:     { margin: 0, fontSize: '0.92rem', fontWeight: 600, color: 'rgba(226,232,240,0.9)', lineHeight: 1.55 },
   optBtn:    { textAlign: 'left' as const, padding: '0.6rem 0.85rem', border: '1.5px solid', borderRadius: '10px', cursor: 'pointer', fontSize: '0.82rem', fontFamily: 'inherit', transition: 'background 0.18s, border-color 0.18s', fontWeight: 500 },
   tfBtn:     { flex: 1, padding: '0.65rem', border: '1.5px solid', borderRadius: '10px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, fontFamily: 'inherit', transition: 'background 0.18s, border-color 0.18s' },
-  textInput: { padding: '0.6rem 0.85rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.85rem', fontFamily: 'inherit', outline: 'none' },
-  textarea:  { padding: '0.65rem 0.85rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.84rem', fontFamily: 'inherit', outline: 'none', resize: 'vertical' as const, lineHeight: 1.5 },
+  textInput: { padding: '0.6rem 0.85rem', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.85rem', fontFamily: 'inherit', outline: 'none' },
+  textarea:  { padding: '0.65rem 0.85rem', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.84rem', fontFamily: 'inherit', outline: 'none', resize: 'vertical' as const, lineHeight: 1.5 },
 };
 
 /* ── Review card (after submission) ─────────────────────────────────────────── */
@@ -159,8 +159,8 @@ function ReviewCard({ q, userAnswer }: { q: QuizQuestion; userAnswer: string | u
   return (
     <div style={{
       ...qc.wrap,
-      borderColor: !isObjective ? 'rgba(255,255,255,0.08)' : isCorrect ? 'rgba(52,211,153,0.3)' : 'rgba(248,113,113,0.3)',
-      background:  !isObjective ? 'rgba(255,255,255,0.02)' : isCorrect ? 'rgba(52,211,153,0.05)' : 'rgba(248,113,113,0.05)',
+      borderColor: !isObjective ? '#e2e8f0' : isCorrect ? 'rgba(52,211,153,0.3)' : 'rgba(248,113,113,0.3)',
+      background:  !isObjective ? '#ffffff' : isCorrect ? 'rgba(52,211,153,0.05)' : 'rgba(248,113,113,0.05)',
     }}>
       <div style={qc.head}>
         <span style={qc.qNum}>Q{q.id}</span>
@@ -176,8 +176,8 @@ function ReviewCard({ q, userAnswer }: { q: QuizQuestion; userAnswer: string | u
       <p style={qc.qText}>{q.question}</p>
 
       {/* User's answer */}
-      <div style={{ padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.04)', borderRadius: '8px' }}>
-        <p style={{ margin: '0 0 0.15rem', fontSize: '0.62rem', fontWeight: 700, color: 'rgba(148,163,184,0.5)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Your Answer</p>
+      <div style={{ padding: '0.5rem 0.75rem', background: '#ffffff', borderRadius: '8px' }}>
+        <p style={{ margin: '0 0 0.15rem', fontSize: '0.62rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Your Answer</p>
         <p style={{ margin: 0, fontSize: '0.82rem', color: isObjective ? (isCorrect ? '#34d399' : '#f87171') : 'rgba(226,232,240,0.8)', fontWeight: 600 }}>
           {userAnswer ?? <em style={{ opacity: 0.4 }}>Not answered</em>}
         </p>
@@ -193,13 +193,13 @@ function ReviewCard({ q, userAnswer }: { q: QuizQuestion; userAnswer: string | u
 
       {/* Explanation */}
       <button onClick={() => setShowExp(v => !v)} style={{
-        padding: '0.3rem 0.6rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '7px', fontSize: '0.7rem', color: 'rgba(148,163,184,0.6)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const,
+        padding: '0.3rem 0.6rem', background: 'transparent', border: '1px solid #e2e8f0',
+        borderRadius: '7px', fontSize: '0.7rem', color: '#475569', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const,
       }}>
         {showExp ? '▲ Hide' : '▼ Show'} Explanation
       </button>
       {showExp && (
-        <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(226,232,240,0.65)', lineHeight: 1.55, padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
+        <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(226,232,240,0.65)', lineHeight: 1.55, padding: '0.5rem', background: '#ffffff', borderRadius: '8px' }}>
           {q.explanation}
         </p>
       )}
@@ -297,8 +297,8 @@ export default function AIAssessments() {
                 onClick={() => setSelected(m)}
                 style={{
                   ...s.matCard,
-                  borderColor: selected?.id === m.id ? 'rgba(0,212,255,0.5)' : 'rgba(255,255,255,0.08)',
-                  background:  selected?.id === m.id ? 'rgba(0,212,255,0.08)' : 'rgba(255,255,255,0.03)',
+                  borderColor: selected?.id === m.id ? 'rgba(0,212,255,0.5)' : '#e2e8f0',
+                  background:  selected?.id === m.id ? 'rgba(0,212,255,0.08)' : '#ffffff',
                 }}
               >
                 <span style={{ fontSize: '1.2rem' }}>{fileIcon(m.mime_type)}</span>
@@ -333,7 +333,7 @@ export default function AIAssessments() {
               {(['easy', 'medium', 'hard', 'mixed'] as Difficulty[]).map(d => (
                 <button key={d} onClick={() => setDifficulty(d)} style={{
                   ...s.diffBtn,
-                  borderColor: difficulty === d ? DIFF_COLORS[d] : 'rgba(255,255,255,0.1)',
+                  borderColor: difficulty === d ? DIFF_COLORS[d] : '#e2e8f0',
                   background:  difficulty === d ? `${DIFF_COLORS[d]}18` : 'transparent',
                   color:       difficulty === d ? DIFF_COLORS[d] : 'rgba(148,163,184,0.55)',
                 }}>{d.charAt(0).toUpperCase() + d.slice(1)}</button>
@@ -346,7 +346,7 @@ export default function AIAssessments() {
             <label style={s.configLabel}>Number of Questions: <strong style={{ color: '#00D4FF' }}>{count}</strong></label>
             <input type="range" min={5} max={30} step={5} value={count} onChange={e => setCount(Number(e.target.value))}
               style={{ width: '100%', accentColor: '#00D4FF' }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: 'rgba(148,163,184,0.35)', marginTop: '0.1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: '#64748b', marginTop: '0.1rem' }}>
               <span>5</span><span>15</span><span>30</span>
             </div>
           </div>
@@ -358,7 +358,7 @@ export default function AIAssessments() {
               {Q_TYPE_OPTIONS.map(t => (
                 <button key={t} onClick={() => toggleType(t)} style={{
                   ...s.typeBtn,
-                  borderColor: types.includes(t) ? 'rgba(99,102,241,0.5)' : 'rgba(255,255,255,0.1)',
+                  borderColor: types.includes(t) ? 'rgba(99,102,241,0.5)' : '#e2e8f0',
                   background:  types.includes(t) ? 'rgba(99,102,241,0.15)' : 'transparent',
                   color:       types.includes(t) ? '#a78bfa' : 'rgba(148,163,184,0.55)',
                 }}>{TYPE_LABELS[t]}</button>
@@ -407,10 +407,10 @@ export default function AIAssessments() {
 
         {/* Progress */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ flex: 1, height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '99px', overflow: 'hidden' }}>
+          <div style={{ flex: 1, height: '5px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${progressPct}%`, background: 'linear-gradient(90deg, #00D4FF, #7c3aed)', borderRadius: '99px', transition: 'width 0.3s' }} />
           </div>
-          <span style={{ fontSize: '0.7rem', color: 'rgba(148,163,184,0.5)', fontWeight: 600, whiteSpace: 'nowrap' as const }}>
+          <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, whiteSpace: 'nowrap' as const }}>
             {answered} / {questions.length} answered
           </span>
         </div>
@@ -440,9 +440,9 @@ export default function AIAssessments() {
                 style={{
                   width: '28px', height: '28px', borderRadius: '50%', border: '1.5px solid',
                   fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-                  background: i === current ? 'rgba(0,212,255,0.2)' : answers[questions[i].id] !== undefined ? 'rgba(52,211,153,0.12)' : 'rgba(255,255,255,0.04)',
-                  borderColor: i === current ? 'rgba(0,212,255,0.5)' : answers[questions[i].id] !== undefined ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.1)',
-                  color: i === current ? '#00D4FF' : answers[questions[i].id] !== undefined ? '#34d399' : 'rgba(148,163,184,0.5)',
+                  background: i === current ? 'rgba(0,212,255,0.2)' : answers[questions[i].id] !== undefined ? 'rgba(52,211,153,0.12)' : '#ffffff',
+                  borderColor: i === current ? 'rgba(0,212,255,0.5)' : answers[questions[i].id] !== undefined ? 'rgba(52,211,153,0.3)' : '#e2e8f0',
+                  color: i === current ? '#00D4FF' : answers[questions[i].id] !== undefined ? '#34d399' : '#64748b',
                 }}
               >{i + 1}</button>
             ))}
@@ -476,7 +476,7 @@ export default function AIAssessments() {
           <p style={{ margin: '0 0 0.35rem', fontWeight: 700, fontSize: '1rem', color: 'rgba(226,232,240,0.88)' }}>
             {pct >= 80 ? '🏆 Excellent!' : pct >= 65 ? '👍 Good Job!' : pct >= 50 ? '📖 Keep Practicing' : '💪 Need More Study'}
           </p>
-          <p style={{ margin: '0 0 1.25rem', fontSize: '0.8rem', color: 'rgba(148,163,184,0.5)' }}>
+          <p style={{ margin: '0 0 1.25rem', fontSize: '0.8rem', color: '#64748b' }}>
             {correctCount} / {objective.length} correct · {earnedMarks} / {totalMarks} marks
             {questions.length > objective.length && ` · ${questions.length - objective.length} subjective (self-review)`}
           </p>
@@ -502,28 +502,28 @@ export default function AIAssessments() {
 
 const s: Record<string, React.CSSProperties> = {
   wrap:       { display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.25rem', maxWidth: '820px', margin: '0 auto' },
-  pageHead:   { paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)' },
+  pageHead:   { paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0' },
   pageTitle:  { margin: '0 0 0.2rem', fontWeight: 900, fontSize: '1.05rem', color: 'rgba(226,232,240,0.92)' },
-  pageSub:    { margin: 0, fontSize: '0.75rem', color: 'rgba(148,163,184,0.5)' },
-  card:       { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' },
+  pageSub:    { margin: 0, fontSize: '0.75rem', color: '#64748b' },
+  card:       { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' },
   cardTitle:  { margin: 0, fontWeight: 800, fontSize: '0.9rem', color: 'rgba(226,232,240,0.88)' },
-  hint:       { margin: 0, fontSize: '0.78rem', color: 'rgba(148,163,184,0.4)', textAlign: 'center' as const },
+  hint:       { margin: 0, fontSize: '0.78rem', color: '#64748b', textAlign: 'center' as const },
   matGrid:    { display: 'flex', flexDirection: 'column', gap: '0.35rem', maxHeight: '200px', overflowY: 'auto' as const },
   matCard:    { display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.55rem 0.75rem', borderRadius: '10px', border: '1px solid', cursor: 'pointer', transition: 'border-color 0.18s, background 0.18s' },
   matName:    { flex: 1, margin: 0, fontSize: '0.78rem', fontWeight: 600, color: 'rgba(226,232,240,0.82)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
   selectedMark:{ fontSize: '0.75rem', fontWeight: 800, color: '#00D4FF', flexShrink: 0 },
   configGrid: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   configField:{ display: 'flex', flexDirection: 'column', gap: '0.4rem' },
-  configLabel:{ fontSize: '0.74rem', fontWeight: 700, color: 'rgba(148,163,184,0.6)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' },
-  textInput:  { padding: '0.55rem 0.85rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.84rem', fontFamily: 'inherit', outline: 'none' },
+  configLabel:{ fontSize: '0.74rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase' as const, letterSpacing: '0.06em' },
+  textInput:  { padding: '0.55rem 0.85rem', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.84rem', fontFamily: 'inherit', outline: 'none' },
   diffBtn:    { flex: '1 1 70px', padding: '0.4rem 0.6rem', border: '1px solid', borderRadius: '8px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.75rem', fontWeight: 700, transition: 'all 0.18s' },
   typeBtn:    { padding: '0.3rem 0.6rem', border: '1px solid', borderRadius: '7px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.7rem', fontWeight: 700, transition: 'all 0.18s' },
   error:      { padding: '0.55rem 0.8rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: '#fca5a5', fontSize: '0.8rem', margin: 0 },
   primaryBtn: { padding: '0.65rem 1.4rem', border: 'none', borderRadius: '10px', background: 'linear-gradient(135deg, #00D4FF, #7c3aed)', color: '#fff', fontWeight: 800, fontSize: '0.88rem', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 16px rgba(0,212,255,0.22)', transition: 'opacity 0.2s' },
-  outlineBtn: { padding: '0.55rem 1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '9px', color: 'rgba(148,163,184,0.7)', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' },
-  loadingRow: { display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.65rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px' },
+  outlineBtn: { padding: '0.55rem 1rem', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '9px', color: 'rgba(148,163,184,0.7)', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' },
+  loadingRow: { display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.65rem', background: '#ffffff', borderRadius: '10px' },
   spinner:    { width: '18px', height: '18px', border: '2px solid rgba(0,212,255,0.15)', borderTopColor: '#00D4FF', borderRadius: '50%', animation: 'spin 0.8s linear infinite', flexShrink: 0 },
   quizHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem' },
   quizTitle:  { margin: '0 0 0.15rem', fontWeight: 800, fontSize: '0.9rem', color: 'rgba(226,232,240,0.88)' },
-  quizMeta:   { margin: 0, fontSize: '0.7rem', color: 'rgba(148,163,184,0.45)' },
+  quizMeta:   { margin: 0, fontSize: '0.7rem', color: '#64748b' },
 };

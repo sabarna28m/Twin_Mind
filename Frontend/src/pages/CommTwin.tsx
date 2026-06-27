@@ -1020,7 +1020,7 @@ export default function CommTwin() {
           <div style={{ color:MUTED,fontSize:'0.72rem' }}>AI-powered communication intelligence hub</div>
         </div>
         <div style={{ marginLeft:'auto' }}>
-          <Link to="/" style={{ color:MUTED,fontSize:'0.8rem',textDecoration:'none' }}>← Dashboard</Link>
+          <Link to="/dashboard" style={{ color:MUTED,fontSize:'0.8rem',textDecoration:'none' }}>← Dashboard</Link>
         </div>
       </div>
 

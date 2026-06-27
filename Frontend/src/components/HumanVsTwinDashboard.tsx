@@ -93,11 +93,11 @@ function MetricCard({ m, icon }: { m: MetricComparison; icon: string }) {
   const c = accColor(m.accuracy);
   const better = m.better_than_predicted;
   return (
-    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', overflow: 'hidden' }}>
+    <div style={{ background: '#f8f9fa', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', overflow: 'hidden' }}>
       {/* Label row */}
       <div style={{ padding: '0.6rem 0.9rem 0.35rem', display: 'flex', alignItems: 'center', gap: '0.45rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <span style={{ fontSize: '0.9rem' }}>{icon}</span>
-        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{m.label}</span>
+        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{m.label}</span>
         <span style={{ marginLeft: 'auto', fontSize: '0.62rem', fontWeight: 700, padding: '0.12rem 0.5rem', borderRadius: '99px', background: accBg(m.accuracy), color: c, border: `1px solid ${c}30` }}>
           {m.accuracy.toFixed(0)}% match
         </span>
@@ -107,13 +107,13 @@ function MetricCard({ m, icon }: { m: MetricComparison; icon: string }) {
         {/* Actual */}
         <div style={{ padding: '0.75rem 0.9rem' }}>
           <p style={{ margin: '0 0 0.15rem', fontSize: '0.6rem', fontWeight: 700, color: '#00D4FF', textTransform: 'uppercase', letterSpacing: '0.07em' }}>You</p>
-          <p style={{ margin: 0, fontSize: '1.35rem', fontWeight: 900, color: '#f1f5f9', lineHeight: 1 }}>
+          <p style={{ margin: 0, fontSize: '1.35rem', fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>
             {m.actual % 1 === 0 ? m.actual : m.actual.toFixed(1)}
             <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#475569', marginLeft: '0.2rem' }}>{m.unit}</span>
           </p>
         </div>
         {/* Divider */}
-        <div style={{ background: 'rgba(255,255,255,0.05)' }} />
+        <div style={{ background: '#f8f9fa' }} />
         {/* Predicted */}
         <div style={{ padding: '0.75rem 0.9rem', position: 'relative' }}>
           <p style={{ margin: '0 0 0.15rem', fontSize: '0.6rem', fontWeight: 700, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Twin</p>
@@ -150,14 +150,14 @@ export default function HumanVsTwinDashboard() {
   }, []);
 
   const card: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '20px', padding: '1.5rem',
-    backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+    background: '#ffffff', border: '1px solid #e2e8f0',
+    borderRadius: '24px', padding: '1.5rem',
+    backdropFilter: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
   };
   const fullWidth: React.CSSProperties = { gridColumn: '1 / -1' };
   const sectionTitle: React.CSSProperties = {
     margin: '0 0 0.25rem', fontSize: '0.95rem', fontWeight: 700,
-    color: '#f1f5f9', letterSpacing: '-0.1px',
+    color: '#0f172a', letterSpacing: '-0.1px',
   };
   const sectionSub: React.CSSProperties = {
     margin: '0 0 1.1rem', fontSize: '0.72rem', color: '#475569',
@@ -175,7 +175,7 @@ export default function HumanVsTwinDashboard() {
   if (!data || !data.has_sufficient_data) return (
     <div style={{ ...card, gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
       <p style={{ fontSize: '2.5rem', margin: '0 0 0.75rem' }}>🧠</p>
-      <p style={{ margin: '0 0 0.4rem', fontSize: '0.92rem', fontWeight: 700, color: '#f1f5f9' }}>Activating Human vs Twin Analysis</p>
+      <p style={{ margin: '0 0 0.4rem', fontSize: '0.92rem', fontWeight: 700, color: '#0f172a' }}>Activating Human vs Twin Analysis</p>
       <p style={{ margin: '0 0 1.25rem', fontSize: '0.82rem', color: '#475569', lineHeight: 1.6, maxWidth: '360px', marginLeft: 'auto', marginRight: 'auto' }}>
         {data?.data_points === 1
           ? 'One more check-in needed — the Twin needs at least 2 data points to start comparing predictions with reality.'
@@ -222,7 +222,7 @@ export default function HumanVsTwinDashboard() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.85rem' }} className="mob-mid-row">
           {/* Twin Accuracy Score */}
-          <div style={{ padding: '1.1rem', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '16px' }}>
+          <div style={{ padding: '1.1rem', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '24px' }}>
             <p style={{ margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Twin Accuracy Score</p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
               <span style={{ fontSize: '2.4rem', fontWeight: 900, color: accColor(data.twin_accuracy_score), lineHeight: 1 }}>
@@ -241,16 +241,16 @@ export default function HumanVsTwinDashboard() {
           </div>
 
           {/* Learning Status */}
-          <div style={{ padding: '1.1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px' }}>
-            <p style={{ margin: '0 0 0.4rem', fontSize: '0.62rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Twin Learning Status</p>
-            <p style={{ margin: '0 0 0.35rem', fontSize: '0.95rem', fontWeight: 800, color: '#f1f5f9', lineHeight: 1.2 }}>
+          <div style={{ padding: '1.1rem', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius: '24px' }}>
+            <p style={{ margin: '0 0 0.4rem', fontSize: '0.62rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Twin Learning Status</p>
+            <p style={{ margin: '0 0 0.35rem', fontSize: '0.95rem', fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>
               {data.learning_status_label}
             </p>
             <p style={{ margin: 0, fontSize: '0.68rem', color: '#475569', lineHeight: 1.5 }}>{data.learning_status_detail}</p>
           </div>
 
           {/* Confidence */}
-          <div style={{ padding: '1.1rem', background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.18)', borderRadius: '16px' }}>
+          <div style={{ padding: '1.1rem', background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.18)', borderRadius: '24px' }}>
             <p style={{ margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Prediction Confidence</p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3rem', marginBottom: '0.4rem' }}>
               <span style={{ fontSize: '2.4rem', fontWeight: 900, color: '#10b981', lineHeight: 1 }}>{Math.round(data.prediction_confidence)}</span>
@@ -278,7 +278,7 @@ export default function HumanVsTwinDashboard() {
           ))}
         </div>
         {/* Column labels */}
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.05)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0', flexWrap: 'wrap' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.68rem', color: '#00D4FF' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00D4FF', display: 'inline-block' }} />
             You (actual behavior)
@@ -301,7 +301,7 @@ export default function HumanVsTwinDashboard() {
             <p style={sectionTitle}>Prediction vs Reality</p>
             <p style={{ ...sectionSub, marginBottom: 0 }}>Solid = you (actual), dashed = Twin (predicted). Hover for accuracy per point.</p>
           </div>
-          <div style={{ display: 'flex', gap: '0.3rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '3px' }}>
+          <div style={{ display: 'flex', gap: '0.3rem', background: 'rgba(255,255,255,0.04)', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '3px' }}>
             {(['study', 'quiz', 'sessions'] as const).map(t => (
               <button key={t} onClick={() => setTab(t)}
                 style={{ padding: '0.28rem 0.7rem', borderRadius: '7px', fontSize: '0.68rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', border: tab === t ? '1px solid rgba(99,102,241,0.4)' : '1px solid transparent', background: tab === t ? 'rgba(99,102,241,0.18)' : 'transparent', color: tab === t ? '#818cf8' : '#475569', transition: 'all 0.15s' }}>
@@ -380,7 +380,7 @@ export default function HumanVsTwinDashboard() {
                 <span style={{ fontSize: '1rem', flexShrink: 0, marginTop: '1px' }}>
                   {i === 0 ? '🎯' : i === 1 ? '📊' : i === 2 ? '🔮' : i === 3 ? '⚡' : '💡'}
                 </span>
-                <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8', lineHeight: 1.6 }}>{insight}</p>
+                <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b', lineHeight: 1.6 }}>{insight}</p>
               </div>
             ))}
           </div>
@@ -402,7 +402,7 @@ export default function HumanVsTwinDashboard() {
                     <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: `${c}15`, border: `1px solid ${c}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', flexShrink: 0 }}>
                       {better ? '📈' : '📉'}
                     </div>
-                    {i < data.prediction_history.length - 1 && <div style={{ width: '1px', flex: 1, background: 'rgba(255,255,255,0.05)', marginTop: '4px' }} />}
+                    {i < data.prediction_history.length - 1 && <div style={{ width: '1px', flex: 1, background: '#f8f9fa', marginTop: '4px' }} />}
                   </div>
                   <div style={{ paddingTop: '4px', flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem', flexWrap: 'wrap' }}>
@@ -410,7 +410,7 @@ export default function HumanVsTwinDashboard() {
                       <span style={{ fontSize: '0.62rem', padding: '0.1rem 0.45rem', borderRadius: '99px', background: `${c}15`, color: c, border: `1px solid ${c}25` }}>{ev.metric}</span>
                       <span style={{ fontSize: '0.62rem', fontWeight: 700, color: c, marginLeft: 'auto' }}>{ev.accuracy.toFixed(0)}% accurate</span>
                     </div>
-                    <p style={{ margin: '0 0 0.25rem', fontSize: '0.78rem', color: '#94a3b8', lineHeight: 1.5 }}>{ev.description}</p>
+                    <p style={{ margin: '0 0 0.25rem', fontSize: '0.78rem', color: '#64748b', lineHeight: 1.5 }}>{ev.description}</p>
                     <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.65rem' }}>
                       <span style={{ color: '#00D4FF' }}>Actual: <strong>{ev.actual}{ev.unit}</strong></span>
                       <span style={{ color: '#818cf8' }}>Predicted: <strong>{ev.predicted}{ev.unit}</strong></span>
@@ -441,7 +441,7 @@ export default function HumanVsTwinDashboard() {
                   {section.items.map((item, i) => (
                     <div key={i} style={{ display: 'flex', gap: '0.4rem' }}>
                       <span style={{ color: section.color, flexShrink: 0, fontSize: '0.72rem', marginTop: '1px' }}>→</span>
-                      <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8', lineHeight: 1.5 }}>{item}</p>
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b', lineHeight: 1.5 }}>{item}</p>
                     </div>
                   ))}
                 </div>

@@ -64,14 +64,14 @@ function SkeletonCard() {
 }
 const sk: Record<string, React.CSSProperties> = {
   card: {
-    borderRadius: '18px',
-    background: 'var(--glass-bg)',
+    borderRadius: '24px',
+    background: '#ffffff',
     border: '1px solid var(--glass-border)',
     overflow: 'hidden',
   },
-  thumb: { width: '100%', aspectRatio: '16/9', background: 'rgba(255,255,255,0.06)' },
+  thumb: { width: '100%', aspectRatio: '16/9', background: '#e2e8f0' },
   body: { padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' },
-  line: { borderRadius: '6px', background: 'rgba(255,255,255,0.06)' },
+  line: { borderRadius: '6px', background: '#e2e8f0' },
 };
 
 /* ─── Video card ─── */
@@ -86,9 +86,9 @@ function VideoCard({ video }: VideoCardProps) {
         ...vc.card,
         border: video.is_top
           ? '1px solid rgba(0,212,255,0.45)'
-          : '1px solid rgba(255,255,255,0.07)',
+          : '1px solid #e2e8f0',
         boxShadow: video.is_top
-          ? '0 0 30px rgba(0,212,255,0.1), 0 8px 40px rgba(0,0,0,0.5)'
+          ? '0 0 30px rgba(0,212,255,0.1), 0 8px 40px rgba(0,0,0,0.1)'
           : '0 4px 30px rgba(0,0,0,0.4)',
       }}
       className="sv-card"
@@ -184,7 +184,7 @@ function VideoCard({ video }: VideoCardProps) {
 
         {/* Estimated time */}
         <div style={vc.estRow}>
-          <BookOpen size={13} color="#00D4FF" />
+          <BookOpen size={13} color="#0052cc" />
           <span style={vc.estText}>{video.estimated_time}</span>
         </div>
 
@@ -222,10 +222,10 @@ function VideoCard({ video }: VideoCardProps) {
 
 const vc: Record<string, React.CSSProperties> = {
   card: {
-    borderRadius: '18px',
-    background: 'var(--glass-bg)',
-    backdropFilter: 'blur(var(--glass-blur))',
-    WebkitBackdropFilter: 'blur(var(--glass-blur))',
+    borderRadius: '24px',
+    background: '#ffffff',
+    backdropFilter: 'blur(0px)',
+    WebkitBackdropFilter: 'blur(0px)',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
@@ -316,8 +316,8 @@ const vc: Record<string, React.CSSProperties> = {
     height: '28px',
     borderRadius: '50%',
     background: 'rgba(0,0,0,0.6)',
-    border: '1px solid rgba(255,255,255,0.15)',
-    color: '#fff',
+    border: '1px solid #cbd5e1',
+    color: '#ffffff',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
@@ -340,7 +340,7 @@ const vc: Record<string, React.CSSProperties> = {
   rankNum: {
     fontSize: '0.7rem',
     fontWeight: 700,
-    color: 'var(--text)',
+    color: '#475569',
     fontFamily: 'ui-monospace, monospace',
   },
   diffBadge: {
@@ -355,7 +355,7 @@ const vc: Record<string, React.CSSProperties> = {
     margin: 0,
     fontSize: '0.92rem',
     fontWeight: 700,
-    color: 'var(--text-h)',
+    color: '#0f172a',
     lineHeight: 1.35,
     display: '-webkit-box',
     WebkitLineClamp: 2,
@@ -378,7 +378,7 @@ const vc: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: '0.25rem',
     fontSize: '0.72rem',
-    color: 'var(--text)',
+    color: '#475569',
   },
   estRow: {
     display: 'flex',
@@ -386,7 +386,7 @@ const vc: Record<string, React.CSSProperties> = {
     gap: '0.4rem',
     padding: '0.45rem 0.6rem',
     borderRadius: '8px',
-    background: 'rgba(0,212,255,0.06)',
+    background: 'rgba(0,212,255,0.15)',
     border: '1px solid rgba(0,212,255,0.12)',
   },
   estText: {
@@ -408,7 +408,7 @@ const vc: Record<string, React.CSSProperties> = {
   reasonText: {
     margin: 0,
     fontSize: '0.75rem',
-    color: 'var(--text-m)',
+    color: '#64748b',
     lineHeight: 1.5,
   },
   btnRow: {
@@ -426,7 +426,7 @@ const vc: Record<string, React.CSSProperties> = {
     padding: '0.55rem 0.75rem',
     borderRadius: '10px',
     background: 'linear-gradient(135deg,#00D4FF,#7C3AED)',
-    color: '#fff',
+    color: '#ffffff',
     fontSize: '0.8rem',
     fontWeight: 700,
     textDecoration: 'none',
@@ -514,10 +514,10 @@ export default function StudyVideos() {
           {/* Page header */}
           <div style={s.pageHeader}>
             <div style={s.pageIconWrap}>
-              <Video size={24} color="#00D4FF" />
+              <Video size={24} color="#0052cc" />
             </div>
             <div>
-              <h1 style={s.pageTitle} className="grad-text-cyan">AI Study Videos</h1>
+              <h1 style={s.pageTitle} style={{...s.pageTitle, color: "#0f172a"}}>AI Study Videos</h1>
               <p style={s.pageSub}>AI-ranked educational YouTube videos for any topic</p>
             </div>
           </div>
@@ -530,7 +530,7 @@ export default function StudyVideos() {
 
             <form onSubmit={onSubmit} style={s.searchForm}>
               <div style={s.searchInputWrap}>
-                <Search size={18} color="rgba(148,163,184,0.5)" style={s.searchIcon} />
+                <Search size={18} color="#64748b" style={s.searchIcon} />
                 <input
                   ref={inputRef}
                   type="text"
@@ -538,7 +538,7 @@ export default function StudyVideos() {
                   onChange={e => setQuery(e.target.value)}
                   placeholder="Enter a study topic… e.g. Machine Learning, DBMS, Calculus"
                   style={s.searchInput}
-                  className="dark-input sv-search-input"
+                  className="sv-search-input" style={{...s.searchInput, background: "#f8f9fa", border: "1px solid #e2e8f0", color: "#0f172a"}}
                   autoFocus
                   disabled={loading}
                 />
@@ -557,7 +557,7 @@ export default function StudyVideos() {
                 type="submit"
                 disabled={loading || !query.trim()}
                 style={s.searchBtn}
-                className="grad-btn sv-search-btn"
+                className="sv-search-btn" style={{...s.searchBtn, background: "#0052cc", color: "#ffffff"}}
               >
                 {loading ? (
                   <span style={s.spinnerWrap}>
@@ -623,7 +623,7 @@ export default function StudyVideos() {
           {loading && (
             <div className="animate-fade-in">
               <p style={s.loadingHint}>
-                <Wifi size={14} color="#00D4FF" />
+                <Wifi size={14} color="#0052cc" />
                 Searching YouTube and ranking with AI…
               </p>
               <div style={s.grid}>
@@ -723,7 +723,7 @@ const s: Record<string, React.CSSProperties> = {
     minHeight: '100svh',
     display: 'flex',
     flexDirection: 'column',
-    background: 'var(--bg)',
+    background: '#f8f9fa',
     fontFamily: 'var(--sans)',
   },
   nav: {
@@ -783,7 +783,7 @@ const s: Record<string, React.CSSProperties> = {
   pageSub: {
     margin: '0.1rem 0 0',
     fontSize: '0.84rem',
-    color: 'var(--text)',
+    color: '#475569',
   },
 
   /* Search card */
@@ -791,12 +791,12 @@ const s: Record<string, React.CSSProperties> = {
     position: 'relative',
     overflow: 'hidden',
     padding: '1.75rem',
-    borderRadius: '22px',
+    borderRadius: '24px',
     background: 'rgba(10,16,32,0.82)',
     border: '1px solid rgba(0,212,255,0.12)',
     backdropFilter: 'blur(28px)',
     WebkitBackdropFilter: 'blur(28px)',
-    boxShadow: '0 8px 50px rgba(0,0,0,0.5)',
+    boxShadow: '0 8px 50px rgba(0,0,0,0.1)',
     display: 'flex',
     flexDirection: 'column',
     gap: '1.1rem',
@@ -857,7 +857,7 @@ const s: Record<string, React.CSSProperties> = {
     right: '0.75rem',
     background: 'none',
     border: 'none',
-    color: 'var(--text)',
+    color: '#475569',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
@@ -894,7 +894,7 @@ const s: Record<string, React.CSSProperties> = {
   quickLabel: {
     fontSize: '0.75rem',
     fontWeight: 600,
-    color: 'var(--text)',
+    color: '#475569',
     whiteSpace: 'nowrap' as const,
     marginTop: '0.3rem',
     flexShrink: 0,
@@ -907,9 +907,9 @@ const s: Record<string, React.CSSProperties> = {
   chip: {
     padding: '0.28rem 0.75rem',
     borderRadius: '999px',
-    border: '1px solid rgba(255,255,255,0.09)',
-    background: 'rgba(255,255,255,0.04)',
-    color: 'var(--text-m)',
+    border: '1px solid #e2e8f0',
+    background: '#ffffff',
+    color: '#64748b',
     fontSize: '0.75rem',
     fontWeight: 500,
     cursor: 'pointer',
@@ -951,11 +951,11 @@ const s: Record<string, React.CSSProperties> = {
   resultsCount: {
     fontSize: '0.95rem',
     fontWeight: 700,
-    color: 'var(--text-h)',
+    color: '#0f172a',
   },
   resultsTopic: {
     fontSize: '0.88rem',
-    color: 'var(--text)',
+    color: '#475569',
   },
   cachedBadge: {
     padding: '0.12rem 0.55rem',
@@ -969,7 +969,7 @@ const s: Record<string, React.CSSProperties> = {
   diffOverview: {
     margin: 0,
     fontSize: '0.82rem',
-    color: 'var(--text)',
+    color: '#475569',
     fontStyle: 'italic' as const,
   },
 
@@ -1016,7 +1016,7 @@ const s: Record<string, React.CSSProperties> = {
   pathCard: {
     marginTop: '0.5rem',
     padding: '1.35rem 1.5rem',
-    borderRadius: '18px',
+    borderRadius: '24px',
     background: 'rgba(124,58,237,0.07)',
     border: '1px solid rgba(124,58,237,0.2)',
     backdropFilter: 'blur(12px)',
@@ -1045,17 +1045,17 @@ const s: Record<string, React.CSSProperties> = {
     margin: 0,
     fontSize: '1rem',
     fontWeight: 700,
-    color: 'var(--text-h)',
+    color: '#0f172a',
   },
   pathSub: {
     margin: '0.15rem 0 0',
     fontSize: '0.78rem',
-    color: 'var(--text)',
+    color: '#475569',
   },
   pathBody: {
     margin: 0,
     fontSize: '0.88rem',
-    color: 'var(--text-m)',
+    color: '#64748b',
     lineHeight: 1.65,
   },
 
@@ -1077,13 +1077,13 @@ const s: Record<string, React.CSSProperties> = {
   },
   errorMsg: {
     margin: 0,
-    color: 'var(--text)',
+    color: '#475569',
     fontSize: '0.83rem',
     lineHeight: 1.5,
   },
   errorHint: {
     margin: '0.4rem 0 0',
-    color: 'var(--text)',
+    color: '#475569',
     fontSize: '0.8rem',
     lineHeight: 1.5,
   },
@@ -1100,12 +1100,12 @@ const s: Record<string, React.CSSProperties> = {
   emptyTitle: {
     margin: '0 0 0.45rem',
     fontWeight: 700,
-    color: 'var(--text-h)',
+    color: '#0f172a',
     fontSize: '1.05rem',
   },
   emptyHint: {
     margin: 0,
-    color: 'var(--text)',
+    color: '#475569',
     fontSize: '0.85rem',
     lineHeight: 1.6,
     maxWidth: '480px',

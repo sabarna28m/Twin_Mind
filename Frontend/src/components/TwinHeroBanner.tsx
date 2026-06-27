@@ -204,10 +204,10 @@ const hero: CSSProperties = {
   flexWrap: 'wrap' as const,
   padding: '24px 32px',
   minHeight: '160px',
-  borderRadius: '16px',
-  background: 'linear-gradient(135deg, #0D0D2B 0%, #130D35 40%, #1A0A3B 100%)',
-  border: '1px solid rgba(99,102,241,0.2)',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04)',
+  borderRadius: '24px',
+  background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
+  border: '1px solid #e2e8f0',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
   marginBottom: '1.5rem',
 };
 
@@ -254,8 +254,8 @@ const livePill: CSSProperties = {
   gap: '0.35rem',
   padding: '0.2rem 0.65rem',
   borderRadius: '99px',
-  background: '#0d2a14',
-  border: '1px solid rgba(34,197,94,0.5)',
+  background: 'rgba(34,197,94,0.1)',
+  border: '1px solid rgba(34,197,94,0.4)',
   color: '#22C55E',
   fontSize: '0.72rem',
   fontWeight: 700,
@@ -284,7 +284,7 @@ const liveDotInner: CSSProperties = {
 const subtitle: CSSProperties = {
   margin: 0,
   fontSize: '0.9rem',
-  color: '#94a3b8',
+  color: '#64748b',
   lineHeight: 1.6,
   maxWidth: '440px',
   marginBottom: '0.85rem',
@@ -301,9 +301,9 @@ const fidCard: CSSProperties = {
   minWidth: '220px',
   padding: '18px 20px',
   borderRadius: '14px',
-  background: '#12122a',
-  border: '1px solid #2a2a50',
-  boxShadow: '0 0 30px rgba(99,102,241,0.12), 0 4px 16px rgba(0,0,0,0.35)',
+  background: '#ffffff',
+  border: '1px solid #e2e8f0',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
   zIndex: 1,
 };
 
@@ -311,7 +311,7 @@ const fidLabel: CSSProperties = {
   margin: '0 0 0.65rem',
   fontSize: '0.7rem',
   fontWeight: 600,
-  color: '#94a3b8',
+  color: '#64748b',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
 };
@@ -319,7 +319,7 @@ const fidLabel: CSSProperties = {
 const fidNumber: CSSProperties = {
   fontSize: '2.4rem',
   fontWeight: 800,
-  color: '#f1f5f9',
+  color: '#0f172a',
   lineHeight: 1,
   letterSpacing: '-1px',
 };
@@ -341,7 +341,7 @@ const fidSub: CSSProperties = {
 const barTrack: CSSProperties = {
   height: '5px',
   borderRadius: '99px',
-  background: '#1e1e40',
+  background: '#e2e8f0',
   overflow: 'hidden',
 };
 

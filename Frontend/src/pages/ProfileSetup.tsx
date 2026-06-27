@@ -197,7 +197,7 @@ export default function ProfileSetup() {
         await api.post('/student-profile', payload, { headers });
       }
       await refreshStudentProfile();
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(detail ?? 'Failed to save profile.');

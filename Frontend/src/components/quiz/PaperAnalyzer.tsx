@@ -211,15 +211,15 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
               <div style={{
                 width: '24px', height: '24px', borderRadius: '50%', display: 'flex',
                 alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800,
-                background: done ? '#10b981' : active ? 'rgba(0,212,255,0.2)' : 'rgba(255,255,255,0.06)',
-                border: `1.5px solid ${done ? '#10b981' : active ? 'rgba(0,212,255,0.5)' : 'rgba(255,255,255,0.1)'}`,
-                color: done ? '#fff' : active ? '#00D4FF' : 'rgba(148,163,184,0.4)',
+                background: done ? '#10b981' : active ? 'rgba(0,212,255,0.2)' : '#e2e8f0',
+                border: `1.5px solid ${done ? '#10b981' : active ? 'rgba(0,212,255,0.5)' : '#e2e8f0'}`,
+                color: done ? '#fff' : active ? '#00D4FF' : '#64748b',
               }}>{done ? '✓' : i + 1}</div>
               <span style={{ fontSize: '0.72rem', fontWeight: active ? 700 : 500,
-                color: active ? '#00D4FF' : done ? '#34d399' : 'rgba(148,163,184,0.4)' }}>
+                color: active ? '#00D4FF' : done ? '#34d399' : '#64748b' }}>
                 {labels[i]}
               </span>
-              {i < 2 && <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: '0.7rem' }}>→</span>}
+              {i < 2 && <span style={{ color: '#cbd5e1', fontSize: '0.7rem' }}>→</span>}
             </div>
           );
         })}
@@ -296,7 +296,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
           {analyzing && (
             <div style={s.loadingRow}>
               <div style={s.spinner} />
-              <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(148,163,184,0.6)' }}>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#475569' }}>
                 AI is reading the exam structure, marks distribution, and topic weightage…
               </p>
             </div>
@@ -348,7 +348,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
                         <p style={{ margin: '0 0 0.15rem', fontWeight: 700, fontSize: '0.78rem', color: 'rgba(226,232,240,0.85)' }}>
                           {sec.title} <span style={{ fontWeight: 500, color: '#a78bfa' }}>({sec.question_type})</span>
                         </p>
-                        <p style={{ margin: 0, fontSize: '0.7rem', color: 'rgba(148,163,184,0.5)' }}>{sec.instructions}</p>
+                        <p style={{ margin: 0, fontSize: '0.7rem', color: '#64748b' }}>{sec.instructions}</p>
                       </div>
                     </div>
                   ))}
@@ -391,7 +391,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
                         <span style={{ fontSize: '0.75rem', color: 'rgba(226,232,240,0.8)' }}>{tw.topic}</span>
                         <span style={{ fontSize: '0.7rem', color: '#00D4FF', fontWeight: 700 }}>{tw.percentage}%</span>
                       </div>
-                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden' }}>
+                      <div style={{ height: '4px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
                         <div style={{ height: '100%', width: `${tw.percentage}%`, background: 'linear-gradient(90deg, #00D4FF, #7c3aed)', borderRadius: '99px' }} />
                       </div>
                     </div>
@@ -433,9 +433,9 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
                   onClick={() => setDifficulty(opt.value)}
                   style={{
                     ...s.diffBtn,
-                    borderColor: difficulty === opt.value ? opt.color : 'rgba(255,255,255,0.1)',
+                    borderColor: difficulty === opt.value ? opt.color : '#e2e8f0',
                     background:  difficulty === opt.value ? `${opt.color}18` : 'transparent',
-                    color:       difficulty === opt.value ? opt.color : 'rgba(148,163,184,0.6)',
+                    color:       difficulty === opt.value ? opt.color : '#475569',
                   }}
                 >
                   <span style={{ fontWeight: 800, display: 'block', fontSize: '0.78rem' }}>{opt.label}</span>
@@ -452,7 +452,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
             {generating && (
               <div style={s.loadingRow}>
                 <div style={s.spinner} />
-                <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(148,163,184,0.6)' }}>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#475569' }}>
                   AI is creating brand-new questions following the same format…
                 </p>
               </div>
@@ -514,43 +514,43 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
 
 const s: Record<string, React.CSSProperties> = {
   wrap: { display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.25rem', maxWidth: '860px', margin: '0 auto' },
-  header: { paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)' },
+  header: { paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0' },
   pageTitle: { margin: '0 0 0.2rem', fontWeight: 900, fontSize: '1.05rem', color: 'rgba(226,232,240,0.92)' },
-  pageSub:   { margin: 0, fontSize: '0.75rem', color: 'rgba(148,163,184,0.5)' },
+  pageSub:   { margin: 0, fontSize: '0.75rem', color: '#64748b' },
   steps: { display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' as const },
   card: {
-    background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)',
+    background: '#ffffff', border: '1px solid #e2e8f0',
     borderRadius: '16px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.85rem',
   },
   cardTitle: { margin: 0, fontWeight: 800, fontSize: '0.9rem', color: 'rgba(226,232,240,0.88)' },
-  cardSub:   { margin: 0, fontSize: '0.74rem', color: 'rgba(148,163,184,0.5)' },
+  cardSub:   { margin: 0, fontSize: '0.74rem', color: '#64748b' },
   dropZone: {
-    border: '2px dashed rgba(0,212,255,0.22)', borderRadius: '14px',
+    border: '2px dashed rgba(0,212,255,0.22)', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
     padding: '1.5rem', textAlign: 'center', cursor: 'pointer',
     background: 'rgba(0,212,255,0.03)', display: 'flex', flexDirection: 'column',
     alignItems: 'center', gap: '0.4rem', transition: 'border-color 0.2s, background 0.2s',
   },
   dropActive: { borderColor: 'rgba(0,212,255,0.6)', background: 'rgba(0,212,255,0.08)' },
   dropLabel:  { margin: 0, fontWeight: 700, fontSize: '0.85rem', color: 'rgba(226,232,240,0.8)' },
-  dropHint:   { margin: 0, fontSize: '0.7rem', color: 'rgba(148,163,184,0.4)' },
-  progTrack:  { width: '200px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '99px', overflow: 'hidden', margin: '0.3rem auto' },
+  dropHint:   { margin: 0, fontSize: '0.7rem', color: '#64748b' },
+  progTrack:  { width: '200px', height: '4px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden', margin: '0.3rem auto' },
   progFill:   { height: '100%', background: '#00D4FF', borderRadius: '99px', transition: 'width 0.1s' },
   error:      { padding: '0.5rem 0.75rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: '#fca5a5', fontSize: '0.8rem', margin: 0 },
-  orDivider:  { textAlign: 'center', fontSize: '0.72rem', color: 'rgba(148,163,184,0.35)', margin: '0.25rem 0' },
+  orDivider:  { textAlign: 'center', fontSize: '0.72rem', color: '#64748b', margin: '0.25rem 0' },
   libList:    { display: 'flex', flexDirection: 'column', gap: '0.35rem', maxHeight: '220px', overflowY: 'auto' },
   libItem: {
     display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.55rem 0.75rem',
-    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+    background: '#ffffff', border: '1px solid #e2e8f0',
     borderRadius: '10px', cursor: 'pointer', transition: 'background 0.15s',
   },
   libName:    { margin: '0 0 0.1rem', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(226,232,240,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
-  libMeta:    { margin: 0, fontSize: '0.63rem', color: 'rgba(148,163,184,0.4)' },
+  libMeta:    { margin: 0, fontSize: '0.63rem', color: '#64748b' },
   selectedRow:{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.65rem', background: 'rgba(0,212,255,0.05)', border: '1px solid rgba(0,212,255,0.15)', borderRadius: '10px' },
   matName:    { margin: '0 0 0.1rem', fontSize: '0.82rem', fontWeight: 700, color: 'rgba(226,232,240,0.88)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
-  matMeta:    { margin: 0, fontSize: '0.65rem', color: 'rgba(148,163,184,0.4)' },
+  matMeta:    { margin: 0, fontSize: '0.65rem', color: '#64748b' },
   changeBtn: {
-    padding: '0.3rem 0.7rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.15)',
-    borderRadius: '7px', color: 'rgba(148,163,184,0.6)', fontSize: '0.72rem', cursor: 'pointer', fontFamily: 'inherit',
+    padding: '0.3rem 0.7rem', background: 'transparent', border: '1px solid #cbd5e1',
+    borderRadius: '7px', color: '#475569', fontSize: '0.72rem', cursor: 'pointer', fontFamily: 'inherit',
   },
   primaryBtn: {
     padding: '0.65rem 1.4rem', border: 'none', borderRadius: '10px',
@@ -558,23 +558,23 @@ const s: Record<string, React.CSSProperties> = {
     color: '#fff', fontWeight: 800, fontSize: '0.88rem', cursor: 'pointer', fontFamily: 'inherit',
     boxShadow: '0 4px 16px rgba(0,212,255,0.25)', transition: 'opacity 0.2s',
   },
-  loadingRow: { display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.65rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px' },
+  loadingRow: { display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.65rem', background: '#ffffff', borderRadius: '10px' },
   spinner: { width: '18px', height: '18px', border: '2px solid rgba(0,212,255,0.15)', borderTopColor: '#00D4FF', borderRadius: '50%', animation: 'spin 0.8s linear infinite', flexShrink: 0 },
   statsRow:   { display: 'flex', flexWrap: 'wrap' as const, gap: '0.5rem' },
   statBox: {
     flex: '1 1 80px', padding: '0.6rem 0.75rem', textAlign: 'center',
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px',
+    background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px',
   },
   statVal:    { margin: '0 0 0.15rem', fontWeight: 900, fontSize: '1rem', color: '#00D4FF' },
-  statLabel:  { margin: 0, fontSize: '0.62rem', color: 'rgba(148,163,184,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.06em', fontWeight: 600 },
-  infoBlock:  { padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px' },
+  statLabel:  { margin: 0, fontSize: '0.62rem', color: '#64748b', textTransform: 'uppercase' as const, letterSpacing: '0.06em', fontWeight: 600 },
+  infoBlock:  { padding: '0.75rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' },
   infoHead:   { margin: '0 0 0.4rem', fontSize: '0.75rem', fontWeight: 800, color: '#00D4FF', textTransform: 'uppercase' as const, letterSpacing: '0.06em' },
   infoBody:   { margin: 0, fontSize: '0.82rem', color: 'rgba(226,232,240,0.72)', lineHeight: 1.6 },
   secRow:     { display: 'flex', alignItems: 'flex-start', gap: '0.6rem' },
   secBadge:   { padding: '0.15rem 0.45rem', background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 800, color: '#a78bfa', flexShrink: 0 },
   table:      { width: '100%', borderCollapse: 'collapse' as const, fontSize: '0.77rem' },
-  th:         { padding: '0.35rem 0.5rem', textAlign: 'left' as const, color: 'rgba(148,163,184,0.5)', fontWeight: 700, borderBottom: '1px solid rgba(255,255,255,0.07)', fontSize: '0.68rem', textTransform: 'uppercase' as const },
-  td:         { padding: '0.35rem 0.5rem', color: 'rgba(226,232,240,0.75)', borderBottom: '1px solid rgba(255,255,255,0.05)' },
+  th:         { padding: '0.35rem 0.5rem', textAlign: 'left' as const, color: '#64748b', fontWeight: 700, borderBottom: '1px solid #e2e8f0', fontSize: '0.68rem', textTransform: 'uppercase' as const },
+  td:         { padding: '0.35rem 0.5rem', color: 'rgba(226,232,240,0.75)', borderBottom: '1px solid #f8fafc' },
   repeatChip: { padding: '0.18rem 0.5rem', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: '99px', fontSize: '0.68rem', fontWeight: 700, color: '#fbbf24' },
   diffBtn: {
     flex: '1 1 110px', padding: '0.55rem 0.7rem', border: '1.5px solid',
@@ -582,15 +582,15 @@ const s: Record<string, React.CSSProperties> = {
     transition: 'border-color 0.2s, background 0.2s, color 0.2s',
   },
   printBtn: {
-    padding: '0.45rem 1rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)',
+    padding: '0.45rem 1rem', background: '#e2e8f0', border: '1px solid #cbd5e1',
     borderRadius: '8px', color: 'rgba(226,232,240,0.75)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
   },
   instrBox: { padding: '0.65rem', background: 'rgba(0,212,255,0.05)', border: '1px solid rgba(0,212,255,0.12)', borderRadius: '8px', fontSize: '0.78rem', color: 'rgba(226,232,240,0.7)', lineHeight: 1.5 },
-  secHead:  { margin: '0 0 0.25rem', fontWeight: 800, fontSize: '0.85rem', color: 'rgba(226,232,240,0.88)', paddingBottom: '0.3rem', borderBottom: '1px solid rgba(255,255,255,0.07)' },
-  secInstr: { margin: '0 0 0.6rem', fontSize: '0.72rem', color: 'rgba(148,163,184,0.5)', fontStyle: 'italic' },
-  qBox: { padding: '0.65rem 0.85rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px' },
+  secHead:  { margin: '0 0 0.25rem', fontWeight: 800, fontSize: '0.85rem', color: 'rgba(226,232,240,0.88)', paddingBottom: '0.3rem', borderBottom: '1px solid #e2e8f0' },
+  secInstr: { margin: '0 0 0.6rem', fontSize: '0.72rem', color: '#64748b', fontStyle: 'italic' },
+  qBox: { padding: '0.65rem 0.85rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' },
   qNum:   { fontSize: '0.72rem', fontWeight: 800, color: '#7c3aed', background: 'rgba(124,58,237,0.12)', padding: '0.1rem 0.4rem', borderRadius: '6px' },
-  qMarks: { fontSize: '0.68rem', color: 'rgba(148,163,184,0.5)', fontWeight: 600 },
+  qMarks: { fontSize: '0.68rem', color: '#64748b', fontWeight: 600 },
   qText:  { margin: '0.1rem 0 0', fontSize: '0.82rem', color: 'rgba(226,232,240,0.82)', lineHeight: 1.5 },
   qOpt:   { margin: '0 0 0 0.75rem', fontSize: '0.77rem', color: 'rgba(148,163,184,0.7)' },
 };

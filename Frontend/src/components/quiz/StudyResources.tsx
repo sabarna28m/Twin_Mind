@@ -109,14 +109,14 @@ function Flashcard({ front, back, index, total }: { front: string; back: string;
   const [flipped, setFlipped] = useState(false);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
-      <p style={{ margin: 0, fontSize: '0.68rem', color: 'rgba(148,163,184,0.4)', fontWeight: 600 }}>
+      <p style={{ margin: 0, fontSize: '0.68rem', color: '#64748b', fontWeight: 600 }}>
         {index + 1} / {total}
       </p>
       <div onClick={() => setFlipped(f => !f)} style={{
         width: '100%', minHeight: '130px', cursor: 'pointer',
         background: flipped ? 'rgba(99,102,241,0.1)' : 'rgba(0,212,255,0.07)',
         border: `1.5px solid ${flipped ? 'rgba(99,102,241,0.3)' : 'rgba(0,212,255,0.2)'}`,
-        borderRadius: '14px', padding: '1.4rem', display: 'flex',
+        borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', padding: '1.4rem', display: 'flex',
         alignItems: 'center', justifyContent: 'center', textAlign: 'center' as const,
         transition: 'background 0.25s, border-color 0.25s',
       }}>
@@ -131,7 +131,7 @@ function Flashcard({ front, back, index, total }: { front: string; back: string;
           </p>
         </div>
       </div>
-      <p style={{ margin: 0, fontSize: '0.62rem', color: 'rgba(148,163,184,0.35)' }}>
+      <p style={{ margin: 0, fontSize: '0.62rem', color: '#64748b' }}>
         Tap to {flipped ? 'see question' : 'reveal answer'}
       </p>
     </div>
@@ -156,7 +156,7 @@ function MindMap({ data }: { data: { central: string; branches: { label: string;
                 color: '#a78bfa', textAlign: 'center' as const }}>{branch.label}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.18rem' }}>
                 {branch.children.map((child, ci) => (
-                  <p key={ci} style={{ margin: 0, fontSize: '0.63rem', color: 'rgba(148,163,184,0.65)',
+                  <p key={ci} style={{ margin: 0, fontSize: '0.63rem', color: '#475569',
                     paddingLeft: '0.35rem', borderLeft: '2px solid rgba(99,102,241,0.28)' }}>{child}</p>
                 ))}
               </div>
@@ -173,7 +173,7 @@ function QuizQuestionCard({ q, index, total, answer, onAnswer }: {
   q: QuizQuestion; index: number; total: number;
   answer: string | undefined; onAnswer: (a: string) => void;
 }) {
-  const dc = DIFF_COLORS[q.difficulty] ?? '#94a3b8';
+  const dc = DIFF_COLORS[q.difficulty] ?? '#64748b';
   return (
     <div style={qs.wrap}>
       <div style={qs.head}>
@@ -192,8 +192,8 @@ function QuizQuestionCard({ q, index, total, answer, onAnswer }: {
             return (
               <button key={oi} onClick={() => onAnswer(letter)} style={{
                 ...qs.optBtn,
-                background: sel ? 'rgba(0,212,255,0.12)' : 'rgba(255,255,255,0.03)',
-                borderColor: sel ? 'rgba(0,212,255,0.45)' : 'rgba(255,255,255,0.09)',
+                background: sel ? 'rgba(0,212,255,0.12)' : '#ffffff',
+                borderColor: sel ? 'rgba(0,212,255,0.45)' : '#e2e8f0',
                 color: sel ? '#00D4FF' : 'rgba(226,232,240,0.75)',
               }}>{opt}</button>
             );
@@ -206,9 +206,9 @@ function QuizQuestionCard({ q, index, total, answer, onAnswer }: {
           {['True', 'False'].map(v => (
             <button key={v} onClick={() => onAnswer(v)} style={{
               ...qs.tfBtn,
-              background: answer === v ? (v === 'True' ? 'rgba(52,211,153,0.12)' : 'rgba(248,113,113,0.12)') : 'rgba(255,255,255,0.03)',
-              borderColor: answer === v ? (v === 'True' ? 'rgba(52,211,153,0.45)' : 'rgba(248,113,113,0.45)') : 'rgba(255,255,255,0.09)',
-              color: answer === v ? (v === 'True' ? '#34d399' : '#f87171') : 'rgba(148,163,184,0.65)',
+              background: answer === v ? (v === 'True' ? 'rgba(52,211,153,0.12)' : 'rgba(248,113,113,0.12)') : '#ffffff',
+              borderColor: answer === v ? (v === 'True' ? 'rgba(52,211,153,0.45)' : 'rgba(248,113,113,0.45)') : '#e2e8f0',
+              color: answer === v ? (v === 'True' ? '#34d399' : '#f87171') : '#475569',
             }}>{v}</button>
           ))}
         </div>
@@ -227,17 +227,17 @@ function QuizQuestionCard({ q, index, total, answer, onAnswer }: {
   );
 }
 const qs: Record<string, React.CSSProperties> = {
-  wrap:      { display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1.1rem', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px' },
+  wrap:      { display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1.1rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' },
   head:      { display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' as const },
-  qNum:      { fontSize: '0.68rem', fontWeight: 800, color: 'rgba(148,163,184,0.45)' },
+  qNum:      { fontSize: '0.68rem', fontWeight: 800, color: '#64748b' },
   chip:      { padding: '0.1rem 0.38rem', borderRadius: '99px', fontSize: '0.6rem', fontWeight: 700, border: '1px solid' },
   topicChip: { padding: '0.1rem 0.38rem', borderRadius: '99px', fontSize: '0.6rem', fontWeight: 600, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.22)', color: '#a78bfa' },
   marksChip: { marginLeft: 'auto', padding: '0.1rem 0.38rem', borderRadius: '99px', fontSize: '0.6rem', fontWeight: 700, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.22)', color: '#fbbf24' },
   qText:     { margin: 0, fontSize: '0.9rem', fontWeight: 600, color: 'rgba(226,232,240,0.9)', lineHeight: 1.55 },
   optBtn:    { textAlign: 'left' as const, padding: '0.55rem 0.8rem', border: '1.5px solid', borderRadius: '9px', cursor: 'pointer', fontSize: '0.8rem', fontFamily: 'inherit', transition: 'background 0.18s, border-color 0.18s', fontWeight: 500 },
   tfBtn:     { flex: 1, padding: '0.6rem', border: '1.5px solid', borderRadius: '9px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, fontFamily: 'inherit', transition: 'all 0.18s' },
-  textInput: { padding: '0.55rem 0.8rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '9px', color: 'var(--text-h)', fontSize: '0.84rem', fontFamily: 'inherit', outline: 'none', width: '100%', boxSizing: 'border-box' as const },
-  textarea:  { padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '9px', color: 'var(--text-h)', fontSize: '0.82rem', fontFamily: 'inherit', outline: 'none', resize: 'vertical' as const, lineHeight: 1.5, width: '100%', boxSizing: 'border-box' as const },
+  textInput: { padding: '0.55rem 0.8rem', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '9px', color: 'var(--text-h)', fontSize: '0.84rem', fontFamily: 'inherit', outline: 'none', width: '100%', boxSizing: 'border-box' as const },
+  textarea:  { padding: '0.6rem 0.8rem', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '9px', color: 'var(--text-h)', fontSize: '0.82rem', fontFamily: 'inherit', outline: 'none', resize: 'vertical' as const, lineHeight: 1.5, width: '100%', boxSizing: 'border-box' as const },
 };
 
 /* ── ReviewCard ─────────────────────────────────────────────────────────────── */
@@ -245,13 +245,13 @@ function ReviewCard({ q, userAnswer }: { q: QuizQuestion; userAnswer: string | u
   const [showExp, setShowExp] = useState(false);
   const isObj = ['MCQ', 'true_false'].includes(q.type);
   const isCorrect = isObj ? (userAnswer ?? '').toUpperCase() === q.correct_answer.toUpperCase() : true;
-  const dc = DIFF_COLORS[q.difficulty] ?? '#94a3b8';
+  const dc = DIFF_COLORS[q.difficulty] ?? '#64748b';
 
   return (
     <div style={{
       ...qs.wrap,
-      borderColor: !isObj ? 'rgba(255,255,255,0.08)' : isCorrect ? 'rgba(52,211,153,0.28)' : 'rgba(248,113,113,0.28)',
-      background:  !isObj ? 'rgba(255,255,255,0.025)' : isCorrect ? 'rgba(52,211,153,0.05)' : 'rgba(248,113,113,0.05)',
+      borderColor: !isObj ? '#e2e8f0' : isCorrect ? 'rgba(52,211,153,0.28)' : 'rgba(248,113,113,0.28)',
+      background:  !isObj ? '#ffffff' : isCorrect ? 'rgba(52,211,153,0.05)' : 'rgba(248,113,113,0.05)',
     }}>
       <div style={qs.head}>
         <span style={qs.qNum}>Q{q.id}</span>
@@ -265,8 +265,8 @@ function ReviewCard({ q, userAnswer }: { q: QuizQuestion; userAnswer: string | u
       </div>
       <p style={qs.qText}>{q.question}</p>
 
-      <div style={{ padding: '0.45rem 0.7rem', background: 'rgba(255,255,255,0.04)', borderRadius: '8px' }}>
-        <p style={{ margin: '0 0 0.1rem', fontSize: '0.58rem', fontWeight: 700, color: 'rgba(148,163,184,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Your Answer</p>
+      <div style={{ padding: '0.45rem 0.7rem', background: '#ffffff', borderRadius: '8px' }}>
+        <p style={{ margin: '0 0 0.1rem', fontSize: '0.58rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Your Answer</p>
         <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600,
           color: isObj ? (isCorrect ? '#34d399' : '#f87171') : 'rgba(226,232,240,0.8)' }}>
           {userAnswer ?? <em style={{ opacity: 0.4 }}>Not answered</em>}
@@ -280,11 +280,11 @@ function ReviewCard({ q, userAnswer }: { q: QuizQuestion; userAnswer: string | u
         </div>
       )}
 
-      <button onClick={() => setShowExp(v => !v)} style={{ padding: '0.25rem 0.55rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '7px', fontSize: '0.67rem', color: 'rgba(148,163,184,0.55)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const }}>
+      <button onClick={() => setShowExp(v => !v)} style={{ padding: '0.25rem 0.55rem', background: 'transparent', border: '1px solid #e2e8f0', borderRadius: '7px', fontSize: '0.67rem', color: 'rgba(148,163,184,0.55)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const }}>
         {showExp ? '▲ Hide' : '▼ Show'} Explanation
       </button>
       {showExp && (
-        <p style={{ margin: 0, fontSize: '0.78rem', color: 'rgba(226,232,240,0.62)', lineHeight: 1.55, padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
+        <p style={{ margin: 0, fontSize: '0.78rem', color: 'rgba(226,232,240,0.62)', lineHeight: 1.55, padding: '0.5rem', background: '#ffffff', borderRadius: '8px' }}>
           {q.explanation}
         </p>
       )}
@@ -479,7 +479,7 @@ export default function StudyResources() {
             <p style={{ margin: '0 0 0.12rem', fontWeight: 800, fontSize: '0.9rem', color: 'rgba(226,232,240,0.9)' }}>
               {quiz.material_name}
             </p>
-            <p style={{ margin: 0, fontSize: '0.68rem', color: 'rgba(148,163,184,0.42)' }}>
+            <p style={{ margin: 0, fontSize: '0.68rem', color: '#64748b' }}>
               {questions.length} questions · {quiz.difficulty} · {quiz.question_types.join(', ')}
             </p>
           </div>
@@ -487,10 +487,10 @@ export default function StudyResources() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-          <div style={{ flex: 1, height: '5px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden' }}>
+          <div style={{ flex: 1, height: '5px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${pctDone}%`, background: 'linear-gradient(90deg,#00D4FF,#7c3aed)', borderRadius: '99px', transition: 'width 0.3s' }} />
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'rgba(148,163,184,0.42)', fontWeight: 600, whiteSpace: 'nowrap' as const }}>
+          <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, whiteSpace: 'nowrap' as const }}>
             {answered} / {questions.length}
           </span>
         </div>
@@ -507,9 +507,9 @@ export default function StudyResources() {
               <button key={i} onClick={() => setCurrentQ(i)} style={{
                 width: '26px', height: '26px', borderRadius: '50%', border: '1.5px solid',
                 fontSize: '0.6rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-                background: i === currentQ ? 'rgba(0,212,255,0.18)' : answers[questions[i].id] !== undefined ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.04)',
-                borderColor: i === currentQ ? 'rgba(0,212,255,0.5)' : answers[questions[i].id] !== undefined ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.09)',
-                color: i === currentQ ? '#00D4FF' : answers[questions[i].id] !== undefined ? '#34d399' : 'rgba(148,163,184,0.45)',
+                background: i === currentQ ? 'rgba(0,212,255,0.18)' : answers[questions[i].id] !== undefined ? 'rgba(52,211,153,0.1)' : '#ffffff',
+                borderColor: i === currentQ ? 'rgba(0,212,255,0.5)' : answers[questions[i].id] !== undefined ? 'rgba(52,211,153,0.3)' : '#e2e8f0',
+                color: i === currentQ ? '#00D4FF' : answers[questions[i].id] !== undefined ? '#34d399' : '#64748b',
               }}>{i + 1}</button>
             ))}
           </div>
@@ -536,7 +536,7 @@ export default function StudyResources() {
           <p style={{ margin: '0 0 0.25rem', fontWeight: 700, fontSize: '0.95rem', color: 'rgba(226,232,240,0.88)' }}>
             {pct >= 80 ? '🏆 Excellent!' : pct >= 65 ? '👍 Good Job!' : pct >= 50 ? '📖 Keep Practicing' : '💪 Need More Study'}
           </p>
-          <p style={{ margin: '0 0 1.25rem', fontSize: '0.75rem', color: 'rgba(148,163,184,0.45)' }}>
+          <p style={{ margin: '0 0 1.25rem', fontSize: '0.75rem', color: '#64748b' }}>
             {correct} / {objective.length} correct
             {questions.length > objective.length && ` · ${questions.length - objective.length} subjective (self-review)`}
           </p>
@@ -632,8 +632,8 @@ export default function StudyResources() {
             return (
               <div key={m.id} style={{
                 ...s.matCard,
-                borderColor: isActive ? 'rgba(0,212,255,0.42)' : 'rgba(255,255,255,0.07)',
-                background:  isActive ? 'rgba(0,212,255,0.055)' : 'rgba(255,255,255,0.025)',
+                borderColor: isActive ? 'rgba(0,212,255,0.42)' : '#e2e8f0',
+                background:  isActive ? 'rgba(0,212,255,0.055)' : '#ffffff',
                 boxShadow:   isActive ? '0 0 16px rgba(0,212,255,0.1)' : 'none',
               }}>
                 {/* Info row */}
@@ -728,7 +728,7 @@ export default function StudyResources() {
                 <p style={{ margin: '0 0 0.15rem', fontSize: '0.8rem', fontWeight: 700, color: 'rgba(226,232,240,0.75)' }}>
                   AI is reading your document…
                 </p>
-                <p style={{ margin: 0, fontSize: '0.68rem', color: 'rgba(148,163,184,0.4)' }}>
+                <p style={{ margin: 0, fontSize: '0.68rem', color: '#64748b' }}>
                   Generating summaries · flashcards · definitions · mind map · revision notes
                 </p>
               </div>
@@ -739,7 +739,7 @@ export default function StudyResources() {
           {selStatus === 'done' && selAnalysis && !selAnalysis.error && (
             <>
               {/* Workflow indicator */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' as const, padding: '0.45rem 0.7rem', background: 'rgba(255,255,255,0.025)', borderRadius: '9px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' as const, padding: '0.45rem 0.7rem', background: '#ffffff', borderRadius: '9px' }}>
                 {[
                   { icon: '☁',  label: 'Uploaded',     done: true  },
                   { icon: '🤖', label: 'Analyzed',      done: true  },
@@ -750,21 +750,21 @@ export default function StudyResources() {
                     <div style={{ width: '20px', height: '20px', borderRadius: '50%', fontSize: '0.58rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0, background: step.done ? '#10b981' : 'rgba(0,212,255,0.14)', color: step.done ? '#fff' : '#00D4FF', border: `1.5px solid ${step.done ? '#10b981' : 'rgba(0,212,255,0.35)'}` }}>
                       {step.done ? '✓' : step.icon}
                     </div>
-                    <span style={{ fontSize: '0.6rem', fontWeight: 600, color: step.done ? '#34d399' : 'rgba(148,163,184,0.5)' }}>{step.label}</span>
-                    {i < 3 && <span style={{ color: 'rgba(255,255,255,0.12)', fontSize: '0.6rem' }}>→</span>}
+                    <span style={{ fontSize: '0.6rem', fontWeight: 600, color: step.done ? '#34d399' : '#64748b' }}>{step.label}</span>
+                    {i < 3 && <span style={{ color: '#cbd5e1', fontSize: '0.6rem' }}>→</span>}
                   </div>
                 ))}
               </div>
 
               {/* Tab bar */}
-              <div style={{ display: 'flex', gap: '0.22rem', flexWrap: 'wrap' as const, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.22rem', flexWrap: 'wrap' as const, borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
                 {ANALYSIS_TABS.map(t => (
                   <button key={t.key} onClick={() => { setATab(t.key); setFcIndex(0); }} style={{
                     padding: '0.26rem 0.55rem', borderRadius: '7px', border: '1px solid',
                     fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
                     whiteSpace: 'nowrap' as const, transition: 'background 0.15s, color 0.15s',
                     background:  aTab === t.key ? 'rgba(0,212,255,0.12)' : 'transparent',
-                    color:       aTab === t.key ? '#00D4FF' : 'rgba(148,163,184,0.5)',
+                    color:       aTab === t.key ? '#00D4FF' : '#64748b',
                     borderColor: aTab === t.key ? 'rgba(0,212,255,0.35)' : 'transparent',
                   }}>{t.icon} {t.label}</button>
                 ))}
@@ -813,7 +813,7 @@ export default function StudyResources() {
                     {(selAnalysis.chapter_breakdown ?? []).length === 0
                       ? <p style={s.hint}>No chapter breakdown available.</p>
                       : selAnalysis.chapter_breakdown!.map((ch, i) => (
-                          <div key={i} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px' }}>
+                          <div key={i} style={{ padding: '0.75rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
                             <p style={{ margin: '0 0 0.35rem', fontWeight: 800, fontSize: '0.82rem', color: 'rgba(226,232,240,0.88)' }}>{i + 1}. {ch.title}</p>
                             <p style={{ ...s.body, margin: '0 0 0.45rem' }}>{ch.summary}</p>
                             <ul style={s.ul}>{ch.key_points.map((pt, j) => <li key={j} style={s.li}>{pt}</li>)}</ul>
@@ -852,7 +852,7 @@ export default function StudyResources() {
                     {(selAnalysis.key_definitions ?? []).length === 0
                       ? <p style={s.hint}>No definitions generated.</p>
                       : selAnalysis.key_definitions!.map((d, i) => (
-                          <div key={i} style={{ padding: '0.55rem 0.8rem', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '9px' }}>
+                          <div key={i} style={{ padding: '0.55rem 0.8rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '9px' }}>
                             <p style={{ margin: '0 0 0.18rem', fontWeight: 800, fontSize: '0.8rem', color: '#fbbf24' }}>{d.term}</p>
                             <p style={{ margin: 0, fontSize: '0.76rem', color: 'rgba(226,232,240,0.68)', lineHeight: 1.5 }}>{d.definition}</p>
                           </div>
@@ -893,7 +893,7 @@ export default function StudyResources() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
                     <div>
                       <p style={{ margin: '0 0 0.1rem', fontWeight: 800, fontSize: '0.88rem', color: 'rgba(226,232,240,0.9)' }}>🧠 Generate Quiz</p>
-                      <p style={{ margin: 0, fontSize: '0.66rem', color: 'rgba(148,163,184,0.42)' }}>Quiz based on AI-analyzed content from this material</p>
+                      <p style={{ margin: 0, fontSize: '0.66rem', color: '#64748b' }}>Quiz based on AI-analyzed content from this material</p>
                     </div>
                     <button onClick={() => setShowQuizPanel(false)} style={s.closePanelBtn}>✕</button>
                   </div>
@@ -913,9 +913,9 @@ export default function StudyResources() {
                           <button key={d} onClick={() => setQuizDiff(d)} style={{
                             padding: '0.3rem 0.65rem', border: '1px solid', borderRadius: '8px',
                             cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.7rem', fontWeight: 700,
-                            borderColor: quizDiff === d ? DIFF_COLORS[d] : 'rgba(255,255,255,0.09)',
+                            borderColor: quizDiff === d ? DIFF_COLORS[d] : '#e2e8f0',
                             background:  quizDiff === d ? `${DIFF_COLORS[d]}18` : 'transparent',
-                            color:       quizDiff === d ? DIFF_COLORS[d] : 'rgba(148,163,184,0.5)',
+                            color:       quizDiff === d ? DIFF_COLORS[d] : '#64748b',
                             transition: 'all 0.15s',
                           }}>{d.charAt(0).toUpperCase() + d.slice(1)}</button>
                         ))}
@@ -927,7 +927,7 @@ export default function StudyResources() {
                       <input type="range" min={5} max={30} step={5} value={quizCount}
                         onChange={e => setQuizCount(Number(e.target.value))}
                         style={{ width: '100%', accentColor: '#00D4FF' }} />
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: 'rgba(148,163,184,0.3)', marginTop: '0.1rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.6rem', color: '#64748b', marginTop: '0.1rem' }}>
                         <span>5</span><span>15</span><span>30</span>
                       </div>
                     </div>
@@ -939,9 +939,9 @@ export default function StudyResources() {
                           <button key={t.key} onClick={() => toggleType(t.key)} style={{
                             padding: '0.24rem 0.52rem', border: '1px solid', borderRadius: '7px',
                             cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.66rem', fontWeight: 700,
-                            borderColor: quizTypes.includes(t.key) ? 'rgba(99,102,241,0.48)' : 'rgba(255,255,255,0.09)',
+                            borderColor: quizTypes.includes(t.key) ? 'rgba(99,102,241,0.48)' : '#e2e8f0',
                             background:  quizTypes.includes(t.key) ? 'rgba(99,102,241,0.14)' : 'transparent',
-                            color:       quizTypes.includes(t.key) ? '#a78bfa' : 'rgba(148,163,184,0.5)',
+                            color:       quizTypes.includes(t.key) ? '#a78bfa' : '#64748b',
                             transition: 'all 0.15s',
                           }}>{t.label}</button>
                         ))}
@@ -959,7 +959,7 @@ export default function StudyResources() {
                     {generating && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <div style={s.spinner} />
-                        <p style={{ margin: 0, fontSize: '0.7rem', color: 'rgba(148,163,184,0.42)' }}>
+                        <p style={{ margin: 0, fontSize: '0.7rem', color: '#64748b' }}>
                           Creating {quizCount} questions at {quizDiff} difficulty…
                         </p>
                       </div>
@@ -979,54 +979,54 @@ export default function StudyResources() {
 const s: Record<string, React.CSSProperties> = {
   wrap:        { display: 'flex', flexDirection: 'column', gap: '0.88rem', padding: '1.1rem', maxWidth: '880px', margin: '0 auto' },
   dropZone: {
-    border: '2px dashed rgba(0,212,255,0.22)', borderRadius: '14px',
+    border: '2px dashed rgba(0,212,255,0.22)', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
     padding: '1.35rem 2rem', textAlign: 'center', cursor: 'pointer',
     background: 'rgba(0,212,255,0.025)', transition: 'border-color 0.2s, background 0.2s',
     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem',
   },
   dropActive:  { borderColor: 'rgba(0,212,255,0.65)', background: 'rgba(0,212,255,0.07)' },
   dropLabel:   { margin: 0, fontWeight: 700, color: 'rgba(226,232,240,0.8)', fontSize: '0.86rem' },
-  dropHint:    { margin: 0, fontSize: '0.67rem', color: 'rgba(148,163,184,0.4)' },
-  progTrack:   { width: '200px', height: '4px', background: 'rgba(255,255,255,0.09)', borderRadius: '99px', overflow: 'hidden', margin: '0.4rem auto' },
+  dropHint:    { margin: 0, fontSize: '0.67rem', color: '#64748b' },
+  progTrack:   { width: '200px', height: '4px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden', margin: '0.4rem auto' },
   progFill:    { height: '100%', background: '#00D4FF', borderRadius: '99px', transition: 'width 0.1s' },
   errorMsg:    { padding: '0.5rem 0.75rem', background: 'rgba(239,68,68,0.09)', border: '1px solid rgba(239,68,68,0.28)', borderRadius: '8px', color: '#fca5a5', fontSize: '0.78rem' },
   libHeader:   { display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' as const },
-  searchInput: { flex: 1, padding: '0.46rem 0.78rem', minWidth: '160px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '9px', color: 'var(--text-h)', fontSize: '0.8rem', fontFamily: 'inherit', outline: 'none' },
-  libCount:    { fontSize: '0.66rem', color: 'rgba(148,163,184,0.38)', whiteSpace: 'nowrap' as const },
+  searchInput: { flex: 1, padding: '0.46rem 0.78rem', minWidth: '160px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '9px', color: 'var(--text-h)', fontSize: '0.8rem', fontFamily: 'inherit', outline: 'none' },
+  libCount:    { fontSize: '0.66rem', color: '#64748b', whiteSpace: 'nowrap' as const },
   analyzeAllBtn: { padding: '0.4rem 0.88rem', background: 'rgba(99,102,241,0.11)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '9px', color: '#a78bfa', fontSize: '0.74rem', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' as const, transition: 'opacity 0.18s' },
   emptyState:  { textAlign: 'center', padding: '2.5rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' },
   emptyTitle:  { margin: '0 0 0.4rem', fontWeight: 700, fontSize: '0.9rem', color: 'rgba(226,232,240,0.65)' },
-  emptyHint:   { margin: 0, fontSize: '0.76rem', color: 'rgba(148,163,184,0.4)', lineHeight: 1.55, maxWidth: '400px' },
+  emptyHint:   { margin: 0, fontSize: '0.76rem', color: '#64748b', lineHeight: 1.55, maxWidth: '400px' },
   libGrid:     { display: 'flex', flexDirection: 'column', gap: '0.38rem' },
   matCard:     { display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0.7rem 0.88rem', borderRadius: '12px', border: '1px solid', transition: 'border-color 0.18s, background 0.18s, box-shadow 0.18s' },
   matName:     { margin: '0 0 0.1rem', fontSize: '0.79rem', fontWeight: 700, color: 'rgba(226,232,240,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
-  matMeta:     { margin: 0, fontSize: '0.62rem', color: 'rgba(148,163,184,0.4)' },
+  matMeta:     { margin: 0, fontSize: '0.62rem', color: '#64748b' },
   statusAnalyzing: { display: 'flex', alignItems: 'center', gap: '0.28rem', marginTop: '0.18rem', fontSize: '0.6rem', color: '#fbbf24', fontWeight: 700 },
   miniSpinner: { width: '9px', height: '9px', border: '1.5px solid rgba(251,191,36,0.3)', borderTopColor: '#fbbf24', borderRadius: '50%', animation: 'spin 0.8s linear infinite', flexShrink: 0 },
   statusDone:  { display: 'inline-block', marginTop: '0.18rem', fontSize: '0.6rem', fontWeight: 700, color: '#34d399' },
   statusError: { display: 'inline-block', marginTop: '0.18rem', fontSize: '0.6rem', fontWeight: 700, color: '#f87171' },
   matActions:  { display: 'flex', gap: '0.28rem', flexWrap: 'wrap' as const },
-  actionBtn:   { padding: '0.22rem 0.52rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '7px', color: 'rgba(148,163,184,0.65)', fontSize: '0.66rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' },
-  analysisPanel: { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(0,212,255,0.15)', borderRadius: '16px', padding: '1.05rem', display: 'flex', flexDirection: 'column', gap: '0.82rem' },
+  actionBtn:   { padding: '0.22rem 0.52rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '7px', color: '#475569', fontSize: '0.66rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' },
+  analysisPanel: { background: '#ffffff', border: '1px solid rgba(0,212,255,0.15)', borderRadius: '16px', padding: '1.05rem', display: 'flex', flexDirection: 'column', gap: '0.82rem' },
   analysisPanelTitle: { margin: '0 0 0.12rem', fontWeight: 700, fontSize: '0.84rem', color: 'rgba(226,232,240,0.88)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
-  analysisPanelMeta:  { margin: 0, fontSize: '0.63rem', color: 'rgba(148,163,184,0.45)' },
-  reAnalyzeBtn: { padding: '0.26rem 0.62rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.11)', borderRadius: '7px', color: 'rgba(148,163,184,0.6)', fontSize: '0.68rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' },
-  closePanelBtn:{ padding: '0.24rem 0.48rem', background: 'transparent', border: 'none', color: 'rgba(148,163,184,0.38)', fontSize: '0.78rem', cursor: 'pointer', fontFamily: 'inherit', borderRadius: '6px' },
+  analysisPanelMeta:  { margin: 0, fontSize: '0.63rem', color: '#64748b' },
+  reAnalyzeBtn: { padding: '0.26rem 0.62rem', background: '#f8fafc', border: '1px solid rgba(255,255,255,0.11)', borderRadius: '7px', color: '#475569', fontSize: '0.68rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' },
+  closePanelBtn:{ padding: '0.24rem 0.48rem', background: 'transparent', border: 'none', color: '#64748b', fontSize: '0.78rem', cursor: 'pointer', fontFamily: 'inherit', borderRadius: '6px' },
   spinner:     { width: '18px', height: '18px', border: '2.5px solid rgba(0,212,255,0.15)', borderTopColor: '#00D4FF', borderRadius: '50%', animation: 'spin 0.8s linear infinite', flexShrink: 0, marginTop: '2px' },
   sectionHead: { margin: '0 0 0.4rem', fontSize: '0.7rem', fontWeight: 800, color: '#00D4FF', letterSpacing: '0.05em', textTransform: 'uppercase' as const },
   body:        { margin: 0, fontSize: '0.81rem', color: 'rgba(226,232,240,0.7)', lineHeight: 1.6 },
-  hint:        { margin: 0, fontSize: '0.75rem', color: 'rgba(148,163,184,0.4)', textAlign: 'center' as const },
+  hint:        { margin: 0, fontSize: '0.75rem', color: '#64748b', textAlign: 'center' as const },
   ul:          { margin: 0, paddingLeft: '1.1rem' },
   li:          { fontSize: '0.79rem', color: 'rgba(226,232,240,0.7)', lineHeight: 1.55, marginBottom: '0.26rem' },
   chipRow:     { display: 'flex', flexWrap: 'wrap' as const, gap: '0.28rem' },
   topicChip:   { padding: '0.16rem 0.48rem', borderRadius: '99px', fontSize: '0.63rem', fontWeight: 700, background: 'rgba(0,212,255,0.09)', border: '1px solid rgba(0,212,255,0.22)', color: '#00D4FF' },
   kwChip:      { padding: '0.16rem 0.48rem', borderRadius: '99px', fontSize: '0.63rem', fontWeight: 700, background: 'rgba(99,102,241,0.09)', border: '1px solid rgba(99,102,241,0.22)', color: '#a78bfa' },
   conceptChip: { padding: '0.16rem 0.48rem', borderRadius: '99px', fontSize: '0.63rem', fontWeight: 700, background: 'rgba(16,185,129,0.09)', border: '1px solid rgba(16,185,129,0.22)', color: '#34d399' },
-  navBtn:      { padding: '0.36rem 0.85rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', color: 'rgba(148,163,184,0.62)', fontSize: '0.74rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' },
+  navBtn:      { padding: '0.36rem 0.85rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', color: 'rgba(148,163,184,0.62)', fontSize: '0.74rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' },
   generateQuizBtn: { padding: '0.62rem 1.2rem', border: '1px solid rgba(99,102,241,0.38)', borderRadius: '12px', background: 'rgba(99,102,241,0.1)', color: '#c4b5fd', fontWeight: 800, fontSize: '0.86rem', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center' as const, boxShadow: '0 0 18px rgba(99,102,241,0.12)', transition: 'opacity 0.2s' },
-  quizConfigPanel: { padding: '1rem', background: 'rgba(99,102,241,0.055)', border: '1px solid rgba(99,102,241,0.22)', borderRadius: '14px' },
-  configLabel: { display: 'block', fontSize: '0.68rem', fontWeight: 700, color: 'rgba(148,163,184,0.52)', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: '0.32rem' },
-  configInput: { width: '100%', padding: '0.46rem 0.78rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '9px', color: 'var(--text-h)', fontSize: '0.81rem', fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' as const },
+  quizConfigPanel: { padding: '1rem', background: 'rgba(99,102,241,0.055)', border: '1px solid rgba(99,102,241,0.22)', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' },
+  configLabel: { display: 'block', fontSize: '0.68rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: '0.32rem' },
+  configInput: { width: '100%', padding: '0.46rem 0.78rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '9px', color: 'var(--text-h)', fontSize: '0.81rem', fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' as const },
   primaryBtn:  { padding: '0.58rem 1.25rem', border: 'none', borderRadius: '10px', background: 'linear-gradient(135deg,#00D4FF,#7c3aed)', color: '#fff', fontWeight: 800, fontSize: '0.84rem', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(0,212,255,0.2)', transition: 'opacity 0.2s' },
-  outlineBtn:  { padding: '0.48rem 0.95rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '9px', color: 'rgba(148,163,184,0.7)', fontSize: '0.77rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' },
+  outlineBtn:  { padding: '0.48rem 0.95rem', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '9px', color: 'rgba(148,163,184,0.7)', fontSize: '0.77rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' },
 };

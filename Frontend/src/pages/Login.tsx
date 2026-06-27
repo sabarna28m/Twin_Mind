@@ -51,7 +51,7 @@ export default function Login() {
     setLoading(true);
     try {
       const needs2fa = await login(email, password);
-      if (!needs2fa) navigate('/');
+      if (!needs2fa) navigate('/dashboard');
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(detail ?? t('login_error'));
@@ -67,7 +67,7 @@ export default function Login() {
     setLoading(true);
     try {
       await completeTwoFALogin(twoFACode.trim());
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(detail ?? 'Invalid code. Please try again.');
@@ -81,7 +81,7 @@ export default function Login() {
     setLoading(true);
     try {
       await loginWithGoogle(credential);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(detail ?? 'Google sign-in failed. Please try again.');
@@ -94,7 +94,7 @@ export default function Login() {
   if (twoFARequired) {
     return (
       <div className="saasable-root flex items-center justify-center p-6 min-h-screen">
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} className="saasable-card w-full max-w-[420px]">
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} className="w-full max-w-[380px] mx-auto flex flex-col pt-8 pb-12">
           <div className="flex flex-col items-center mb-6">
             <Link to="/" className="mb-4">
               <TwinMindLogo size={44} variant="auth" />
@@ -115,8 +115,8 @@ export default function Login() {
           )}
 
           <form onSubmit={handleTwoFASubmit} className="flex flex-col gap-5">
-            <label className="flex flex-col gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              Verification Code
+            <label className="flex flex-col gap-2">
+              <span className="text-[0.8rem] font-bold text-slate-700">Verification Code</span>
               <input
                 ref={twoFAInputRef}
                 className="dark-input"
@@ -133,7 +133,7 @@ export default function Login() {
             </label>
 
             <button
-              className="saasable-btn-primary w-full justify-center py-3 text-base mt-2"
+              className="saasable-btn-primary w-full justify-center py-3.5 rounded-xl font-bold text-[0.95rem] mt-2 shadow-md shadow-indigo-500/20"
               type="submit"
               disabled={loading || twoFACode.trim().length < 6}
             >
@@ -143,7 +143,7 @@ export default function Login() {
 
           <button
             onClick={() => { clearTwoFAChallenge(); setError(''); }}
-            className="block mx-auto mt-6 text-sm text-slate-500 hover:text-slate-900 transition-colors font-medium"
+            className="block mx-auto mt-6 text-sm text-slate-500 hover:text-slate-900 transition-colors font-semibold"
           >
             ← Back to login
           </button>
@@ -155,13 +155,12 @@ export default function Login() {
   // ──── Normal credentials step ──────────────────────────────────────────────
   return (
     <div className="saasable-root flex items-center justify-center p-6 min-h-screen">
-      <motion.div initial="hidden" animate="visible" variants={fadeUp} className="saasable-card w-full max-w-[420px]">
-        <div className="flex flex-col items-center mb-6">
-          <Link to="/" className="mb-4">
+      <motion.div initial="hidden" animate="visible" variants={fadeUp} className="w-full max-w-[380px] mx-auto flex flex-col pt-4 pb-12">
+        <div className="flex flex-col items-center mb-8">
+          <Link to="/" className="mb-6">
             <TwinMindLogo size={44} variant="auth" />
           </Link>
-          <p className="text-sm text-slate-500 mb-2">{t('login_tagline')}</p>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{t('login_title')}</h2>
+          <h2 className="text-[1.85rem] font-bold text-slate-900 tracking-tight">{t('login_title') || 'Welcome back'}</h2>
         </div>
 
         {error && (
@@ -170,33 +169,9 @@ export default function Login() {
           </div>
         )}
 
-        {/* Google Sign-In */}
-        {GOOGLE_CLIENT_ID && (
-          <div className="flex justify-center mb-4">
-            <GoogleLogin
-              onSuccess={cr => cr.credential && handleGoogleSuccess(cr.credential)}
-              onError={() => setError('Google sign-in failed. Please try again.')}
-              theme="outline"
-              size="large"
-              text="continue_with"
-              width={340}
-              useOneTap={false}
-            />
-          </div>
-        )}
-
-        {/* Divider */}
-        {GOOGLE_CLIENT_ID && (
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-slate-200"></div>
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">or continue with email</span>
-            <div className="flex-1 h-px bg-slate-200"></div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-            {t('login_email')}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <label className="flex flex-col gap-2">
+            <span className="text-[0.8rem] font-bold text-slate-700">{t('login_email') || 'Email'}</span>
             <input 
               className="dark-input" 
               type="email" 
@@ -207,8 +182,13 @@ export default function Login() {
               autoFocus 
             />
           </label>
-          <label className="flex flex-col gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-            {t('login_password')}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-center">
+              <span className="text-[0.8rem] font-bold text-slate-700">{t('login_password') || 'Password'}</span>
+              <Link to="/forgot-password" className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors">
+                {t('login_forgot') || 'Forgot?'}
+              </Link>
+            </div>
             <div className="relative auth-password-override">
               <PasswordInput
                 value={password}
@@ -218,26 +198,47 @@ export default function Login() {
                 autoComplete="current-password"
               />
             </div>
-            <Link to="/forgot-password" className="text-xs font-medium text-[#005C97] hover:text-[#004a7a] self-end mt-1 transition-colors">
-              {t('login_forgot')}
-            </Link>
-          </label>
+          </div>
 
-          <div className="mt-2">
+          <div className="mt-1">
             <CustomCaptcha onValid={setCaptchaValid} resetKey={captchaReset} />
           </div>
 
           <button
-            className="saasable-btn-primary w-full justify-center py-3 text-base mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="saasable-btn-primary w-full justify-center py-3.5 rounded-xl font-bold text-[0.95rem] mt-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20"
             type="submit"
             disabled={loading || !captchaValid}
           >
-            {loading ? t('login_btn_loading') : t('login_btn')}
+            {loading ? (t('login_btn_loading') || 'Signing in...') : (t('login_btn') || 'Sign in')}
           </button>
         </form>
 
-        <p className="mt-8 text-center text-sm text-slate-500">
-          {t('login_no_account')} <Link to="/register" className="font-semibold text-[#005C97] hover:text-[#004a7a] transition-colors">{t('login_create')}</Link>
+        {/* Divider */}
+        {GOOGLE_CLIENT_ID && (
+          <div className="flex items-center gap-4 my-7">
+            <div className="flex-1 h-px bg-slate-200"></div>
+            <span className="text-xs font-semibold text-slate-400 italic">or</span>
+            <div className="flex-1 h-px bg-slate-200"></div>
+          </div>
+        )}
+
+        {/* Google Sign-In */}
+        {GOOGLE_CLIENT_ID && (
+          <div className="flex justify-center mb-8">
+            <GoogleLogin
+              onSuccess={cr => cr.credential && handleGoogleSuccess(cr.credential)}
+              onError={() => setError('Google sign-in failed. Please try again.')}
+              theme="outline"
+              size="large"
+              text="signin_with"
+              width={380}
+              useOneTap={false}
+            />
+          </div>
+        )}
+
+        <p className="mt-6 text-center text-[0.85rem] text-slate-500">
+          {t('login_no_account') || "Don't you have an account?"} <Link to="/register" className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors">{t('login_create') || 'Sign Up'}</Link>
         </p>
       </motion.div>
     </div>

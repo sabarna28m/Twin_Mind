@@ -80,12 +80,12 @@ const s: Record<string, React.CSSProperties> = {
   heading: { margin: 0, fontSize: '0.78rem', fontWeight: 700, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.08em' },
   grid:    { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' },
   cell:    {
-    padding: '0.85rem 0.65rem', borderRadius: '14px', textAlign: 'center',
-    background: 'rgba(10,16,32,0.75)', border: '1px solid rgba(255,255,255,0.07)',
+    padding: '0.85rem 0.65rem', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', textAlign: 'center',
+    background: 'rgba(10,16,32,0.75)', border: '1px solid #e2e8f0',
     backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.18rem',
   },
   icon: { fontSize: '1.1rem', lineHeight: 1 },
   val:  { margin: 0, fontSize: '1.3rem', fontWeight: 800, lineHeight: 1.1 },
-  lbl:  { margin: 0, fontSize: '0.6rem', color: 'rgba(148,163,184,0.6)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' },
+  lbl:  { margin: 0, fontSize: '0.6rem', color: '#475569', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' },
 };

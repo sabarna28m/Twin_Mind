@@ -64,8 +64,8 @@ export default function SessionHistory({ sessions, loading, onToggle, onDelete, 
 const s: Record<string, React.CSSProperties> = {
   loadWrap: { display: 'flex', flexDirection: 'column', gap: '0.65rem' },
   skeleton: {
-    height: '72px', borderRadius: '14px',
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
+    height: '72px', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+    background: '#ffffff', border: '1px solid #e2e8f0',
   },
   empty: { textAlign: 'center', padding: '3.5rem 1rem' },
   emptyIcon:  { margin: '0 0 0.6rem', fontSize: '2.2rem' },

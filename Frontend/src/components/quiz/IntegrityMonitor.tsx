@@ -167,7 +167,7 @@ export default function IntegrityMonitor({ stream, demoMode, sessionActive, onMe
       {/* Score ring + state */}
       <div style={m.scoreRow}>
         <svg width={76} height={76} viewBox="0 0 76 76">
-          <circle cx={38} cy={38} r={30} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={7} />
+          <circle cx={38} cy={38} r={30} fill="none" stroke="#e2e8f0" strokeWidth={7} />
           <circle cx={38} cy={38} r={30} fill="none" stroke={color} strokeWidth={7} strokeLinecap="round"
             strokeDasharray={C} strokeDashoffset={offset}
             transform="rotate(-90 38 38)"
@@ -197,7 +197,7 @@ const m: Record<string, React.CSSProperties> = {
   },
   header: {
     display: 'flex', alignItems: 'center', gap: '0.4rem',
-    padding: '0.6rem 0.85rem', borderBottom: '1px solid rgba(255,255,255,0.06)',
+    padding: '0.6rem 0.85rem', borderBottom: '1px solid #e2e8f0',
   },
   dot: { width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0 },
   label: { flex: 1, fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-h)' },

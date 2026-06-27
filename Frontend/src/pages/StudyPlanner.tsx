@@ -510,7 +510,7 @@ export default function StudyPlanner() {
               style={{ padding: '0.42rem 1rem', background: generating ? 'rgba(var(--primary-rgb),0.15)' : 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', border: 'none', borderRadius: '9px', fontSize: '0.8rem', fontWeight: 700, cursor: generating ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(var(--primary-rgb),0.3)' }}>
               {generating ? '⟳ Generating…' : smartPlan ? '⟳ Regenerate AI Plan' : '✦ Generate AI Plan'}
             </button>
-            <Link to="/" style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', padding: '0.32rem 0.85rem', border: '1px solid rgba(var(--primary-rgb),0.25)', borderRadius: '8px' }}>← Dashboard</Link>
+            <Link to="/dashboard" style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', padding: '0.32rem 0.85rem', border: '1px solid rgba(var(--primary-rgb),0.25)', borderRadius: '8px' }}>← Dashboard</Link>
           </div>
         </header>
 

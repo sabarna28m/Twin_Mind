@@ -78,11 +78,11 @@ export default function QuizModeSelector({ onSelectMode }: Props) {
 }
 
 const s: Record<string, React.CSSProperties> = {
-  shell: { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' },
+  shell: { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: '#f8f9fa' },
   nav: {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     padding: '0 1.5rem', height: '56px',
-    borderBottom: '1px solid var(--border)', background: 'var(--bg)',
+    borderBottom: '1px solid var(--border)', background: '#f8f9fa',
     position: 'sticky', top: 0, zIndex: 50,
   },
   navTitle: { fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-h)' },
@@ -108,7 +108,7 @@ const s: Record<string, React.CSSProperties> = {
     width: '220px', height: '220px', borderRadius: '50%', pointerEvents: 'none',
   },
   iconWrap: {
-    width: '52px', height: '52px', borderRadius: '14px',
+    width: '52px', height: '52px', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     boxShadow: '0 4px 16px rgba(0,0,0,0.35)', flexShrink: 0,
   },

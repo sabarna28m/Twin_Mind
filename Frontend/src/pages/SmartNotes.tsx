@@ -37,18 +37,18 @@ type AIAction = 'summarize' | 'keypoints' | 'quiz' | 'flashcards' | 'explain';
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 
-const BG      = 'transparent';
-const CARD    = 'rgba(255,255,255,0.04)';
-const CARD2   = 'rgba(255,255,255,0.07)';
-const BORDER  = '1px solid rgba(255,255,255,0.08)';
+const BG = '#f8f9fa';
+const CARD    = '#ffffff';
+const CARD2   = '#e2e8f0';
+const BORDER  = '1px solid #e2e8f0';
 const CYAN    = '#00D4FF';
 const INDIGO  = '#6366f1';
 const GREEN   = '#10b981';
 const AMBER   = '#f59e0b';
 const RED     = '#ef4444';
 const PURPLE  = '#8b5cf6';
-const TEXT    = '#f1f5f9';
-const MUTED   = '#94a3b8';
+const TEXT    = '#0f172a';
+const MUTED   = '#64748b';
 const DIM     = '#475569';
 
 // ── Tiny helpers ──────────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ const sc = (v: number) => v >= 75 ? GREEN : v >= 50 ? CYAN : v >= 30 ? AMBER : R
 
 function Bar({ value, color, h = 4 }: { value: number; color: string; h?: number }) {
   return (
-    <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: 99, height: h, overflow: 'hidden' }}>
+    <div style={{ background: '#e2e8f0', borderRadius: 99, height: h, overflow: 'hidden' }}>
       <div style={{ width: `${Math.min(value, 100)}%`, height: '100%', background: color, borderRadius: 99, transition: 'width 0.8s ease' }} />
     </div>
   );
@@ -89,16 +89,16 @@ function renderMarkdown(md: string): string {
   if (!md) return '';
   let html = md
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/^#{3}\s+(.+)$/gm, '<h3 style="color:#00D4FF;margin:0.5rem 0 0.2rem;font-size:0.95rem">$1</h3>')
-    .replace(/^#{2}\s+(.+)$/gm, '<h2 style="color:#00D4FF;margin:0.6rem 0 0.3rem;font-size:1.05rem">$1</h2>')
-    .replace(/^#{1}\s+(.+)$/gm, '<h1 style="color:#00D4FF;margin:0.7rem 0 0.3rem;font-size:1.2rem">$1</h1>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#f1f5f9">$1</strong>')
+    .replace(/^#{3}\s+(.+)$/gm, '<h3 style="color:#0052cc;margin:0.5rem 0 0.2rem;font-size:0.95rem">$1</h3>')
+    .replace(/^#{2}\s+(.+)$/gm, '<h2 style="color:#0052cc;margin:0.6rem 0 0.3rem;font-size:1.05rem">$1</h2>')
+    .replace(/^#{1}\s+(.+)$/gm, '<h1 style="color:#0052cc;margin:0.7rem 0 0.3rem;font-size:1.2rem">$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#0f172a">$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code style="background:rgba(99,102,241,0.2);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:0.85em;color:#a5b4fc">$1</code>')
-    .replace(/^\s*```[\w]*\n?([\s\S]*?)```/gm, '<pre style="background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.75rem;overflow-x:auto;font-family:monospace;font-size:0.83rem;color:#a5b4fc;margin:0.5rem 0">$1</pre>')
+    .replace(/`([^`]+)`/g, '<code style="background:rgba(99,102,241,0.2);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:0.85em;color:#0052cc">$1</code>')
+    .replace(/^\s*```[\w]*\n?([\s\S]*?)```/gm, '<pre style="background:rgba(0,0,0,0.4);border:1px solid #e2e8f0;border-radius:8px;padding:0.75rem;overflow-x:auto;font-family:monospace;font-size:0.83rem;color:#0052cc;margin:0.5rem 0">$1</pre>')
     .replace(/^\s*[-*]\s+(.+)$/gm, '<li style="margin-bottom:3px">$1</li>')
     .replace(/^\s*\d+\.\s+(.+)$/gm, '<li style="margin-bottom:3px">$1</li>')
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:#00D4FF;text-decoration:underline">$1</a>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:#0052cc;text-decoration:underline">$1</a>')
     .replace(/\n\n/g, '</p><p style="margin:0 0 0.4rem">')
     .replace(/\n/g, '<br/>');
 
@@ -112,12 +112,12 @@ function renderMarkdown(md: string): string {
 function FormatToolbar({ onInsert }: { onInsert: (before: string, after?: string, placeholder?: string) => void }) {
   const btn = (label: string, b: string, a: string, ph: string, title: string) => (
     <button key={label} title={title} onClick={() => onInsert(b, a, ph)}
-      style={{ padding: '3px 8px', background: 'rgba(255,255,255,0.05)', border: BORDER, borderRadius: 5, color: MUTED, cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, fontFamily: 'monospace' }}>
+      style={{ padding: '3px 8px', background: '#f8fafc', border: BORDER, borderRadius: 5, color: MUTED, cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, fontFamily: 'monospace' }}>
       {label}
     </button>
   );
   return (
-    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', padding: '6px 12px', background: 'rgba(0,0,0,0.2)', borderBottom: BORDER }}>
+    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', padding: '6px 12px', background: '#f8fafc', borderBottom: BORDER }}>
       {btn('B', '**', '**', 'bold text', 'Bold')}
       {btn('I', '_', '_', 'italic text', 'Italic')}
       {btn('H1', '# ', '', 'Heading', 'Heading 1')}
@@ -143,7 +143,7 @@ function AIResultPanel({ action, result, onClose }: { action: AIAction; result: 
   };
   const { icon, label, color } = labels[action];
   return (
-    <div style={{ background: CARD, border: `1px solid ${color}30`, borderRadius: 14, padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.65rem', maxHeight: 320, overflow: 'hidden' }}>
+    <div style={{ background: CARD, border: `1px solid ${color}30`, borderRadius: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.65rem', maxHeight: 320, overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ color, fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: 1 }}>{icon} {label}</span>
         <button onClick={onClose} style={{ background: 'none', border: 'none', color: DIM, cursor: 'pointer', fontSize: '0.9rem' }}>✕</button>
@@ -171,8 +171,8 @@ function VersionModal({ noteId, currentVersion, onRestore, onClose }:
   }, [noteId]);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-      <div style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--glass-border)', borderRadius: 18, width: '100%', maxWidth: 780, maxHeight: '85vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ position: 'fixed', inset: 0, background: '#f8fafc', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+      <div style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid #e2e8f0', borderRadius: 18, width: '100%', maxWidth: 780, maxHeight: '85vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Header */}
         <div style={{ padding: '1rem 1.25rem', borderBottom: BORDER, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 700, color: TEXT, fontSize: '0.95rem' }}>🕑 Version History</span>
@@ -214,7 +214,7 @@ function VersionModal({ noteId, currentVersion, onRestore, onClose }:
                     </button>
                   )}
                 </div>
-                <div style={{ background: 'rgba(0,0,0,0.3)', border: BORDER, borderRadius: 10, padding: '0.85rem', minHeight: 200, fontSize: '0.83rem', lineHeight: 1.75, color: MUTED, whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+                <div style={{ background: '#f1f5f9', border: BORDER, borderRadius: 10, padding: '0.85rem', minHeight: 200, fontSize: '0.83rem', lineHeight: 1.75, color: MUTED, whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
                   {preview.content || <span style={{ opacity: 0.4, fontStyle: 'italic' }}>Empty</span>}
                 </div>
               </>
@@ -262,11 +262,11 @@ function NoteCard({ note, active, onClick, onPin, onDelete }:
           <span style={{ fontSize: '0.65rem', color: DIM, whiteSpace: 'nowrap' }}>{fmtDate(note.updated_at, true)}</span>
           <div style={{ display: 'flex', gap: 3 }}>
             <button onClick={e => { e.stopPropagation(); onPin(); }}
-              style={{ padding: '2px 5px', background: note.is_pinned ? `${AMBER}20` : 'rgba(255,255,255,0.05)', border: `1px solid ${note.is_pinned ? AMBER + '40' : 'rgba(255,255,255,0.08)'}`, borderRadius: 4, color: note.is_pinned ? AMBER : DIM, cursor: 'pointer', fontSize: '0.65rem' }}>
+              style={{ padding: '2px 5px', background: note.is_pinned ? `${AMBER}20` : '#f8fafc', border: `1px solid ${note.is_pinned ? AMBER + '40' : '#e2e8f0'}`, borderRadius: 4, color: note.is_pinned ? AMBER : DIM, cursor: 'pointer', fontSize: '0.65rem' }}>
               📌
             </button>
             <button onClick={e => { e.stopPropagation(); onDelete(); }}
-              style={{ padding: '2px 5px', background: 'rgba(255,255,255,0.05)', border: BORDER, borderRadius: 4, color: DIM, cursor: 'pointer', fontSize: '0.65rem' }}>
+              style={{ padding: '2px 5px', background: '#f8fafc', border: BORDER, borderRadius: 4, color: DIM, cursor: 'pointer', fontSize: '0.65rem' }}>
               🗑
             </button>
           </div>
@@ -316,7 +316,7 @@ function KnowledgeHeatmap({ subjectStats }: { subjectStats: Record<string, Subje
           { label: '⚡ Developing Topics',      items: medium, color: AMBER  },
           { label: '⚠ Needs Attention',         items: weak,   color: RED    },
         ].map(({ label, items, color }) => (
-          <div key={label} style={{ background: CARD, border: `1px solid ${color}25`, borderRadius: 14, padding: '0.9rem' }}>
+          <div key={label} style={{ background: CARD, border: `1px solid ${color}25`, borderRadius: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '0.9rem' }}>
             <div style={{ color, fontWeight: 700, fontSize: '0.75rem', marginBottom: '0.6rem' }}>{label}</div>
             {items.length === 0
               ? <div style={{ color: DIM, fontSize: '0.73rem', fontStyle: 'italic' }}>None</div>
@@ -357,7 +357,7 @@ function TimelineView({ events }: { events: Array<{ type: string; title: string;
         return (
           <div key={i} style={{ display: 'flex', gap: '0.85rem', paddingBottom: '1rem', position: 'relative' }}>
             {/* Dot */}
-            <div style={{ position: 'absolute', left: '-1.85rem', width: 14, height: 14, borderRadius: '50%', background: color, border: `2px solid ${BG}`, boxShadow: `0 0 8px ${color}55`, flexShrink: 0, top: 2 }} />
+            <div style={{ position: 'absolute', left: '-1.85rem', width: 14, height: 14, borderRadius: '50%', background: color, border: `2px solid ${BG}`, boxShadow: `0 4px 12px ${color}30`, flexShrink: 0, top: 2 }} />
 
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -655,34 +655,34 @@ export default function SmartNotes() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ minHeight: '100svh', background: BG, color: TEXT, fontFamily: 'system-ui,-apple-system,sans-serif', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100svh', background: BG, color: TEXT, fontFamily: '"Inter", system-ui, sans-serif', display: 'flex', flexDirection: 'column' }}>
       <style>{`
         @keyframes spin { to { transform:rotate(360deg); } }
-        * { scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.1) transparent; }
+        * { scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
         *::-webkit-scrollbar { width:4px; height:4px; }
-        *::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
+        *::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:99px; }
         input,textarea,select { outline:none; }
         input:focus,textarea:focus,select:focus { border-color:rgba(99,102,241,0.5) !important; }
-        select option { background:#0d1117; color:#f1f5f9; }
-        .note-card:hover { background:rgba(255,255,255,0.03) !important; }
+        select option { background:#0d1117; color:#0f172a; }
+        .note-card:hover { background:#ffffff !important; }
         .ai-btn:hover { opacity:0.85; }
-        .view-tab:hover { color:#f1f5f9 !important; }
+        .view-tab:hover { color:#0f172a !important; }
       `}</style>
 
       {/* ── Header ── */}
-      <div style={{ borderBottom: 'var(--glass-border)', padding: '0.85rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--glass-bg)', backdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 50 }}>
+      <div style={{ borderBottom: '#e2e8f0', padding: '0.85rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 50 }}>
         <BackButton />
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span style={{ fontSize: '1.25rem' }}>🧠</span>
           <span style={{ fontWeight: 800, fontSize: '1.1rem', color: TEXT }}>Smart Notes</span>
           <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 99, background: `${CYAN}15`, color: CYAN, border: `1px solid ${CYAN}30`, fontWeight: 700 }}>Knowledge Memory</span>
         </div>
-        <Link to="/" style={{ marginLeft: 'auto', color: MUTED, fontSize: '0.8rem', textDecoration: 'none' }}>← Dashboard</Link>
+        <Link to="/dashboard" style={{ marginLeft: 'auto', color: MUTED, fontSize: '0.8rem', textDecoration: 'none' }}>← Dashboard</Link>
       </div>
 
       {/* ── Stats bar ── */}
       {analytics && (
-        <div style={{ display: 'flex', gap: '0', borderBottom: BORDER, background: 'rgba(0,0,0,0.2)', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: '0', borderBottom: BORDER, background: '#f8fafc', overflowX: 'auto' }}>
           {[
             { icon: '📝', label: 'Total Notes',    value: analytics.total_notes,   color: CYAN   },
             { icon: '📌', label: 'Pinned',          value: analytics.pinned_count,  color: AMBER  },
@@ -699,7 +699,7 @@ export default function SmartNotes() {
       )}
 
       {/* ── View tabs ── */}
-      <div style={{ display: 'flex', borderBottom: BORDER, background: 'var(--glass-bg)', backdropFilter: 'blur(16px)' }}>
+      <div style={{ display: 'flex', borderBottom: BORDER, background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(16px)' }}>
         {([
           { id: 'notes',     icon: '📝', label: 'Notes'     },
           { id: 'history',   icon: '🗑️', label: 'History'   },
@@ -714,14 +714,15 @@ export default function SmartNotes() {
       </div>
 
       {/* ── Main content ── */}
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
+      <div style={{ position: 'absolute', top: '-20%', left: '50%', transform: 'translateX(-50%)', width: '120vw', height: '60vh', background: 'radial-gradient(ellipse at center, rgba(0,82,204,0.05) 0%, rgba(248,249,250,0) 70%)', pointerEvents: 'none', zIndex: 0 }} />
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', zIndex: 1, position: 'relative' }}>
 
         {/* ══════════════ NOTES VIEW ══════════════ */}
         {view === 'notes' && (
           <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '180px 300px 1fr', overflow: 'hidden' }}>
 
             {/* Left: Subject sidebar */}
-            <div style={{ borderRight: BORDER, display: 'flex', flexDirection: 'column', overflowY: 'auto', background: 'rgba(0,0,0,0.15)' }}>
+            <div style={{ borderRight: BORDER, display: 'flex', flexDirection: 'column', overflowY: 'auto', background: '#f8fafc' }}>
               <div style={{ padding: '0.9rem 0.85rem 0.5rem', fontSize: '0.62rem', color: DIM, textTransform: 'uppercase', letterSpacing: 1 }}>Subjects</div>
               <button onClick={() => setFilterSubj(null)}
                 style={{ padding: '0.5rem 0.85rem', background: !filterSubj ? `${CYAN}15` : 'transparent', border: 'none', borderLeft: `3px solid ${!filterSubj ? CYAN : 'transparent'}`, color: !filterSubj ? CYAN : MUTED, cursor: 'pointer', fontSize: '0.8rem', fontWeight: !filterSubj ? 700 : 400, textAlign: 'left' }}>
@@ -741,7 +742,7 @@ export default function SmartNotes() {
             {/* Center: Note list */}
             <div style={{ borderRight: BORDER, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               {/* Toolbar */}
-              <div style={{ padding: '0.6rem 0.75rem', borderBottom: BORDER, display: 'flex', flexDirection: 'column', gap: '0.45rem', background: 'rgba(0,0,0,0.1)' }}>
+              <div style={{ padding: '0.6rem 0.75rem', borderBottom: BORDER, display: 'flex', flexDirection: 'column', gap: '0.45rem', background: '#f1f5f9' }}>
                 <div style={{ display: 'flex', gap: '0.4rem' }}>
                   <input
                     value={search}
@@ -756,13 +757,13 @@ export default function SmartNotes() {
                 </div>
                 <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
                   <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)} className="form-select"
-                    style={{ flex: 1, background: '#1F2937', border: '1px solid #4B5563', borderRadius: 6, padding: '0.28rem 0.5rem', color: '#FFFFFF', fontSize: '0.7rem' }}>
+                    style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 6, padding: '0.28rem 0.5rem', color: '#0f172a', fontSize: '0.7rem' }}>
                     <option value="updated">Sort: Updated</option>
                     <option value="created">Sort: Created</option>
                     <option value="title">Sort: Title</option>
                   </select>
                   <button onClick={() => setPinnedOnly(p => !p)}
-                    style={{ padding: '0.28rem 0.55rem', background: pinnedOnly ? `${AMBER}20` : 'rgba(0,0,0,0.3)', border: `1px solid ${pinnedOnly ? AMBER + '40' : 'rgba(255,255,255,0.08)'}`, borderRadius: 6, color: pinnedOnly ? AMBER : DIM, cursor: 'pointer', fontSize: '0.68rem' }}>
+                    style={{ padding: '0.28rem 0.55rem', background: pinnedOnly ? `${AMBER}20` : 'rgba(0,0,0,0.3)', border: `1px solid ${pinnedOnly ? AMBER + '40' : '#e2e8f0'}`, borderRadius: 6, color: pinnedOnly ? AMBER : DIM, cursor: 'pointer', fontSize: '0.68rem' }}>
                     📌
                   </button>
                 </div>
@@ -800,16 +801,16 @@ export default function SmartNotes() {
               ) : (
                 <>
                   {/* Editor top bar */}
-                  <div style={{ padding: '0.65rem 1rem', borderBottom: BORDER, display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', background: 'rgba(0,0,0,0.1)', flexShrink: 0 }}>
+                  <div style={{ padding: '0.65rem 1rem', borderBottom: BORDER, display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', background: '#f1f5f9', flexShrink: 0 }}>
                     {/* Subject */}
                     <select value={subject} onChange={e => { setSubject(e.target.value); scheduleSave(title, content, e.target.value, tags); }} className="form-select"
-                      style={{ background: '#1F2937', border: '1px solid #4B5563', borderRadius: 7, padding: '0.28rem 0.6rem', color: '#FFFFFF', fontSize: '0.75rem', cursor: 'pointer' }}>
+                      style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 7, padding: '0.28rem 0.6rem', color: '#0f172a', fontSize: '0.75rem', cursor: 'pointer' }}>
                       <option value="">No subject</option>
                       {subjects.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
 
                     {/* Tags */}
-                    <div style={{ display: 'flex', gap: 4, alignItems: 'center', flex: 1, minWidth: 120, flexWrap: 'wrap', background: 'rgba(0,0,0,0.3)', border: BORDER, borderRadius: 7, padding: '0.22rem 0.6rem' }}>
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center', flex: 1, minWidth: 120, flexWrap: 'wrap', background: '#f1f5f9', border: BORDER, borderRadius: 7, padding: '0.22rem 0.6rem' }}>
                       {tags.map(t => (
                         <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '1px 6px', borderRadius: 99, background: `${PURPLE}20`, color: PURPLE, fontSize: '0.68rem', border: `1px solid ${PURPLE}35` }}>
                           {t}<button onClick={() => removeTag(t)} style={{ background: 'none', border: 'none', color: PURPLE, cursor: 'pointer', padding: 0, lineHeight: 1, fontSize: '0.7rem' }}>×</button>
@@ -825,17 +826,17 @@ export default function SmartNotes() {
                     {/* Actions */}
                     <div style={{ display: 'flex', gap: 4, marginLeft: 'auto' }}>
                       <button onClick={() => setPreview(p => !p)}
-                        style={{ padding: '0.28rem 0.65rem', background: preview ? `${CYAN}20` : 'rgba(0,0,0,0.3)', border: `1px solid ${preview ? CYAN + '40' : 'rgba(255,255,255,0.08)'}`, borderRadius: 7, color: preview ? CYAN : MUTED, cursor: 'pointer', fontSize: '0.72rem' }}>
+                        style={{ padding: '0.28rem 0.65rem', background: preview ? `${CYAN}20` : 'rgba(0,0,0,0.3)', border: `1px solid ${preview ? CYAN + '40' : '#e2e8f0'}`, borderRadius: 7, color: preview ? CYAN : MUTED, cursor: 'pointer', fontSize: '0.72rem' }}>
                         {preview ? '✎ Edit' : '👁 Preview'}
                       </button>
                       <button onClick={() => setShowVersions(true)}
-                        style={{ padding: '0.28rem 0.65rem', background: 'rgba(0,0,0,0.3)', border: BORDER, borderRadius: 7, color: MUTED, cursor: 'pointer', fontSize: '0.72rem' }} title="Version history">
+                        style={{ padding: '0.28rem 0.65rem', background: '#f1f5f9', border: BORDER, borderRadius: 7, color: MUTED, cursor: 'pointer', fontSize: '0.72rem' }} title="Version history">
                         🕑 v{currentVersion}
                       </button>
                       <button onClick={exportTxt}
-                        style={{ padding: '0.28rem 0.65rem', background: 'rgba(0,0,0,0.3)', border: BORDER, borderRadius: 7, color: MUTED, cursor: 'pointer', fontSize: '0.72rem' }}>TXT</button>
+                        style={{ padding: '0.28rem 0.65rem', background: '#f1f5f9', border: BORDER, borderRadius: 7, color: MUTED, cursor: 'pointer', fontSize: '0.72rem' }}>TXT</button>
                       <button onClick={exportPdf}
-                        style={{ padding: '0.28rem 0.65rem', background: 'rgba(0,0,0,0.3)', border: BORDER, borderRadius: 7, color: MUTED, cursor: 'pointer', fontSize: '0.72rem' }}>PDF</button>
+                        style={{ padding: '0.28rem 0.65rem', background: '#f1f5f9', border: BORDER, borderRadius: 7, color: MUTED, cursor: 'pointer', fontSize: '0.72rem' }}>PDF</button>
                     </div>
                   </div>
 
@@ -870,7 +871,7 @@ export default function SmartNotes() {
                     )}
 
                     {/* AI panel */}
-                    <div style={{ borderTop: BORDER, padding: '0.65rem 1rem', background: 'rgba(0,0,0,0.15)', flexShrink: 0 }}>
+                    <div style={{ borderTop: BORDER, padding: '0.65rem 1rem', background: '#f8fafc', flexShrink: 0 }}>
                       {/* AI buttons */}
                       <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: aiResult ? '0.65rem' : 0 }}>
                         {([
@@ -881,7 +882,7 @@ export default function SmartNotes() {
                           { action: 'explain'   as AIAction,  icon: '💡', label: 'Explain',     color: INDIGO },
                         ]).map(({ action, icon, label, color }) => (
                           <button key={action} onClick={() => runAI(action)} disabled={aiLoading || !content.trim()} className="ai-btn"
-                            style={{ padding: '0.32rem 0.75rem', background: aiAction === action && aiResult ? `${color}20` : CARD, border: `1px solid ${aiAction === action && aiResult ? color + '40' : 'rgba(255,255,255,0.08)'}`, borderRadius: 8, color: aiLoading && aiAction === action ? MUTED : color, cursor: aiLoading || !content.trim() ? 'not-allowed' : 'pointer', fontSize: '0.73rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, opacity: !content.trim() ? 0.5 : 1, transition: 'all 0.15s' }}>
+                            style={{ padding: '0.32rem 0.75rem', background: aiAction === action && aiResult ? `${color}20` : CARD, border: `1px solid ${aiAction === action && aiResult ? color + '40' : '#e2e8f0'}`, borderRadius: 8, color: aiLoading && aiAction === action ? MUTED : color, cursor: aiLoading || !content.trim() ? 'not-allowed' : 'pointer', fontSize: '0.73rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, opacity: !content.trim() ? 0.5 : 1, transition: 'all 0.15s' }}>
                             {aiLoading && aiAction === action
                               ? <div style={{ width: 10, height: 10, border: `2px solid ${color}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
                               : icon}
@@ -976,7 +977,7 @@ export default function SmartNotes() {
                       { icon: '🔄', label: 'Revisions',    value: analytics.total_versions, color: PURPLE },
                       { icon: '📚', label: 'Subjects',     value: Object.keys(analytics.subject_stats).length, color: GREEN },
                     ].map(({ icon, label, value, color }) => (
-                      <div key={label} style={{ background: CARD2, border: `1px solid ${color}25`, borderRadius: 14, padding: '0.9rem', textAlign: 'center' }}>
+                      <div key={label} style={{ background: CARD2, border: `1px solid ${color}25`, borderRadius: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '0.9rem', textAlign: 'center' }}>
                         <div style={{ fontSize: '1.2rem', marginBottom: 4 }}>{icon}</div>
                         <div style={{ fontSize: '0.62rem', color: MUTED, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>{label}</div>
                         <div style={{ fontSize: '1.6rem', fontWeight: 900, color }}>{value}</div>

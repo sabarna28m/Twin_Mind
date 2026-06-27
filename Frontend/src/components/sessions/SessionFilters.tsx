@@ -98,7 +98,7 @@ const s: Record<string, React.CSSProperties> = {
   searchRow: { display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' },
   searchWrap: {
     flex: '1 1 200px', display: 'flex', alignItems: 'center', gap: '0.4rem',
-    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+    background: '#f8fafc', border: '1px solid #e2e8f0',
     borderRadius: '10px', overflow: 'hidden',
   },
   searchInput: {
@@ -113,13 +113,13 @@ const s: Record<string, React.CSSProperties> = {
   },
   subjectSelect: {
     flex: '0 0 auto', padding: '0.52rem 0.75rem',
-    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+    background: '#f8fafc', border: '1px solid #e2e8f0',
     borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.82rem', fontFamily: 'inherit',
     cursor: 'pointer', outline: 'none',
   },
   sortSelect: {
     flex: '0 0 auto', padding: '0.52rem 0.75rem',
-    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+    background: '#f8fafc', border: '1px solid #e2e8f0',
     borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.82rem', fontFamily: 'inherit',
     cursor: 'pointer', outline: 'none',
   },
@@ -127,8 +127,8 @@ const s: Record<string, React.CSSProperties> = {
   tabs: { display: 'flex', gap: '0.4rem', flexWrap: 'wrap' },
   tab: {
     padding: '0.3rem 0.7rem', borderRadius: '99px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(255,255,255,0.04)', color: 'var(--text)',
+    border: '1px solid #e2e8f0',
+    background: '#ffffff', color: 'var(--text)',
     fontSize: '0.74rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
     transition: 'background 0.18s, border-color 0.18s, color 0.18s',
   },

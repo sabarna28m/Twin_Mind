@@ -52,7 +52,7 @@ export default function Register() {
     setLoading(true);
     try {
       await loginWithGoogle(credential);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(detail ?? 'Google sign-up failed. Please try again.');
@@ -63,13 +63,12 @@ export default function Register() {
 
   return (
     <div className="saasable-root flex items-center justify-center p-6 min-h-screen">
-      <motion.div initial="hidden" animate="visible" variants={fadeUp} className="saasable-card w-full max-w-[420px]">
-        <div className="flex flex-col items-center mb-6">
-          <Link to="/" className="mb-4">
+      <motion.div initial="hidden" animate="visible" variants={fadeUp} className="w-full max-w-[380px] mx-auto flex flex-col pt-4 pb-12">
+        <div className="flex flex-col items-center mb-8">
+          <Link to="/" className="mb-6">
             <TwinMindLogo size={44} variant="auth" />
           </Link>
-          <p className="text-sm text-slate-500 mb-2">{t('login_tagline')}</p>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{t('register_title')}</h2>
+          <h2 className="text-[1.85rem] font-bold text-slate-900 tracking-tight">{t('register_title') || 'Create account'}</h2>
         </div>
 
         {error && (
@@ -78,33 +77,9 @@ export default function Register() {
           </div>
         )}
 
-        {/* Google Sign-Up */}
-        {GOOGLE_CLIENT_ID && (
-          <div className="flex justify-center mb-4">
-            <GoogleLogin
-              onSuccess={cr => cr.credential && handleGoogleSuccess(cr.credential)}
-              onError={() => setError('Google sign-up failed. Please try again.')}
-              theme="outline"
-              size="large"
-              text="signup_with"
-              width={340}
-              useOneTap={false}
-            />
-          </div>
-        )}
-
-        {/* Divider */}
-        {GOOGLE_CLIENT_ID && (
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-slate-200"></div>
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">or sign up with email</span>
-            <div className="flex-1 h-px bg-slate-200"></div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-            {t('register_fullname')}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <label className="flex flex-col gap-2">
+            <span className="text-[0.8rem] font-bold text-slate-700">{t('register_fullname') || 'Full Name'}</span>
             <input 
               className="dark-input" 
               type="text" 
@@ -116,8 +91,8 @@ export default function Register() {
             />
           </label>
           
-          <label className="flex flex-col gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-            {t('register_email')}
+          <label className="flex flex-col gap-2">
+            <span className="text-[0.8rem] font-bold text-slate-700">{t('register_email') || 'Email'}</span>
             <input 
               className="dark-input" 
               type="email" 
@@ -129,8 +104,8 @@ export default function Register() {
           </label>
 
           <div className="flex flex-col gap-2">
-            <label className="flex flex-col gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              {t('register_password')}
+            <label className="flex flex-col gap-2">
+              <span className="text-[0.8rem] font-bold text-slate-700">{t('register_password') || 'Password'}</span>
               <div className="relative auth-password-override">
                 <PasswordInput
                   value={password}
@@ -147,21 +122,45 @@ export default function Register() {
             </div>
           </div>
 
-          <div className="mt-2">
+          <div className="mt-1">
             <CustomCaptcha onValid={setCaptchaValid} resetKey={captchaReset} />
           </div>
 
           <button
-            className="saasable-btn-primary w-full justify-center py-3 text-base mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="saasable-btn-primary w-full justify-center py-3.5 rounded-xl font-bold text-[0.95rem] mt-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20"
             type="submit"
             disabled={loading || !captchaValid}
           >
-            {loading ? t('register_btn_loading') : t('register_btn')}
+            {loading ? (t('register_btn_loading') || 'Creating account...') : (t('register_btn') || 'Sign Up')}
           </button>
         </form>
 
-        <p className="mt-8 text-center text-sm text-slate-500">
-          {t('register_have_account')} <Link to="/login" className="font-semibold text-[#005C97] hover:text-[#004a7a] transition-colors">{t('register_signin')}</Link>
+        {/* Divider */}
+        {GOOGLE_CLIENT_ID && (
+          <div className="flex items-center gap-4 my-7">
+            <div className="flex-1 h-px bg-slate-200"></div>
+            <span className="text-xs font-semibold text-slate-400 italic">or</span>
+            <div className="flex-1 h-px bg-slate-200"></div>
+          </div>
+        )}
+
+        {/* Google Sign-Up */}
+        {GOOGLE_CLIENT_ID && (
+          <div className="flex justify-center mb-8">
+            <GoogleLogin
+              onSuccess={cr => cr.credential && handleGoogleSuccess(cr.credential)}
+              onError={() => setError('Google sign-up failed. Please try again.')}
+              theme="outline"
+              size="large"
+              text="signup_with"
+              width={380}
+              useOneTap={false}
+            />
+          </div>
+        )}
+
+        <p className="mt-6 text-center text-[0.85rem] text-slate-500">
+          {t('register_have_account') || 'Already have an account?'} <Link to="/login" className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors">{t('register_signin') || 'Sign in'}</Link>
         </p>
       </motion.div>
     </div>

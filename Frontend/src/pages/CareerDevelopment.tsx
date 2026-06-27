@@ -2141,7 +2141,7 @@ export default function CareerDevelopment() {
           <div style={{ color:MUTED, fontSize:'0.72rem' }}>AI-powered career guidance for every learner & professional</div>
         </div>
         <div style={{ marginLeft:'auto' }}>
-          <Link to="/" style={{ color:MUTED, fontSize:'0.8rem', textDecoration:'none' }}>← Dashboard</Link>
+          <Link to="/dashboard" style={{ color:MUTED, fontSize:'0.8rem', textDecoration:'none' }}>← Dashboard</Link>
         </div>
       </div>
 

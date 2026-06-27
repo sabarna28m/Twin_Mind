@@ -31,7 +31,7 @@ export default function WarningSystem({ warnings, latestWarning, onDismiss, term
             key={i}
             style={{
               ...w.dot,
-              background: i < count ? '#ef4444' : 'rgba(255,255,255,0.1)',
+              background: i < count ? '#ef4444' : '#e2e8f0',
               boxShadow: i < count ? '0 0 6px rgba(239,68,68,0.6)' : 'none',
               transform: i === count - 1 ? 'scale(1.25)' : 'scale(1)',
             }}
@@ -111,8 +111,8 @@ const w: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'flex-start', gap: '0.65rem',
     padding: '0.85rem 1rem',
     background: 'rgba(10,16,32,0.95)', backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(239,68,68,0.35)', borderRadius: '14px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+    border: '1px solid rgba(239,68,68,0.35)', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
   },
   toastTitle: { margin: '0 0 0.2rem', fontSize: '0.78rem', fontWeight: 800, color: '#ef4444' },
   toastMsg:   { margin: 0, fontSize: '0.77rem', color: 'var(--text-h)', lineHeight: 1.45 },

@@ -578,7 +578,7 @@ export default function FocusModeQuiz({ onBack }: Props) {
                 {integrityRef.current.getScore()}%
               </span>
             </div>
-            <div style={{ height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '99px', overflow: 'hidden' }}>
+            <div style={{ height: '5px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
               <div style={{ height: '100%', borderRadius: '99px', width: `${integrityRef.current.getScore()}%`, background: warnCount === 0 ? '#10b981' : warnCount < 3 ? '#f59e0b' : '#ef4444', transition: 'width 0.5s' }} />
             </div>
             <p style={{ margin: '0.4rem 0 0', fontSize: '0.65rem', color: 'var(--text)' }}>
@@ -596,8 +596,8 @@ export default function FocusModeQuiz({ onBack }: Props) {
 }
 
 const f: Record<string, React.CSSProperties> = {
-  shell:   { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' },
-  nav:     { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.25rem', height: '52px', borderBottom: '1px solid var(--border)', background: 'var(--bg)', position: 'sticky', top: 0, zIndex: 50, flexShrink: 0 },
+  shell:   { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: '#f8f9fa' },
+  nav:     { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.25rem', height: '52px', borderBottom: '1px solid var(--border)', background: '#f8f9fa', position: 'sticky', top: 0, zIndex: 50, flexShrink: 0 },
   navTitle:{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-h)' },
   backBtn: { padding: '0.35rem 0.8rem', borderRadius: '8px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-h)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' },
   demoBadge:{ padding: '0.2rem 0.6rem', borderRadius: '99px', background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.25)', color: '#a78bfa', fontSize: '0.7rem', fontWeight: 700 },
@@ -621,7 +621,7 @@ const f: Record<string, React.CSSProperties> = {
   demoBtn:   { background: 'none', border: 'none', color: 'var(--text)', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline' },
 
   // Setup
-  configCard: { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '18px', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' },
+  configCard: { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' },
   cardHead:   { display: 'flex', alignItems: 'center', gap: '0.75rem' },
   cardTitle:  { margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-h)' },
   cardSub:    { margin: 0, fontSize: '0.75rem', color: 'var(--text)' },
@@ -640,7 +640,7 @@ const f: Record<string, React.CSSProperties> = {
   genSub:    { margin: 0, fontSize: '0.85rem', color: 'var(--text)', maxWidth: '320px' },
 
   // Active quiz
-  quizCard:     { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '18px', padding: '1.75rem' },
+  quizCard:     { background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '1.75rem' },
   progressRow:  { display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' },
   progressLabel:{ fontSize: '0.78rem', color: 'var(--text)', flexShrink: 0, fontWeight: 500 },
   progressTrack:{ flex: 1, height: '6px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' },
@@ -649,7 +649,7 @@ const f: Record<string, React.CSSProperties> = {
   questionText: { fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-h)', lineHeight: 1.55, margin: '0 0 1.25rem' },
   optionsGrid:  { display: 'flex', flexDirection: 'column', gap: '0.6rem' },
   optionBtn:    { display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.8rem 1rem', borderRadius: '12px', fontFamily: 'inherit', fontSize: '0.88rem', textAlign: 'left' as const, transition: 'all 0.15s', width: '100%' },
-  optionLetter: { width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 700, flexShrink: 0 },
+  optionLetter: { width: '24px', height: '24px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 700, flexShrink: 0 },
   nextBtn:      { padding: '0.7rem 1.4rem', borderRadius: '10px', background: 'linear-gradient(135deg,#00D4FF,#7C3AED)', color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: '0.88rem', fontWeight: 700, cursor: 'pointer', transition: 'opacity 0.15s' },
   endBtn:       { padding: '0.6rem 1rem', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' },
   integrityPulse: { border: '1px solid', borderRadius: '12px', padding: '0.85rem 0.95rem', transition: 'border-color 0.4s, background 0.4s' },
@@ -657,7 +657,7 @@ const f: Record<string, React.CSSProperties> = {
 };
 
 const fp: Record<string, React.CSSProperties> = {
-  feat: { display: 'flex', alignItems: 'flex-start', gap: '0.65rem', padding: '0.7rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px' },
+  feat: { display: 'flex', alignItems: 'flex-start', gap: '0.65rem', padding: '0.7rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' },
   featLabel: { margin: '0 0 0.15rem', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-h)' },
   featDesc:  { margin: 0, fontSize: '0.68rem', color: 'var(--text)', lineHeight: 1.4 },
 };

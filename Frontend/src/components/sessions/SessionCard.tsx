@@ -26,7 +26,7 @@ export default function SessionCard({ session, onToggle, onDelete, index = 0 }: 
 
   return (
     <div
-      style={{ ...s.card, animationDelay: `${index * 0.04}s`, borderColor: done ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.07)' }}
+      style={{ ...s.card, animationDelay: `${index * 0.04}s`, borderColor: done ? 'rgba(16,185,129,0.15)' : '#e2e8f0' }}
       className="animate-fade-in glass-panel"
     >
       {/* Left: status toggle */}
@@ -38,7 +38,7 @@ export default function SessionCard({ session, onToggle, onDelete, index = 0 }: 
       >
         {done
           ? <CheckCircle size={20} style={{ color: '#10b981' }} />
-          : <Circle size={20} style={{ color: 'rgba(148,163,184,0.4)' }} />
+          : <Circle size={20} style={{ color: '#64748b' }} />
         }
       </button>
 
@@ -82,7 +82,7 @@ export default function SessionCard({ session, onToggle, onDelete, index = 0 }: 
 const s: Record<string, React.CSSProperties> = {
   card: {
     display: 'flex', alignItems: 'center', gap: '0.85rem',
-    padding: '0.95rem 1.1rem', borderRadius: '14px',
+    padding: '0.95rem 1.1rem', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
     background: 'rgba(10,16,32,0.7)',
     border: '1px solid',
     backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
@@ -107,7 +107,7 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'center', gap: '0.2rem',
     fontSize: '0.72rem', color: 'var(--text)', fontWeight: 500,
   },
-  metaDate: { fontSize: '0.72rem', color: 'rgba(148,163,184,0.5)' },
+  metaDate: { fontSize: '0.72rem', color: '#64748b' },
   actions: { display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 },
   badgeActive: {
     padding: '0.2rem 0.6rem', borderRadius: '99px',
@@ -123,7 +123,7 @@ const s: Record<string, React.CSSProperties> = {
   },
   deleteBtn: {
     background: 'none', border: 'none', cursor: 'pointer',
-    color: 'rgba(148,163,184,0.4)', padding: '0.25rem',
+    color: '#64748b', padding: '0.25rem',
     borderRadius: '7px', display: 'flex', alignItems: 'center',
     transition: 'color 0.18s', fontFamily: 'inherit',
   },
