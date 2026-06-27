@@ -10,7 +10,6 @@ import { BrainIcon } from '../components/TwinMindLogo';
 import { XPStoreProvider } from '../contexts/XPStoreContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import ThemeToggle from '../components/ThemeToggle';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import NotificationBell from '../components/NotificationBell';
 import TutorialOverlay from '../components/TutorialOverlay';
@@ -497,7 +496,6 @@ export default function Dashboard() {
 
         <div style={s.navRight} className="mob-nav-right">
           <span className="mob-hide-mobile"><LanguageSwitcher /></span>
-          <ThemeToggle />
           <button
             onClick={() => setChallengeOpen(true)}
             title="Weekly Challenges"
