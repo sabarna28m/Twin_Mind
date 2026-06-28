@@ -273,7 +273,7 @@ const mr: Record<string, React.CSSProperties> = {
 /* ─────────────────────────────────────────────────────────────────────────────
    Main Component
    ─────────────────────────────────────────────────────────────────────────────*/
-export default function SmartDailyMission() {
+export default function SmartDailyMission({ layout = 'vertical' }: { layout?: 'vertical' | 'horizontal' }) {
   const [ctx,     setCtx]     = useState<UserContext>({});
   const [metrics, setMetrics] = useState<MissionMetrics>(EMPTY_METRICS);
   const [loading, setLoading] = useState(true);
@@ -443,21 +443,26 @@ export default function SmartDailyMission() {
       </div>
 
       {/* ── Primary missions ── */}
-      {loading ? (
-        <div style={dm.list}>
-          {[0, 1, 2].map(i => <div key={i} style={dm.skeleton} />)}
-        </div>
-      ) : (
-        <div style={dm.list}>
-          {evalPrimary.map(m => (
-            <MissionRow
-              key={m.id}
-              mission={m}
-              isJustCompleted={justCompleted.has(m.id)}
-            />
-          ))}
-        </div>
-      )}
+      {(() => {
+        const listStyle: React.CSSProperties = layout === 'horizontal'
+          ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.65rem', position: 'relative', zIndex: 1 }
+          : dm.list;
+        return loading ? (
+          <div style={listStyle}>
+            {[0, 1, 2].map(i => <div key={i} style={dm.skeleton} />)}
+          </div>
+        ) : (
+          <div style={listStyle}>
+            {evalPrimary.map(m => (
+              <MissionRow
+                key={m.id}
+                mission={m}
+                isJustCompleted={justCompleted.has(m.id)}
+              />
+            ))}
+          </div>
+        );
+      })()}
 
       {/* ── Bonus mission — unlocks when all primary done ── */}
       {!loading && (

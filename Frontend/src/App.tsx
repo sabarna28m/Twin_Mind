@@ -9,10 +9,13 @@ function MaybeGoogleProvider({ children }: { children: ReactNode }) {
   if (!GOOGLE_CLIENT_ID) return <>{children}</>;
   return <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>{children}</GoogleOAuthProvider>;
 }
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { SidebarProvider } from './contexts/SidebarContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AppShell from './components/AppShell';
+import SplashScreen from './components/SplashScreen';
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null };
@@ -42,7 +45,6 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Sessions from './pages/Sessions';
-import Notes from './pages/Notes';
 // Materials page retired — content merged into /quiz (Study Resources tab)
 import Progress from './pages/Progress';
 import ProfileSetup from './pages/ProfileSetup';
@@ -70,6 +72,16 @@ import ShieldCenter from './pages/ShieldCenter';
 import About from './pages/About';
 import Home from './pages/Home';
 
+/* Auth guard that doubles as the layout route element.
+   Renders AppShell (which contains <Outlet />) for all child routes. */
+function AuthGuard() {
+  const { token, studentProfile, profileLoaded } = useAuth();
+  if (!token) return <Navigate to="/login" replace />;
+  if (!profileLoaded) return <SplashScreen />;
+  if (!studentProfile) return <Navigate to="/profile/setup" replace />;
+  return <AppShell />;
+}
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -79,221 +91,64 @@ export default function App() {
     <LanguageProvider>
     <BrowserRouter>
       <AuthProvider>
-        <ThemeEngine />
-        <ParticleEngine />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/sessions"
-            element={
-              <ProtectedRoute>
-                <Sessions />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/notes"
-            element={
-              <ProtectedRoute>
-                <SmartNotes />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/materials" element={<Navigate to="/quiz" replace />} />
-          <Route
-            path="/progress"
-            element={
-              <ProtectedRoute>
-                <Progress />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/predict"
-            element={
-              <ProtectedRoute>
-                <Predict />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/mentor"
-            element={
-              <ProtectedRoute>
-                <Mentor />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/simulate"
-            element={
-              <ProtectedRoute>
-                <Simulate />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/twin"
-            element={
-              <ProtectedRoute>
-                <Twin />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/twin-profile"
-            element={
-              <ProtectedRoute>
-                <DigitalPersonaTwin />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/twin-legacy"
-            element={
-              <ProtectedRoute>
-                <DigitalPersonaTwin />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/checkin"
-            element={
-              <ProtectedRoute>
-                <CheckIn />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/shop"
-            element={
-              <ProtectedRoute>
-                <Shop />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile/setup"
-            element={
-              <ProtectedRoute requireProfile={false}>
-                <ProfileSetup />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/achievements"
-            element={
-              <ProtectedRoute>
-                <Achievements />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/quiz"
-            element={
-              <ProtectedRoute>
-                <Quiz />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/battles"
-            element={
-              <ProtectedRoute>
-                <Battles />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/focus" element={<Navigate to="/sessions" replace />} />
-          <Route
-            path="/videos"
-            element={
-              <ProtectedRoute>
-                <StudyVideos />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/burnout"
-            element={
-              <ProtectedRoute>
-                <Burnout />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/subjects"
-            element={
-              <ProtectedRoute>
-                <SubjectAnalysis />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/career"
-            element={
-              <ProtectedRoute>
-                <CareerDevelopment />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/comm-twin"
-            element={
-              <ProtectedRoute>
-                <CommTwin />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/skill-tree"
-            element={
-              <ProtectedRoute>
-                <SkillTree />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/smart-notes" element={<Navigate to="/notes" replace />} />
-          <Route
-            path="/study-planner"
-            element={
-              <ProtectedRoute>
-                <StudyPlanner />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/shield"
-            element={
-              <ProtectedRoute>
-                <ShieldCenter />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/about" element={<About />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        <TwinMindCopilot />
+        <SidebarProvider>
+          <ThemeEngine />
+          <ParticleEngine />
+          <Routes>
+            {/* ── Public routes ── */}
+            <Route path="/"                element={<Home />} />
+            <Route path="/login"           element={<Login />} />
+            <Route path="/register"        element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password"  element={<ResetPassword />} />
+            <Route path="/about"           element={<About />} />
+
+            {/* Profile setup — protected but skips profile-exists check */}
+            <Route
+              path="/profile/setup"
+              element={
+                <ProtectedRoute requireProfile={false}>
+                  <ProfileSetup />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* ── Authenticated app — all share the AppShell sidebar + header ── */}
+            <Route element={<AuthGuard />}>
+              <Route path="/dashboard"     element={<Dashboard />} />
+              <Route path="/sessions"      element={<Sessions />} />
+              <Route path="/notes"         element={<SmartNotes />} />
+              <Route path="/progress"      element={<Progress />} />
+              <Route path="/predict"       element={<Predict />} />
+              <Route path="/mentor"        element={<Mentor />} />
+              <Route path="/simulate"      element={<Simulate />} />
+              <Route path="/twin"          element={<Twin />} />
+              <Route path="/twin-profile"  element={<DigitalPersonaTwin />} />
+              <Route path="/twin-legacy"   element={<DigitalPersonaTwin />} />
+              <Route path="/checkin"       element={<CheckIn />} />
+              <Route path="/shop"          element={<Shop />} />
+              <Route path="/achievements"  element={<Achievements />} />
+              <Route path="/quiz"          element={<Quiz />} />
+              <Route path="/battles"       element={<Battles />} />
+              <Route path="/videos"        element={<StudyVideos />} />
+              <Route path="/burnout"       element={<Burnout />} />
+              <Route path="/subjects"      element={<SubjectAnalysis />} />
+              <Route path="/career"        element={<CareerDevelopment />} />
+              <Route path="/comm-twin"     element={<CommTwin />} />
+              <Route path="/skill-tree"    element={<SkillTree />} />
+              <Route path="/study-planner" element={<StudyPlanner />} />
+              <Route path="/shield"        element={<ShieldCenter />} />
+              <Route path="/profile"       element={<Profile />} />
+            </Route>
+
+            {/* ── Legacy redirects ── */}
+            <Route path="/materials"   element={<Navigate to="/quiz"     replace />} />
+            <Route path="/focus"       element={<Navigate to="/sessions" replace />} />
+            <Route path="/smart-notes" element={<Navigate to="/notes"    replace />} />
+            <Route path="*"            element={<Navigate to="/"         replace />} />
+          </Routes>
+          <TwinMindCopilot />
+        </SidebarProvider>
       </AuthProvider>
     </BrowserRouter>
     </LanguageProvider>
