@@ -223,7 +223,7 @@ html[data-theme="neural-brain"] {
 }
 
 /* Light theme */
-html[data-theme="light"] {
+html[data-color-scheme="light"] {
   --color-bg:              oklch(97% 0.005 260);
   --color-surface:         oklch(100% 0 0);
   --color-surface-raised:  oklch(100% 0 0);

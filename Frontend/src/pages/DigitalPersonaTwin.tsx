@@ -2,9 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import BackButton from '../components/BackButton';
 import { type GamificationProgress } from '../utils/gamification';
-import { BrainIcon } from '../components/TwinMindLogo';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
   ResponsiveContainer,
@@ -189,7 +187,7 @@ function ScoreBar({ label, value, color, note }: { label:string; value:number; c
   return (
     <div style={{ marginBottom:'0.75rem' }}>
       <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'0.25rem' }}>
-        <span style={{ fontSize:'0.78rem', color:'#E5E7EB', fontWeight:600 }}>{label}</span>
+        <span className="dpt-score-label" style={{ fontSize:'0.78rem', color:'#E5E7EB', fontWeight:600 }}>{label}</span>
         <div style={{ display:'flex', gap:'0.4rem', alignItems:'center' }}>
           {note && <span style={{ fontSize:'0.6rem', color: '#64748b' }}>{note}</span>}
           <span style={{ fontSize:'0.82rem', fontWeight:800, color }}>{value}</span>
@@ -212,7 +210,7 @@ function PredCard({ icon, label, prob, conf, color, riskLevel, trend }: { icon:s
         <span style={{ fontSize:'1.2rem' }}>{icon}</span>
         <div style={{ display:'flex', gap:'0.3rem', flexWrap:'wrap', justifyContent:'flex-end' }}>
           {riskLevel && <span style={{ fontSize:'0.54rem', fontWeight:800, color:rc, background:`${rc}14`, border:`1px solid ${rc}28`, padding:'0.1rem 0.38rem', borderRadius:99 }}>{riskLevel.toUpperCase()}</span>}
-          <span style={{ fontSize:'0.54rem', fontWeight:700, color: '#64748b', background: '#f8f9fa', border: '1px solid #e2e8f0', padding:'0.1rem 0.38rem', borderRadius:99 }}>{conf}% conf</span>
+          <span className="dpt-conf-badge" style={{ fontSize:'0.54rem', fontWeight:700, color: '#64748b', background: '#f8f9fa', border: '1px solid #e2e8f0', padding:'0.1rem 0.38rem', borderRadius:99 }}>{conf}% conf</span>
         </div>
       </div>
       <p style={{ margin:'0 0 0.45rem', fontSize:'0.68rem', color: '#475569', lineHeight:1.4 }}>{label}</p>
@@ -221,7 +219,7 @@ function PredCard({ icon, label, prob, conf, color, riskLevel, trend }: { icon:s
         <span style={{ fontSize:'0.62rem', color: '#64748b' }}>%</span>
         {trend && <span style={{ fontSize:'0.9rem', color:tc, marginLeft:'auto' }}>{ta}</span>}
       </div>
-      <div style={{ height:4, background: '#f8f9fa', borderRadius:99, overflow:'hidden' }}>
+      <div className="dpt-bar-track" style={{ height:4, background: '#f8f9fa', borderRadius:99, overflow:'hidden' }}>
         <div style={{ height:'100%', width:`${prob}%`, background:`linear-gradient(90deg,${color}99,${color})`, borderRadius:99, transition:'width 1.2s cubic-bezier(0.16,1,0.3,1)' }} />
       </div>
     </div>
@@ -248,13 +246,13 @@ function EmptyState({ twin, profile, subjects, learningData }: { twin:TwinState|
       <SectionHead icon="🏗️" title="Your Twin is Still Learning" desc={`Complete ${items.length-done} more step${items.length-done!==1?'s':''} to fully activate your Digital Persona Twin.`} color="#6366f1" />
       <div style={{ display:'flex', flexDirection:'column', gap:'0.45rem', marginBottom:'1rem' }}>
         {items.map(item => (
-          <div key={item.label} style={{ display:'flex', alignItems:'center', gap:'0.75rem', padding:'0.6rem 0.85rem', background:`rgba(255,255,255,${item.done?'0.04':'0.02'})`, border:`1px solid ${item.done?'rgba(16,185,129,0.2)':'rgba(255,255,255,0.06)'}`, borderRadius:11 }}>
+          <div key={item.label} className="dpt-checklist-item" style={{ display:'flex', alignItems:'center', gap:'0.75rem', padding:'0.6rem 0.85rem', background:`rgba(255,255,255,${item.done?'0.04':'0.02'})`, border:`1px solid ${item.done?'rgba(16,185,129,0.2)':'rgba(255,255,255,0.06)'}`, borderRadius:11 }}>
             <span style={{ fontSize:'0.95rem', flexShrink:0 }}>{item.done?'✅':'☐'}</span>
-            <span style={{ fontSize:'0.8rem', color:item.done?'#34d399':'#94a3b8', fontWeight:item.done?700:500, textDecoration:item.done?'line-through':'none', opacity:item.done?0.75:1 }}>{item.label}</span>
+            <span className={item.done ? 'dpt-todo-text dpt-todo-done' : 'dpt-todo-text'} style={{ fontSize:'0.8rem', color:item.done?'#34d399':'#94a3b8', fontWeight:item.done?700:500, textDecoration:item.done?'line-through':'none', opacity:item.done?0.75:1 }}>{item.label}</span>
           </div>
         ))}
       </div>
-      <div style={{ height:5, background: '#f8f9fa', borderRadius:99, overflow:'hidden' }}>
+      <div className="dpt-bar-track" style={{ height:5, background: '#f8f9fa', borderRadius:99, overflow:'hidden' }}>
         <div style={{ width:`${(done/items.length)*100}%`, height:'100%', background:'linear-gradient(90deg,#6366f1,#10b981)', borderRadius:99, transition:'width 1s ease' }} />
       </div>
       <p style={{ margin:'0.4rem 0 0', fontSize:'0.68rem', color:'#334155', textAlign:'right' }}>{done}/{items.length} complete</p>
@@ -282,7 +280,7 @@ function HeroSection({ fid, twin, user, onNavigate }: {
   const now = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 
   return (
-    <div style={{
+    <div className="dpt-hero" style={{
       position:'relative', overflow:'hidden', borderRadius:24,
       background:'linear-gradient(135deg,rgba(99,102,241,0.12) 0%,rgba(6,182,212,0.06) 50%,rgba(139,92,246,0.08) 100%)',
       border:'1px solid rgba(99,102,241,0.22)', padding:'2.5rem 2.5rem 2rem', marginBottom:'1.5rem',
@@ -298,7 +296,7 @@ function HeroSection({ fid, twin, user, onNavigate }: {
             <TwinAvatar size={52} glow="#6366f1" />
             <div>
               <div style={{ display:'flex', alignItems:'center', gap:'0.55rem', marginBottom:'0.2rem', flexWrap:'wrap' }}>
-                <span style={{ fontSize:'0.6rem', fontWeight:800, letterSpacing:'0.1em', color:'#00D4FF', background:'rgba(0,212,255,0.1)', border:'1px solid rgba(0,212,255,0.25)', padding:'0.14rem 0.55rem', borderRadius:99 }}>◈ DIGITAL PERSONA TWIN</span>
+                <span className="dpt-badge-cyan" style={{ fontSize:'0.6rem', fontWeight:800, letterSpacing:'0.1em', color:'#00D4FF', background:'rgba(0,212,255,0.1)', border:'1px solid rgba(0,212,255,0.25)', padding:'0.14rem 0.55rem', borderRadius:99 }}>◈ DIGITAL PERSONA TWIN</span>
                 <span style={{ fontSize:'0.58rem', fontWeight:800, color:'#10b981', background:'rgba(16,185,129,0.1)', border:'1px solid rgba(16,185,129,0.28)', padding:'0.12rem 0.5rem', borderRadius:99, display:'flex', alignItems:'center', gap:'0.3rem' }}>
                   <span style={{ width:5,height:5,borderRadius:'50%',background:'#10b981',display:'inline-block',animation:'live-pulse 2s ease-in-out infinite' }} />LIVE
                 </span>
@@ -321,7 +319,7 @@ function HeroSection({ fid, twin, user, onNavigate }: {
                 {label:'Twin Age',    value:`${twin.twin_age}d`,                       color:'#f59e0b'},
                 {label:'Trend',       value:twin.trend.charAt(0).toUpperCase()+twin.trend.slice(1), color:twin.trend==='improving'?'#10b981':twin.trend==='stable'?'#f59e0b':'#ef4444'},
               ].map(s=>(
-                <div key={s.label} style={{ padding:'0.45rem 0.8rem', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius:11 }}>
+                <div key={s.label} className="dpt-stat-card" style={{ padding:'0.45rem 0.8rem', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius:11 }}>
                   <p style={{ margin:0, fontSize:'0.54rem', fontWeight:700, color:'#334155', letterSpacing:'0.06em', textTransform:'uppercase' }}>{s.label}</p>
                   <p style={{ margin:'0.12rem 0 0', fontSize:'0.88rem', fontWeight:800, color:s.color }}>{s.value}</p>
                 </div>
@@ -342,10 +340,10 @@ function HeroSection({ fid, twin, user, onNavigate }: {
             <button onClick={()=>onNavigate('intelligence')} style={{ padding:'0.65rem 1.35rem', borderRadius:12, background: '#0052cc', border:'none', color:'#fff', fontWeight:800, fontSize:'0.82rem', cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 20px rgba(99,102,241,0.35)' }}>
               ◈ Ask My Twin
             </button>
-            <button onClick={()=>onNavigate('overview')} style={{ padding:'0.65rem 1.2rem', borderRadius:12, background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.28)', color:'#818cf8', fontWeight:700, fontSize:'0.82rem', cursor:'pointer', fontFamily:'inherit' }}>
+            <button onClick={()=>onNavigate('overview')} className="dpt-btn-ghost" style={{ padding:'0.65rem 1.2rem', borderRadius:12, background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.28)', color:'#818cf8', fontWeight:700, fontSize:'0.82rem', cursor:'pointer', fontFamily:'inherit' }}>
               🏗️ Build My Twin
             </button>
-            <Link to="/twin" style={{ padding:'0.65rem 1.2rem', borderRadius:12, background: '#f8f9fa', border: '1px solid #e2e8f0', color: '#475569', fontWeight:600, fontSize:'0.82rem', textDecoration:'none', display:'flex', alignItems:'center', gap:'0.35rem' }}>
+            <Link to="/twin" className="dpt-link-btn" style={{ padding:'0.65rem 1.2rem', borderRadius:12, background: '#f8f9fa', border: '1px solid #e2e8f0', color: '#475569', fontWeight:600, fontSize:'0.82rem', textDecoration:'none', display:'flex', alignItems:'center', gap:'0.35rem' }}>
               📊 Evolution Dashboard
             </Link>
           </div>
@@ -355,7 +353,7 @@ function HeroSection({ fid, twin, user, onNavigate }: {
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'1rem', flexShrink:0, minWidth:190 }}>
           <div style={{ position:'relative', width:120, height:120 }}>
             <svg width="120" height="120" viewBox="0 0 120 120" style={{ transform:'rotate(-90deg)' }}>
-              <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+              <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" className="dpt-svg-track" />
               <circle cx="60" cy="60" r="46" fill="none" stroke={fc} strokeWidth="10"
                 strokeDasharray={`${circ*fid.overall/100} ${circ*(1-fid.overall/100)}`}
                 strokeLinecap="round" style={{ filter:`drop-shadow(0 0 8px ${fc}88)`, transition:'stroke-dasharray 1.5s cubic-bezier(0.16,1,0.3,1)' }} />
@@ -372,7 +370,7 @@ function HeroSection({ fid, twin, user, onNavigate }: {
             {models.map(m=>(
               <div key={m.label} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.28rem' }}>
                 <span style={{ fontSize:'0.62rem', color:'#334155', fontWeight:600, minWidth:68 }}>{m.label}</span>
-                <div style={{ flex:1, height:3, background: '#f8f9fa', borderRadius:99, margin:'0 0.4rem', overflow:'hidden' }}>
+                <div className="dpt-bar-track" style={{ flex:1, height:3, background: '#f8f9fa', borderRadius:99, margin:'0 0.4rem', overflow:'hidden' }}>
                   <div style={{ height:'100%', width:`${m.v}%`, background:m.c, borderRadius:99, transition:'width 1.2s ease' }} />
                 </div>
                 <span style={{ fontSize:'0.62rem', fontWeight:800, color:m.c, minWidth:26, textAlign:'right' }}>{m.v}%</span>
@@ -409,12 +407,12 @@ function TabBar({ active, setActive, sticky=false }: { active:DPTTab; setActive:
       display:'flex', gap:'0.2rem', overflowX:'auto', scrollbarWidth:'none' as const,
       ...(sticky?{
         position:'fixed' as const, top:60, left:0, right:0, zIndex:45,
-        padding:'0.45rem 2rem', background: '#ffffff', backdropFilter: 'none',
-        WebkitBackdropFilter: 'none', borderBottom:'1px solid rgba(99,102,241,0.14)',
+        padding:'0.45rem 2rem', background: 'var(--bg-elevated)', backdropFilter: 'none',
+        WebkitBackdropFilter: 'none', borderBottom:'1px solid var(--border)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
       }:{
-        padding:'0.3rem', marginBottom:'1.5rem', background: '#ffffff',
-        border: '1px solid #e2e8f0', borderRadius:18,
+        padding:'0.3rem', marginBottom:'1.5rem', background: 'var(--bg-elevated)',
+        border: '1px solid var(--border)', borderRadius:18,
       }),
     }}>
       {TABS.map(t=>{
@@ -424,7 +422,7 @@ function TabBar({ active, setActive, sticky=false }: { active:DPTTab; setActive:
             flex:'0 0 auto', padding:'0.6rem 1.05rem', borderRadius:13,
             border:'none', fontFamily:'inherit', cursor:'pointer',
             background: on?`${t.color}1e`:'transparent',
-            color: on?t.color: '#64748b',
+            color: on?t.color: 'var(--text-m)',
             fontSize:'0.76rem', fontWeight:on?800:600,
             borderBottom: on?`2px solid ${t.color}`:'2px solid transparent',
             boxShadow: on?`0 0 14px ${t.color}1e`:'none',
@@ -1354,20 +1352,6 @@ export default function DigitalPersonaTwin() {
 
       {sticky && <TabBar active={activeTab} setActive={setTab} sticky />}
 
-      {/* Main navbar */}
-      <header className="nav-premium" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 1.75rem', height:60, position:'sticky', top:0, zIndex:50 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
-          <BackButton />
-          <BrainIcon size={26} />
-          <span style={{ fontSize:'1.05rem', fontWeight:900, color: '#0f172a', letterSpacing:'-0.3px' }}>TwinMind</span>
-        </div>
-        <div style={{ display:'flex', gap:'0.6rem', alignItems:'center' }}>
-          <Link to="/checkin" style={{ padding:'0.38rem 0.9rem', borderRadius:9, background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.25)', color:'#818cf8', fontSize:'0.78rem', fontWeight:700, textDecoration:'none' }}>Log Check-in</Link>
-          <div style={{ width:34,height:34,borderRadius:'50%',background: '#0052cc',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.78rem',fontWeight:800,color:'#fff',boxShadow:'0 0 12px rgba(99,102,241,0.3)',flexShrink:0 }}>
-            {user?.full_name?.split(' ').map(w=>w[0]).slice(0,2).join('')??'◈'}
-          </div>
-        </div>
-      </header>
 
       <main style={{ flex:1, padding:'2rem 2rem 6rem', maxWidth:1080, width:'100%', margin:'0 auto', boxSizing:'border-box', position:'relative', zIndex:1 }}>
         {loading?(

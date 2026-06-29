@@ -9,10 +9,7 @@
 
 :root {
   /* ── Core Backgrounds ── */
-  /* --bg is transparent so ThemeEngine (position:fixed,z-index:-1) shows through.
-     Pages that override with a hardcoded colour still work; they just won't
-     show the particle layer — their CSS-variable accents still theme correctly. */
-  --bg:          transparent;
+  --bg:          #0A0F1E;
   --bg-surface:  rgba(255,255,255,0.04);
   --bg-elevated: rgba(255,255,255,0.07);
 
@@ -24,6 +21,18 @@
   /* ── Borders ── */
   --border:        rgba(255,255,255,0.07);
   --border-subtle: rgba(255,255,255,0.04);
+
+  /* ── UI System Variables (used by Dashboard, AppShell, etc.) ── */
+  --ui-bg:                #0A0F1E;
+  --ui-header-bg:         #0F172A;
+  --ui-header-border:     rgba(255,255,255,0.08);
+  --ui-surface:           rgba(17, 24, 39, 0.85);
+  --ui-surface-elevated:  rgba(30, 41, 59, 0.65);
+  --ui-border:            rgba(255,255,255,0.10);
+  --ui-card-shadow:       0 2px 12px rgba(0,0,0,0.3);
+  --ui-text:              #94A3B8;
+  --ui-text-muted:        #94A3B8;
+  --ui-text-h:            #F1F5F9;
 
   /* ── Theme RGB seeds (used for rgba(var(--primary-rgb), alpha)) ── */
   --primary-rgb: 0,212,255;
@@ -98,68 +107,115 @@
    Light theme overrides
    ══════════════════════════════ */
 
-html[data-theme="light"] {
-  --bg:          #f0f4ff;
-  --bg-surface:  #e8eeff;
-  --bg-elevated: #dce4f8;
+html[data-color-scheme="light"] {
+  --bg:          #F8FAFC;
+  --bg-surface:  #FFFFFF;
+  --bg-elevated: #FFFFFF;
 
-  --text:   #475569;
-  --text-m: #334155;
-  --text-h: #0f172a;
+  --text:   #374151;
+  --text-m: #1F2937;
+  --text-h: #111827;
 
-  --border:        rgba(0,0,0,0.09);
-  --border-subtle: rgba(0,0,0,0.04);
+  --border:        #E5E7EB;
+  --border-subtle: #F3F4F6;
 
-  --accent-bg:     rgba(0,212,255,0.08);
-  --accent-border: rgba(0,212,255,0.3);
-  --shadow:        0 25px 50px rgba(0,0,0,0.12);
+  /* ── UI System Variables (light mode) ── */
+  --ui-bg:                #FFFFFF;
+  --ui-header-bg:         #FFFFFF;
+  --ui-header-border:     #E5E7EB;
+  --ui-surface:           #FFFFFF;
+  --ui-surface-elevated:  #F9FAFB;
+  --ui-border:            #E5E7EB;
+  --ui-card-shadow:       0 2px 12px rgba(0,0,0,0.05);
+  --ui-text:              #374151;
+  --ui-text-muted:        #6B7280;
+  --ui-text-h:            #111827;
 
-  --glass-bg:     rgba(255,255,255,0.85);
-  --glass-border: rgba(0,0,0,0.08);
+  --accent:        #2563EB;
+  --accent-bg:     rgba(37,99,235,0.08);
+  --accent-border: rgba(37,99,235,0.3);
+  --shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+
+  --glass-bg:     rgba(255,255,255,0.95);
+  --glass-border: rgba(203,213,225,0.8);
   --glass-blur:   16px;
 
-  --glow-card: 0 8px 32px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.06);
+  --glow-card: 0 4px 16px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  --glow-primary: none;
+  --glow-accent:  none;
+  --glow-green:   none;
+  --card-bg:           #FFFFFF;
+  --card-border:       #E5E7EB;
+  --card-shadow:       0 2px 12px rgba(0,0,0,0.05);
+  --card-hover-border: rgba(59,130,246,0.5);
+  --card-hover-shadow: 0 8px 32px rgba(0,0,0,0.10), 0 0 0 1px rgba(59,130,246,0.3);
+  --input-bg:     #FFFFFF;
+  --input-border: #E5E7EB;
+  --chart-grid:        rgba(0,0,0,0.06);
+  --chart-tooltip-bg:  rgba(255,255,255,0.98);
 
   color-scheme: light;
 }
 
-html[data-theme="light"] body,
-html[data-theme="light"] #root { background: var(--bg); }
+html[data-color-scheme="light"] body,
+html[data-color-scheme="light"] #root { background: var(--bg); }
 
-html[data-theme="light"] .dark-input {
-  background: #fff;
-  border-color: rgba(0,0,0,0.12);
-  color: #0f172a;
+html[data-color-scheme="light"] .dark-input {
+  background: #FFFFFF;
+  border-color: #CBD5E1;
+  color: #0F172A;
 }
-html[data-theme="light"] .dark-input:focus {
-  border-color: rgba(0,212,255,0.45);
-  box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+html[data-color-scheme="light"] .dark-input:focus {
+  border-color: rgba(0,212,255,0.55);
+  box-shadow: 0 0 0 3px rgba(0,212,255,0.12);
 }
-html[data-theme="light"] .dark-input::placeholder { color: rgba(71,85,105,0.45); }
+html[data-color-scheme="light"] .dark-input::placeholder { color: #94A3B8; }
 
-html[data-theme="light"] .action-card {
+html[data-color-scheme="light"] .action-card {
   background: rgba(0,0,0,0.02);
   border-color: rgba(0,0,0,0.07);
 }
-html[data-theme="light"] .action-card:hover {
+html[data-color-scheme="light"] .action-card:hover {
   background: rgba(0,212,255,0.06);
   border-color: rgba(0,212,255,0.25);
   box-shadow: 0 4px 20px rgba(0,212,255,0.08);
 }
-html[data-theme="light"] .nav-link:hover { background: rgba(0,0,0,0.05); }
-html[data-theme="light"] .score-bar-track { background: rgba(0,0,0,0.07); }
-html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); }
-html[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.28); }
+html[data-color-scheme="light"] .nav-link { color: #475569; }
+html[data-color-scheme="light"] .nav-link:hover { color: #0F172A; background: rgba(0,0,0,0.05); }
+html[data-color-scheme="light"] .nav-link svg { opacity: 1; }
+html[data-color-scheme="light"] .score-bar-track { background: rgba(0,0,0,0.08); }
+html[data-color-scheme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); }
+html[data-color-scheme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.28); }
+html[data-color-scheme="light"] .sign-out-btn { color: #475569; border-color: #CBD5E1; }
+html[data-color-scheme="light"] .sign-out-btn:hover { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3); color: #dc2626; }
+html[data-color-scheme="light"] .mob-hamburger { background: #FFFFFF; border-color: #CBD5E1; color: #0F172A; }
+html[data-color-scheme="light"] .theme-toggle { background: #FFFFFF; border-color: #CBD5E1; color: #475569; }
 
-html[data-theme="light"] .nav-premium {
-  background: rgba(240, 244, 255, 0.92) !important;
-  border-bottom-color: rgba(0,212,255,0.2) !important;
+html[data-color-scheme="light"] .nav-premium {
+  background: rgba(255,255,255,0.95) !important;
+  border-bottom-color: #CBD5E1 !important;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06) !important;
 }
-html[data-theme="light"] .glass-panel {
-  background: rgba(255,255,255,0.8) !important;
+html[data-color-scheme="light"] .glass-panel {
+  background: rgba(255,255,255,0.95) !important;
+  border-color: #CBD5E1 !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
 }
-html[data-theme="light"] .stat-card-premium:hover {
+html[data-color-scheme="light"] .stat-card-premium:hover {
   box-shadow: 0 0 0 1px rgba(0,212,255,0.3), 0 12px 40px rgba(0,212,255,0.1) !important;
+}
+html[data-color-scheme="light"] .hero-animated {
+  background: linear-gradient(-45deg, #F8FAFC, #F0F4FF, #EFF6FF, #F0F4FF, #F8FAFC) !important;
+  background-size: 400% 400% !important;
+}
+html[data-color-scheme="light"] .tm-card {
+  background: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
+}
+html[data-color-scheme="light"] .tm-card:hover {
+  border-color: rgba(0,212,255,0.45) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,212,255,0.3) !important;
 }
 
 /* ── Reset ── */
@@ -252,10 +308,6 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
   0%, 100% { box-shadow: 0 0 4px #00D4FF, 0 0 8px rgba(0,212,255,0.4); opacity: 1; }
   50%       { box-shadow: 0 0 10px #00D4FF, 0 0 20px rgba(0,212,255,0.7); opacity: 0.7; }
 }
-@keyframes particle-float {
-  0%, 100% { opacity: 0.15; transform: scale(0.7) translateY(0px); }
-  50%       { opacity: 0.85; transform: scale(1.4) translateY(-6px); }
-}
 @keyframes btn-shimmer {
   0%   { background-position: -200% center; }
   100% { background-position: 200% center; }
@@ -263,11 +315,6 @@ h1, h2, h3, h4 { font-family: var(--heading); color: var(--text-h); margin: 0; }
 
 .live-dot { animation: live-pulse 2s ease-in-out infinite; }
 .spin      { animation: ring-spin 0.9s linear infinite; }
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.15; transform: scale(0.8); }
-  50%       { opacity: 0.9;  transform: scale(1.3); }
-}
 @keyframes dot-ping {
   0%   { transform: scale(1); opacity: 0.9; }
   80%  { transform: scale(2.2); opacity: 0; }
@@ -664,6 +711,16 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
   border-color: rgba(0,212,255,0.5) !important;
   box-shadow: 0 0 0 3px rgba(0,212,255,0.1) !important;
 }
+.sv-search-btn {
+  background: linear-gradient(135deg, #00D4FF, #7C3AED);
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 12px;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.sv-search-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .sv-search-btn:not(:disabled):hover {
   transform: translateY(-1px) !important;
   box-shadow: 0 8px 32px rgba(0,212,255,0.5) !important;
@@ -689,26 +746,224 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 }
 
 /* Light theme overrides for videos */
-html[data-theme="light"] .sv-chip {
+html[data-color-scheme="light"] .sv-chip {
   background: rgba(0,0,0,0.04) !important;
   border-color: rgba(0,0,0,0.09) !important;
   color: var(--text-m) !important;
 }
-html[data-theme="light"] .sv-chip:hover:not(:disabled) {
+html[data-color-scheme="light"] .sv-chip:hover:not(:disabled) {
   background: rgba(0,212,255,0.1) !important;
   border-color: rgba(0,212,255,0.3) !important;
   color: #0098b8 !important;
 }
 
 /* Light theme adjustments */
-html[data-theme="light"] .focus-preset-btn {
+html[data-color-scheme="light"] .focus-preset-btn {
   background: rgba(0,212,255,0.07) !important;
   border-color: rgba(0,212,255,0.3) !important;
 }
-html[data-theme="light"] .focus-ctrl-ghost {
+html[data-color-scheme="light"] .focus-ctrl-ghost {
   background: rgba(0,0,0,0.04) !important;
   border-color: rgba(0,0,0,0.1) !important;
   color: #475569 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   CHECK-IN PAGE  —  Light Mode Design System
+   Dark mode: CSS variables in inline styles take over.
+   Light mode: ci-* class overrides handle colour, shadow, gradients.
+   ══════════════════════════════════════════════════════ */
+
+/* Page shell — white + subtle dot grid at ~2% opacity */
+html[data-color-scheme="light"] .ci-shell {
+  background-color: #FFFFFF;
+  background-image: radial-gradient(circle, rgba(148,163,184,0.35) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Page title */
+html[data-color-scheme="light"] .ci-page-title {
+  color: #111827 !important;
+}
+
+/* Section headings inside cards */
+html[data-color-scheme="light"] .ci-section-title {
+  color: #1F2937 !important;
+}
+
+/* Form labels + stress label */
+html[data-color-scheme="light"] .ci-label {
+  color: #374151 !important;
+}
+
+/* Cards (form card, history panels, survey modal) */
+html[data-color-scheme="light"] .ci-card {
+  background: #FFFFFF !important;
+  border-color: #E5E7EB !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.04) !important;
+}
+html[data-color-scheme="light"] .ci-modal {
+  background: #FFFFFF !important;
+  border-color: #E5E7EB !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.14), 0 4px 12px rgba(0,0,0,0.06) !important;
+}
+
+/* Inputs + textarea */
+html[data-color-scheme="light"] .ci-input,
+html[data-color-scheme="light"] .ci-textarea {
+  background: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+html[data-color-scheme="light"] .ci-input:hover,
+html[data-color-scheme="light"] .ci-textarea:hover { border-color: #93C5FD !important; }
+html[data-color-scheme="light"] .ci-input:focus,
+html[data-color-scheme="light"] .ci-textarea:focus {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.12) !important;
+  outline: none !important;
+}
+html[data-color-scheme="light"] .ci-input::placeholder,
+html[data-color-scheme="light"] .ci-textarea::placeholder { color: #9CA3AF !important; }
+
+/* Survey trigger button — gradient pill */
+html[data-color-scheme="light"] .ci-survey-btn {
+  background: linear-gradient(135deg, #38BDF8, #2563EB) !important;
+  border: none !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(59,130,246,0.25) !important;
+}
+html[data-color-scheme="light"] .ci-survey-btn:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 6px 20px rgba(59,130,246,0.35) !important;
+}
+
+/* Primary submit / apply / nav-next buttons */
+html[data-color-scheme="light"] .ci-submit-btn {
+  background: linear-gradient(135deg, #3B82F6, #2563EB) !important;
+  border: none !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(59,130,246,0.25) !important;
+}
+html[data-color-scheme="light"] .ci-submit-btn:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 6px 20px rgba(59,130,246,0.35) !important;
+}
+
+/* Survey option cards */
+html[data-color-scheme="light"] .ci-option {
+  background: #FFFFFF !important;
+  border-color: #E5E7EB !important;
+}
+html[data-color-scheme="light"] .ci-option:hover {
+  border-color: #93C5FD !important;
+  background: #EFF6FF !important;
+}
+html[data-color-scheme="light"] .ci-option-selected {
+  background: #EFF6FF !important;
+  border-color: #3B82F6 !important;
+}
+
+/* Table header + row dividers in history panel */
+html[data-color-scheme="light"] .ci-th {
+  color: #374151 !important;
+  border-bottom-color: #E5E7EB !important;
+}
+html[data-color-scheme="light"] .ci-tr { border-bottom-color: #F3F4F6 !important; }
+html[data-color-scheme="light"] .ci-td { color: #111827 !important; }
+
+/* ══════════════════════════════════════════════════════
+   WHAT-IF SIMULATOR  —  Light Mode Design System
+   Dark mode: CSS variables in inline styles take over.
+   Light mode: sim-* class overrides handle colour, shadow, gradients.
+   ══════════════════════════════════════════════════════ */
+
+/* Page shell — white + subtle dot grid */
+html[data-color-scheme="light"] .sim-shell {
+  background-color: #FFFFFF;
+  background-image: radial-gradient(circle, rgba(148,163,184,0.35) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+html[data-color-scheme="light"] .sim-page-title { color: #111827 !important; }
+html[data-color-scheme="light"] .sim-subtitle    { color: #6B7280 !important; }
+
+/* Configuration + result cards */
+html[data-color-scheme="light"] .sim-card {
+  background: #FFFFFF !important;
+  border-color: #E5E7EB !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.04) !important;
+}
+html[data-color-scheme="light"] .sim-card-title  { color: #1F2937 !important; }
+html[data-color-scheme="light"] .sim-card-sub    { color: #6B7280 !important; }
+
+/* Slider rows */
+html[data-color-scheme="light"] .sim-slider-label  { color: #374151 !important; }
+html[data-color-scheme="light"] .sim-slider-track  { background: #E5E7EB !important; }
+html[data-color-scheme="light"] .sim-slider-bounds { color: #9CA3AF !important; }
+
+/* Score comparison cards */
+html[data-color-scheme="light"] .sim-score-card {
+  background: #F9FAFB !important;
+  border-color: #E5E7EB !important;
+}
+html[data-color-scheme="light"] .sim-score-label { color: #6B7280 !important; }
+html[data-color-scheme="light"] .sim-score-range { color: #9CA3AF !important; }
+html[data-color-scheme="light"] .sim-arrow       { color: #9CA3AF !important; }
+
+/* Impact bars */
+html[data-color-scheme="light"] .sim-bar-label { color: #374151 !important; }
+html[data-color-scheme="light"] .sim-bar-track { background: #E5E7EB !important; }
+
+/* Recommendations */
+html[data-color-scheme="light"] .sim-rec-bullet { color: #3B82F6 !important; }
+html[data-color-scheme="light"] .sim-rec-item   { color: #374151 !important; }
+
+/* Reset button */
+html[data-color-scheme="light"] .sim-reset-btn {
+  background: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+  color: #374151 !important;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+html[data-color-scheme="light"] .sim-reset-btn:hover {
+  border-color: #93C5FD !important;
+  color: #1D4ED8 !important;
+  background: #EFF6FF !important;
+}
+
+/* Miscellaneous states */
+html[data-color-scheme="light"] .sim-risk-label    { color: #6B7280 !important; font-style: normal !important; }
+html[data-color-scheme="light"] .sim-loading       { color: #6B7280 !important; }
+html[data-color-scheme="light"] .sim-updating      { color: #9CA3AF !important; }
+
+/* ── Twin.tsx (Digital/Career Twin) light mode overrides ── */
+/* MSG_COLOR: original values (#6ee7b7 etc.) fail on white (<2:1). Use WCAG-AA colours. */
+html[data-color-scheme="light"] .twin-msg-text-improving { color: #047857 !important; } /* 5.4:1 */
+html[data-color-scheme="light"] .twin-msg-text-declining { color: #B91C1C !important; } /* 6.9:1 */
+html[data-color-scheme="light"] .twin-msg-text-stable    { color: #B45309 !important; } /* 4.8:1 */
+/* #a5b4fc nav button: 1.97:1 → fix to #3B5BDB (7.6:1) */
+html[data-color-scheme="light"] .twin-nav-profile-btn    { color: #3B5BDB !important; background: rgba(59,91,219,0.08) !important; border-color: rgba(59,91,219,0.3) !important; }
+/* #a78bfa reliability badge: ~2.5:1 → fix to #5B21B6 (7.5:1) */
+html[data-color-scheme="light"] .twin-badge-light        { color: #5B21B6 !important; }
+/* TREND_COLOR stable '#94a3b8': 2.52:1 → fix to #64748b (4.55:1) */
+html[data-color-scheme="light"] .twin-trend-stable       { color: #64748b !important; }
+/* CommTwin hero gradient cards: ~9% opacity overlay → visible accent card */
+html[data-color-scheme="light"] .ct-hero {
+  background: linear-gradient(135deg, #EEF2FF, #F0FDFA) !important;
+  border: 1px solid #D1D5DB !important;
+}
+html[data-color-scheme="light"] .ct-header {
+  background: var(--bg-elevated) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+html[data-color-scheme="light"] .ct-tabbar {
+  background: var(--bg-elevated) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 1px solid var(--border) !important;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -998,7 +1253,7 @@ a[href="/ai-focus"]:hover {
 }
 
 /* Light-theme overrides for new AI components */
-html[data-theme="light"] .cmd-metric-card:hover {
+html[data-color-scheme="light"] .cmd-metric-card:hover {
   box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,212,255,0.3) !important;
 }
 
@@ -1191,36 +1446,36 @@ select.form-select option:checked{ background-color: #3B82F6 !important; color: 
 select.form-select optgroup      { background-color: #111827 !important; color: #9CA3AF !important; }
 
 /* ── Light theme ─────────────────────────────────────────────────────── */
-html[data-theme="light"] select {
+html[data-color-scheme="light"] select {
   background-color: #FFFFFF !important;
   color: #111827 !important;
   border-color: #D1D5DB !important;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
-html[data-theme="light"] select:focus {
+html[data-color-scheme="light"] select:focus {
   border-color: #3B82F6 !important;
   box-shadow: 0 0 0 3px rgba(59,130,246,0.18), 0 1px 3px rgba(0,0,0,0.1) !important;
 }
-html[data-theme="light"] select option {
+html[data-color-scheme="light"] select option {
   background-color: #FFFFFF !important;
   color: #111827 !important;
 }
-html[data-theme="light"] select option:checked,
-html[data-theme="light"] select option:focus {
+html[data-color-scheme="light"] select option:checked,
+html[data-color-scheme="light"] select option:focus {
   background-color: #EFF6FF !important;
   color: #1D4ED8 !important;
 }
-html[data-theme="light"] select optgroup {
+html[data-color-scheme="light"] select optgroup {
   background-color: #F9FAFB !important;
   color: #6B7280 !important;
 }
-html[data-theme="light"] select.form-select {
+html[data-color-scheme="light"] select.form-select {
   background-color: #FFFFFF !important;
   color: #0f172a !important;
   border-color: rgba(0,0,0,0.12) !important;
 }
-html[data-theme="light"] select.form-select option        { background-color: #FFFFFF !important; color: #0f172a !important; }
-html[data-theme="light"] select.form-select option:checked{ background-color: #e0e7ff !important; color: #1e1b4b !important; }
+html[data-color-scheme="light"] select.form-select option        { background-color: #FFFFFF !important; color: #0f172a !important; }
+html[data-color-scheme="light"] select.form-select option:checked{ background-color: #e0e7ff !important; color: #1e1b4b !important; }
 
 /* ═══════════════════════════════════════════════════════════════════════
    IMMERSIVE THEME SYSTEM — 8 Unique Atmospheres
@@ -2969,16 +3224,16 @@ html[data-theme="neural-brain"] h2 {
 }
 
 /* ── Light theme overrides for new cards ── */
-html[data-theme="light"] .ai-tool-card:hover {
+html[data-color-scheme="light"] .ai-tool-card:hover {
   box-shadow: 0 20px 50px rgba(0,0,0,0.12) !important;
 }
-html[data-theme="light"] .learning-card:hover {
+html[data-color-scheme="light"] .learning-card:hover {
   box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important;
 }
-html[data-theme="light"] .quick-stat-card:hover {
+html[data-color-scheme="light"] .quick-stat-card:hover {
   box-shadow: 0 12px 32px rgba(var(--primary-rgb), 0.12), 0 0 0 1px rgba(var(--primary-rgb), 0.2) !important;
 }
-html[data-theme="light"] .dd-item:hover {
+html[data-color-scheme="light"] .dd-item:hover {
   background: rgba(0,0,0,0.04) !important;
 }
 
@@ -2990,7 +3245,7 @@ html[data-theme="light"] .dd-item:hover {
   flex-shrink: 0;
   margin: 0 0.25rem;
 }
-html[data-theme="light"] .nav-group-divider {
+html[data-color-scheme="light"] .nav-group-divider {
   background: rgba(0,0,0,0.1);
 }
 
@@ -4115,4 +4370,163 @@ body {
     background: var(--color-surface-overlay);
   }
 }
+
+/* ── SmartNotes.tsx light mode overrides ── */
+html[data-color-scheme="light"] .sn-header {
+  background: rgba(255,255,255,0.97) !important;
+  backdrop-filter: none !important;
+}
+html[data-color-scheme="light"] .sn-badge {
+  background: rgba(37,99,235,0.1) !important;
+  color: #2563EB !important;
+  border-color: rgba(37,99,235,0.3) !important;
+}
+html[data-color-scheme="light"] .sn-tabbar {
+  background: rgba(255,255,255,0.97) !important;
+  backdrop-filter: none !important;
+}
+html[data-color-scheme="light"] .sn-tab-active {
+  color: #2563EB !important;
+  border-bottom-color: #2563EB !important;
+  font-weight: 700 !important;
+}
+html[data-color-scheme="light"] .sn-tab-inactive { color: #374151 !important; }
+html[data-color-scheme="light"] .view-tab:hover  { color: #111827 !important; }
+html[data-color-scheme="light"] .sn-sidebar      { background: #F9FAFB !important; }
+html[data-color-scheme="light"] .sn-subj-active {
+  color: #2563EB !important;
+  background: rgba(37,99,235,0.08) !important;
+  border-left-color: #2563EB !important;
+}
+html[data-color-scheme="light"] .sn-subj-inactive { color: #374151 !important; }
+html[data-color-scheme="light"] .sn-subj-label    { color: #2563EB !important; }
+html[data-color-scheme="light"] .sn-link-cyan     { color: #2563EB !important; }
+html[data-color-scheme="light"] .sn-note-active {
+  background: rgba(37,99,235,0.06) !important;
+  border-left-color: #2563EB !important;
+}
+html[data-color-scheme="light"] .sn-markdown h1,
+html[data-color-scheme="light"] .sn-markdown h2,
+html[data-color-scheme="light"] .sn-markdown h3 { color: #1D4ED8 !important; }
+html[data-color-scheme="light"] .sn-markdown code {
+  background: #EEF2FF !important;
+  color: #4338CA !important;
+}
+html[data-color-scheme="light"] .sn-markdown pre {
+  background: #F3F4F6 !important;
+  border-color: #E5E7EB !important;
+  color: #374151 !important;
+}
+html[data-color-scheme="light"] .sn-markdown a { color: #2563EB !important; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   GLOBAL LIGHT-MODE DESIGN SYSTEM OVERRIDES
+   Fixes Tailwind utility classes that are invisible in light mode.
+   Scoped to data-color-scheme="light" — dark mode is untouched.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Low-contrast gray/slate text classes ── */
+html[data-color-scheme="light"] .text-gray-300,
+html[data-color-scheme="light"] .text-gray-400,
+html[data-color-scheme="light"] .text-slate-300,
+html[data-color-scheme="light"] .text-slate-400 {
+  color: #374151 !important;
+}
+html[data-color-scheme="light"] .text-gray-500,
+html[data-color-scheme="light"] .text-slate-500 {
+  color: #6B7280 !important;
+}
+
+/* ── Semantic muted text tokens ── */
+html[data-color-scheme="light"] .text-muted,
+html[data-color-scheme="light"] .text-muted-foreground {
+  color: #6B7280 !important;
+}
+
+/* ── White transparency backgrounds → solid white ── */
+html[data-color-scheme="light"] .bg-white\/40,
+html[data-color-scheme="light"] .bg-white\/50,
+html[data-color-scheme="light"] .bg-white\/60,
+html[data-color-scheme="light"] .bg-white\/70,
+html[data-color-scheme="light"] .bg-white\/80 {
+  background-color: #FFFFFF !important;
+}
+html[data-color-scheme="light"] .bg-background\/50,
+html[data-color-scheme="light"] .bg-background\/60,
+html[data-color-scheme="light"] .bg-background\/80 {
+  background-color: var(--bg) !important;
+}
+
+/* ── Remove glassmorphism/blur in light mode ── */
+html[data-color-scheme="light"] .backdrop-blur,
+html[data-color-scheme="light"] .backdrop-blur-sm,
+html[data-color-scheme="light"] .backdrop-blur-md,
+html[data-color-scheme="light"] .backdrop-blur-lg,
+html[data-color-scheme="light"] .backdrop-blur-xl,
+html[data-color-scheme="light"] .backdrop-blur-2xl {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ── OKLCH token light-mode aliases ── */
+/* tokens.css now fires --color-* correctly, but alias to --ui-* for
+   components that use the old variable names */
+html[data-color-scheme="light"] {
+  --color-text-high:       #111827;
+  --color-text-secondary:  #1F2937;
+  --color-text-base:       #374151;
+  --color-text-muted:      #6B7280;
+  --color-bg:              #F8FAFC;
+  --color-surface:         #FFFFFF;
+  --color-surface-raised:  #FFFFFF;
+  --color-surface-overlay: #F9FAFB;
+  --color-border:          #E5E7EB;
+  --color-border-strong:   #D1D5DB;
+}
+
+/* ── Border utility ── */
+html[data-color-scheme="light"] .border-white\/10,
+html[data-color-scheme="light"] .border-white\/20 {
+  border-color: #E5E7EB !important;
+}
+
+/* ── DigitalPersonaTwin.tsx light-mode overrides ── */
+html[data-color-scheme="light"] .dpt-hero {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--glow-card) !important;
+}
+html[data-color-scheme="light"] .dpt-score-label { color: var(--text-m) !important; }
+html[data-color-scheme="light"] .dpt-conf-badge {
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-m) !important;
+}
+html[data-color-scheme="light"] .dpt-bar-track { background: var(--border-subtle) !important; }
+html[data-color-scheme="light"] .dpt-checklist-item {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+}
+html[data-color-scheme="light"] .dpt-todo-text { color: var(--text-m) !important; opacity: 1 !important; }
+html[data-color-scheme="light"] .dpt-todo-done { color: #059669 !important; }
+html[data-color-scheme="light"] .dpt-badge-cyan {
+  color: var(--accent) !important;
+  background: var(--accent-bg) !important;
+  border-color: var(--accent-border) !important;
+}
+html[data-color-scheme="light"] .dpt-stat-card {
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+}
+html[data-color-scheme="light"] .dpt-btn-ghost {
+  background: var(--accent-bg) !important;
+  border-color: var(--accent-border) !important;
+  color: var(--accent) !important;
+}
+html[data-color-scheme="light"] .dpt-link-btn {
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-m) !important;
+}
+html[data-color-scheme="light"] .dpt-svg-track { stroke: var(--border) !important; }
 

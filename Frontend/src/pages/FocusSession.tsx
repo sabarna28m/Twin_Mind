@@ -169,8 +169,8 @@ export default function FocusSession() {
   const { h: rH, m: rM, s: rS } = toHMS(remainingSec);
 
   const statusColor: Record<Status, string> = {
-    ready:     '#94a3b8',
-    running:   '#00D4FF',
+    ready:     'var(--text-m)',
+    running:   'var(--accent)',
     paused:    '#F59E0B',
     completed: '#10B981',
   };
@@ -322,7 +322,7 @@ export default function FocusSession() {
           {/* Page header */}
           <div style={s.pageHeader}>
             <div style={s.pageIconWrap}>
-              <Timer size={24} color="#00D4FF" />
+              <Timer size={24} color="var(--accent)" />
             </div>
             <div>
               <h1 style={s.pageTitle} className="grad-text-cyan">Focus Session</h1>
@@ -348,7 +348,7 @@ export default function FocusSession() {
                 </defs>
                 {/* Track ring */}
                 <circle cx={110} cy={110} r={RADIUS}
-                  fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={10} />
+                  fill="none" stroke="var(--border)" strokeWidth={10} />
                 {/* Progress arc */}
                 <circle cx={110} cy={110} r={RADIUS}
                   fill="none"
@@ -508,7 +508,7 @@ export default function FocusSession() {
                   value: isActive || status === 'completed'
                     ? fmtDuration(totalSec - remainingSec)
                     : '—',
-                  color: '#00D4FF',
+                  color: 'var(--accent)',
                 },
                 {
                   icon: '🎯', label: 'Focus Score',
@@ -543,7 +543,7 @@ export default function FocusSession() {
           <div style={s.historyCard} className="glass-panel">
             <div style={s.historyHeader}>
               <div style={s.historyIconWrap}>
-                <Clock size={18} color="#00D4FF" />
+                <Clock size={18} color="var(--accent)" />
               </div>
               <h2 style={s.historyTitle}>Session History</h2>
               {history.length > 0 && (
@@ -631,8 +631,8 @@ const coach: Record<string, React.CSSProperties> = {
     border: '1.5px solid rgba(99,102,241,0.28)',
     animation: 'breathe 3.5s ease-in-out infinite',
   },
-  name:       { margin: 0, fontSize: '0.88rem', fontWeight: 800, color: '#e2e8f0' },
-  statusLine: { margin: 0, fontSize: '0.67rem', color: 'rgba(148,163,184,0.6)', display: 'flex', alignItems: 'center', gap: '0.3rem' },
+  name:       { margin: 0, fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-h)' },
+  statusLine: { margin: 0, fontSize: '0.67rem', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.3rem' },
   dot:        { display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0 },
   msgBox: {
     padding: '0.85rem 1rem',
@@ -642,7 +642,7 @@ const coach: Record<string, React.CSSProperties> = {
     position: 'relative', zIndex: 1,
   },
   msgText: {
-    margin: 0, fontSize: '0.82rem', color: 'rgba(226,232,240,0.88)', lineHeight: 1.6,
+    margin: 0, fontSize: '0.82rem', color: 'var(--text-m)', lineHeight: 1.6,
     fontStyle: 'italic',
   },
   analyticsRow: {
@@ -650,13 +650,13 @@ const coach: Record<string, React.CSSProperties> = {
     position: 'relative', zIndex: 1,
   },
   metricCard: {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.07)',
+    background: 'var(--bg-surface)',
+    border: '1px solid var(--border)',
     borderRadius: '12px', padding: '0.75rem 0.6rem',
     display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '0.2rem',
   },
   metricValue: { margin: 0, fontSize: '1rem', fontWeight: 800, lineHeight: 1.1 },
-  metricLabel: { margin: 0, fontSize: '0.6rem', color: 'rgba(148,163,184,0.5)', fontWeight: 600, letterSpacing: '0.05em' },
+  metricLabel: { margin: 0, fontSize: '0.6rem', color: 'var(--text)', fontWeight: 600, letterSpacing: '0.05em' },
 };
 
 /* ══════════════════════════════════════
@@ -683,7 +683,7 @@ const tf: Record<string, React.CSSProperties> = {
     background: 'rgba(0,212,255,0.08)',
     border: '1px solid rgba(0,212,255,0.18)',
     borderRadius: '6px',
-    color: '#00D4FF',
+    color: 'var(--accent)',
     fontSize: '0.65rem',
     cursor: 'pointer',
     display: 'flex',
@@ -696,8 +696,8 @@ const tf: Record<string, React.CSSProperties> = {
     width: '64px',
     textAlign: 'center' as const,
     padding: '0.45rem 0.3rem',
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'var(--bg-surface)',
+    border: '1px solid var(--border)',
     borderRadius: '10px',
     color: 'var(--text-h)',
     fontSize: '1.35rem',
@@ -787,8 +787,8 @@ const s: Record<string, React.CSSProperties> = {
     width: '48px',
     height: '48px',
     borderRadius: '14px',
-    background: 'linear-gradient(135deg, rgba(0,212,255,0.18) 0%, rgba(124,58,237,0.18) 100%)',
-    border: '1px solid rgba(0,212,255,0.22)',
+    background: 'var(--bg-elevated)',
+    border: '1px solid var(--border)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -812,11 +812,9 @@ const s: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
     padding: '2rem 1.75rem 1.75rem',
     borderRadius: '24px',
-    background: 'rgba(10,16,32,0.82)',
-    border: '1px solid rgba(0,212,255,0.12)',
-    backdropFilter: 'blur(28px)',
-    WebkitBackdropFilter: 'blur(28px)',
-    boxShadow: '0 8px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05)',
+    background: 'var(--bg-elevated)',
+    border: '1px solid var(--border)',
+    boxShadow: 'var(--glow-card)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -880,7 +878,6 @@ const s: Record<string, React.CSSProperties> = {
   timeHint: {
     fontSize: '0.68rem',
     color: 'var(--text)',
-    opacity: 0.6,
   },
 
   /* Time input fields row */
@@ -895,7 +892,7 @@ const s: Record<string, React.CSSProperties> = {
   fieldSep: {
     fontSize: '1.6rem',
     fontWeight: 700,
-    color: 'rgba(255,255,255,0.2)',
+    color: 'var(--text)',
     marginTop: '1.2rem',
     lineHeight: 1,
     userSelect: 'none' as const,
@@ -913,10 +910,10 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: '0.3rem',
     padding: '0.38rem 0.85rem',
-    border: '1px solid rgba(0,212,255,0.22)',
+    border: '1px solid var(--accent-border)',
     borderRadius: '999px',
-    background: 'rgba(0,212,255,0.07)',
-    color: '#00D4FF',
+    background: 'var(--accent-bg)',
+    color: 'var(--accent)',
     fontSize: '0.78rem',
     fontWeight: 600,
     cursor: 'pointer',
@@ -935,7 +932,7 @@ const s: Record<string, React.CSSProperties> = {
   barTrack: {
     flex: 1,
     height: '8px',
-    background: 'rgba(255,255,255,0.07)',
+    background: 'var(--border)',
     borderRadius: '999px',
     overflow: 'hidden',
   },
@@ -987,7 +984,7 @@ const s: Record<string, React.CSSProperties> = {
   ctrlDanger: {
     background: 'rgba(239,68,68,0.14)',
     border: '1px solid rgba(239,68,68,0.35)',
-    color: '#fca5a5',
+    color: '#dc2626',
     boxShadow: 'none',
   },
   ctrlSuccess: {
@@ -996,8 +993,8 @@ const s: Record<string, React.CSSProperties> = {
     boxShadow: '0 4px 20px rgba(16,185,129,0.35)',
   },
   ctrlGhost: {
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'var(--bg-surface)',
+    border: '1px solid var(--border)',
     color: 'var(--text)',
     boxShadow: 'none',
   },
@@ -1024,28 +1021,25 @@ const s: Record<string, React.CSSProperties> = {
   notifText: {
     fontSize: '0.88rem',
     fontWeight: 600,
-    color: '#6ee7b7',
+    color: '#059669',
     whiteSpace: 'nowrap' as const,
   },
   notifClose: {
     background: 'none',
     border: 'none',
-    color: '#6ee7b7',
+    color: '#059669',
     cursor: 'pointer',
     fontSize: '0.8rem',
     padding: '0 0.2rem',
     fontFamily: 'inherit',
-    opacity: 0.7,
   },
 
   /* History card */
   historyCard: {
     borderRadius: '20px',
-    background: 'rgba(10,16,32,0.75)',
-    border: '1px solid rgba(255,255,255,0.07)',
-    backdropFilter: 'blur(24px)',
-    WebkitBackdropFilter: 'blur(24px)',
-    boxShadow: '0 4px 40px rgba(0,0,0,0.4)',
+    background: 'var(--bg-elevated)',
+    border: '1px solid var(--border)',
+    boxShadow: 'var(--glow-card)',
     overflow: 'hidden',
   },
   historyHeader: {
@@ -1053,7 +1047,7 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: '0.65rem',
     padding: '1.25rem 1.5rem',
-    borderBottom: '1px solid rgba(255,255,255,0.06)',
+    borderBottom: '1px solid var(--border-subtle)',
   },
   historyIconWrap: {
     width: '34px',
@@ -1076,9 +1070,9 @@ const s: Record<string, React.CSSProperties> = {
   historyBadge: {
     padding: '0.18rem 0.6rem',
     borderRadius: '999px',
-    background: 'rgba(0,212,255,0.12)',
-    border: '1px solid rgba(0,212,255,0.22)',
-    color: '#00D4FF',
+    background: 'var(--accent-bg)',
+    border: '1px solid var(--accent-border)',
+    color: 'var(--accent)',
     fontSize: '0.75rem',
     fontWeight: 700,
   },

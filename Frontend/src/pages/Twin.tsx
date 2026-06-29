@@ -96,6 +96,7 @@ const TREND_ICON  = { improving: '↑', declining: '↓', stable: '→' };
 const TREND_COLOR = { improving: '#10b981', declining: '#ef4444', stable: '#94a3b8' };
 const TREND_LABEL = { improving: 'Improving', declining: 'Declining', stable: 'Stable' };
 
+// Kept as lighter hues for dark mode; index.css overrides to darker variants in light mode via .twin-msg-text-*
 const MSG_COLOR  = { improving: '#6ee7b7', declining: '#fca5a5', stable: '#fde68a' };
 const MSG_BG     = { improving: 'rgba(16,185,129,0.08)', declining: 'rgba(239,68,68,0.08)', stable: 'rgba(245,158,11,0.08)' };
 const MSG_BORDER = { improving: 'rgba(16,185,129,0.25)', declining: 'rgba(239,68,68,0.25)', stable: 'rgba(245,158,11,0.25)' };
@@ -176,7 +177,7 @@ function ScoreBar({ label, value, grad, delay = 0 }: { label: string; value: num
     <div style={{ marginBottom: '1rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
         <span style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 500 }}>{label}</span>
-        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>{count}</span>
+        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-h)' }}>{count}</span>
       </div>
       <div className="score-bar-track">
         <div
@@ -223,7 +224,7 @@ function SparkLine({ history }: { history: HistoryPoint[] }) {
       {vals.map((v, i) => {
         const x = pad + (i / (vals.length - 1)) * (W - pad * 2);
         const y = H - pad - ((v - min) / range) * (H - pad * 2);
-        return <circle key={i} cx={x} cy={y} r="4" fill="#8b5cf6" stroke="#1e1b4b" strokeWidth="2" />;
+        return <circle key={i} cx={x} cy={y} r="4" fill="#8b5cf6" stroke="var(--bg-elevated)" strokeWidth="2" />;
       })}
       {/* Start label */}
       <text x={fx} y={fy - 10} fill="#64748b" fontSize="9" textAnchor="middle">{Math.round(vals[0])}</text>
@@ -231,7 +232,7 @@ function SparkLine({ history }: { history: HistoryPoint[] }) {
       {(() => {
         const lx = pad + (W - pad * 2);
         const ly = H - pad - ((vals[vals.length - 1] - min) / range) * (H - pad * 2);
-        return <text x={lx} y={ly - 10} fill="#f1f5f9" fontSize="9" textAnchor="middle" fontWeight="700">{Math.round(vals[vals.length - 1])}</text>;
+        return <text x={lx} y={ly - 10} fill="var(--text-h)" fontSize="9" textAnchor="middle" fontWeight="700">{Math.round(vals[vals.length - 1])}</text>;
       })()}
     </svg>
   );
@@ -310,7 +311,7 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
         <h3 style={{ ...s.cardTitle, marginBottom: 0 }}>Future Twin</h3>
 
         {/* Tab switcher */}
-        <div style={{ display: 'flex', gap: '0.25rem', padding: '3px', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+        <div style={{ display: 'flex', gap: '0.25rem', padding: '3px', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px' }}>
           {([30, 60, 90] as TabDays[]).map(days => {
             const c = TAB_CONFIG[days];
             const isActive = activeTab === days;
@@ -344,7 +345,7 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
           const delta = m.fut - m.cur;
           const dc = delta >= 2 ? '#10b981' : delta <= -2 ? '#ef4444' : '#64748b';
           return (
-            <div key={m.label} style={{ padding: '0.6rem 0.75rem', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+            <div key={m.label} style={{ padding: '0.6rem 0.75rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                 <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>{m.label}</span>
                 <span style={{ fontSize: '0.72rem', fontWeight: 700, color: dc }}>{delta >= 0 ? '+' : ''}{Math.round(delta)}</span>
@@ -352,9 +353,9 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3rem', marginBottom: '0.4rem' }}>
                 <span style={{ fontSize: '0.78rem', color: '#64748b' }}>{Math.round(m.cur)}</span>
                 <span style={{ fontSize: '0.7rem', color: '#334155' }}>→</span>
-                <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>{Math.round(m.fut)}</span>
+                <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-h)' }}>{Math.round(m.fut)}</span>
               </div>
-              <div style={{ height: '4px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
+              <div style={{ height: '4px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' }}>
                 <div className="score-bar-fill" style={{ height: '100%', width: `${m.fut}%`, background: delta >= 0 ? m.grad : 'linear-gradient(90deg,#ef4444,#f87171)', borderRadius: '99px' }} />
               </div>
             </div>
@@ -376,7 +377,7 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
           </div>
         )}
         <div style={{ padding: '0.6rem 0.75rem', background: MSG_BG[twin.trend], border: `1px solid ${MSG_BORDER[twin.trend]}`, borderRadius: '10px', display: 'flex', alignItems: 'center' }}>
-          <p style={{ margin: 0, fontSize: '0.8rem', color: MSG_COLOR[twin.trend], lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: '0.8rem', color: MSG_COLOR[twin.trend], lineHeight: 1.5 }} className={`twin-msg-text-${twin.trend}`}>
             {ft.motivational_message}
           </p>
         </div>
@@ -417,9 +418,9 @@ function EvoTooltip({ active, payload, label }: {
   const pt = (payload[0] as unknown as { payload: HistoryPoint }).payload;
   return (
     <div style={{
-      background: 'rgba(8,13,26,0.97)', border: '1px solid rgba(129,140,248,0.3)',
+      background: 'var(--bg-elevated)', border: '1px solid var(--border)',
       borderRadius: '14px', padding: '0.85rem 1rem', maxWidth: '280px',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
     }}>
       <p style={{ margin: '0 0 0.55rem', fontSize: '0.78rem', fontWeight: 800, color: '#0052cc' }}>{pt.date}</p>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem 0.75rem', marginBottom: '0.6rem' }}>
@@ -432,14 +433,14 @@ function EvoTooltip({ active, payload, label }: {
           </div>
         ))}
       </div>
-      <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '0.5rem', marginBottom: '0.45rem' }}>
+      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.5rem', marginBottom: '0.45rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.25rem 0.75rem', fontSize: '0.7rem' }}>
-          <span style={{ color: '#64748b' }}>Study: <strong style={{ color: '#0f172a' }}>{pt.study_hours}h</strong></span>
-          <span style={{ color: '#64748b' }}>Notes: <strong style={{ color: '#0f172a' }}>{pt.notes_created}</strong></span>
+          <span style={{ color: '#64748b' }}>Study: <strong style={{ color: 'var(--text-h)' }}>{pt.study_hours}h</strong></span>
+          <span style={{ color: '#64748b' }}>Notes: <strong style={{ color: 'var(--text-h)' }}>{pt.notes_created}</strong></span>
           {pt.quiz_accuracy !== null && (
             <span style={{ color: '#64748b' }}>Quiz: <strong style={{ color: '#10b981' }}>{pt.quiz_accuracy?.toFixed(0)}%</strong></span>
           )}
-          <span style={{ color: '#64748b' }}>Sessions: <strong style={{ color: '#0f172a' }}>{pt.focus_sessions}</strong></span>
+          <span style={{ color: '#64748b' }}>Sessions: <strong style={{ color: 'var(--text-h)' }}>{pt.focus_sessions}</strong></span>
         </div>
       </div>
       {pt.ai_explanation && (
@@ -460,7 +461,7 @@ function HeatBar({ label, value, desc }: { label: string; value: number; desc: s
     <div style={{ marginBottom: '0.85rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
         <div>
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0f172a' }}>{label}</span>
+          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-h)' }}>{label}</span>
           <span style={{ marginLeft: '0.5rem', fontSize: '0.62rem', color: '#64748b' }}>{desc}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -468,7 +469,7 @@ function HeatBar({ label, value, desc }: { label: string; value: number; desc: s
           <span style={{ fontSize: '0.88rem', fontWeight: 800, color }}>{Math.round(value)}</span>
         </div>
       </div>
-      <div style={{ height: '7px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
+      <div style={{ height: '7px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' }}>
         <div className="score-bar-fill" style={{ width: `${value}%`, height: '100%', background: color, borderRadius: '99px', boxShadow: `0 0 8px ${color}60` }} />
       </div>
     </div>
@@ -508,7 +509,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
           <span style={{ fontSize: '1.1rem' }}>◈</span>
           <h3 style={{ ...s.cardTitle, marginBottom: 0 }}>Digital Twin Evolution Dashboard</h3>
-          <span style={{ marginLeft: 'auto', fontSize: '0.68rem', fontWeight: 700, color: '#64748b', padding: '0.18rem 0.55rem', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius: '99px' }}>
+          <span style={{ marginLeft: 'auto', fontSize: '0.68rem', fontWeight: 700, color: '#64748b', padding: '0.18rem 0.55rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '99px' }}>
             Real-time · {twin.data_points} data pts
           </span>
         </div>
@@ -519,7 +520,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
           <div style={{ padding: '1rem', background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.2)', borderRadius: '14px' }}>
             <p style={{ margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, color: '#0052cc', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Twin Intelligence Score</p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
-              <span style={{ fontSize: '2rem', fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>{Math.round(twin.twin_intelligence_score)}</span>
+              <span style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-h)', lineHeight: 1 }}>{Math.round(twin.twin_intelligence_score)}</span>
               <span style={{ fontSize: '0.75rem', color: '#64748b' }}>/100</span>
               {tisDelta !== null && (
                 <span style={{ fontSize: '0.72rem', fontWeight: 700, color: tisDelta >= 0 ? '#10b981' : '#ef4444' }}>
@@ -536,10 +537,10 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
           <div style={{ padding: '1rem', background: 'rgba(6,182,212,0.07)', border: '1px solid rgba(6,182,212,0.2)', borderRadius: '14px' }}>
             <p style={{ margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, color: '#06b6d4', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Confidence Level</p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
-              <span style={{ fontSize: '2rem', fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>{Math.round(twin.confidence_level)}</span>
+              <span style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-h)', lineHeight: 1 }}>{Math.round(twin.confidence_level)}</span>
               <span style={{ fontSize: '0.75rem', color: '#64748b' }}>%</span>
             </div>
-            <div style={{ height: '4px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden', marginTop: '0.4rem' }}>
+            <div style={{ height: '4px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden', marginTop: '0.4rem' }}>
               <div style={{ width: `${twin.confidence_level}%`, height: '100%', background: '#06b6d4', borderRadius: '99px', transition: 'width 1s ease' }} />
             </div>
             <p style={{ margin: '0.3rem 0 0', fontSize: '0.65rem', color: '#64748b' }}>How sure the twin is about its predictions based on your data density.</p>
@@ -549,23 +550,23 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
           <div style={{ padding: '1rem', background: `${maturityColor}0d`, border: `1px solid ${maturityColor}30`, borderRadius: '14px' }}>
             <p style={{ margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, color: maturityColor, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Twin Maturity</p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-              <span style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>L{twin.twin_maturity_level}</span>
+              <span style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--text-h)', lineHeight: 1 }}>L{twin.twin_maturity_level}</span>
               <span style={{ fontSize: '0.78rem', fontWeight: 700, color: maturityColor }}>{MATURITY_LABELS[twin.twin_maturity_level]}</span>
             </div>
             <div style={{ display: 'flex', gap: '3px' }}>
               {[1,2,3,4,5].map(l => (
-                <div key={l} style={{ flex: 1, height: '4px', borderRadius: '99px', background: l <= twin.twin_maturity_level ? maturityColor : '#e2e8f0' }} />
+                <div key={l} style={{ flex: 1, height: '4px', borderRadius: '99px', background: l <= twin.twin_maturity_level ? maturityColor : 'var(--border)' }} />
               ))}
             </div>
             <p style={{ margin: '0.3rem 0 0', fontSize: '0.65rem', color: '#64748b' }}>Grows as you log more data over time. Expert at Level 5.</p>
           </div>
 
           {/* State */}
-          <div style={{ padding: '1rem', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius: '14px' }}>
+          <div style={{ padding: '1rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '14px' }}>
             <p style={{ margin: '0 0 0.2rem', fontSize: '0.62rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Current State</p>
-            <p style={{ margin: '0 0 0.35rem', fontSize: '1rem', fontWeight: 800, color: '#0f172a', lineHeight: 1.25 }}>{twin.current_state_label}</p>
+            <p style={{ margin: '0 0 0.35rem', fontSize: '1rem', fontWeight: 800, color: 'var(--text-h)', lineHeight: 1.25 }}>{twin.current_state_label}</p>
             <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.62rem', padding: '0.12rem 0.45rem', borderRadius: '99px', background: 'rgba(139,92,246,0.12)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}>
+              <span className="twin-badge-light" style={{ fontSize: '0.62rem', padding: '0.12rem 0.45rem', borderRadius: '99px', background: 'rgba(139,92,246,0.12)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}>
                 Reliability {Math.round(twin.prediction_reliability)}%
               </span>
               <span style={{ fontSize: '0.62rem', padding: '0.12rem 0.45rem', borderRadius: '99px', background: 'rgba(99,102,241,0.1)', color: '#0052cc', border: '1px solid rgba(99,102,241,0.2)' }}>
@@ -592,7 +593,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
               const on = activeLayers.has(l.key);
               return (
                 <button key={l.key} onClick={() => toggleLayer(l.key)}
-                  style={{ padding: '0.25rem 0.65rem', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', background: on ? `${l.color}20` : 'rgba(255,255,255,0.03)', color: on ? l.color : '#475569', border: `1px solid ${on ? l.color + '50' : '#e2e8f0'}` }}>
+                  style={{ padding: '0.25rem 0.65rem', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s', background: on ? `${l.color}20` : 'var(--bg-elevated)', color: on ? l.color : 'var(--text-m)', border: `1px solid ${on ? l.color + '50' : 'var(--border)'}` }}>
                   {l.label}
                 </button>
               );
@@ -608,24 +609,24 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
         ) : (
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={twin.history} margin={{ top: 5, right: 16, bottom: 5, left: -20 }}>
-              <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
+              <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
-                tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }}
+                tick={{ fill: 'var(--text-m)', fontSize: 9 }}
                 axisLine={false} tickLine={false}
                 tickFormatter={d => {
                   const parts = d.split('-');
                   return parts.length === 3 ? `${parts[1]}/${parts[2]}` : d;
                 }}
               />
-              <YAxis domain={[0, 100]} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }} axisLine={false} tickLine={false} />
-              <Tooltip content={<EvoTooltip />} cursor={{ stroke: '#e2e8f0' }} />
+              <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-m)', fontSize: 9 }} axisLine={false} tickLine={false} />
+              <Tooltip content={<EvoTooltip />} cursor={{ stroke: 'var(--border)' }} />
               {LAYERS.filter(l => activeLayers.has(l.key)).map(l => (
                 <Line
                   key={l.key} type="monotone" dataKey={l.key}
                   stroke={l.color} strokeWidth={activeLayers.size === 1 ? 2.5 : 1.8}
                   dot={{ fill: l.color, r: 3, strokeWidth: 0 }}
-                  activeDot={{ r: 6, stroke: l.color, strokeWidth: 2, fill: '#08131a' }}
+                  activeDot={{ r: 6, stroke: l.color, strokeWidth: 2, fill: 'var(--bg-elevated)' }}
                 />
               ))}
             </LineChart>
@@ -667,7 +668,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
                     <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', flexShrink: 0 }}>{ev.icon}</div>
                     {i < twin.evolution_timeline.length - 1 && (
-                      <div style={{ width: '1px', flex: 1, background: '#e2e8f0', marginTop: '4px' }} />
+                      <div style={{ width: '1px', flex: 1, background: 'var(--border)', marginTop: '4px' }} />
                     )}
                   </div>
                   <div style={{ paddingTop: '4px' }}>
@@ -766,7 +767,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
           ].map(m => (
             <div key={m.label} style={{ padding: '0.85rem', background: `${m.color}08`, border: `1px solid ${m.color}20`, borderRadius: '12px' }}>
               <p style={{ margin: '0 0 0.15rem', fontSize: '0.62rem', fontWeight: 700, color: m.color, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{m.label}</p>
-              <p style={{ margin: '0 0 0.4rem', fontSize: '0.95rem', fontWeight: 800, color: '#0f172a' }}>{m.value}</p>
+              <p style={{ margin: '0 0 0.4rem', fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-h)' }}>{m.value}</p>
               <p style={{ margin: 0, fontSize: '0.73rem', color: '#64748b', lineHeight: 1.5 }}>{m.explain}</p>
             </div>
           ))}
@@ -812,7 +813,7 @@ function TwinFidelityBanner({
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
           <div style={{ position: 'relative', width: '76px', height: '76px' }}>
             <svg width="76" height="76" viewBox="0 0 76 76" style={{ transform: 'rotate(-90deg)' }}>
-              <circle cx="38" cy="38" r="32" fill="none" stroke="'#e2e8f0'" strokeWidth="7" />
+              <circle cx="38" cy="38" r="32" fill="none" stroke="var(--border)" strokeWidth="7" />
               <circle cx="38" cy="38" r="32" fill="none" stroke={fidelityColor} strokeWidth="7"
                 strokeDasharray={`${2 * Math.PI * 32 * overall / 100} ${2 * Math.PI * 32 * (1 - overall / 100)}`}
                 strokeLinecap="round" style={{ transition: 'stroke-dasharray 1s ease' }} />
@@ -827,7 +828,7 @@ function TwinFidelityBanner({
 
         <div style={{ flex: 1, minWidth: '260px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0f172a' }}>Digital Twin Accuracy System</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-h)' }}>Digital Twin Accuracy System</span>
             <span style={{ fontSize: '0.6rem', fontWeight: 700, color: fidelityColor, padding: '0.12rem 0.5rem', borderRadius: '99px', background: `${fidelityColor}18`, border: `1px solid ${fidelityColor}30` }}>
               {overall >= 80 ? 'HIGH FIDELITY' : overall >= 55 ? 'DEVELOPING' : 'CALIBRATING'}
             </span>
@@ -839,7 +840,7 @@ function TwinFidelityBanner({
                   <span style={{ fontSize: '0.58rem', fontWeight: 700, color: '#64748b', letterSpacing: '0.05em' }}>{m.label}</span>
                   <span style={{ fontSize: '0.6rem', fontWeight: 800, color: m.color }}>{m.value}%</span>
                 </div>
-                <div style={{ height: '4px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
+                <div style={{ height: '4px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${m.value}%`, background: m.color, borderRadius: '99px', transition: 'width 1s ease' }} />
                 </div>
               </div>
@@ -943,7 +944,7 @@ function ExtendedModelsSection({
             <span style={{ fontSize: '0.82rem', fontWeight: 800, color }}>{value}</span>
           </div>
         </div>
-        <div style={{ height: '6px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
+        <div style={{ height: '6px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' }}>
           <div className="score-bar-fill" style={{ width: `${value}%`, height: '100%', background: color, borderRadius: '99px', boxShadow: `0 0 6px ${color}60` }} />
         </div>
       </div>
@@ -961,7 +962,7 @@ function ExtendedModelsSection({
       </div>
 
       {/* Tab bar */}
-      <div style={{ display: 'flex', gap: '0.3rem', marginBottom: '1.5rem', padding: '4px', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius: '14px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '0.3rem', marginBottom: '1.5rem', padding: '4px', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '14px', flexWrap: 'wrap' }}>
         {tabs.map(t => {
           const active = tab === t.key;
           return (
@@ -1035,8 +1036,8 @@ function ExtendedModelsSection({
                 { label: 'Avg Sleep', value: `${avgSleep.toFixed(1)}h`, sub: 'per night' },
                 { label: 'Avg Stress', value: `${avgStress.toFixed(1)}/10`, sub: 'stress level' },
               ].map(stat => (
-                <div key={stat.label} style={{ padding: '0.6rem', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius: '10px', textAlign: 'center' }}>
-                  <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>{stat.value}</p>
+                <div key={stat.label} style={{ padding: '0.6rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '10px', textAlign: 'center' }}>
+                  <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--text-h)' }}>{stat.value}</p>
                   <p style={{ margin: '0.2rem 0 0', fontSize: '0.6rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</p>
                 </div>
               ))}
@@ -1053,7 +1054,7 @@ function ExtendedModelsSection({
               <div key={ins.title} style={{ display: 'flex', gap: '0.6rem', padding: '0.7rem 0.85rem', background: `${activeColor}08`, border: `1px solid ${activeColor}18`, borderRadius: '12px', marginBottom: '0.5rem' }}>
                 <span style={{ fontSize: '1rem', flexShrink: 0 }}>{ins.icon}</span>
                 <div>
-                  <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: '#0f172a' }}>{ins.title}</p>
+                  <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-h)' }}>{ins.title}</p>
                   <p style={{ margin: '0.15rem 0 0', fontSize: '0.68rem', color: '#64748b', lineHeight: 1.5 }}>{ins.text}</p>
                 </div>
               </div>
@@ -1069,7 +1070,7 @@ function ExtendedModelsSection({
             <p style={{ ...x.sectionLabel, color: activeColor }}>Learning Style Detection</p>
             <div style={{ marginBottom: '1rem', padding: '0.85rem 1rem', background: `${activeColor}10`, border: `1px solid ${activeColor}28`, borderRadius: '14px' }}>
               <p style={{ margin: 0, fontSize: '0.65rem', fontWeight: 700, color: activeColor, letterSpacing: '0.08em' }}>DETECTED STYLE</p>
-              <p style={{ margin: '0.2rem 0 0', fontSize: '1.2rem', fontWeight: 900, color: '#0f172a' }}>{styleLabels[dominantStyle]}</p>
+              <p style={{ margin: '0.2rem 0 0', fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-h)' }}>{styleLabels[dominantStyle]}</p>
             </div>
             {Object.entries(styleScores).map(([key, val]) => (
               <MBar key={key} label={styleLabels[key]} value={val} color={key === dominantStyle ? activeColor : '#334155'} />
@@ -1088,7 +1089,7 @@ function ExtendedModelsSection({
             ].filter(Boolean).slice(0, 4).map((ins: unknown, i) => {
               const item = ins as { icon: string; text: string };
               return (
-                <div key={i} style={{ display: 'flex', gap: '0.6rem', padding: '0.65rem 0.85rem', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius: '12px', marginBottom: '0.5rem' }}>
+                <div key={i} style={{ display: 'flex', gap: '0.6rem', padding: '0.65rem 0.85rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '0.5rem' }}>
                   <span style={{ flexShrink: 0 }}>{item.icon}</span>
                   <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b', lineHeight: 1.55 }}>{item.text}</p>
                 </div>
@@ -1118,7 +1119,7 @@ function ExtendedModelsSection({
               <div key={trait} style={{ display: 'flex', gap: '0.6rem', padding: '0.65rem 0.85rem', background: `${PERS_COLORS[trait] ?? activeColor}08`, border: `1px solid ${PERS_COLORS[trait] ?? activeColor}20`, borderRadius: '12px', marginBottom: '0.5rem' }}>
                 <span>{icon}</span>
                 <div>
-                  <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: '#0f172a' }}>{trait}</p>
+                  <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-h)' }}>{trait}</p>
                   <p style={{ margin: '0.15rem 0 0', fontSize: '0.67rem', color: '#64748b', lineHeight: 1.5 }}>{note}</p>
                 </div>
               </div>
@@ -1141,7 +1142,7 @@ function ExtendedModelsSection({
             <MBar label="Study Efficiency"  value={efficiency}                     color="#6366f1" />
             <MBar label="Task Completion"   value={Math.round(avgCompletion)}      color="#8b5cf6" />
             <MBar label="Energy Trend"      value={energyTrend}                    color="#f59e0b" />
-            <div style={{ height: '1px', background: '#e2e8f0', margin: '0.85rem 0' }} />
+            <div style={{ height: '1px', background: 'var(--border)', margin: '0.85rem 0' }} />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
               {[
                 { label: 'Daily Score',   value: dailyProd,   color: '#10b981' },
@@ -1170,7 +1171,7 @@ function ExtendedModelsSection({
               { icon: '📉', title: 'Productivity Decline Risk', value: twin.trend === 'declining' ? 'HIGH' : twin.trend === 'stable' ? 'MEDIUM' : 'LOW' },
               { icon: '🎯', title: 'Missed Study Probability', value: `${Math.max(5, Math.round(100 - twin.consistency_score * 0.9))}%` },
             ].map(p => (
-              <div key={p.title} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.55rem 0.75rem', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '0.5rem' }}>
+              <div key={p.title} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.55rem 0.75rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '10px', marginBottom: '0.5rem' }}>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <span>{p.icon}</span>
                   <span style={{ fontSize: '0.72rem', color: '#64748b' }}>{p.title}</span>
@@ -1230,7 +1231,7 @@ function PredictionCenterSection({
           <div key={pred.label} style={{ padding: '0.85rem', background: `${pred.color}08`, border: `1px solid ${pred.color}1a`, borderRadius: '14px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
               <span style={{ fontSize: '1.1rem' }}>{pred.icon}</span>
-              <span style={{ fontSize: '0.58rem', fontWeight: 700, color: '#64748b', padding: '0.12rem 0.4rem', background: '#f8f9fa', border: '1px solid #e2e8f0', borderRadius: '99px' }}>
+              <span style={{ fontSize: '0.58rem', fontWeight: 700, color: '#64748b', padding: '0.12rem 0.4rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '99px' }}>
                 {pred.conf}% conf.
               </span>
             </div>
@@ -1239,7 +1240,7 @@ function PredictionCenterSection({
               <span style={{ fontSize: '1.5rem', fontWeight: 900, color: pred.color, lineHeight: 1 }}>{pred.prob}</span>
               <span style={{ fontSize: '0.65rem', color: '#64748b' }}>%</span>
             </div>
-            <div style={{ height: '3px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
+            <div style={{ height: '3px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${pred.prob}%`, background: pred.color, borderRadius: '99px', transition: 'width 1s ease' }} />
             </div>
           </div>
@@ -1384,7 +1385,7 @@ function AskMyTwinSection({
               </div>
               <div style={{ display: 'flex', gap: '0.55rem' }}>
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg,#6366f1,#00D4FF)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', flexShrink: 0, color: '#fff', fontWeight: 800 }}>◈</div>
-                <div style={{ flex: 1, padding: '0.75rem 0.95rem', background: '#f8f9fa', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '4px 14px 14px 14px', fontSize: '0.77rem', color: '#64748b', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                <div style={{ flex: 1, padding: '0.75rem 0.95rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '4px 14px 14px 14px', fontSize: '0.77rem', color: '#64748b', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
                   {m.a}
                 </div>
               </div>
@@ -1393,7 +1394,7 @@ function AskMyTwinSection({
           {thinking && (
             <div style={{ display: 'flex', gap: '0.55rem' }}>
               <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg,#6366f1,#00D4FF)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', flexShrink: 0, color: '#fff', fontWeight: 800, animation: 'breathe 1.5s ease-in-out infinite' }}>◈</div>
-              <div style={{ padding: '0.75rem 0.95rem', background: '#f8f9fa', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '4px 14px 14px 14px', display: 'flex', gap: '4px', alignItems: 'center' }}>
+              <div style={{ padding: '0.75rem 0.95rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '4px 14px 14px 14px', display: 'flex', gap: '4px', alignItems: 'center' }}>
                 {[0, 0.2, 0.4].map(delay => (
                   <div key={delay} style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#818cf8', animation: `particle-float 1.2s ease-in-out infinite`, animationDelay: `${delay}s` }} />
                 ))}
@@ -1413,8 +1414,8 @@ function AskMyTwinSection({
           placeholder='Ask your twin anything… "If I skip studying today?"'
           style={{
             flex: 1, padding: '0.65rem 1rem', borderRadius: '12px',
-            background: '#f8f9fa', border: '1px solid rgba(99,102,241,0.25)',
-            color: '#0f172a', fontSize: '0.82rem', fontFamily: 'inherit', outline: 'none',
+            background: 'var(--bg-surface)', border: '1px solid rgba(99,102,241,0.25)',
+            color: 'var(--text-h)', fontSize: '0.82rem', fontFamily: 'inherit', outline: 'none',
           }}
         />
         <button
@@ -1422,7 +1423,7 @@ function AskMyTwinSection({
           disabled={!input.trim() || thinking}
           style={{
             padding: '0.65rem 1.25rem', borderRadius: '12px',
-            background: '#0052cc', border: 'none',
+            background: 'linear-gradient(135deg, #00D4FF, #7C3AED)', border: 'none',
             color: '#fff', fontWeight: 800, fontSize: '0.82rem', cursor: input.trim() ? 'pointer' : 'not-allowed',
             opacity: input.trim() ? 1 : 0.5, fontFamily: 'inherit', transition: 'opacity 0.15s',
           }}
@@ -1437,12 +1438,12 @@ function AskMyTwinSection({
 /* ── Extra styles for new sections ───────────────────────────────── */
 const x: Record<string, React.CSSProperties> = {
   card: {
-    background: '#ffffff', border: '1px solid #e2e8f0',
+    background: 'var(--bg-elevated)', border: '1px solid var(--border)',
     borderRadius: '20px', padding: '1.75rem',
     backdropFilter: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
   },
   fullWidth: { gridColumn: '1 / -1' },
-  cardTitle: { fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', marginBottom: '1.25rem', letterSpacing: '-0.1px' },
+  cardTitle: { fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-h)', marginBottom: '1.25rem', letterSpacing: '-0.1px' },
   sectionLabel: { margin: '0 0 0.85rem', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.09em', textTransform: 'uppercase' as const },
 };
 
@@ -1503,7 +1504,7 @@ export default function Twin() {
           {wsConnected && <LiveBadge />}
         </div>
         <div style={s.navRight}>
-          <Link to="/twin-profile" style={{ padding:'0.38rem 0.9rem', borderRadius:9, background:'rgba(129,140,248,0.1)', border:'1px solid rgba(129,140,248,0.3)', color:'#a5b4fc', fontSize:'0.78rem', fontWeight:700, textDecoration:'none' }}>Twin Profile →</Link>
+          <Link to="/twin-profile" className="twin-nav-profile-btn" style={{ padding:'0.38rem 0.9rem', borderRadius:9, background:'rgba(129,140,248,0.1)', border:'1px solid rgba(129,140,248,0.3)', color:'#a5b4fc', fontSize:'0.78rem', fontWeight:700, textDecoration:'none' }}>Twin Profile →</Link>
           <Link to="/checkin" className="nav-link" style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', color: '#0052cc' }}>{t('twin_log_checkin')}</Link>
         </div>
       </header>
@@ -1547,7 +1548,7 @@ export default function Twin() {
                       <p style={{ margin: '0 0 0.1rem', fontSize: '0.65rem', fontWeight: 700, color: getLevelColor(progress.level), textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>
                         {t('twin_level_prefix')} {progress.level}
                       </p>
-                      <p style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>
+                      <p style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.3px' }}>
                         {progress.level_name}
                       </p>
                     </div>
@@ -1565,7 +1566,7 @@ export default function Twin() {
                         </span>
                       )}
                     </div>
-                    <div style={{ height: '8px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
+                    <div style={{ height: '8px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' }}>
                       <div style={{
                         height: '100%', width: `${progress.progress_pct}%`,
                         background: getLevelGradient(progress.level),
@@ -1582,7 +1583,7 @@ export default function Twin() {
                       ].map(b => b.xp > 0 && (
                         <span key={b.label} style={{
                           padding: '0.15rem 0.5rem', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 600,
-                          background: '#f8f9fa', border: '1px solid #e2e8f0',
+                          background: 'var(--bg-surface)', border: '1px solid var(--border)',
                           color: '#64748b',
                         }}>
                           {b.label} +{b.xp}
@@ -1598,8 +1599,8 @@ export default function Twin() {
                       return (
                         <div key={lv} title={`Level ${lv}`} style={{
                           width: '18px', height: '18px', borderRadius: '4px',
-                          background: lv <= progress.level ? c : '#e2e8f0',
-                          border: lv === progress.level ? `2px solid ${c}` : '1px solid #e2e8f0',
+                          background: lv <= progress.level ? c : 'var(--border)',
+                          border: lv === progress.level ? `2px solid ${c}` : '1px solid var(--border)',
                           transition: 'all 0.2s',
                           boxShadow: lv === progress.level ? `0 0 8px ${c}80` : 'none',
                         }} />
@@ -1635,15 +1636,15 @@ export default function Twin() {
                 {/* Inner ring counter-spin */}
                 <div style={{
                   position: 'absolute', inset: '8px', borderRadius: '50%',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--border)',
                   borderBottomColor: `${avatarColor}60`,
                   animation: 'ring-spin-rev 6s linear infinite',
                 }} />
                 {/* Avatar circle */}
                 <div style={{
                   position: 'absolute', inset: '4px', borderRadius: '50%',
-                  background: `radial-gradient(circle at 35% 35%, ${avatarColor}35 0%, '#ffffff' 70%)`,
-                  border: '1px solid #e2e8f0',
+                  background: `radial-gradient(circle at 35% 35%, ${avatarColor}35 0%, transparent 70%)`,
+                  border: '1px solid var(--border)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '2rem', fontWeight: 800, color: avatarColor,
                   letterSpacing: '-1px',
@@ -1668,7 +1669,7 @@ export default function Twin() {
                 </div>
               )}
 
-              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.6rem' }}>
+              <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-h)', marginBottom: '0.6rem' }}>
                 {user?.full_name?.split(' ')[0]}'s Twin
               </h2>
 
@@ -1682,7 +1683,7 @@ export default function Twin() {
               </div>
 
               {/* Trend */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '1rem', color: TREND_COLOR[twin.trend], fontWeight: 700, fontSize: '0.95rem' }}>
+              <div className={twin.trend === 'stable' ? 'twin-trend-stable' : ''} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '1rem', color: TREND_COLOR[twin.trend], fontWeight: 700, fontSize: '0.95rem' }}>
                 <span style={{ fontSize: '1.1rem' }}>{TREND_ICON[twin.trend]}</span>
                 <span>{TREND_LABEL[twin.trend]}</span>
               </div>
@@ -1690,12 +1691,12 @@ export default function Twin() {
               {/* Meta */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{ageCount}</p>
+                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-h)', lineHeight: 1 }}>{ageCount}</p>
                   <p style={{ fontSize: '0.68rem', color: '#64748b', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginTop: '0.25rem' }}>days old</p>
                 </div>
-                <div style={{ width: '1px', height: '36px', background: '#e2e8f0' }} />
+                <div style={{ width: '1px', height: '36px', background: 'var(--border)' }} />
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{dataCount}</p>
+                  <p style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-h)', lineHeight: 1 }}>{dataCount}</p>
                   <p style={{ fontSize: '0.68rem', color: '#64748b', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginTop: '0.25rem' }}>check-ins</p>
                 </div>
               </div>
@@ -1781,34 +1782,34 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: '0 1.75rem', height: '60px',
     borderBottom: '1px solid var(--glass-border)',
-    background: '#ffffff',
+    background: 'var(--bg-elevated)',
     backdropFilter: 'none', WebkitBackdropFilter: 'none',
     position: 'sticky', top: 0, zIndex: 50,
   },
   navLeft: { display: 'flex', alignItems: 'center', gap: '0.45rem' },
-  navLogo: { fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' },
+  navLogo: { fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.3px' },
   navRight: { display: 'flex', alignItems: 'center', gap: '0.75rem' },
   main: {
     flex: 1, padding: '2.5rem 2rem', maxWidth: '1000px',
     width: '100%', margin: '0 auto', boxSizing: 'border-box', position: 'relative', zIndex: 1,
   },
-  pageTitle: { fontSize: '1.9rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: '0.4rem' },
+  pageTitle: { fontSize: '1.9rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.5px', marginBottom: '0.4rem' },
   pageSub: { color: '#64748b', fontSize: '0.95rem' },
   grid: { display: 'grid', gridTemplateColumns: '200px 1fr', gap: '1.25rem', alignItems: 'start' },
   avatarCard: {
-    background: '#ffffff', border: '1px solid #e2e8f0',
+    background: 'var(--bg-elevated)', border: '1px solid var(--border)',
     borderRadius: '20px', padding: '2rem 1.5rem',
     display: 'flex', flexDirection: 'column', alignItems: 'center',
     textAlign: 'center', backdropFilter: 'none',
     boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
   },
   card: {
-    background: '#ffffff', border: '1px solid #e2e8f0',
+    background: 'var(--bg-elevated)', border: '1px solid var(--border)',
     borderRadius: '20px', padding: '1.75rem',
     backdropFilter: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
   },
   fullWidth: { gridColumn: '1 / -1' },
-  cardTitle: { fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', marginBottom: '1.25rem', letterSpacing: '-0.1px' },
+  cardTitle: { fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-h)', marginBottom: '1.25rem', letterSpacing: '-0.1px' },
   tagHeading: { margin: '0 0 0.5rem', fontSize: '0.7rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' as const, letterSpacing: '0.07em' },
   tagRow: { display: 'flex', flexWrap: 'wrap' as const, gap: '0.4rem' },
   tag: { padding: '0.25rem 0.65rem', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 600 },
@@ -1817,14 +1818,14 @@ const s: Record<string, React.CSSProperties> = {
   cmpHeader: {
     display: 'grid', gridTemplateColumns: '1fr 52px 72px 56px 1fr',
     gap: '0.5rem', paddingBottom: '0.6rem',
-    borderBottom: '1px solid #e2e8f0', marginBottom: '0.25rem',
+    borderBottom: '1px solid var(--border)', marginBottom: '0.25rem',
     fontSize: '0.68rem', fontWeight: 700, color: '#64748b',
     textTransform: 'uppercase' as const, letterSpacing: '0.07em',
   },
   cmpRow: {
     display: 'grid', gridTemplateColumns: '1fr 52px 72px 56px 1fr',
     gap: '0.5rem', padding: '0.6rem 0',
-    borderBottom: '1px solid #e2e8f0', alignItems: 'center',
+    borderBottom: '1px solid var(--border)', alignItems: 'center',
   },
   cmpLabelCol: { fontSize: '0.83rem', color: '#64748b' },
   cmpNowCol:   { fontSize: '0.83rem', textAlign: 'right' as const },

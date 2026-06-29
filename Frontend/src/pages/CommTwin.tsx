@@ -45,11 +45,9 @@ interface CoachActivity { order:number; activity:string; duration:string; focus_
 interface CoachData { level:string; daily_plan:CoachActivity[]; focus_today:string; motivational_message:string; weekly_goal:string; badge_to_earn:string }
 
 // ── Theme ─────────────────────────────────────────────────────────────────
+// Accent colours stay as hex (work in both modes as status/score colours).
+// Surface/text tokens use CSS custom properties so light/dark adapt automatically.
 
-const BG     = '#060b18';
-const CARD   = 'rgba(255,255,255,0.04)';
-const CARD2  = 'rgba(255,255,255,0.06)';
-const BORDER = '1px solid rgba(255,255,255,0.08)';
 const CYAN   = '#00D4FF';
 const INDIGO = '#6366f1';
 const GREEN  = '#10b981';
@@ -58,9 +56,13 @@ const RED    = '#ef4444';
 const PURPLE = '#8b5cf6';
 const PINK   = '#ec4899';
 const TEAL   = '#14b8a6';
-const TEXT   = '#f1f5f9';
-const MUTED  = '#94a3b8';
-const DIM    = '#475569';
+
+const TEXT   = 'var(--text-h)';
+const MUTED  = 'var(--text)';
+const DIM    = 'var(--text-m)';
+const CARD   = 'var(--bg-elevated)';
+const CARD2  = 'var(--bg-surface)';
+const BORDER = '1px solid var(--border)';
 
 const TABS = [
   { id:'twin',      label:'Twin',       icon:'🧠' },
@@ -131,7 +133,7 @@ function VoiceRecorder({
           onChange={e => setTranscript(e.target.value)}
           placeholder={placeholder}
           rows={5}
-          style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:`1px solid ${recording?CYAN:'rgba(255,255,255,0.08)'}`, borderRadius:12, padding:'0.85rem 3.5rem 0.85rem 1rem', color:TEXT, fontSize:'0.87rem', resize:'vertical', boxSizing:'border-box', lineHeight:1.65, transition:'border-color 0.2s' }}
+          style={{ width:'100%', background:'var(--bg-elevated)', border:`1px solid ${recording?CYAN:'var(--border)'}`, borderRadius:12, padding:'0.85rem 3.5rem 0.85rem 1rem', color:'var(--text-h)', fontSize:'0.87rem', resize:'vertical', boxSizing:'border-box', lineHeight:1.65, transition:'border-color 0.2s' }}
         />
         {supported && (
           <button onClick={startStop}
@@ -158,7 +160,7 @@ function VoiceRecorder({
           <button onClick={() => onTranscript(transcript)} style={{ flex:1, padding:'0.6rem', background:`linear-gradient(135deg,${INDIGO},${CYAN})`, border:'none', borderRadius:9, color:'#fff', fontWeight:700, cursor:'pointer', fontSize:'0.88rem' }}>
             Analyze Response
           </button>
-          <button onClick={() => setTranscript('')} style={{ padding:'0.6rem 1rem', background:'rgba(255,255,255,0.05)', border:BORDER, borderRadius:9, color:MUTED, cursor:'pointer', fontSize:'0.82rem' }}>
+          <button onClick={() => setTranscript('')} style={{ padding:'0.6rem 1rem', background:'var(--bg-surface)', border:BORDER, borderRadius:9, color:MUTED, cursor:'pointer', fontSize:'0.82rem' }}>
             Clear
           </button>
         </div>
@@ -181,13 +183,13 @@ function ScoreRing({ score, color, size=110 }:{score:number;color:string;size?:n
   const r=(size-14)/2, c=2*Math.PI*r, d=(score/100)*c;
   return (
     <svg width={size} height={size} style={{ transform:'rotate(-90deg)' }}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={9} />
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--border)" strokeWidth={9} />
       <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={9} strokeDasharray={`${d} ${c-d}`} strokeLinecap="round" style={{ transition:'stroke-dasharray 1s ease',filter:`drop-shadow(0 0 6px ${color}88)` }} />
     </svg>
   );
 }
 function Bar({ value, color, height=6 }:{value:number;color:string;height?:number}) {
-  return <div style={{ background:'rgba(255,255,255,0.07)',borderRadius:99,height,overflow:'hidden' }}><div style={{ width:`${Math.min(value,100)}%`,height:'100%',background:color,borderRadius:99,transition:'width 1s ease' }} /></div>;
+  return <div style={{ background:'var(--border)',borderRadius:99,height,overflow:'hidden' }}><div style={{ width:`${Math.min(value,100)}%`,height:'100%',background:color,borderRadius:99,transition:'width 1s ease' }} /></div>;
 }
 function Tag({ text, color }:{text:string;color:string}) {
   return <span style={{ display:'inline-block',padding:'2px 9px',borderRadius:99,fontSize:'0.71rem',fontWeight:600,background:`${color}22`,color,border:`1px solid ${color}44` }}>{text}</span>;
@@ -229,7 +231,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
         <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem' }}>
           <div style={{ color:AMBER,fontWeight:700,fontSize:'0.82rem',marginBottom:'0.65rem' }}>✎ Grammar Corrections ({r.grammar_error_count})</div>
           {r.grammar_errors.slice(0,4).map((e,i) => (
-            <div key={i} style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:8,padding:'0.5rem',background:'rgba(255,255,255,0.03)',borderRadius:8 }}>
+            <div key={i} style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:8,padding:'0.5rem',background:'var(--bg-surface)',borderRadius:8 }}>
               <div style={{ background:`${RED}0a`,border:`1px solid ${RED}25`,borderRadius:6,padding:'0.4rem 0.6rem' }}>
                 <div style={{ fontSize:'0.63rem',color:RED,marginBottom:2 }}>ORIGINAL</div>
                 <div style={{ color:MUTED,fontSize:'0.8rem' }}>{e.original}</div>
@@ -321,7 +323,7 @@ function TwinSection() {
   return (
     <div style={{ display:'flex',flexDirection:'column',gap:'1.5rem' }}>
       {/* Hero */}
-      <div style={{ background:`linear-gradient(135deg,${INDIGO}18,${TEAL}10)`,border:`1px solid ${INDIGO}35`,borderRadius:24,padding:'1.75rem',display:'grid',gridTemplateColumns:'auto 1fr',gap:'1.75rem',alignItems:'center' }}>
+      <div className="ct-hero" style={{ background:`linear-gradient(135deg,${INDIGO}18,${TEAL}10)`,border:`1px solid ${INDIGO}35`,borderRadius:24,padding:'1.75rem',display:'grid',gridTemplateColumns:'auto 1fr',gap:'1.75rem',alignItems:'center' }}>
         <div style={{ position:'relative',display:'inline-flex',alignItems:'center',justifyContent:'center' }}>
           <ScoreRing score={data.overall_score} color={mainC} size={140} />
           <div style={{ position:'absolute',textAlign:'center' }}>
@@ -390,10 +392,10 @@ function TwinSection() {
                   <stop offset="95%" stopColor={TEAL} stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="date" tick={{fill:DIM,fontSize:10}} />
               <YAxis domain={[0,100]} tick={{fill:DIM,fontSize:10}} />
-              <Tooltip contentStyle={{background:'#0d1117',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8,color:TEXT,fontSize:12}} />
+              <Tooltip contentStyle={{background:'var(--bg-elevated)',border:'1px solid var(--border)',borderRadius:8,color:TEXT,fontSize:12}} />
               <Area type="monotone" dataKey="overall" stroke={TEAL} strokeWidth={2} fill="url(#commGrad)" name="Overall" />
             </AreaChart>
           </ResponsiveContainer>
@@ -405,7 +407,7 @@ function TwinSection() {
         <div style={{ background:CARD,border:BORDER,borderRadius:16,padding:'1.25rem' }}>
           <div style={{ color:TEXT,fontWeight:700,marginBottom:'0.85rem' }}>Recent Activity</div>
           {data.recent_activities.slice(0,5).map((a,i) => (
-            <div key={i} style={{ display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.5rem 0',borderBottom:i<4?'1px solid rgba(255,255,255,0.05)':'none' }}>
+            <div key={i} style={{ display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.5rem 0',borderBottom:i<4?'1px solid var(--border-subtle)':'none' }}>
               <span style={{ fontSize:'1rem' }}>{String(a.type)==='image_challenge'?'🖼️':String(a.type)==='vocabulary'?'📚':String(a.type)==='grammar_correction'?'✏️':'🎙️'}</span>
               <div style={{ flex:1 }}>
                 <div style={{ color:TEXT,fontSize:'0.8rem',fontWeight:600,textTransform:'capitalize' }}>{String(a.type).replace('_',' ')}</div>
@@ -470,7 +472,7 @@ function ImageSection() {
           <div style={{ display:'flex',gap:6 }}>
             {(['Easy','Medium','Hard'] as const).map(d=>(
               <button key={d} onClick={()=>setDifficulty(d)}
-                style={{ padding:'0.38rem 0.85rem',borderRadius:7,border:`1px solid ${difficulty===d?diffColor(d):'rgba(255,255,255,0.1)'}`,background:difficulty===d?`${diffColor(d)}20`:'transparent',color:difficulty===d?diffColor(d):MUTED,cursor:'pointer',fontSize:'0.8rem',fontWeight:600 }}>
+                style={{ padding:'0.38rem 0.85rem',borderRadius:7,border:`1px solid ${difficulty===d?diffColor(d):'var(--border)'}`,background:difficulty===d?`${diffColor(d)}20`:'transparent',color:difficulty===d?diffColor(d):MUTED,cursor:'pointer',fontSize:'0.8rem',fontWeight:600 }}>
                 {d}
               </button>
             ))}
@@ -592,7 +594,7 @@ function TasksSection() {
       <div style={{ display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'0.6rem' }}>
         {TYPES.map(t=>(
           <button key={t.id} onClick={()=>setTaskType(t.id)}
-            style={{ padding:'0.75rem',borderRadius:12,border:`1px solid ${taskType===t.id?INDIGO:'rgba(255,255,255,0.08)'}`,background:taskType===t.id?`${INDIGO}18`:'transparent',color:taskType===t.id?TEXT:MUTED,cursor:'pointer',fontSize:'0.83rem',fontWeight:taskType===t.id?700:400,display:'flex',flexDirection:'column',alignItems:'center',gap:4 }}>
+            style={{ padding:'0.75rem',borderRadius:12,border:`1px solid ${taskType===t.id?INDIGO:'var(--border)'}`,background:taskType===t.id?`${INDIGO}18`:CARD,color:taskType===t.id?TEXT:MUTED,cursor:'pointer',fontSize:'0.83rem',fontWeight:taskType===t.id?700:400,display:'flex',flexDirection:'column',alignItems:'center',gap:4 }}>
             <span style={{ fontSize:'1.3rem' }}>{t.icon}</span>
             <span>{t.label}</span>
           </button>
@@ -623,7 +625,7 @@ function TasksSection() {
                 <div style={{ color:MUTED,fontSize:'0.87rem',lineHeight:1.6 }}>{task.sub_prompt}</div>
               </div>
             </div>
-            <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:10,padding:'0.85rem' }}>
+            <div style={{ background:'var(--bg-surface)',borderRadius:10,padding:'0.85rem' }}>
               <div style={{ color:CYAN,fontWeight:700,fontSize:'0.75rem',marginBottom:6 }}>TIPS</div>
               {task.tips.map((tip,i)=><div key={i} style={{ color:MUTED,fontSize:'0.8rem',marginBottom:3 }}>• {tip}</div>)}
             </div>
@@ -668,7 +670,7 @@ function GrammarSection() {
         <div style={{ color:MUTED,fontSize:'0.82rem',marginBottom:'0.85rem' }}>Type or paste any text. The AI will detect all grammar errors, show corrections, and explain every rule.</div>
         <textarea value={text} onChange={e=>setText(e.target.value)} rows={7}
           placeholder="Type a sentence, paragraph, or your answer to an interview question…"
-          style={{ width:'100%',background:'rgba(255,255,255,0.04)',border:BORDER,borderRadius:12,padding:'0.85rem 1rem',color:TEXT,fontSize:'0.87rem',resize:'vertical',boxSizing:'border-box',lineHeight:1.65 }} />
+          style={{ width:'100%',background:'var(--bg-elevated)',border:BORDER,borderRadius:12,padding:'0.85rem 1rem',color:'var(--text-h)',fontSize:'0.87rem',resize:'vertical',boxSizing:'border-box',lineHeight:1.65 }} />
         <button onClick={analyze} disabled={loading||!text.trim()}
           style={{ marginTop:'0.75rem',width:'100%',padding:'0.7rem',background:loading||!text.trim()?DIM:`linear-gradient(135deg,${AMBER},${PINK})`,border:'none',borderRadius:10,color:'#fff',fontWeight:700,cursor:'pointer' }}>
           {loading?'Analyzing…':'✎ Analyze Grammar'}
@@ -714,7 +716,7 @@ function GrammarSection() {
             <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem' }}>
               <div style={{ color:TEXT,fontWeight:700,marginBottom:'1rem' }}>Error Breakdown</div>
               {result.errors.map((e,i)=>(
-                <div key={i} style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:10,padding:'0.65rem',background:'rgba(255,255,255,0.03)',borderRadius:10 }}>
+                <div key={i} style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:10,padding:'0.65rem',background:'var(--bg-surface)',borderRadius:10 }}>
                   <div style={{ background:`${RED}0a`,border:`1px solid ${RED}25`,borderRadius:7,padding:'0.5rem 0.65rem' }}>
                     <div style={{ fontSize:'0.62rem',color:RED,marginBottom:2,textTransform:'uppercase' }}>Wrong</div>
                     <div style={{ color:MUTED,fontSize:'0.82rem' }}>{e.original}</div>
@@ -776,14 +778,14 @@ function VocabSection() {
               <span style={{ color:MUTED,fontSize:'0.7rem' }}>{open?'▲':'▼'}</span>
             </div>
             {open && (
-              <div style={{ padding:'1rem 1.25rem',borderTop:'1px solid rgba(255,255,255,0.06)',display:'flex',flexDirection:'column',gap:'0.85rem' }}>
+              <div style={{ padding:'1rem 1.25rem',borderTop:'1px solid var(--border-subtle)',display:'flex',flexDirection:'column',gap:'0.85rem' }}>
                 {/* Synonyms / Antonyms */}
                 <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem' }}>
-                  <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:10,padding:'0.75rem' }}>
+                  <div style={{ background:'var(--bg-surface)',borderRadius:10,padding:'0.75rem' }}>
                     <div style={{ fontSize:'0.7rem',color:GREEN,fontWeight:700,marginBottom:5 }}>SYNONYMS</div>
                     <div style={{ display:'flex',flexWrap:'wrap',gap:4 }}>{w.synonyms.map(s=><Tag key={s} text={s} color={GREEN}/>)}</div>
                   </div>
-                  <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:10,padding:'0.75rem' }}>
+                  <div style={{ background:'var(--bg-surface)',borderRadius:10,padding:'0.75rem' }}>
                     <div style={{ fontSize:'0.7rem',color:RED,fontWeight:700,marginBottom:5 }}>ANTONYMS</div>
                     <div style={{ display:'flex',flexWrap:'wrap',gap:4 }}>{w.antonyms.map(a=><Tag key={a} text={a} color={RED}/>)}</div>
                   </div>
@@ -795,11 +797,11 @@ function VocabSection() {
                 </div>
                 {/* Usage tips */}
                 <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem' }}>
-                  <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:10,padding:'0.75rem' }}>
+                  <div style={{ background:'var(--bg-surface)',borderRadius:10,padding:'0.75rem' }}>
                     <div style={{ fontSize:'0.68rem',color:AMBER,fontWeight:700,marginBottom:3 }}>SPEAKING USAGE</div>
                     <div style={{ color:MUTED,fontSize:'0.8rem',lineHeight:1.55 }}>{w.interview_usage}</div>
                   </div>
-                  <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:10,padding:'0.75rem' }}>
+                  <div style={{ background:'var(--bg-surface)',borderRadius:10,padding:'0.75rem' }}>
                     <div style={{ fontSize:'0.68rem',color:INDIGO,fontWeight:700,marginBottom:3 }}>PROFESSIONAL USAGE</div>
                     <div style={{ color:MUTED,fontSize:'0.8rem',lineHeight:1.55 }}>{w.professional_usage}</div>
                   </div>
@@ -855,12 +857,12 @@ function AnalyticsSection() {
         <div style={{ color:TEXT,fontWeight:700,marginBottom:'1rem' }}>Communication Skills Radar</div>
         <ResponsiveContainer width="100%" height={260}>
           <RadarChart data={radarData}>
-            <PolarGrid stroke="rgba(255,255,255,0.08)" />
-            <PolarAngleAxis dataKey="skill" tick={{fill:MUTED,fontSize:10}} />
-            <Radar name="Target"  dataKey="target" stroke={`${MUTED}50`} fill={`${MUTED}06`} />
+            <PolarGrid stroke="var(--border)" />
+            <PolarAngleAxis dataKey="skill" tick={{fill:DIM,fontSize:10}} />
+            <Radar name="Target"  dataKey="target" stroke="rgba(148,163,184,0.3)" fill="rgba(148,163,184,0.04)" />
             <Radar name="Current" dataKey="score"  stroke={TEAL}         fill={`${TEAL}20`} />
             <Legend wrapperStyle={{color:MUTED,fontSize:11}} />
-            <Tooltip contentStyle={{background:'#0d1117',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8,color:TEXT,fontSize:12}} />
+            <Tooltip contentStyle={{background:'var(--bg-elevated)',border:'1px solid var(--border)',borderRadius:8,color:TEXT,fontSize:12}} />
           </RadarChart>
         </ResponsiveContainer>
       </div>
@@ -883,10 +885,10 @@ function AnalyticsSection() {
                     <stop offset="95%" stopColor={TEAL} stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="date" tick={{fill:DIM,fontSize:10}} />
                 <YAxis domain={[0,100]} tick={{fill:DIM,fontSize:10}} />
-                <Tooltip contentStyle={{background:'#0d1117',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8,color:TEXT,fontSize:12}} />
+                <Tooltip contentStyle={{background:'var(--bg-elevated)',border:'1px solid var(--border)',borderRadius:8,color:TEXT,fontSize:12}} />
                 <Area type="monotone" dataKey="overall" stroke={TEAL} strokeWidth={2} fill="url(#tealGrad)" name="Overall" />
               </AreaChart>
             </ResponsiveContainer>
@@ -896,10 +898,10 @@ function AnalyticsSection() {
             <div style={{ color:TEXT,fontWeight:700,marginBottom:'1rem' }}>Skill Breakdown Trend</div>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={data.score_history}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="date" tick={{fill:DIM,fontSize:10}} />
                 <YAxis domain={[0,100]} tick={{fill:DIM,fontSize:10}} />
-                <Tooltip contentStyle={{background:'#0d1117',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8,color:TEXT,fontSize:12}} />
+                <Tooltip contentStyle={{background:'var(--bg-elevated)',border:'1px solid var(--border)',borderRadius:8,color:TEXT,fontSize:12}} />
                 <Legend wrapperStyle={{color:MUTED,fontSize:11}} />
                 <Line type="monotone" dataKey="fluency"    stroke={CYAN}   strokeWidth={2} dot={false} name="Fluency"   />
                 <Line type="monotone" dataKey="grammar"    stroke={GREEN}  strokeWidth={2} dot={false} name="Grammar"   />
@@ -929,7 +931,7 @@ function CoachSection() {
   return (
     <div style={{ display:'flex',flexDirection:'column',gap:'1.5rem' }}>
       {/* Header */}
-      <div style={{ background:`linear-gradient(135deg,${TEAL}18,${CYAN}10)`,border:`1px solid ${TEAL}35`,borderRadius:20,padding:'1.5rem',display:'flex',gap:'1.25rem',alignItems:'flex-start' }}>
+      <div className="ct-hero" style={{ background:`linear-gradient(135deg,${TEAL}18,${CYAN}10)`,border:`1px solid ${TEAL}35`,borderRadius:20,padding:'1.5rem',display:'flex',gap:'1.25rem',alignItems:'flex-start' }}>
         <span style={{ fontSize:'2.5rem' }}>🏆</span>
         <div>
           <div style={{ color:TEAL,fontWeight:700,fontSize:'0.78rem',textTransform:'uppercase',letterSpacing:1,marginBottom:4 }}>Your Personal AI Coach</div>
@@ -951,7 +953,7 @@ function CoachSection() {
             <div key={i} style={{ display:'flex',gap:'0.85rem',marginBottom:'0.85rem' }}>
               <div style={{ display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0 }}>
                 <div style={{ width:34,height:34,borderRadius:'50%',background:`${c}22`,border:`1px solid ${c}55`,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,color:c,fontSize:'0.88rem' }}>{activity.order}</div>
-                {i<data.daily_plan.length-1 && <div style={{ width:2,flex:1,background:'rgba(255,255,255,0.06)',minHeight:16,margin:'3px 0' }} />}
+                {i<data.daily_plan.length-1 && <div style={{ width:2,flex:1,background:'var(--border)',minHeight:16,margin:'3px 0' }} />}
               </div>
               <div style={{ flex:1,paddingBottom:i<data.daily_plan.length-1?'0.85rem':0 }}>
                 <div style={{ display:'flex',alignItems:'center',gap:8,marginBottom:3 }}>
@@ -997,20 +999,25 @@ export default function CommTwin() {
   }, [activeTab]);
 
   return (
-    <div style={{ minHeight:'100svh',background:'transparent',color:TEXT,fontFamily:'system-ui,-apple-system,sans-serif' }}>
+    <div className="ct-page" style={{ minHeight:'100svh',background:'transparent',color:TEXT,fontFamily:'system-ui,-apple-system,sans-serif' }}>
       <style>{`
         @keyframes spin  { to { transform:rotate(360deg); } }
         @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.3;} }
-        * { scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.1) transparent; }
-        *::-webkit-scrollbar { width:4px; height:4px; }
-        *::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
+        .ct-page * { scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.1) transparent; }
+        .ct-page *::-webkit-scrollbar { width:4px; height:4px; }
+        .ct-page *::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
         input,textarea,select { outline:none; }
         input:focus,textarea:focus,select:focus { border-color:rgba(99,102,241,0.5)!important; }
         select option { background:#0d1117; color:#f1f5f9; }
+        html[data-color-scheme="light"] .ct-page * { scrollbar-color:#CBD5E1 transparent; }
+        html[data-color-scheme="light"] .ct-page *::-webkit-scrollbar-thumb { background:#CBD5E1; }
+        html[data-color-scheme="light"] select option { background:#FFFFFF; color:#111827; }
+        html[data-color-scheme="light"] .ct-header { background:rgba(255,255,255,0.97)!important; border-bottom:1px solid #E5E7EB!important; }
+        html[data-color-scheme="light"] .ct-tabbar { background:rgba(255,255,255,0.95)!important; border-bottom:1px solid #E5E7EB!important; }
       `}</style>
 
       {/* Header */}
-      <div style={{ borderBottom:BORDER,padding:'0.9rem 1.5rem',display:'flex',alignItems:'center',gap:'1rem',background:'rgba(6,11,24,0.92)',backdropFilter:'blur(12px)',position:'sticky',top:0,zIndex:50 }}>
+      <div className="ct-header" style={{ borderBottom:BORDER,padding:'0.9rem 1.5rem',display:'flex',alignItems:'center',gap:'1rem',background:'rgba(6,11,24,0.92)',backdropFilter:'blur(12px)',position:'sticky',top:0,zIndex:50 }}>
         <BackButton />
         <div>
           <div style={{ display:'flex',alignItems:'center',gap:'0.5rem' }}>
@@ -1025,7 +1032,7 @@ export default function CommTwin() {
       </div>
 
       {/* Tab bar */}
-      <div style={{ overflowX:'auto',borderBottom:BORDER,background:'rgba(6,11,24,0.75)',backdropFilter:'blur(8px)',position:'sticky',top:62,zIndex:40 }}>
+      <div className="ct-tabbar" style={{ overflowX:'auto',borderBottom:BORDER,background:'rgba(6,11,24,0.75)',backdropFilter:'blur(8px)',position:'sticky',top:62,zIndex:40 }}>
         <div style={{ display:'flex',minWidth:'max-content',padding:'0 1.5rem' }}>
           {TABS.map(tab=>{
             const active=activeTab===tab.id;

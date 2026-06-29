@@ -65,13 +65,13 @@ function SkeletonCard() {
 const sk: Record<string, React.CSSProperties> = {
   card: {
     borderRadius: '24px',
-    background: '#ffffff',
+    background: 'var(--bg-elevated)',
     border: '1px solid var(--glass-border)',
     overflow: 'hidden',
   },
-  thumb: { width: '100%', aspectRatio: '16/9', background: '#e2e8f0' },
+  thumb: { width: '100%', aspectRatio: '16/9', background: 'var(--border-subtle)' },
   body: { padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' },
-  line: { borderRadius: '6px', background: '#e2e8f0' },
+  line: { borderRadius: '6px', background: 'var(--border)' },
 };
 
 /* ─── Video card ─── */
@@ -85,11 +85,11 @@ function VideoCard({ video }: VideoCardProps) {
       style={{
         ...vc.card,
         border: video.is_top
-          ? '1px solid rgba(0,212,255,0.45)'
-          : '1px solid #e2e8f0',
+          ? '1px solid var(--accent-border)'
+          : '1px solid var(--border)',
         boxShadow: video.is_top
           ? '0 0 30px rgba(0,212,255,0.1), 0 8px 40px rgba(0,0,0,0.1)'
-          : '0 4px 30px rgba(0,0,0,0.4)',
+          : 'var(--glow-card)',
       }}
       className="sv-card"
     >
@@ -184,7 +184,7 @@ function VideoCard({ video }: VideoCardProps) {
 
         {/* Estimated time */}
         <div style={vc.estRow}>
-          <BookOpen size={13} color="#0052cc" />
+          <BookOpen size={13} color="var(--accent)" />
           <span style={vc.estText}>{video.estimated_time}</span>
         </div>
 
@@ -207,7 +207,7 @@ function VideoCard({ video }: VideoCardProps) {
             Watch on YouTube
           </a>
           <button
-            style={{ ...vc.previewBtn, background: showEmbed ? 'rgba(0,212,255,0.15)' : undefined }}
+            style={{ ...vc.previewBtn, background: showEmbed ? 'var(--accent-bg)' : undefined }}
             onClick={() => setShowEmbed(v => !v)}
             className="sv-preview-btn"
           >
@@ -223,7 +223,7 @@ function VideoCard({ video }: VideoCardProps) {
 const vc: Record<string, React.CSSProperties> = {
   card: {
     borderRadius: '24px',
-    background: '#ffffff',
+    background: 'var(--bg-elevated)',
     backdropFilter: 'blur(0px)',
     WebkitBackdropFilter: 'blur(0px)',
     display: 'flex',
@@ -265,7 +265,7 @@ const vc: Record<string, React.CSSProperties> = {
     position: 'relative',
     width: '100%',
     aspectRatio: '16/9',
-    background: 'rgba(0,0,0,0.3)',
+    background: 'var(--border-subtle)',
     overflow: 'hidden',
     flexShrink: 0,
   },
@@ -316,7 +316,7 @@ const vc: Record<string, React.CSSProperties> = {
     height: '28px',
     borderRadius: '50%',
     background: 'rgba(0,0,0,0.6)',
-    border: '1px solid #cbd5e1',
+    border: '1px solid var(--border)',
     color: '#ffffff',
     cursor: 'pointer',
     display: 'flex',
@@ -340,7 +340,7 @@ const vc: Record<string, React.CSSProperties> = {
   rankNum: {
     fontSize: '0.7rem',
     fontWeight: 700,
-    color: '#475569',
+    color: 'var(--text-m)',
     fontFamily: 'ui-monospace, monospace',
   },
   diffBadge: {
@@ -355,7 +355,7 @@ const vc: Record<string, React.CSSProperties> = {
     margin: 0,
     fontSize: '0.92rem',
     fontWeight: 700,
-    color: '#0f172a',
+    color: 'var(--text-h)',
     lineHeight: 1.35,
     display: '-webkit-box',
     WebkitLineClamp: 2,
@@ -365,7 +365,7 @@ const vc: Record<string, React.CSSProperties> = {
   channel: {
     margin: 0,
     fontSize: '0.78rem',
-    color: '#00D4FF',
+    color: 'var(--accent)',
     fontWeight: 600,
   },
   metaRow: {
@@ -378,7 +378,7 @@ const vc: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: '0.25rem',
     fontSize: '0.72rem',
-    color: '#475569',
+    color: 'var(--text-m)',
   },
   estRow: {
     display: 'flex',
@@ -386,12 +386,12 @@ const vc: Record<string, React.CSSProperties> = {
     gap: '0.4rem',
     padding: '0.45rem 0.6rem',
     borderRadius: '8px',
-    background: 'rgba(0,212,255,0.15)',
-    border: '1px solid rgba(0,212,255,0.12)',
+    background: 'var(--accent-bg)',
+    border: '1px solid var(--accent-border)',
   },
   estText: {
     fontSize: '0.75rem',
-    color: '#00D4FF',
+    color: 'var(--accent)',
     fontWeight: 500,
     lineHeight: 1.4,
   },
@@ -408,7 +408,7 @@ const vc: Record<string, React.CSSProperties> = {
   reasonText: {
     margin: 0,
     fontSize: '0.75rem',
-    color: '#64748b',
+    color: 'var(--text)',
     lineHeight: 1.5,
   },
   btnRow: {
@@ -439,9 +439,9 @@ const vc: Record<string, React.CSSProperties> = {
     gap: '0.35rem',
     padding: '0.55rem 0.85rem',
     borderRadius: '10px',
-    background: 'rgba(0,212,255,0.08)',
-    border: '1px solid rgba(0,212,255,0.2)',
-    color: '#00D4FF',
+    background: 'var(--accent-bg)',
+    border: '1px solid var(--accent-border)',
+    color: 'var(--accent)',
     fontSize: '0.8rem',
     fontWeight: 700,
     cursor: 'pointer',
@@ -514,10 +514,10 @@ export default function StudyVideos() {
           {/* Page header */}
           <div style={s.pageHeader}>
             <div style={s.pageIconWrap}>
-              <Video size={24} color="#0052cc" />
+              <Video size={24} color="var(--text-h)" />
             </div>
             <div>
-              <h1 style={s.pageTitle} style={{...s.pageTitle, color: "#0f172a"}}>AI Study Videos</h1>
+              <h1 style={s.pageTitle}>AI Study Videos</h1>
               <p style={s.pageSub}>AI-ranked educational YouTube videos for any topic</p>
             </div>
           </div>
@@ -538,7 +538,7 @@ export default function StudyVideos() {
                   onChange={e => setQuery(e.target.value)}
                   placeholder="Enter a study topic… e.g. Machine Learning, DBMS, Calculus"
                   style={s.searchInput}
-                  className="sv-search-input" style={{...s.searchInput, background: "#f8f9fa", border: "1px solid #e2e8f0", color: "#0f172a"}}
+                  className="sv-search-input dark-input"
                   autoFocus
                   disabled={loading}
                 />
@@ -557,7 +557,7 @@ export default function StudyVideos() {
                 type="submit"
                 disabled={loading || !query.trim()}
                 style={s.searchBtn}
-                className="sv-search-btn" style={{...s.searchBtn, background: "#0052cc", color: "#ffffff"}}
+                className="sv-search-btn"
               >
                 {loading ? (
                   <span style={s.spinnerWrap}>
@@ -608,7 +608,7 @@ export default function StudyVideos() {
                       href="https://console.cloud.google.com"
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: '#00D4FF' }}
+                      style={{ color: 'var(--accent)' }}
                     >
                       console.cloud.google.com
                     </a>
@@ -623,7 +623,7 @@ export default function StudyVideos() {
           {loading && (
             <div className="animate-fade-in">
               <p style={s.loadingHint}>
-                <Wifi size={14} color="#0052cc" />
+                <Wifi size={14} color="var(--accent)" />
                 Searching YouTube and ranking with AI…
               </p>
               <div style={s.grid}>
@@ -723,7 +723,7 @@ const s: Record<string, React.CSSProperties> = {
     minHeight: '100svh',
     display: 'flex',
     flexDirection: 'column',
-    background: '#f8f9fa',
+    background: 'var(--bg)',
     fontFamily: 'var(--sans)',
   },
   nav: {
@@ -767,8 +767,8 @@ const s: Record<string, React.CSSProperties> = {
     width: '50px',
     height: '50px',
     borderRadius: '14px',
-    background: 'linear-gradient(135deg, rgba(0,212,255,0.18), rgba(124,58,237,0.18))',
-    border: '1px solid rgba(0,212,255,0.22)',
+    background: 'var(--bg-elevated)',
+    border: '1px solid var(--border)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -783,7 +783,7 @@ const s: Record<string, React.CSSProperties> = {
   pageSub: {
     margin: '0.1rem 0 0',
     fontSize: '0.84rem',
-    color: '#475569',
+    color: 'var(--text-m)',
   },
 
   /* Search card */
@@ -792,11 +792,9 @@ const s: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
     padding: '1.75rem',
     borderRadius: '24px',
-    background: 'rgba(10,16,32,0.82)',
-    border: '1px solid rgba(0,212,255,0.12)',
-    backdropFilter: 'blur(28px)',
-    WebkitBackdropFilter: 'blur(28px)',
-    boxShadow: '0 8px 50px rgba(0,0,0,0.1)',
+    background: 'var(--bg-elevated)',
+    border: '1px solid var(--border)',
+    boxShadow: 'var(--glow-card)',
     display: 'flex',
     flexDirection: 'column',
     gap: '1.1rem',
@@ -857,7 +855,7 @@ const s: Record<string, React.CSSProperties> = {
     right: '0.75rem',
     background: 'none',
     border: 'none',
-    color: '#475569',
+    color: 'var(--text-m)',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
@@ -894,7 +892,7 @@ const s: Record<string, React.CSSProperties> = {
   quickLabel: {
     fontSize: '0.75rem',
     fontWeight: 600,
-    color: '#475569',
+    color: 'var(--text-m)',
     whiteSpace: 'nowrap' as const,
     marginTop: '0.3rem',
     flexShrink: 0,
@@ -907,9 +905,9 @@ const s: Record<string, React.CSSProperties> = {
   chip: {
     padding: '0.28rem 0.75rem',
     borderRadius: '999px',
-    border: '1px solid #e2e8f0',
-    background: '#ffffff',
-    color: '#64748b',
+    border: '1px solid var(--border)',
+    background: 'var(--bg-elevated)',
+    color: 'var(--text-m)',
     fontSize: '0.75rem',
     fontWeight: 500,
     cursor: 'pointer',
@@ -922,7 +920,7 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
-    color: '#00D4FF',
+    color: 'var(--accent)',
     fontSize: '0.85rem',
     fontWeight: 600,
     marginBottom: '1rem',
@@ -951,11 +949,11 @@ const s: Record<string, React.CSSProperties> = {
   resultsCount: {
     fontSize: '0.95rem',
     fontWeight: 700,
-    color: '#0f172a',
+    color: 'var(--text-h)',
   },
   resultsTopic: {
     fontSize: '0.88rem',
-    color: '#475569',
+    color: 'var(--text-m)',
   },
   cachedBadge: {
     padding: '0.12rem 0.55rem',
@@ -969,7 +967,7 @@ const s: Record<string, React.CSSProperties> = {
   diffOverview: {
     margin: 0,
     fontSize: '0.82rem',
-    color: '#475569',
+    color: 'var(--text-m)',
     fontStyle: 'italic' as const,
   },
 
@@ -1045,17 +1043,17 @@ const s: Record<string, React.CSSProperties> = {
     margin: 0,
     fontSize: '1rem',
     fontWeight: 700,
-    color: '#0f172a',
+    color: 'var(--text-h)',
   },
   pathSub: {
     margin: '0.15rem 0 0',
     fontSize: '0.78rem',
-    color: '#475569',
+    color: 'var(--text-m)',
   },
   pathBody: {
     margin: 0,
     fontSize: '0.88rem',
-    color: '#64748b',
+    color: 'var(--text)',
     lineHeight: 1.65,
   },
 
@@ -1077,13 +1075,13 @@ const s: Record<string, React.CSSProperties> = {
   },
   errorMsg: {
     margin: 0,
-    color: '#475569',
+    color: 'var(--text-m)',
     fontSize: '0.83rem',
     lineHeight: 1.5,
   },
   errorHint: {
     margin: '0.4rem 0 0',
-    color: '#475569',
+    color: 'var(--text-m)',
     fontSize: '0.8rem',
     lineHeight: 1.5,
   },
@@ -1100,12 +1098,12 @@ const s: Record<string, React.CSSProperties> = {
   emptyTitle: {
     margin: '0 0 0.45rem',
     fontWeight: 700,
-    color: '#0f172a',
+    color: 'var(--text-h)',
     fontSize: '1.05rem',
   },
   emptyHint: {
     margin: 0,
-    color: '#475569',
+    color: 'var(--text-m)',
     fontSize: '0.85rem',
     lineHeight: 1.6,
     maxWidth: '480px',
