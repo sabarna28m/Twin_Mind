@@ -7,6 +7,7 @@ import {
 import { motion } from 'framer-motion';
 import { XPStoreProvider } from '../contexts/XPStoreContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import TutorialOverlay from '../components/TutorialOverlay';
 import api from '../services/api';
@@ -130,8 +131,8 @@ function StudyAreaChart({ data }: { data: { date: string; hours: number; label: 
           const y = py + chartH - g * chartH;
           return (
             <g key={i}>
-              <line x1={px} y1={y} x2={w - px} y2={y} stroke="#e2e8f0" strokeWidth="0.5" strokeDasharray="4,4" />
-              <text x={px - 8} y={y + 4} textAnchor="end" fontSize="10" fill="#94a3b8">{(max * g).toFixed(1)}h</text>
+              <line x1={px} y1={y} x2={w - px} y2={y} style={{ stroke: 'var(--ui-border)' }} strokeWidth="0.5" strokeDasharray="4,4" />
+              <text x={px - 8} y={y + 4} textAnchor="end" fontSize="10" style={{ fill: 'var(--ui-text-muted)' }}>{(max * g).toFixed(1)}h</text>
             </g>
           );
         })}
@@ -142,8 +143,8 @@ function StudyAreaChart({ data }: { data: { date: string; hours: number; label: 
         {/* Dots */}
         {points.map((p, i) => (
           <g key={i}>
-            <circle cx={p.x} cy={p.y} r="4" fill="#fff" stroke="#00D4FF" strokeWidth="2" />
-            <text x={p.x} y={py + chartH + 16} textAnchor="middle" fontSize="11" fill="#64748b" fontWeight="500">{data[i].label}</text>
+            <circle cx={p.x} cy={p.y} r="4" style={{ fill: 'var(--ui-surface)', stroke: '#00D4FF' }} strokeWidth="2" />
+            <text x={p.x} y={py + chartH + 16} textAnchor="middle" fontSize="11" style={{ fill: 'var(--ui-text-muted)' }} fontWeight="500">{data[i].label}</text>
           </g>
         ))}
       </svg>
@@ -160,7 +161,7 @@ function CircularProgress({ pct, color, size = 56 }: { pct: number; color: strin
   const offset = circumference - (pct / 100) * circumference;
   return (
     <svg width={size} height={size} style={{ flexShrink: 0 }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e2e8f0" strokeWidth="6" />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" style={{ stroke: 'var(--ui-border)' }} strokeWidth="6" />
       <circle
         cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth="6"
         strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset}
@@ -227,11 +228,13 @@ function KPICard({ icon: Icon, label, value, unit, gradient, trend, delay }: {
    ═══════════════════════════════════════════════ */
 export default function Dashboard() {
   const { user, token } = useAuth();
+  const { colorScheme } = useTheme();
   const { t } = useLanguage();
   const hour = new Date().getHours();
   const greeting = hour < 5 ? t('greeting_midnight') : hour < 12 ? t('greeting_morning') : hour < 17 ? t('greeting_afternoon') : t('greeting_evening');
   const firstName = user?.full_name?.split(' ')[0] ?? '';
   const quote = getDailyQuote();
+  const isDark = colorScheme === 'dark';
 
   const [entries, setEntries] = useState<LearningEntry[]>([]);
   const [sessionCount, setSessionCount] = useState(0);
@@ -294,7 +297,6 @@ export default function Dashboard() {
   const last7 = getLast7Days(entries);
   const weekHours = last7.reduce((s, d) => s + d.hours, 0);
 
-  // Focus & consistency from last 7 days of real data
   const last7Entries = entries.filter(e => {
     const daysAgo = Math.floor((Date.now() - new Date(e.date).getTime()) / 86400000);
     return daysAgo >= 0 && daysAgo <= 6;
@@ -306,7 +308,6 @@ export default function Dashboard() {
     ? Math.round(last7Entries.reduce((s, e) => s + e.assignment_completion_rate, 0) / last7Entries.length)
     : 0;
 
-  // Previous 7 days (days 7–13 ago) for real trend comparison
   const prev7Entries = entries.filter(e => {
     const daysAgo = Math.floor((Date.now() - new Date(e.date).getTime()) / 86400000);
     return daysAgo >= 7 && daysAgo <= 13;
@@ -317,9 +318,21 @@ export default function Dashboard() {
 
   const focusTrend       = focusScore > 0 ? formatTrendPct(focusScore, prevFocusScore) : null;
   const consistencyTrend = consistencyScore > 0 ? formatTrendPct(consistencyScore, prevConsistency) : null;
+
   const studyHoursTrend  = prevWeekHours > 0
     ? `${weekHours >= prevWeekHours ? '↑' : '↓'} ${Math.abs(Math.round((weekHours - prevWeekHours) / prevWeekHours * 100))}% vs last week`
     : totalHours > 0 ? 'First week tracked' : undefined;
+
+  /* Suppress unused-var warnings for state that drives websocket reconnect logic */
+  void wsConnected; void calEvents; void noteCount; void badgeCount;
+
+  const cardStyle = {
+    background: 'var(--ui-surface)',
+    borderRadius: '16px',
+    border: '1px solid var(--ui-border)',
+    boxShadow: 'var(--ui-card-shadow)',
+    transition: 'background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
+  };
 
   return (
     <XPStoreProvider>
@@ -332,16 +345,12 @@ export default function Dashboard() {
               {/* ═══ ROW 1: GREETING + DIGITAL TWIN ═══ */}
               <motion.div variants={fadeUp} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'stretch' }} className="mob-hero-grid">
                 {/* Greeting Card */}
-                <div style={{
-                  background: '#fff', borderRadius: '16px', padding: '28px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
-                  border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column',
-                }}>
-                  <p style={{ margin: '0 0 4px', fontSize: '0.875rem', color: '#64748b' }}>{greeting} 👋</p>
-                  <h2 style={{ margin: '0 0 4px', fontSize: '1.75rem', fontWeight: 700, color: '#0f172a', letterSpacing: '-0.02em' }}>
+                <div style={{ ...cardStyle, padding: '28px', display: 'flex', flexDirection: 'column' }}>
+                  <p style={{ margin: '0 0 4px', fontSize: '0.875rem', color: 'var(--ui-text-muted)' }}>{greeting} 👋</p>
+                  <h2 style={{ margin: '0 0 4px', fontSize: '1.75rem', fontWeight: 700, color: 'var(--ui-text-h)', letterSpacing: '-0.02em' }}>
                     {firstName}
                   </h2>
-                  <p style={{ margin: '0 0 20px', fontSize: '0.875rem', color: '#94a3b8' }}>
+                  <p style={{ margin: '0 0 20px', fontSize: '0.875rem', color: 'var(--ui-text-muted)' }}>
                     Your AI-powered learning companion is ready.
                   </p>
 
@@ -349,8 +358,9 @@ export default function Dashboard() {
                   {gamProgress && (
                     <div style={{
                       display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px',
-                      background: '#f8fafc', borderRadius: '12px', marginBottom: '16px',
-                      border: '1px solid #f1f5f9',
+                      background: 'var(--ui-surface-elevated)', borderRadius: '12px', marginBottom: '16px',
+                      border: '1px solid var(--ui-border)',
+                      transition: 'background 0.3s ease',
                     }}>
                       <div style={{
                         width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
@@ -363,16 +373,16 @@ export default function Dashboard() {
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0f172a' }}>{gamProgress.level_name}</span>
-                          <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Level {gamProgress.level}</span>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--ui-text-h)' }}>{gamProgress.level_name}</span>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--ui-text-muted)' }}>Level {gamProgress.level}</span>
                         </div>
-                        <div style={{ height: '6px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
+                        <div style={{ height: '6px', background: 'var(--ui-border)', borderRadius: '99px', overflow: 'hidden' }}>
                           <div style={{
                             height: '100%', width: `${gamProgress.progress_pct}%`, borderRadius: '99px',
                             background: getLevelGradient(gamProgress.level), transition: 'width 0.8s ease',
                           }} />
                         </div>
-                        <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: '#94a3b8' }}>
+                        <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: 'var(--ui-text-muted)' }}>
                           {(gamProgress.xp ?? 0).toLocaleString()} XP · {(gamProgress.xp_to_next ?? 0) > 0 ? `${gamProgress.xp_to_next} XP to level up` : 'Max level!'}
                         </p>
                       </div>
@@ -381,10 +391,13 @@ export default function Dashboard() {
 
                   {/* Quote */}
                   <div style={{
-                    padding: '14px 16px', background: '#f0f9ff', borderLeft: '3px solid #00D4FF',
+                    padding: '14px 16px',
+                    background: isDark ? 'rgba(0,212,255,0.06)' : '#f0f9ff',
+                    borderLeft: '3px solid #00D4FF',
                     borderRadius: '0 10px 10px 0', marginTop: 'auto',
+                    transition: 'background 0.3s ease',
                   }}>
-                    <p style={{ margin: '0 0 4px', fontSize: '0.8rem', color: '#334155', lineHeight: 1.5, fontStyle: 'italic' }}>
+                    <p style={{ margin: '0 0 4px', fontSize: '0.8rem', color: 'var(--ui-text)', lineHeight: 1.5, fontStyle: 'italic' }}>
                       "{quote.text}"
                     </p>
                     <p style={{ margin: 0, fontSize: '0.7rem', color: '#00D4FF', fontWeight: 600 }}>— {quote.author}</p>
@@ -410,14 +423,21 @@ export default function Dashboard() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Activity size={20} color="#00D4FF" />
-                    <h2 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700, color: '#0f172a' }}>Analytics & Insights</h2>
+                    <h2 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700, color: 'var(--ui-text-h)' }}>Analytics & Insights</h2>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     {['Study Activity', 'Focus', 'Performance'].map((tab, i) => (
                       <button key={tab} style={{
-                        padding: '6px 14px', borderRadius: '8px', border: '1px solid #e2e8f0',
-                        background: i === 0 ? '#0f172a' : '#fff', color: i === 0 ? '#fff' : '#64748b',
-                        fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s',
+                        padding: '6px 14px', borderRadius: '8px',
+                        border: '1px solid var(--ui-border)',
+                        background: i === 0
+                          ? (isDark ? 'rgba(0,212,255,0.15)' : '#0f172a')
+                          : 'var(--ui-surface)',
+                        color: i === 0
+                          ? (isDark ? '#00D4FF' : '#fff')
+                          : 'var(--ui-text-muted)',
+                        fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer',
+                        transition: 'all 0.2s',
                       }}>{tab}</button>
                     ))}
                   </div>
@@ -425,19 +445,16 @@ export default function Dashboard() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '20px', alignItems: 'start' }} className="mob-wellness-grid">
                   {/* LEFT: Chart */}
-                  <div style={{
-                    background: '#fff', borderRadius: '16px', padding: '24px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
-                    border: '1px solid #f1f5f9',
-                  }}>
+                  <div style={{ ...cardStyle, padding: '24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                       <div>
-                        <h3 style={{ margin: '0 0 2px', fontSize: '0.95rem', fontWeight: 600, color: '#0f172a' }}>Study Activity</h3>
-                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8' }}>Hours studied per day</p>
+                        <h3 style={{ margin: '0 0 2px', fontSize: '0.95rem', fontWeight: 600, color: 'var(--ui-text-h)' }}>Study Activity</h3>
+                        <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--ui-text-muted)' }}>Hours studied per day</p>
                       </div>
                       <div style={{
-                        padding: '6px 12px', borderRadius: '8px', border: '1px solid #e2e8f0',
-                        fontSize: '0.8rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px',
+                        padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--ui-border)',
+                        fontSize: '0.8rem', color: 'var(--ui-text-muted)', display: 'flex', alignItems: 'center', gap: '6px',
+                        background: 'var(--ui-surface-elevated)',
                       }}>
                         Last 7 days <ChevronDown size={14} />
                       </div>
@@ -445,22 +462,22 @@ export default function Dashboard() {
                     {last7.some(d => d.hours > 0) ? (
                       <>
                         <StudyAreaChart data={last7} />
-                        <div style={{ display: 'flex', gap: '24px', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
+                        <div style={{ display: 'flex', gap: '24px', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--ui-border)' }}>
                           <div>
-                            <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>This Week</p>
-                            <p style={{ margin: '2px 0 0', fontSize: '1.125rem', fontWeight: 700, color: '#0f172a' }}>{weekHours.toFixed(1)}h</p>
+                            <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--ui-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>This Week</p>
+                            <p style={{ margin: '2px 0 0', fontSize: '1.125rem', fontWeight: 700, color: 'var(--ui-text-h)' }}>{weekHours.toFixed(1)}h</p>
                           </div>
                           <div>
-                            <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Daily Avg</p>
-                            <p style={{ margin: '2px 0 0', fontSize: '1.125rem', fontWeight: 700, color: '#0f172a' }}>{(weekHours / 7).toFixed(1)}h</p>
+                            <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--ui-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Daily Avg</p>
+                            <p style={{ margin: '2px 0 0', fontSize: '1.125rem', fontWeight: 700, color: 'var(--ui-text-h)' }}>{(weekHours / 7).toFixed(1)}h</p>
                           </div>
                         </div>
                       </>
                     ) : (
                       <div style={{ textAlign: 'center', padding: '40px 0' }}>
                         <p style={{ fontSize: '2rem', marginBottom: '8px' }}>📊</p>
-                        <p style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a', marginBottom: '4px' }}>{t('no_data_title') || 'No Data Yet'}</p>
-                        <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: '16px' }}>{t('no_data_sub') || 'Log a check-in to activate your study chart'}</p>
+                        <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--ui-text-h)', marginBottom: '4px' }}>{t('no_data_title') || 'No Data Yet'}</p>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--ui-text-muted)', marginBottom: '16px' }}>{t('no_data_sub') || 'Log a check-in to activate your study chart'}</p>
                         <Link to="/checkin" style={{
                           display: 'inline-block', padding: '8px 20px', background: '#00D4FF', color: '#fff',
                           borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none',
@@ -473,10 +490,9 @@ export default function Dashboard() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     {/* Focus Score */}
                     <motion.div
-                      whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+                      whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
                       style={{
-                        background: '#fff', borderRadius: '16px', padding: '20px',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #f1f5f9',
+                        ...cardStyle, padding: '20px',
                         display: 'flex', alignItems: 'center', gap: '16px',
                       }}
                     >
@@ -484,21 +500,21 @@ export default function Dashboard() {
                         <>
                           <CircularProgress pct={focusScore} color="#10b981" />
                           <div>
-                            <p style={{ margin: '0 0 2px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a' }}>Focus Score</p>
+                            <p style={{ margin: '0 0 2px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--ui-text-h)' }}>Focus Score</p>
                             <p style={{ margin: '0 0 2px', fontSize: '0.75rem', color: focusScore >= 70 ? '#10b981' : '#f59e0b', fontWeight: 600 }}>
                               {focusScore >= 70 ? 'Good' : focusScore >= 40 ? 'Moderate' : 'Needs Work'}
                             </p>
-                            {focusTrend && <p style={{ margin: 0, fontSize: '0.65rem', color: '#94a3b8' }}>{focusTrend}</p>}
+                            {focusTrend && <p style={{ margin: 0, fontSize: '0.65rem', color: 'var(--ui-text-muted)' }}>{focusTrend}</p>}
                           </div>
                         </>
                       ) : (
                         <>
-                          <div style={{ width: '56px', height: '56px', borderRadius: '50%', border: '4px dashed #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <span style={{ fontSize: '1rem', color: '#cbd5e1' }}>—</span>
+                          <div style={{ width: '56px', height: '56px', borderRadius: '50%', border: '4px dashed var(--ui-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <span style={{ fontSize: '1rem', color: 'var(--ui-text-muted)' }}>—</span>
                           </div>
                           <div>
-                            <p style={{ margin: '0 0 2px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a' }}>Focus Score</p>
-                            <p style={{ margin: 0, fontSize: '0.72rem', color: '#94a3b8' }}>Log check-ins to see your score</p>
+                            <p style={{ margin: '0 0 2px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--ui-text-h)' }}>Focus Score</p>
+                            <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--ui-text-muted)' }}>Log check-ins to see your score</p>
                           </div>
                         </>
                       )}
@@ -506,10 +522,9 @@ export default function Dashboard() {
 
                     {/* Study Consistency */}
                     <motion.div
-                      whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+                      whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
                       style={{
-                        background: '#fff', borderRadius: '16px', padding: '20px',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #f1f5f9',
+                        ...cardStyle, padding: '20px',
                         display: 'flex', alignItems: 'center', gap: '16px',
                       }}
                     >
@@ -517,34 +532,31 @@ export default function Dashboard() {
                         <>
                           <CircularProgress pct={consistencyScore} color="#7C3AED" />
                           <div>
-                            <p style={{ margin: '0 0 2px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a' }}>Study Consistency</p>
+                            <p style={{ margin: '0 0 2px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--ui-text-h)' }}>Study Consistency</p>
                             <p style={{ margin: '0 0 2px', fontSize: '0.75rem', color: consistencyScore >= 70 ? '#10b981' : '#f59e0b', fontWeight: 600 }}>
                               {consistencyScore >= 70 ? 'Excellent' : consistencyScore >= 40 ? 'Moderate' : 'Needs Work'}
                             </p>
-                            {consistencyTrend && <p style={{ margin: 0, fontSize: '0.65rem', color: '#94a3b8' }}>{consistencyTrend}</p>}
+                            {consistencyTrend && <p style={{ margin: 0, fontSize: '0.65rem', color: 'var(--ui-text-muted)' }}>{consistencyTrend}</p>}
                           </div>
                         </>
                       ) : (
                         <>
-                          <div style={{ width: '56px', height: '56px', borderRadius: '50%', border: '4px dashed #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <span style={{ fontSize: '1rem', color: '#cbd5e1' }}>—</span>
+                          <div style={{ width: '56px', height: '56px', borderRadius: '50%', border: '4px dashed var(--ui-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <span style={{ fontSize: '1rem', color: 'var(--ui-text-muted)' }}>—</span>
                           </div>
                           <div>
-                            <p style={{ margin: '0 0 2px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a' }}>Study Consistency</p>
-                            <p style={{ margin: 0, fontSize: '0.72rem', color: '#94a3b8' }}>Log check-ins to see your score</p>
+                            <p style={{ margin: '0 0 2px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--ui-text-h)' }}>Study Consistency</p>
+                            <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--ui-text-muted)' }}>Log check-ins to see your score</p>
                           </div>
                         </>
                       )}
                     </motion.div>
 
-                    {/* Burnout Risk Monitor — in right column below metrics */}
-                    <div style={{
-                      background: '#fff', borderRadius: '16px', padding: '20px',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #f1f5f9',
-                    }}>
+                    {/* Burnout Risk Monitor */}
+                    <div style={{ ...cardStyle, padding: '20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                         <Heart size={16} color="#ef4444" />
-                        <h3 style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>Burnout Risk Monitor</h3>
+                        <h3 style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: 'var(--ui-text-h)' }}>Burnout Risk Monitor</h3>
                       </div>
                       <BurnoutWidget />
                     </div>

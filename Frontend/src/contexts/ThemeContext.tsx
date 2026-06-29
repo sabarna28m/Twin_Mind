@@ -115,17 +115,21 @@ interface ThemeContextValue {
   themeId: ThemeId;
   setTheme: (id: ThemeId) => void;
   themeMeta: ThemeMeta;
+  colorScheme: 'light' | 'dark';
+  toggleColorScheme: () => void;
   // Legacy API kept so existing callers still compile
   theme: 'dark' | 'light';
   toggle: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  themeId:   'galaxy-nexus',
-  setTheme:  () => {},
-  themeMeta: THEMES[0],
-  theme:     'dark',
-  toggle:    () => {},
+  themeId:           'galaxy-nexus',
+  setTheme:          () => {},
+  themeMeta:         THEMES[0],
+  colorScheme:       'dark',
+  toggleColorScheme: () => {},
+  theme:             'dark',
+  toggle:            () => {},
 });
 
 function getInitialTheme(): ThemeId {
@@ -139,8 +143,17 @@ function getInitialTheme(): ThemeId {
   return 'galaxy-nexus';
 }
 
+function getInitialColorScheme(): 'light' | 'dark' {
+  try {
+    const saved = localStorage.getItem('tm_color_scheme');
+    if (saved === 'light' || saved === 'dark') return saved;
+  } catch { /* ignore */ }
+  return 'dark';
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [themeId, setThemeId] = useState<ThemeId>(getInitialTheme);
+  const [colorScheme, setColorScheme] = useState<'light' | 'dark'>(getInitialColorScheme);
 
   useLayoutEffect(() => {
     document.documentElement.setAttribute('data-theme', themeId);
@@ -148,6 +161,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const meta = THEMES.find(t => t.id === themeId)!;
     localStorage.setItem('theme', meta.isDark ? 'dark' : 'light');
   }, [themeId]);
+
+  useLayoutEffect(() => {
+    document.documentElement.setAttribute('data-color-scheme', colorScheme);
+    localStorage.setItem('tm_color_scheme', colorScheme);
+  }, [colorScheme]);
 
   const themeMeta = THEMES.find(t => t.id === themeId) ?? THEMES[0];
 
@@ -160,11 +178,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     });
   }
 
+  function toggleColorScheme() {
+    setColorScheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  }
+
   return (
     <ThemeContext.Provider value={{
       themeId,
       setTheme,
       themeMeta,
+      colorScheme,
+      toggleColorScheme,
       theme: themeMeta.isDark ? 'dark' : 'light',
       toggle,
     }}>

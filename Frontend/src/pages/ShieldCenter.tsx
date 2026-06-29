@@ -156,7 +156,7 @@ function ShieldCenterContent() {
               ...p.buyBtn,
               color: btnHovered && !disabled && afford ? '#fff' : item.accent,
               background: btnHovered && !disabled && afford ? item.accent : 'transparent',
-              borderColor: disabled ? '#cbd5e1' : item.accent,
+              borderColor: disabled ? 'var(--border)' : item.accent,
               opacity: disabled ? 0.5 : 1,
               cursor: disabled || !afford ? 'not-allowed' : 'pointer',
             };
@@ -245,8 +245,8 @@ export default function ShieldCenter() {
 const p: Record<string, React.CSSProperties> = {
   shell: {
     minHeight: '100svh',
-    background: '#f8f9fa',
-    color: '#0f172a',
+    background: 'var(--bg-surface)',
+    color: 'var(--text-h)',
     fontFamily: '"Inter", system-ui, sans-serif',
     position: 'relative',
     overflowX: 'hidden',
@@ -287,8 +287,8 @@ const p: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     marginBottom: '1rem',
   },
-  pageTitle: { margin: 0, fontSize: '2.75rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.03em', lineHeight: 1.2 },
-  pageSub:   { margin: '1rem auto 0', fontSize: '1.1rem', color: '#475569', maxWidth: '600px' },
+  pageTitle: { margin: 0, fontSize: '2.75rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.03em', lineHeight: 1.2 },
+  pageSub:   { margin: '1rem auto 0', fontSize: '1.1rem', color: 'var(--text-m)', maxWidth: '600px' },
 
   sectionWrapper: {
     maxWidth: '600px',
@@ -313,8 +313,8 @@ const p: Record<string, React.CSSProperties> = {
   },
 
   item: {
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
+    background: 'var(--bg-elevated)',
+    border: '1px solid var(--border)',
     borderRadius: '24px',
     padding: '2.5rem',
     display: 'flex', flexDirection: 'column',
@@ -325,21 +325,21 @@ const p: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
     marginBottom: '1rem' 
   },
-  itemName: { margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#0f172a' },
+  itemName: { margin: 0, fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-h)' },
   chip: { fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.07em', padding: '0.2rem 0.6rem', borderRadius: '99px' },
   
   priceBox: { textAlign: 'center', marginBottom: '0.5rem' },
-  priceAmt: { fontSize: '3.5rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.04em', lineHeight: 1 },
-  priceUnit: { fontSize: '1.2rem', fontWeight: 600, color: '#64748b', marginLeft: '0.2rem' },
+  priceAmt: { fontSize: '3.5rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.04em', lineHeight: 1 },
+  priceUnit: { fontSize: '1.2rem', fontWeight: 600, color: 'var(--text)', marginLeft: '0.2rem' },
   
-  invLabel: { margin: '0 0 1.5rem', fontSize: '0.85rem', color: '#64748b', fontWeight: 600, textAlign: 'center' },
+  invLabel: { margin: '0 0 1.5rem', fontSize: '0.85rem', color: 'var(--text)', fontWeight: 600, textAlign: 'center' },
 
   dividerWrapper: {
     display: 'flex', alignItems: 'center', gap: '1rem',
     margin: '1.5rem 0'
   },
   dividerLine: {
-    flex: 1, height: '1px', background: '#e2e8f0'
+    flex: 1, height: '1px', background: 'var(--border)'
   },
   dividerText: {
     fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em'
@@ -355,8 +355,8 @@ const p: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'flex-start', gap: '0.75rem',
     lineHeight: 1.4
   },
-  checkMark: { color: '#0f172a', fontWeight: 900, marginTop: '2px' },
-  crossMark: { color: '#cbd5e1', fontWeight: 900, marginTop: '2px' },
+  checkMark: { color: 'var(--text-h)', fontWeight: 900, marginTop: '2px' },
+  crossMark: { color: 'var(--border)', fontWeight: 900, marginTop: '2px' },
 
   itemFoot: {
     display: 'flex', flexDirection: 'column', gap: '0.75rem',
@@ -379,11 +379,11 @@ const p: Record<string, React.CSSProperties> = {
   freeRow: {
     display: 'flex', alignItems: 'center', gap: '1rem',
     padding: '1.25rem',
-    background: '#ffffff', border: '1px solid #e2e8f0',
+    background: 'var(--bg-elevated)', border: '1px solid var(--border)',
     borderRadius: '16px',
     boxShadow: '0 4px 16px rgba(0,0,0,0.02)',
   },
-  freeName:   { margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#0f172a' },
-  freeSub:    { margin: 0, fontSize: '0.8rem', color: '#64748b' },
+  freeName:   { margin: 0, fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-h)' },
+  freeSub:    { margin: 0, fontSize: '0.8rem', color: 'var(--text)' },
   freeReward: { fontSize: '0.85rem', fontWeight: 800, color: '#0052cc', whiteSpace: 'nowrap' },
 };

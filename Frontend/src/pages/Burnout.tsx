@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine,
 } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import BackButton from '../components/BackButton';
+import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -110,7 +109,7 @@ const ENERGY_ICONS = ['🪫', '🔋', '⚡', '⚡⚡', '🚀'];
 
 // ── Circular Progress SVG ──────────────────────────────────────────────
 
-function CircularMeter({ score, risk }: { score: number; risk: string }) {
+function CircularMeter({ score, risk, isDark }: { score: number; risk: string; isDark: boolean }) {
   const R = 70;
   const C = 2 * Math.PI * R;
   const offset = C * (1 - score / 100);
@@ -118,7 +117,7 @@ function CircularMeter({ score, risk }: { score: number; risk: string }) {
   return (
     <svg width="180" height="180" viewBox="0 0 180 180" style={{ display: 'block', margin: '0 auto' }}>
       {/* Track */}
-      <circle cx="90" cy="90" r={R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="12" />
+      <circle cx="90" cy="90" r={R} fill="none" stroke={isDark ? "rgba(255,255,255,0.07)" : "#E5E7EB"} strokeWidth="12" />
       {/* Progress arc */}
       <circle
         cx="90" cy="90" r={R}
@@ -139,10 +138,10 @@ function CircularMeter({ score, risk }: { score: number; risk: string }) {
         </filter>
       </defs>
       {/* Score text */}
-      <text x="90" y="82" textAnchor="middle" fill={color} fontSize="32" fontWeight="800" fontFamily="inherit">
+      <text x="90" y="82" textAnchor="middle" fill={color} fontSize="48" fontWeight="800" fontFamily="inherit">
         {score}
       </text>
-      <text x="90" y="102" textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize="11" fontFamily="inherit">
+      <text x="90" y="102" textAnchor="middle" fill={isDark ? "rgba(255,255,255,0.5)" : "#6B7280"} fontSize="11" fontFamily="inherit">
         / 100
       </text>
       <text x="90" y="120" textAnchor="middle" fill={color} fontSize="11" fontWeight="700" fontFamily="inherit">
@@ -154,18 +153,18 @@ function CircularMeter({ score, risk }: { score: number; risk: string }) {
 
 // ── Custom Recharts Tooltip ────────────────────────────────────────────
 
-function BurnoutTooltip({ active, payload, label }: {
-  active?: boolean; payload?: { value: number; payload: TrendPoint }[]; label?: string;
+function BurnoutTooltip({ active, payload, label, isDark }: {
+  active?: boolean; payload?: { value: number; payload: TrendPoint }[]; label?: string; isDark?: boolean;
 }) {
   if (!active || !payload?.length) return null;
   const { burnout_score, risk_level } = payload[0].payload;
   return (
     <div style={{
-      background: 'rgba(15,23,42,0.95)', border: `1px solid ${riskColor(risk_level)}40`,
+      background: isDark ? 'rgba(15,23,42,0.95)' : '#FFFFFF', border: `1px solid ${riskColor(risk_level)}40`,
       borderRadius: '10px', padding: '0.65rem 0.9rem',
-      boxShadow: `0 8px 24px rgba(0,0,0,0.4)`,
+      boxShadow: isDark ? `0 8px 24px rgba(0,0,0,0.4)` : `0 4px 20px rgba(0,0,0,0.05)`,
     }}>
-      <p style={{ margin: '0 0 0.25rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)' }}>{label}</p>
+      <p style={{ margin: '0 0 0.25rem', fontSize: '0.72rem', color: isDark ? 'rgba(255,255,255,0.5)' : '#6B7280' }}>{label}</p>
       <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: riskColor(risk_level) }}>
         {burnout_score} <span style={{ fontSize: '0.72rem', fontWeight: 400 }}>/ 100</span>
       </p>
@@ -181,6 +180,9 @@ function BurnoutTooltip({ active, payload, label }: {
 export default function Burnout() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
+  const p = getStyles(isDark);
 
   // Form state
   const [studyH, setStudyH]     = useState(6);
@@ -286,18 +288,13 @@ export default function Burnout() {
   return (
     <div style={p.page}>
       {/* ── Animated background orbs ── */}
-      <div style={p.orb1} />
-      <div style={p.orb2} />
+      {isDark && (
+        <>
+          <div style={p.orb1} />
+          <div style={p.orb2} />
+        </>
+      )}
 
-      {/* ── Navbar row ── */}
-      <div style={p.topBar}>
-        <BackButton />
-        <div style={p.topBarCenter}>
-          <span style={p.topIcon}>🧠</span>
-          <h1 style={p.pageTitle}>{t('burnout_title')}</h1>
-        </div>
-        <Link to="/dashboard" style={p.homeLink}>{t('back_dashboard')}</Link>
-      </div>
 
       <div style={p.content}>
 
@@ -347,6 +344,7 @@ export default function Burnout() {
                 <CircularMeter
                   score={displayedScore ?? preview.score}
                   risk={displayed ? displayedRisk : preview.risk}
+                  isDark={isDark}
                 />
 
                 {/* Risk breakdown */}
@@ -568,10 +566,10 @@ export default function Burnout() {
                     <stop offset="100%" stopColor="#ef4444" />
                   </linearGradient>
                 </defs>
-                <CartesianGrid stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" />
-                <XAxis dataKey="dateLabel" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis domain={[0, 100]} tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<BurnoutTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }} />
+                <CartesianGrid stroke={isDark ? "rgba(255,255,255,0.05)" : "#E5E7EB"} strokeDasharray="3 3" />
+                <XAxis dataKey="dateLabel" tick={{ fill: isDark ? 'rgba(255,255,255,0.4)' : '#6B7280', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis domain={[0, 100]} tick={{ fill: isDark ? 'rgba(255,255,255,0.4)' : '#6B7280', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip content={<BurnoutTooltip isDark={isDark} />} cursor={{ stroke: isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB', strokeWidth: 1 }} />
                 <ReferenceLine y={40} stroke="#10b981" strokeDasharray="4 4" strokeWidth={1} strokeOpacity={0.5} />
                 <ReferenceLine y={70} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1} strokeOpacity={0.5} />
                 <Line
@@ -635,235 +633,254 @@ function getTwinPreview(risk: string, studyH: number, sleepH: number, streak: nu
 
 // ── Styles ─────────────────────────────────────────────────────────────
 
-const p: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: '100vh',
-    background: 'var(--bg)',
-    color: 'var(--text-h)',
-    fontFamily: 'inherit',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  orb1: {
-    position: 'fixed', top: '-10%', right: '-5%',
-    width: '500px', height: '500px', borderRadius: '50%',
-    background: 'radial-gradient(circle,rgba(239,68,68,0.07) 0%,transparent 70%)',
-    pointerEvents: 'none', zIndex: 0,
-  },
-  orb2: {
-    position: 'fixed', bottom: '5%', left: '-10%',
-    width: '400px', height: '400px', borderRadius: '50%',
-    background: 'radial-gradient(circle,rgba(99,102,241,0.07) 0%,transparent 70%)',
-    pointerEvents: 'none', zIndex: 0,
-  },
-  topBar: {
-    position: 'sticky', top: 0, zIndex: 50,
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '0.85rem 1.75rem',
-    background: 'rgba(6,11,24,0.85)',
-    backdropFilter: 'blur(20px)',
-    borderBottom: '1px solid rgba(255,255,255,0.06)',
-  },
-  topBarCenter: {
-    display: 'flex', alignItems: 'center', gap: '0.5rem',
-  },
-  topIcon: { fontSize: '1.25rem' },
-  pageTitle: {
-    margin: 0, fontSize: '1.05rem', fontWeight: 800,
-    background: 'linear-gradient(135deg,#ef4444,#f59e0b)',
-    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-  },
-  homeLink: {
-    fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent)',
-    textDecoration: 'none', padding: '0.3rem 0.75rem',
-    background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)',
-    borderRadius: '8px',
-  },
-  content: {
-    position: 'relative', zIndex: 1,
-    maxWidth: '1100px', margin: '0 auto',
-    padding: '1.5rem 1.5rem 4rem',
-    display: 'flex', flexDirection: 'column' as const, gap: '1.25rem',
-  },
+function getStyles(isDark: boolean): Record<string, React.CSSProperties> {
+  return {
+    page: {
+      minHeight: '100vh',
+      background: isDark ? 'var(--bg)' : '#FFFFFF',
+      color: isDark ? 'var(--text-h)' : '#111827',
+      fontFamily: 'inherit',
+      position: 'relative',
+      overflow: 'hidden',
+    },
+    orb1: {
+      position: 'fixed', top: '-10%', right: '-5%',
+      width: '500px', height: '500px', borderRadius: '50%',
+      background: 'radial-gradient(circle,rgba(239,68,68,0.07) 0%,transparent 70%)',
+      pointerEvents: 'none', zIndex: 0,
+    },
+    orb2: {
+      position: 'fixed', bottom: '5%', left: '-10%',
+      width: '400px', height: '400px', borderRadius: '50%',
+      background: 'radial-gradient(circle,rgba(99,102,241,0.07) 0%,transparent 70%)',
+      pointerEvents: 'none', zIndex: 0,
+    },
+    topBar: {
+      position: 'sticky', top: 0, zIndex: 50,
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '0.85rem 1.75rem',
+      background: isDark ? 'rgba(6,11,24,0.85)' : 'rgba(255,255,255,0.95)',
+      backdropFilter: 'blur(20px)',
+      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#E5E7EB'}`,
+    },
+    topBarCenter: {
+      display: 'flex', alignItems: 'center', gap: '0.5rem',
+    },
+    topIcon: { fontSize: '1.25rem' },
+    pageTitle: {
+      margin: 0, fontSize: isDark ? '1.05rem' : '32px', fontWeight: isDark ? 800 : 700,
+      color: isDark ? undefined : '#111827',
+      background: isDark ? 'linear-gradient(135deg,#ef4444,#f59e0b)' : 'none',
+      WebkitBackgroundClip: isDark ? 'text' : undefined,
+      WebkitTextFillColor: isDark ? 'transparent' : undefined,
+    },
+    homeLink: {
+      fontSize: '0.8rem', fontWeight: 600,
+      color: isDark ? 'var(--accent)' : '#4F46E5',
+      textDecoration: 'none', padding: '0.3rem 0.75rem',
+      background: isDark ? 'rgba(99,102,241,0.12)' : '#F3F4F6',
+      border: `1px solid ${isDark ? 'rgba(99,102,241,0.25)' : '#E5E7EB'}`,
+      borderRadius: '8px',
+    },
+    content: {
+      position: 'relative', zIndex: 1,
+      maxWidth: '1100px', margin: '0 auto',
+      padding: '1.5rem 1.5rem 4rem',
+      display: 'flex', flexDirection: 'column' as const, gap: '1.25rem',
+    },
 
-  // Alert Banner
-  alertBanner: {
-    display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-    gap: '1rem', padding: '1rem 1.25rem',
-    background: 'rgba(239,68,68,0.12)',
-    border: '1px solid rgba(239,68,68,0.4)',
-    borderRadius: '14px',
-    backdropFilter: 'blur(12px)',
-    boxShadow: '0 4px 24px rgba(239,68,68,0.18)',
-  },
-  alertLeft: { display: 'flex', alignItems: 'flex-start', gap: '0.75rem', flex: 1 },
-  alertIcon: { fontSize: '1.25rem', flexShrink: 0, marginTop: '1px' },
-  alertTitle: { margin: '0 0 0.2rem', fontSize: '0.9rem', fontWeight: 800, color: '#fca5a5' },
-  alertMsg:   { margin: 0, fontSize: '0.8rem', color: 'rgba(252,165,165,0.8)', lineHeight: 1.5 },
-  alertActions: { display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 },
-  alertViewBtn: {
-    padding: '0.4rem 0.9rem', background: 'rgba(239,68,68,0.2)',
-    border: '1px solid rgba(239,68,68,0.45)', borderRadius: '8px',
-    color: '#fca5a5', fontSize: '0.78rem', fontWeight: 700,
-    cursor: 'pointer', fontFamily: 'inherit',
-  },
-  alertDismissBtn: {
-    padding: '0.4rem 0.6rem', background: 'transparent',
-    border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px',
-    color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem',
-    cursor: 'pointer', fontFamily: 'inherit',
-  },
+    // Alert Banner
+    alertBanner: {
+      display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+      gap: '1rem', padding: '1rem 1.25rem',
+      background: isDark ? 'rgba(239,68,68,0.12)' : '#FEF2F2',
+      border: `1px solid ${isDark ? 'rgba(239,68,68,0.4)' : '#FCA5A5'}`,
+      borderRadius: '14px',
+      backdropFilter: isDark ? 'blur(12px)' : 'none',
+      boxShadow: isDark ? '0 4px 24px rgba(239,68,68,0.18)' : '0 4px 12px rgba(239,68,68,0.05)',
+    },
+    alertLeft: { display: 'flex', alignItems: 'flex-start', gap: '0.75rem', flex: 1 },
+    alertIcon: { fontSize: '1.25rem', flexShrink: 0, marginTop: '1px' },
+    alertTitle: { margin: '0 0 0.2rem', fontSize: '0.9rem', fontWeight: 800, color: isDark ? '#fca5a5' : '#B91C1C' },
+    alertMsg:   { margin: 0, fontSize: '0.8rem', color: isDark ? 'rgba(252,165,165,0.8)' : '#DC2626', lineHeight: 1.5 },
+    alertActions: { display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 },
+    alertViewBtn: {
+      padding: '0.4rem 0.9rem',
+      background: isDark ? 'rgba(239,68,68,0.2)' : '#FEE2E2',
+      border: `1px solid ${isDark ? 'rgba(239,68,68,0.45)' : '#FCA5A5'}`,
+      borderRadius: '8px',
+      color: isDark ? '#fca5a5' : '#B91C1C',
+      fontSize: '0.78rem', fontWeight: 700,
+      cursor: 'pointer', fontFamily: 'inherit',
+    },
+    alertDismissBtn: {
+      padding: '0.4rem 0.6rem', background: 'transparent',
+      border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#FCA5A5'}`,
+      borderRadius: '8px',
+      color: isDark ? 'rgba(255,255,255,0.5)' : '#B91C1C',
+      fontSize: '0.85rem',
+      cursor: 'pointer', fontFamily: 'inherit',
+    },
 
-  // Two-col layout
-  twoCol: {
-    display: 'grid',
-    gridTemplateColumns: 'minmax(280px,360px) 1fr',
-    gap: '1.25rem',
-    alignItems: 'start',
-  },
+    // Two-col layout
+    twoCol: {
+      display: 'grid',
+      gridTemplateColumns: 'minmax(280px,360px) 1fr',
+      gap: '1.25rem',
+      alignItems: 'start',
+    },
 
-  // Glass card
-  card: {
-    background: 'var(--glass-bg, rgba(255,255,255,0.04))',
-    backdropFilter: 'blur(24px)',
-    border: '1px solid var(--glass-border, rgba(255,255,255,0.08))',
-    borderRadius: '20px',
-    padding: '1.5rem',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
-  },
-  cardHead: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    marginBottom: '1.25rem',
-  },
-  cardTitle: {
-    margin: 0, fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-h)',
-  },
-  riskBadge: {
-    padding: '0.25rem 0.7rem', borderRadius: '99px',
-    fontSize: '0.75rem', fontWeight: 700,
-  },
+    // Card
+    card: {
+      background: isDark ? 'var(--glass-bg, rgba(255,255,255,0.04))' : '#FFFFFF',
+      backdropFilter: isDark ? 'blur(24px)' : 'none',
+      border: isDark ? '1px solid var(--glass-border, rgba(255,255,255,0.08))' : '1px solid #E5E7EB',
+      borderRadius: isDark ? '20px' : '18px',
+      padding: isDark ? '1.5rem' : '24px',
+      boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.25)' : '0 4px 20px rgba(0,0,0,0.05)',
+    },
+    cardHead: {
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      marginBottom: '1.25rem',
+    },
+    cardTitle: {
+      margin: 0, fontSize: isDark ? '0.95rem' : '18px', fontWeight: isDark ? 800 : 600,
+      color: isDark ? 'var(--text-h)' : '#1F2937',
+    },
+    riskBadge: {
+      padding: '0.25rem 0.7rem', borderRadius: '99px',
+      fontSize: '0.75rem', fontWeight: 700,
+    },
 
-  // Loading
-  loadWrap: { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '0.75rem', padding: '3rem 1rem' },
-  spinner: { width: '32px', height: '32px', border: '3px solid rgba(99,102,241,0.2)', borderTop: '3px solid #818cf8', borderRadius: '50%' },
-  loadText: { margin: 0, fontSize: '0.82rem', color: 'var(--text)', opacity: 0.7 },
+    // Loading
+    loadWrap: { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '0.75rem', padding: '3rem 1rem' },
+    spinner: { width: '32px', height: '32px', border: `3px solid ${isDark ? 'rgba(99,102,241,0.2)' : '#E5E7EB'}`, borderTop: `3px solid ${isDark ? '#818cf8' : '#4F46E5'}`, borderRadius: '50%' },
+    loadText: { margin: 0, fontSize: '0.82rem', color: isDark ? 'var(--text)' : '#6B7280' },
 
-  // Risk pills
-  riskRow: { display: 'flex', gap: '0.4rem', justifyContent: 'center', margin: '0.75rem 0 0.5rem', flexWrap: 'wrap' as const },
-  riskPill: { padding: '0.25rem 0.65rem', borderRadius: '99px', fontSize: '0.72rem', fontWeight: 600, transition: 'all 0.3s' },
+    // Risk pills
+    riskRow: { display: 'flex', gap: '0.4rem', justifyContent: 'center', margin: '0.75rem 0 0.5rem', flexWrap: 'wrap' as const },
+    riskPill: { padding: '0.25rem 0.65rem', borderRadius: '99px', fontSize: '0.72rem', fontWeight: 600, transition: 'all 0.3s' },
 
-  // Scale legend
-  scaleLegend: { marginTop: '1rem' },
-  scaleBar: { height: '6px', borderRadius: '99px', marginBottom: '0.35rem' },
-  scaleLabels: { display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', color: 'var(--text)', opacity: 0.5, marginBottom: '0.2rem' },
-  scaleTicks: { display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', fontWeight: 600, paddingLeft: '8%', paddingRight: '2%' },
+    // Scale legend
+    scaleLegend: { marginTop: '1rem' },
+    scaleBar: { height: '6px', borderRadius: '99px', marginBottom: '0.35rem' },
+    scaleLabels: { display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', color: isDark ? 'var(--text)' : '#6B7280', opacity: isDark ? 0.5 : 1, marginBottom: '0.2rem' },
+    scaleTicks: { display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', fontWeight: 600, paddingLeft: '8%', paddingRight: '2%' },
 
-  lastUpdated: { margin: '0.75rem 0 0', fontSize: '0.72rem', color: 'var(--text)', opacity: 0.5, textAlign: 'center' as const },
-  previewNote: { margin: '0.75rem 0 0', fontSize: '0.72rem', color: '#818cf8', textAlign: 'center' as const, fontStyle: 'italic' },
-  dateBadge: { fontSize: '0.73rem', color: 'var(--text)', opacity: 0.6 },
+    lastUpdated: { margin: '0.75rem 0 0', fontSize: '0.72rem', color: isDark ? 'var(--text)' : '#6B7280', opacity: isDark ? 0.5 : 1, textAlign: 'center' as const },
+    previewNote: { margin: '0.75rem 0 0', fontSize: '0.72rem', color: isDark ? '#818cf8' : '#4F46E5', textAlign: 'center' as const, fontStyle: 'italic' },
+    dateBadge: { fontSize: '0.73rem', color: isDark ? 'var(--text)' : '#6B7280', opacity: isDark ? 0.6 : 1 },
 
-  // Form
-  form: { display: 'flex', flexDirection: 'column' as const, gap: '1rem' },
-  field: { display: 'flex', flexDirection: 'column' as const, gap: '0.45rem' },
-  fieldHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  fieldLabel: { fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-h)' },
-  fieldVal: { fontSize: '0.82rem', fontWeight: 700, color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '0.4rem' },
-  warnTag: { fontSize: '0.65rem', fontWeight: 700, color: '#f59e0b', background: 'rgba(245,158,11,0.15)', padding: '0.1rem 0.4rem', borderRadius: '6px', border: '1px solid rgba(245,158,11,0.3)' },
-  slider: { width: '100%', accentColor: '#6366f1', cursor: 'pointer', height: '4px' },
-  sliderHints: { display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: 'var(--text)', opacity: 0.45 },
+    // Form
+    form: { display: 'flex', flexDirection: 'column' as const, gap: '1rem' },
+    field: { display: 'flex', flexDirection: 'column' as const, gap: '0.45rem' },
+    fieldHead: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+    fieldLabel: { fontSize: '0.82rem', fontWeight: 600, color: isDark ? 'var(--text-h)' : '#374151' },
+    fieldVal: { fontSize: '0.82rem', fontWeight: 700, color: isDark ? 'var(--accent)' : '#4F46E5', display: 'flex', alignItems: 'center', gap: '0.4rem' },
+    warnTag: { fontSize: '0.65rem', fontWeight: 700, color: '#f59e0b', background: 'rgba(245,158,11,0.15)', padding: '0.1rem 0.4rem', borderRadius: '6px', border: '1px solid rgba(245,158,11,0.3)' },
+    slider: { width: '100%', accentColor: isDark ? '#6366f1' : '#4F46E5', cursor: 'pointer', height: '4px' },
+    sliderHints: { display: 'flex', justifyContent: 'space-between', fontSize: '0.62rem', color: isDark ? 'var(--text)' : '#6B7280', opacity: isDark ? 0.45 : 1 },
 
-  counter: { display: 'flex', alignItems: 'center', gap: '0.75rem' },
-  counterBtn: {
-    width: '32px', height: '32px', borderRadius: '8px',
-    background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)',
-    color: '#818cf8', fontSize: '1.15rem', cursor: 'pointer', fontFamily: 'inherit',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-  },
-  counterVal: { fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-h)', minWidth: '2rem', textAlign: 'center' as const },
+    counter: { display: 'flex', alignItems: 'center', gap: '0.75rem' },
+    counterBtn: {
+      width: '32px', height: '32px', borderRadius: '8px',
+      background: isDark ? 'rgba(99,102,241,0.15)' : '#F3F4F6',
+      border: `1px solid ${isDark ? 'rgba(99,102,241,0.3)' : '#E5E7EB'}`,
+      color: isDark ? '#818cf8' : '#4F46E5',
+      fontSize: '1.15rem', cursor: 'pointer', fontFamily: 'inherit',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    },
+    counterVal: { fontSize: '1.15rem', fontWeight: 800, color: isDark ? 'var(--text-h)' : '#111827', minWidth: '2rem', textAlign: 'center' as const },
 
-  emojiRow: { display: 'flex', gap: '0.5rem' },
-  emojiBtn: {
-    flex: 1, padding: '0.55rem 0', borderRadius: '10px',
-    fontSize: '1.3rem', cursor: 'pointer', fontFamily: 'inherit',
-    transition: 'all 0.2s', lineHeight: 1,
-  },
+    emojiRow: { display: 'flex', gap: '0.5rem' },
+    emojiBtn: {
+      flex: 1, padding: '0.55rem 0', borderRadius: '10px',
+      fontSize: '1.3rem', cursor: 'pointer', fontFamily: 'inherit',
+      transition: 'all 0.2s', lineHeight: 1,
+    },
 
-  previewBar: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '0.65rem 0.9rem', borderRadius: '10px', border: '1px solid',
-  },
-  errorBox: {
-    padding: '0.6rem 0.9rem', borderRadius: '10px',
-    background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-    color: '#fca5a5', fontSize: '0.82rem', margin: 0,
-  },
-  submitBtn: {
-    padding: '0.75rem 1.5rem',
-    background: 'linear-gradient(135deg,#ef4444,#f59e0b)',
-    border: 'none', borderRadius: '12px', color: '#fff',
-    fontSize: '0.9rem', fontWeight: 800, cursor: 'pointer',
-    fontFamily: 'inherit', width: '100%',
-    boxShadow: '0 4px 20px rgba(239,68,68,0.3)',
-    transition: 'opacity 0.2s',
-  },
+    previewBar: {
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '0.65rem 0.9rem', borderRadius: '10px', border: '1px solid',
+    },
+    errorBox: {
+      padding: '0.6rem 0.9rem', borderRadius: '10px',
+      background: isDark ? 'rgba(239,68,68,0.1)' : '#FEF2F2',
+      border: `1px solid ${isDark ? 'rgba(239,68,68,0.3)' : '#FCA5A5'}`,
+      color: isDark ? '#fca5a5' : '#B91C1C',
+      fontSize: '0.82rem', margin: 0,
+    },
+    submitBtn: {
+      padding: '0.75rem 1.5rem',
+      background: isDark ? 'linear-gradient(135deg,#ef4444,#f59e0b)' : '#111827',
+      border: 'none', borderRadius: '12px', color: '#fff',
+      fontSize: '0.9rem', fontWeight: 800, cursor: 'pointer',
+      fontFamily: 'inherit', width: '100%',
+      boxShadow: isDark ? '0 4px 20px rgba(239,68,68,0.3)' : '0 4px 12px rgba(0,0,0,0.1)',
+      transition: 'opacity 0.2s',
+    },
 
-  // Recommendations
-  recGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-    gap: '0.85rem',
-    marginTop: '1rem',
-  },
-  recCard: {
-    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '14px', padding: '1.1rem',
-  },
-  recIconWrap: { marginBottom: '0.6rem' },
-  recTitle: { margin: '0 0 0.4rem', fontSize: '0.83rem', fontWeight: 700, color: 'var(--text-h)' },
-  recText: { margin: 0, fontSize: '0.78rem', color: 'var(--text)', lineHeight: 1.6 },
+    // Recommendations
+    recGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+      gap: '0.85rem',
+      marginTop: '1rem',
+    },
+    recCard: {
+      background: isDark ? 'rgba(255,255,255,0.04)' : '#F8FAFC',
+      border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`,
+      borderRadius: '14px', padding: '1.1rem',
+    },
+    recIconWrap: { marginBottom: '0.6rem' },
+    recTitle: { margin: '0 0 0.4rem', fontSize: '0.83rem', fontWeight: 700, color: isDark ? 'var(--text-h)' : '#111827' },
+    recText: { margin: 0, fontSize: '0.78rem', color: isDark ? 'var(--text)' : '#374151', lineHeight: 1.6 },
 
-  // Twin
-  twinHead: { display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1rem' },
-  twinAvatar: {
-    width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0,
-    background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: '1.2rem', color: '#fff', fontWeight: 800,
-    boxShadow: '0 0 16px rgba(99,102,241,0.4)',
-  },
-  twinSub: { margin: '0.1rem 0 0', fontSize: '0.72rem', color: 'var(--text)', opacity: 0.6 },
-  twinBubble: {
-    position: 'relative' as const,
-    background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)',
-    borderRadius: '16px', padding: '1.25rem 1.5rem',
-  },
-  twinQuote: { position: 'absolute' as const, top: '0.5rem', left: '1rem', fontSize: '2.5rem', color: 'rgba(99,102,241,0.25)', lineHeight: 1 },
-  twinText: { margin: '0 0 0.85rem', fontSize: '0.9rem', color: 'var(--text-h)', lineHeight: 1.7, paddingLeft: '1rem', fontStyle: 'italic' },
-  twinAttrib: { textAlign: 'right' as const, fontSize: '0.75rem', color: '#818cf8', fontWeight: 600 },
+    // Twin
+    twinHead: { display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1rem' },
+    twinAvatar: {
+      width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0,
+      background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: '1.2rem', color: '#fff', fontWeight: 800,
+      boxShadow: '0 0 16px rgba(99,102,241,0.4)',
+    },
+    twinSub: { margin: '0.1rem 0 0', fontSize: '0.72rem', color: isDark ? 'var(--text)' : '#6B7280', opacity: isDark ? 0.6 : 1 },
+    twinBubble: {
+      position: 'relative' as const,
+      background: isDark ? 'rgba(99,102,241,0.06)' : '#EEF2FF',
+      border: `1px solid ${isDark ? 'rgba(99,102,241,0.2)' : '#C7D2FE'}`,
+      borderRadius: '16px', padding: '1.25rem 1.5rem',
+    },
+    twinQuote: { position: 'absolute' as const, top: '0.5rem', left: '1rem', fontSize: '2.5rem', color: isDark ? 'rgba(99,102,241,0.25)' : '#C7D2FE', lineHeight: 1 },
+    twinText: { margin: '0 0 0.85rem', fontSize: '0.9rem', color: isDark ? 'var(--text-h)' : '#374151', lineHeight: 1.7, paddingLeft: '1rem', fontStyle: 'italic' },
+    twinAttrib: { textAlign: 'right' as const, fontSize: '0.75rem', color: isDark ? '#818cf8' : '#4F46E5', fontWeight: 600 },
 
-  // Trend chart
-  toggleGroup: { display: 'flex', gap: '0.4rem' },
-  toggleBtn: {
-    padding: '0.3rem 0.75rem', borderRadius: '8px',
-    fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-    transition: 'all 0.2s',
-  },
-  emptyChart: { textAlign: 'center' as const, padding: '3rem 1rem', color: 'var(--text)' },
-  trendLegend: { display: 'flex', gap: '1.25rem', marginTop: '0.75rem', flexWrap: 'wrap' as const },
-  trendLegItem: { fontSize: '0.7rem', color: 'var(--text)', opacity: 0.6, display: 'flex', alignItems: 'center', gap: '0.35rem' },
+    // Trend chart
+    toggleGroup: { display: 'flex', gap: '0.4rem' },
+    toggleBtn: {
+      padding: '0.3rem 0.75rem', borderRadius: '8px',
+      fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+      transition: 'all 0.2s',
+    },
+    emptyChart: { textAlign: 'center' as const, padding: '3rem 1rem', color: isDark ? 'var(--text)' : '#6B7280' },
+    trendLegend: { display: 'flex', gap: '1.25rem', marginTop: '0.75rem', flexWrap: 'wrap' as const },
+    trendLegItem: { fontSize: '0.7rem', color: isDark ? 'var(--text)' : '#6B7280', opacity: isDark ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: '0.35rem' },
 
-  // Notifications
-  notifCard: {
-    display: 'flex', alignItems: 'center', gap: '0.75rem',
-    padding: '0.75rem 1rem',
-    background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.18)',
-    borderRadius: '10px',
-  },
-  notifIcon: { fontSize: '1.1rem', flexShrink: 0 },
-  notifText: { margin: 0, flex: 1, fontSize: '0.82rem', color: 'var(--text-h)' },
-  notifDismiss: {
-    background: 'transparent', border: 'none', color: 'var(--text)',
-    opacity: 0.45, fontSize: '0.85rem', cursor: 'pointer', padding: '0.2rem',
-    flexShrink: 0,
-  },
-};
+    // Notifications
+    notifCard: {
+      display: 'flex', alignItems: 'center', gap: '0.75rem',
+      padding: '0.75rem 1rem',
+      background: isDark ? 'rgba(99,102,241,0.07)' : '#F3F4F6',
+      border: `1px solid ${isDark ? 'rgba(99,102,241,0.18)' : '#E5E7EB'}`,
+      borderRadius: '10px',
+    },
+    notifIcon: { fontSize: '1.1rem', flexShrink: 0 },
+    notifText: { margin: 0, flex: 1, fontSize: '0.82rem', color: isDark ? 'var(--text-h)' : '#374151' },
+    notifDismiss: {
+      background: 'transparent', border: 'none', color: isDark ? 'var(--text)' : '#9CA3AF',
+      opacity: isDark ? 0.45 : 1, fontSize: '0.85rem', cursor: 'pointer', padding: '0.2rem',
+      flexShrink: 0,
+    },
+  };
+}

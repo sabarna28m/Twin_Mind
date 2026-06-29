@@ -3,12 +3,10 @@ import type { KeyboardEvent } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { BrainIcon } from '../components/TwinMindLogo';
+import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
-import LiveBadge from '../components/LiveBadge';
 import PlanContent from '../components/PlanContent';
-import BackButton from '../components/BackButton';
 
 import { API_URL as API_BASE } from '../lib/config';
 
@@ -119,6 +117,8 @@ function WelcomeBubble() {
 export default function Mentor() {
   const { token, user } = useAuth();
   const { t, lang } = useLanguage();
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
 
   const [messages,       setMessages]       = useState<ChatMessage[]>([]);
   const [input,          setInput]          = useState('');
@@ -489,27 +489,7 @@ export default function Mentor() {
   const starters = getSmartStarters(entry, prediction);
 
   return (
-    <div style={mc.shell}>
-      {/* Navbar */}
-      <header style={mc.nav}>
-        <div style={mc.navLeft}>
-          <BackButton />
-          <BrainIcon size={24} />
-          <Link to="/" style={mc.navLogo}>TwinMind</Link>
-          {wsConnected && <LiveBadge />}
-        </div>
-        <nav style={mc.navRight}>
-          <button
-            onClick={() => setShowNewChatConfirm(true)}
-            disabled={streaming}
-            style={{ ...mc.newChatBtn, opacity: streaming ? 0.5 : 1, cursor: streaming ? 'not-allowed' : 'pointer' }}
-          >
-            + New Chat
-          </button>
-          <Link to="/predict" style={mc.navLink}>Predict</Link>
-          <Link to="/simulate" style={mc.navLink}>Simulate</Link>
-        </nav>
-      </header>
+    <div className={isDark ? 'assessment-dark' : 'assessment-light'} style={mc.shell}>
 
       <div style={mc.body}>
         {/* ── Sidebar ──────────────────────────────────────── */}

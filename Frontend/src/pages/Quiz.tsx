@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
 import PracticeQuiz   from '../components/quiz/PracticeQuiz';
 import FocusModeQuiz  from '../components/quiz/FocusModeQuiz';
 import StudyResources from '../components/quiz/StudyResources';
@@ -12,6 +13,8 @@ type Tab  = 'modes' | 'resources' | 'papers';
 export default function Quiz() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const [view, setView] = useState<View>('hub');
   const [tab,  setTab]  = useState<Tab>('modes');
 
@@ -27,7 +30,7 @@ export default function Quiz() {
   const currentTabLabel = TABS.find(tb => tb.key === tab)?.label ?? t('quiz_tab_modes');
 
   return (
-    <div style={s.shell}>
+    <div className={isDark ? 'assessment-dark' : 'assessment-light'} style={s.shell}>
       {/* ── Top bar ── */}
       <header style={s.topBar}>
         <div style={s.topBarInner}>

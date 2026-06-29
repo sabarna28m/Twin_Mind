@@ -1,13 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { BrainIcon } from '../components/TwinMindLogo';
+import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
-import LiveBadge from '../components/LiveBadge';
-import BackButton from '../components/BackButton';
 
 interface LearningEntry {
   study_hours: number; attendance_percentage: number;
@@ -83,6 +80,8 @@ const g: Record<string, React.CSSProperties> = {
 export default function Predict() {
   const { user, token } = useAuth();
   const { t } = useLanguage();
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const headers = { Authorization: `Bearer ${token}` };
 
   const [studyHours,  setStudyHours]  = useState('');
@@ -145,15 +144,8 @@ export default function Predict() {
     : [];
 
   return (
-    <div style={s.shell}>
-      <header style={s.nav}>
-        <div style={s.navLeft}>
-          <BackButton />
-          <BrainIcon size={24} />
-          <Link to="/" style={s.navLogo}>TwinMind</Link>
-          {wsConnected && <LiveBadge />}
-        </div>
-      </header>
+    <div className={isDark ? 'assessment-dark' : 'assessment-light'} style={s.shell}>
+
 
       <main style={s.main}>
         <h1 style={s.pageTitle}>{t('predict_title')}</h1>

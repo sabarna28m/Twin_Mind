@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { BrainIcon } from '../components/TwinMindLogo';
 import type { GamificationProgress } from '../utils/gamification';
 
 /* ════════════════════════════════════════════
@@ -497,22 +495,6 @@ export default function StudyPlanner() {
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(2,4,15,0.5)', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1 }}>
 
-        {/* ── Header nav ── */}
-        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', height: '58px', borderBottom: '1.5px solid rgba(var(--primary-rgb),0.15)', background: 'rgba(4,8,22,0.9)', backdropFilter: 'blur(24px)', position: 'sticky', top: 0, zIndex: 30, flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <BrainIcon size={24} />
-            <Link to="/" style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--primary)', textDecoration: 'none' }}>TwinMind</Link>
-            <span style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)' }} />
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0' }}>📅 AI Study Planner</span>
-          </div>
-          <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
-            <button onClick={generateAIPlan} disabled={generating}
-              style={{ padding: '0.42rem 1rem', background: generating ? 'rgba(var(--primary-rgb),0.15)' : 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', border: 'none', borderRadius: '9px', fontSize: '0.8rem', fontWeight: 700, cursor: generating ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(var(--primary-rgb),0.3)' }}>
-              {generating ? '⟳ Generating…' : smartPlan ? '⟳ Regenerate AI Plan' : '✦ Generate AI Plan'}
-            </button>
-            <Link to="/dashboard" style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', padding: '0.32rem 0.85rem', border: '1px solid rgba(var(--primary-rgb),0.25)', borderRadius: '8px' }}>← Dashboard</Link>
-          </div>
-        </header>
 
         {/* ── KPI strip ── */}
         <div style={{ background: 'rgba(4,8,22,0.82)', borderBottom: '1.5px solid rgba(var(--primary-rgb),0.12)', backdropFilter: 'blur(20px)', padding: '1rem 1.5rem', flexShrink: 0 }}>

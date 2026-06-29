@@ -173,8 +173,8 @@ export default function FocusReport({
 }
 
 const r: Record<string, React.CSSProperties> = {
-  shell:    { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: '#f8f9fa' },
-  nav:      { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', height: '56px', borderBottom: '1px solid var(--border)', background: '#f8f9fa', position: 'sticky', top: 0, zIndex: 50 },
+  shell:    { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' },
+  nav:      { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', height: '56px', borderBottom: '1px solid var(--border)', background: 'var(--bg)', position: 'sticky', top: 0, zIndex: 50 },
   navTitle: { fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-h)' },
   backBtn:  { padding: '0.35rem 0.8rem', borderRadius: '8px', background: 'var(--bg-surface)', border: '1px solid var(--border)', color: 'var(--text-h)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' },
   retakeBtn:{ padding: '0.42rem 0.9rem', borderRadius: '8px', background: 'linear-gradient(135deg,#00D4FF,#7C3AED)', color: '#fff', border: 'none', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' },
@@ -192,13 +192,13 @@ const r: Record<string, React.CSSProperties> = {
   statItem: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' },
   statNum:  { fontSize: '1.6rem', fontWeight: 900, lineHeight: 1 },
   statLbl:  { fontSize: '0.68rem', color: 'var(--text)', fontWeight: 500 },
-  integritySection: { textAlign: 'left' as const, padding: '1rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px' },
-  integrityTrack: { height: '8px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' },
+  integritySection: { textAlign: 'left' as const, padding: '1rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '12px' },
+  integrityTrack: { height: '8px', background: 'var(--border)', borderRadius: '99px', overflow: 'hidden' },
   integrityFill:  { height: '100%', borderRadius: '99px', transition: 'width 0.8s ease' },
   sectionTitle: { margin: '0 0 0.9rem', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-h)' },
   warnRow: { display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 0.75rem', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: '10px' },
   warnCount:{ padding: '0.15rem 0.5rem', borderRadius: '99px', background: 'rgba(239,68,68,0.15)', color: '#ef4444', fontSize: '0.72rem', fontWeight: 800 },
-  warnItem: { display: 'flex', alignItems: 'center', gap: '0.55rem', padding: '0.5rem 0.75rem', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' },
+  warnItem: { display: 'flex', alignItems: 'center', gap: '0.55rem', padding: '0.5rem 0.75rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '8px' },
   warnNum:  { width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(239,68,68,0.2)', color: '#ef4444', fontSize: '0.68rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   warnTime: { fontSize: '0.68rem', color: 'var(--text)', fontFamily: 'ui-monospace,monospace', flexShrink: 0 },
   insightCard: { background: 'rgba(0,212,255,0.05)', border: '1px solid rgba(0,212,255,0.15)', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', padding: '1.25rem 1.5rem' },

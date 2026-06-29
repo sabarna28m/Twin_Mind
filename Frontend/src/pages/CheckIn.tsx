@@ -1,13 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { BrainIcon } from '../components/TwinMindLogo';
 import api from '../services/api';
 import { WS_URL } from '../lib/config';
 import BadgeNotification, { type Badge } from '../components/BadgeNotification';
-import BackButton from '../components/BackButton';
 import LevelUpCelebration from '../components/LevelUpCelebration';
 import { levelStorageKey, STREAK_MILESTONES, type GamificationProgress, type ShieldCheckResult } from '../utils/gamification';
 
@@ -258,7 +255,7 @@ export default function CheckIn() {
   const mappedStress = surveyDone ? surveyScoreToStress(rawScore) : 0;
 
   return (
-    <div style={s.shell}>
+    <div style={s.shell} className="ci-shell">
       {newBadges.length > 0 && <BadgeNotification badges={newBadges} onDone={() => setNewBadges([])} />}
       {levelUpData && <LevelUpCelebration type="level_up" level={levelUpData.level} xp={levelUpData.xp} onClose={() => setLevelUpData(null)} />}
       {streakMilestone && <LevelUpCelebration type="streak" streak={streakMilestone} onClose={() => setStreakMilestone(null)} />}
@@ -276,26 +273,13 @@ export default function CheckIn() {
         </div>
       )}
 
-      <header style={s.nav}>
-        <div style={s.navLeft}>
-          <BackButton />
-          <BrainIcon size={24} />
-          <Link to="/" style={s.navLogo}>TwinMind</Link>
-          {wsConnected && (
-            <div style={s.liveBadge}>
-              <span style={s.liveDot} className="live-dot" />
-              Live
-            </div>
-          )}
-        </div>
-      </header>
 
       <main style={s.main}>
-        <h1 style={s.pageTitle}>{t('checkin_title')}</h1>
+        <h1 style={s.pageTitle} className="ci-page-title">{t('checkin_title')}</h1>
 
-        <section style={s.formCard}>
+        <section style={s.formCard} className="ci-card">
           <div style={s.formHeader}>
-            <h2 style={s.formTitle}>{isEditing ? `Editing entry for ${date}` : "Log today's learning"}</h2>
+            <h2 style={s.formTitle} className="ci-section-title">{isEditing ? `Editing entry for ${date}` : "Log today's learning"}</h2>
             {isEditing && <span style={s.editBadge}>Editing existing entry</span>}
           </div>
 
@@ -303,55 +287,55 @@ export default function CheckIn() {
 
           <form onSubmit={handleSubmit} style={s.form}>
             <div style={s.row}>
-              <label style={s.label}>
+              <label style={s.label} className="ci-label">
                 {t('checkin_date')}
                 <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                  style={s.input} max={today()} required />
+                  style={s.input} className="ci-input" max={today()} required />
               </label>
             </div>
 
             <div style={s.row2} className="mob-form-row">
-              <label style={s.label}>
+              <label style={s.label} className="ci-label">
                 {t('checkin_study_hours')}
                 <input type="number" value={studyHours} onChange={e => setStudyHours(e.target.value)}
-                  style={s.input} min={0} max={24} step={0.5} placeholder="e.g. 3.5" required />
+                  style={s.input} className="ci-input" min={0} max={24} step={0.5} placeholder="e.g. 3.5" required />
               </label>
-              <label style={s.label}>
+              <label style={s.label} className="ci-label">
                 {t('checkin_sleep')}
                 <input type="number" value={sleep} onChange={e => setSleep(e.target.value)}
-                  style={s.input} min={0} max={24} step={0.5} placeholder="e.g. 7" required />
+                  style={s.input} className="ci-input" min={0} max={24} step={0.5} placeholder="e.g. 7" required />
               </label>
             </div>
 
             <div style={s.row2} className="mob-form-row">
-              <label style={s.label}>
+              <label style={s.label} className="ci-label">
                 {t('checkin_attendance')}
                 <input type="number" value={attendance} onChange={e => setAttendance(e.target.value)}
-                  style={s.input} min={0} max={100} step={1} placeholder="e.g. 85" required />
+                  style={s.input} className="ci-input" min={0} max={100} step={1} placeholder="e.g. 85" required />
               </label>
-              <label style={s.label}>
+              <label style={s.label} className="ci-label">
                 {t('checkin_completion')}
                 <input type="number" value={completion} onChange={e => setCompletion(e.target.value)}
-                  style={s.input} min={0} max={100} step={1} placeholder="e.g. 90" required />
+                  style={s.input} className="ci-input" min={0} max={100} step={1} placeholder="e.g. 90" required />
               </label>
             </div>
 
             <div style={s.row2} className="mob-form-row">
-              <label style={s.label}>
+              <label style={s.label} className="ci-label">
                 {t('checkin_quiz_score')}
                 <input type="number" value={quizScore} onChange={e => setQuizScore(e.target.value)}
-                  style={s.input} min={0} max={100} step={0.5} placeholder="—" />
+                  style={s.input} className="ci-input" min={0} max={100} step={0.5} placeholder="—" />
               </label>
-              <label style={s.label}>
+              <label style={s.label} className="ci-label">
                 {t('checkin_exam_score')}
                 <input type="number" value={examScore} onChange={e => setExamScore(e.target.value)}
-                  style={s.input} min={0} max={100} step={0.5} placeholder="—" />
+                  style={s.input} className="ci-input" min={0} max={100} step={0.5} placeholder="—" />
               </label>
             </div>
 
             {/* Stress — survey trigger */}
             <div>
-              <p style={s.stressLabel}>{t('checkin_stress')}</p>
+              <p style={s.stressLabel} className="ci-label">{t('checkin_stress')}</p>
               {stress > 0 ? (
                 <div style={s.surveyDoneRow}>
                   <span style={{ ...s.surveyDoneBadge, color: stressColor(stress), borderColor: stressColor(stress) }}>
@@ -360,27 +344,27 @@ export default function CheckIn() {
                   <button type="button" onClick={openSurvey} style={s.retakeSurveyBtn}>{t('checkin_retake')}</button>
                 </div>
               ) : (
-                <button type="button" onClick={openSurvey} style={s.takeSurveyBtn}>
+                <button type="button" onClick={openSurvey} style={s.takeSurveyBtn} className="ci-survey-btn">
                   {t('checkin_take_survey')}
                 </button>
               )}
             </div>
 
-            <label style={s.label}>
+            <label style={s.label} className="ci-label">
               {t('checkin_notes')}
               <textarea value={notes} onChange={e => setNotes(e.target.value)}
-                style={s.textarea} rows={2} placeholder={t('checkin_notes_ph')} />
+                style={s.textarea} className="ci-textarea" rows={2} placeholder={t('checkin_notes_ph')} />
             </label>
 
-            <button type="submit" disabled={saving} style={s.submitBtn}>
+            <button type="submit" disabled={saving} style={s.submitBtn} className="ci-submit-btn">
               {saving ? t('checkin_submitting') : isEditing ? t('checkin_update') : t('checkin_submit')}
             </button>
           </form>
         </section>
 
         {sparkData.length > 1 && (
-          <section style={s.panel}>
-            <h2 style={s.panelTitle}>{t('simulate_study_hours')} — last {sparkData.length} entries</h2>
+          <section style={s.panel} className="ci-card">
+            <h2 style={s.panelTitle} className="ci-section-title">{t('simulate_study_hours')} — last {sparkData.length} entries</h2>
             <div style={s.spark}>
               {sparkData.map((e, i) => (
                 <div key={i} style={s.sparkCol}>
@@ -395,8 +379,8 @@ export default function CheckIn() {
           </section>
         )}
 
-        <section style={s.panel}>
-          <h2 style={s.panelTitle}>{t('checkin_history_title')}</h2>
+        <section style={s.panel} className="ci-card">
+          <h2 style={s.panelTitle} className="ci-section-title">{t('checkin_history_title')}</h2>
           {loading ? (
             <p style={s.empty}>{t('loading')}</p>
           ) : entries.length === 0 ? (
@@ -407,26 +391,26 @@ export default function CheckIn() {
                 <thead>
                   <tr>
                     {[t('checkin_col_date'),t('checkin_col_study'),t('checkin_col_sleep'),t('checkin_col_attend'),t('checkin_col_complete'),t('checkin_col_quiz'),t('checkin_col_exam'),t('checkin_col_stress'),''].map(h => (
-                      <th key={h} style={s.th}>{h}</th>
+                      <th key={h} style={s.th} className="ci-th">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {entries.map(e => (
-                    <tr key={e.id} style={s.tr}>
-                      <td style={s.td}><button onClick={() => setDate(e.date)} style={s.dateBtn}>{e.date}</button></td>
-                      <td style={s.td}>{e.study_hours}h</td>
-                      <td style={s.td}>{e.sleep_duration}h</td>
-                      <td style={s.td}>{e.attendance_percentage}%</td>
-                      <td style={s.td}>{e.assignment_completion_rate}%</td>
-                      <td style={s.td}>{e.quiz_scores != null ? `${e.quiz_scores}%` : '—'}</td>
-                      <td style={s.td}>{e.exam_scores != null ? `${e.exam_scores}%` : '—'}</td>
-                      <td style={s.td}>
+                    <tr key={e.id} style={s.tr} className="ci-tr">
+                      <td style={s.td} className="ci-td"><button onClick={() => setDate(e.date)} style={s.dateBtn}>{e.date}</button></td>
+                      <td style={s.td} className="ci-td">{e.study_hours}h</td>
+                      <td style={s.td} className="ci-td">{e.sleep_duration}h</td>
+                      <td style={s.td} className="ci-td">{e.attendance_percentage}%</td>
+                      <td style={s.td} className="ci-td">{e.assignment_completion_rate}%</td>
+                      <td style={s.td} className="ci-td">{e.quiz_scores != null ? `${e.quiz_scores}%` : '—'}</td>
+                      <td style={s.td} className="ci-td">{e.exam_scores != null ? `${e.exam_scores}%` : '—'}</td>
+                      <td style={s.td} className="ci-td">
                         <span style={{ ...s.stressTag, color: stressColor(e.stress_level), borderColor: stressColor(e.stress_level) }}>
                           {e.stress_level}
                         </span>
                       </td>
-                      <td style={s.td}>
+                      <td style={s.td} className="ci-td">
                         <button onClick={() => handleDelete(e.id)} style={s.deleteBtn} title="Delete">✕</button>
                       </td>
                     </tr>
@@ -441,7 +425,7 @@ export default function CheckIn() {
       {/* ── Daily Stress Survey Modal ──────────────────────────── */}
       {showSurvey && (
         <div style={s.overlay} onClick={() => setShowSurvey(false)}>
-          <div style={s.surveyModal} onClick={e => e.stopPropagation()}>
+          <div style={s.surveyModal} className="ci-modal" onClick={e => e.stopPropagation()}>
 
             {!surveyDone ? (
               <>
@@ -473,6 +457,7 @@ export default function CheckIn() {
                           type="button"
                           onClick={() => handleSurveyAnswer(val)}
                           style={{ ...s.optionCard, ...(selected ? s.optionSelected : {}) }}
+                          className={selected ? 'ci-option ci-option-selected' : 'ci-option'}
                         >
                           <span style={{
                             ...s.optionNum,
@@ -557,7 +542,7 @@ export default function CheckIn() {
                     style={s.retakeBtn}>
                     {t('checkin_retake')}
                   </button>
-                  <button type="button" onClick={applySurveyScore} style={s.applyBtn}>
+                  <button type="button" onClick={applySurveyScore} style={s.applyBtn} className="ci-submit-btn">
                     {t('checkin_apply_score')} ({mappedStress}/10)
                   </button>
                 </div>
@@ -577,33 +562,33 @@ const s: Record<string, React.CSSProperties> = {
   navLogo: { fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.5px', textDecoration: 'none' },
   liveBadge: { display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.2rem 0.6rem', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '99px', fontSize: '0.65rem', fontWeight: 700, color: '#10b981', letterSpacing: '0.04em' },
   liveDot: { width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981', flexShrink: 0 },
-  main: { flex: 1, padding: '2rem', maxWidth: '860px', width: '100%', margin: '0 auto', boxSizing: 'border-box', textAlign: 'left' },
-  pageTitle: { margin: '0 0 1.5rem', fontSize: '1.5rem', fontWeight: 600, color: 'var(--text-h)' },
+  main: { flex: 1, padding: '2.5rem 2rem', maxWidth: '860px', width: '100%', margin: '0 auto', boxSizing: 'border-box', textAlign: 'left' },
+  pageTitle: { margin: '0 0 2rem', fontSize: '2rem', fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' },
 
-  formCard: { border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', background: 'var(--bg)' },
-  formHeader: { display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem', flexWrap: 'wrap' as const },
-  formTitle: { margin: 0, fontSize: '1rem', fontWeight: 600, color: 'var(--text-h)' },
+  formCard: { border: '1px solid var(--border)', borderRadius: '20px', padding: '2rem', marginBottom: '1.75rem', background: 'var(--bg-elevated)', boxShadow: 'var(--glow-card)' },
+  formHeader: { display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' as const },
+  formTitle: { margin: 0, fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-h)' },
   editBadge: { fontSize: '0.75rem', fontWeight: 600, padding: '0.2rem 0.6rem', background: 'var(--accent-bg)', color: 'var(--accent)', border: '1px solid var(--accent-border)', borderRadius: '99px' },
 
-  form: { display: 'flex', flexDirection: 'column', gap: '1rem' },
+  form: { display: 'flex', flexDirection: 'column', gap: '1.125rem' },
   row: { display: 'flex', gap: '1rem' },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' },
-  label: { display: 'flex', flexDirection: 'column', gap: '0.3rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text)' },
-  input: { padding: '0.55rem 0.75rem', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.95rem', color: 'var(--text-h)', background: 'var(--bg)', outline: 'none' },
-  textarea: { padding: '0.55rem 0.75rem', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.875rem', color: 'var(--text-h)', background: 'var(--bg)', outline: 'none', resize: 'vertical' as const, fontFamily: 'inherit', lineHeight: '1.5' },
+  label: { display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-m)', letterSpacing: '0.01em' },
+  input: { padding: '0.75rem 1rem', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '0.9375rem', color: 'var(--text-h)', background: 'var(--bg-elevated)', outline: 'none', height: '48px', boxSizing: 'border-box' as const, fontFamily: 'inherit', transition: 'border-color 0.15s, box-shadow 0.15s' },
+  textarea: { padding: '0.75rem 1rem', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '0.875rem', color: 'var(--text-h)', background: 'var(--bg-elevated)', outline: 'none', resize: 'vertical' as const, fontFamily: 'inherit', lineHeight: '1.6', transition: 'border-color 0.15s, box-shadow 0.15s' },
 
-  stressLabel: { margin: '0 0 0.5rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text)' },
-  takeSurveyBtn: { padding: '0.7rem 1.25rem', background: 'var(--accent-bg)', border: '2px dashed var(--accent-border)', borderRadius: '10px', color: 'var(--accent)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', width: '100%', textAlign: 'center' as const },
+  stressLabel: { margin: '0 0 0.6rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-m)' },
+  takeSurveyBtn: { padding: '0.875rem 1.25rem', background: 'var(--accent-bg)', border: '2px dashed var(--accent-border)', borderRadius: '12px', color: 'var(--accent)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', width: '100%', textAlign: 'center' as const, transition: 'filter 0.15s, box-shadow 0.15s' },
   surveyDoneRow: { display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' as const },
-  surveyDoneBadge: { padding: '0.35rem 0.9rem', borderRadius: '8px', border: '1px solid', fontSize: '0.875rem', fontWeight: 700 },
-  retakeSurveyBtn: { padding: '0.35rem 0.75rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)', fontSize: '0.78rem', cursor: 'pointer', fontFamily: 'inherit' },
+  surveyDoneBadge: { padding: '0.35rem 0.9rem', borderRadius: '10px', border: '1px solid', fontSize: '0.875rem', fontWeight: 700 },
+  retakeSurveyBtn: { padding: '0.35rem 0.75rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-m)', fontSize: '0.78rem', cursor: 'pointer', fontFamily: 'inherit' },
 
-  msgOk: { margin: '0 0 0.75rem', padding: '0.5rem 0.75rem', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.4)', borderRadius: '8px', color: '#16a34a', fontSize: '0.875rem' },
-  msgErr: { margin: '0 0 0.75rem', padding: '0.5rem 0.75rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '8px', color: '#dc2626', fontSize: '0.875rem' },
-  submitBtn: { alignSelf: 'flex-start', padding: '0.6rem 1.5rem', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer' },
+  msgOk: { margin: '0 0 1rem', padding: '0.65rem 1rem', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '10px', color: '#16a34a', fontSize: '0.875rem' },
+  msgErr: { margin: '0 0 1rem', padding: '0.65rem 1rem', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', color: '#dc2626', fontSize: '0.875rem' },
+  submitBtn: { alignSelf: 'flex-start', padding: '0.75rem 1.75rem', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '0.9375rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'filter 0.15s, box-shadow 0.15s' },
 
-  panel: { border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', background: 'var(--bg)' },
-  panelTitle: { margin: '0 0 1rem', fontSize: '1rem', fontWeight: 600, color: 'var(--text-h)' },
+  panel: { border: '1px solid var(--border)', borderRadius: '20px', padding: '2rem', marginBottom: '1.75rem', background: 'var(--bg-elevated)', boxShadow: 'var(--glow-card)' },
+  panelTitle: { margin: '0 0 1.25rem', fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-h)' },
   spark: { display: 'flex', alignItems: 'flex-end', gap: '4px', height: '80px', paddingTop: '8px' },
   sparkCol: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' },
   sparkBarWrap: { flex: 1, width: '100%', display: 'flex', alignItems: 'flex-end' },
@@ -613,55 +598,55 @@ const s: Record<string, React.CSSProperties> = {
   empty: { color: 'var(--text)', fontSize: '0.875rem', margin: 0 },
   tableWrap: { overflowX: 'auto' as const },
   table: { width: '100%', borderCollapse: 'collapse' as const, fontSize: '0.85rem' },
-  th: { padding: '0.5rem 0.75rem', textAlign: 'left' as const, fontWeight: 600, color: 'var(--text)', borderBottom: '2px solid var(--border)', whiteSpace: 'nowrap' as const },
+  th: { padding: '0.6rem 0.75rem', textAlign: 'left' as const, fontWeight: 600, color: 'var(--text-m)', borderBottom: '2px solid var(--border)', whiteSpace: 'nowrap' as const, fontSize: '0.78rem', textTransform: 'uppercase' as const, letterSpacing: '0.05em' },
   tr: { borderBottom: '1px solid var(--border)' },
-  td: { padding: '0.6rem 0.75rem', color: 'var(--text-h)', whiteSpace: 'nowrap' as const },
-  dateBtn: { background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', padding: 0, fontFamily: 'inherit' },
+  td: { padding: '0.7rem 0.75rem', color: 'var(--text-h)', whiteSpace: 'nowrap' as const, fontSize: '0.875rem' },
+  dateBtn: { background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem', padding: 0, fontFamily: 'inherit' },
   stressTag: { display: 'inline-block', padding: '0.15rem 0.45rem', borderRadius: '5px', border: '1px solid', fontSize: '0.78rem', fontWeight: 700 },
   deleteBtn: { background: 'transparent', border: 'none', color: 'var(--text)', cursor: 'pointer', fontSize: '0.8rem', padding: '0.2rem 0.4rem', borderRadius: '4px' },
 
   // Survey modal
-  overlay: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem' },
-  surveyModal: { background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '16px', width: '100%', maxWidth: '520px', boxShadow: '0 24px 64px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', maxHeight: '90vh', overflow: 'hidden' },
-  surveyHeader: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '1.25rem 1.5rem 0.875rem', borderBottom: '1px solid var(--border)', flexShrink: 0 },
-  surveyTitle: { margin: 0, fontSize: '1rem', fontWeight: 700, color: 'var(--text-h)' },
-  surveySub: { margin: '0.2rem 0 0', fontSize: '0.72rem', color: 'var(--text)' },
+  overlay: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem' },
+  surveyModal: { background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '20px', width: '100%', maxWidth: '540px', boxShadow: '0 24px 64px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column', maxHeight: '90vh', overflow: 'hidden' },
+  surveyHeader: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '1.5rem 1.5rem 1rem', borderBottom: '1px solid var(--border)', flexShrink: 0 },
+  surveyTitle: { margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-h)' },
+  surveySub: { margin: '0.25rem 0 0', fontSize: '0.75rem', color: 'var(--text)' },
   surveyClose: { background: 'transparent', border: 'none', color: 'var(--text)', fontSize: '1rem', cursor: 'pointer', padding: '0.2rem 0.4rem', borderRadius: '6px', lineHeight: 1, flexShrink: 0 },
 
-  progressWrap: { display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1.5rem', flexShrink: 0 },
+  progressWrap: { display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.875rem 1.5rem', flexShrink: 0 },
   progressTrack: { flex: 1, height: '5px', borderRadius: '99px', background: 'var(--border)', overflow: 'hidden' },
-  progressFill: { height: '100%', borderRadius: '99px', background: 'var(--accent)', transition: 'width 0.3s ease' },
-  progressLabel: { fontSize: '0.72rem', color: 'var(--text)', fontWeight: 600, whiteSpace: 'nowrap' as const },
+  progressFill: { height: '100%', borderRadius: '99px', background: 'linear-gradient(90deg, #38BDF8, #3B82F6)', transition: 'width 0.3s ease' },
+  progressLabel: { fontSize: '0.72rem', color: 'var(--text-m)', fontWeight: 700, whiteSpace: 'nowrap' as const },
 
-  questionWrap: { padding: '0.25rem 1.5rem 0.75rem', overflowY: 'auto' as const, flex: 1 },
-  questionNum: { margin: '0 0 0.25rem', fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase' as const, letterSpacing: '0.05em' },
-  questionText: { margin: '0 0 1rem', fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-h)', lineHeight: '1.5' },
-  optionsWrap: { display: 'flex', flexDirection: 'column', gap: '0.35rem' },
-  optionCard: { display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.55rem 0.875rem', border: '1px solid var(--border)', borderRadius: '10px', background: 'var(--bg)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.1s', textAlign: 'left' as const, width: '100%' },
+  questionWrap: { padding: '0.5rem 1.5rem 0.875rem', overflowY: 'auto' as const, flex: 1 },
+  questionNum: { margin: '0 0 0.3rem', fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' },
+  questionText: { margin: '0 0 1.125rem', fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-h)', lineHeight: '1.55' },
+  optionsWrap: { display: 'flex', flexDirection: 'column', gap: '0.4rem' },
+  optionCard: { display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 1rem', border: '1px solid var(--border)', borderRadius: '12px', background: 'var(--bg-elevated)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.12s', textAlign: 'left' as const, width: '100%' },
   optionSelected: { border: '1px solid var(--accent)', background: 'var(--accent-bg)' },
-  optionNum: { width: '26px', height: '26px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700, flexShrink: 0, border: '1px solid', transition: 'all 0.1s' },
-  optionLabel: { fontSize: '0.875rem', transition: 'all 0.1s' },
+  optionNum: { width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700, flexShrink: 0, border: '1px solid', transition: 'all 0.12s' },
+  optionLabel: { fontSize: '0.875rem', transition: 'all 0.12s' },
 
-  surveyNav: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1.5rem 1.1rem', borderTop: '1px solid var(--border)', gap: '0.5rem', flexShrink: 0 },
-  navBtn: { padding: '0.42rem 0.85rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-h)', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' },
-  navBtnNext: { padding: '0.42rem 1rem', background: 'var(--accent)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' },
+  surveyNav: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.875rem 1.5rem 1.25rem', borderTop: '1px solid var(--border)', gap: '0.5rem', flexShrink: 0 },
+  navBtn: { padding: '0.5rem 0.9rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.82rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' },
+  navBtnNext: { padding: '0.5rem 1.1rem', background: 'var(--accent)', border: 'none', borderRadius: '10px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' },
   navDots: { display: 'flex', alignItems: 'center', gap: '5px', flex: 1, justifyContent: 'center' },
   navDot: { width: '7px', height: '7px', borderRadius: '50%', transition: 'background 0.2s', flexShrink: 0 },
 
   // Results
-  resultsWrap: { padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', textAlign: 'center' as const, overflowY: 'auto' as const, flex: 1 },
-  scoreCircle: { width: '88px', height: '88px', borderRadius: '50%', border: '3px solid var(--accent)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' },
-  scoreNum: { fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-h)', lineHeight: 1 },
+  resultsWrap: { padding: '1.75rem 1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.125rem', textAlign: 'center' as const, overflowY: 'auto' as const, flex: 1 },
+  scoreCircle: { width: '92px', height: '92px', borderRadius: '50%', border: '3px solid var(--accent)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-bg)' },
+  scoreNum: { fontSize: '1.85rem', fontWeight: 800, color: 'var(--text-h)', lineHeight: 1 },
   scoreOf: { fontSize: '0.72rem', color: 'var(--text)', marginTop: '0.1rem' },
   catBadge: { padding: '0.4rem 1.1rem', borderRadius: '99px', border: '1px solid', fontSize: '0.875rem', fontWeight: 700 },
-  catDesc: { margin: 0, fontSize: '0.875rem', color: 'var(--text)', lineHeight: '1.55', maxWidth: '340px' },
+  catDesc: { margin: 0, fontSize: '0.875rem', color: 'var(--text)', lineHeight: '1.6', maxWidth: '340px' },
   mappedWrap: { width: '100%', display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'center' },
-  mappedLabel: { fontSize: '0.75rem', color: 'var(--text)', fontWeight: 500 },
+  mappedLabel: { fontSize: '0.75rem', color: 'var(--text-m)', fontWeight: 600 },
   mappedDots: { display: 'flex', alignItems: 'center', gap: '5px' },
   mappedDot: { width: '14px', height: '14px', borderRadius: '50%', transition: 'background 0.2s' },
   mappedVal: { fontSize: '0.82rem', fontWeight: 700, marginLeft: '0.4rem' },
-  rangesNote: { margin: 0, fontSize: '0.68rem', color: 'var(--text)', opacity: 0.6 },
-  resultsFooter: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem', padding: '0.75rem 1.5rem 1.1rem', borderTop: '1px solid var(--border)', flexShrink: 0 },
-  retakeBtn: { padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-h)', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' },
-  applyBtn: { padding: '0.5rem 1.25rem', background: 'var(--accent)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' },
+  rangesNote: { margin: 0, fontSize: '0.68rem', color: 'var(--text)', opacity: 0.65 },
+  resultsFooter: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem', padding: '0.875rem 1.5rem 1.25rem', borderTop: '1px solid var(--border)', flexShrink: 0 },
+  retakeBtn: { padding: '0.55rem 1.1rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' },
+  applyBtn: { padding: '0.55rem 1.25rem', background: 'var(--accent)', border: 'none', borderRadius: '10px', color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' },
 };

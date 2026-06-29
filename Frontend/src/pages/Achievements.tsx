@@ -1,10 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
-import { BrainIcon } from '../components/TwinMindLogo';
-import BackButton from '../components/BackButton';
 
 interface Achievement {
   id: string;
@@ -139,7 +137,7 @@ function NextGoalPanel({ badges }: { badges: Achievement[] }) {
 const ng: Record<string, React.CSSProperties> = {
   wrap: {
     padding: '1.1rem 1.25rem', marginBottom: '1.25rem',
-    background: 'var(--card-bg, rgba(255,255,255,0.03))',
+    background: 'var(--bg-elevated)',
     border: '1px solid var(--border)', borderRadius: '14px',
   },
   title: { margin: '0 0 0.85rem', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.07em' },
@@ -317,6 +315,8 @@ const bc: Record<string, React.CSSProperties> = {
 // ── Main Page ───────────────────────────────────────────────────────────────────
 export default function Achievements() {
   const { token } = useAuth();
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const { t } = useLanguage();
   const [badges,    setBadges]    = useState<Achievement[]>([]);
   const [loading,   setLoading]   = useState(true);
@@ -352,7 +352,7 @@ export default function Achievements() {
     };
     badges.forEach(b => {
       dist[b.rarity].total++;
-      if (b.earned) dist[b.rarity].earned++;
+      if (b.earned) dist[b.earned ? b.rarity : b.rarity].earned++;
     });
     return dist;
   }, [badges]);
@@ -403,17 +403,7 @@ export default function Achievements() {
   const newIds = new Set(newBadges.map(b => b.id));
 
   return (
-    <div style={s.shell}>
-      {/* ── Nav ── */}
-      <header style={s.nav}>
-        <div style={s.navLeft}>
-          <BackButton />
-          <BrainIcon size={24} />
-          <Link to="/" style={s.navLogo}>TwinMind</Link>
-        </div>
-        <div style={s.xpBadge}>⭐ {xpFromBadges.toLocaleString()} XP from badges</div>
-      </header>
-
+    <div className={isDark ? 'assessment-dark' : 'assessment-light'} style={s.shell}>
       <main style={s.main}>
 
         {/* ── New badge banner ── */}
@@ -607,7 +597,7 @@ const s: Record<string, React.CSSProperties> = {
 
   completionCard: {
     padding: '0.85rem 1.25rem', border: '1px solid var(--border)',
-    borderRadius: '14px', background: 'var(--card-bg, rgba(255,255,255,0.03))',
+    borderRadius: '14px', background: 'var(--bg-elevated)',
     minWidth: '130px', textAlign: 'center',
   },
   completionMain: { display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '0.2rem' },
@@ -659,7 +649,7 @@ const s: Record<string, React.CSSProperties> = {
   searchIcon:  { position: 'absolute', left: '0.7rem', fontSize: '0.8rem', pointerEvents: 'none' },
   searchInput: {
     width: '100%', padding: '0.45rem 2rem 0.45rem 2.1rem',
-    background: 'var(--card-bg, rgba(255,255,255,0.04))',
+    background: 'var(--bg-elevated)',
     border: '1px solid var(--border)', borderRadius: '9px',
     color: 'var(--text-h)', fontSize: '0.8rem', fontFamily: 'inherit',
     outline: 'none',
@@ -673,7 +663,7 @@ const s: Record<string, React.CSSProperties> = {
   },
   sortSelect: {
     padding: '0.45rem 0.75rem',
-    background: 'var(--card-bg, rgba(255,255,255,0.04))',
+    background: 'var(--bg-elevated)',
     border: '1px solid var(--border)', borderRadius: '9px',
     color: 'var(--text)', fontSize: '0.78rem', fontFamily: 'inherit',
     cursor: 'pointer', outline: 'none',

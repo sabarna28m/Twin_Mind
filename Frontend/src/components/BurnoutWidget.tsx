@@ -45,7 +45,7 @@ function ScoreMeter({ score, risk }: { score: number; risk: string }) {
   const color = riskColor(risk);
   return (
     <svg width="68" height="68" viewBox="0 0 68 68" style={{ flexShrink: 0 }}>
-      <circle cx="34" cy="34" r={R} fill="none" stroke="#f1f5f9" strokeWidth="7" />
+      <circle cx="34" cy="34" r={R} fill="none" stroke="var(--border)" strokeWidth="7" />
       <circle cx="34" cy="34" r={R} fill="none" stroke={color} strokeWidth="7"
         strokeLinecap="round" strokeDasharray={C} strokeDashoffset={offset}
         transform="rotate(-90 34 34)"
@@ -67,13 +67,13 @@ function HoverTooltip({ active, payload }: {
   const color = riskColor(pt.risk_level);
   return (
     <div style={{
-      background: '#fff', border: `1px solid ${color}35`, borderRadius: '8px',
-      padding: '8px 12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '0.75rem',
+      background: 'var(--bg-elevated)', border: `1px solid ${color}35`, borderRadius: '8px',
+      padding: '8px 12px', boxShadow: 'var(--shadow, 0 4px 12px rgba(0,0,0,0.1))', fontSize: '0.75rem',
     }}>
-      <p style={{ margin: 0, color: '#64748b' }}>{pt.label}</p>
+      <p style={{ margin: 0, color: 'var(--text-m)' }}>{pt.label}</p>
       <p style={{ margin: '3px 0 0', fontWeight: 800, color, fontSize: '1rem' }}>
         {pt.burnout_score}
-        <span style={{ fontWeight: 400, fontSize: '0.7rem', color: '#94a3b8' }}> / 100</span>
+        <span style={{ fontWeight: 400, fontSize: '0.7rem', color: 'var(--text-m)' }}> / 100</span>
       </p>
       <p style={{ margin: '2px 0 0', fontWeight: 600, color }}>{riskLabel(pt.risk_level)}</p>
     </div>
@@ -98,8 +98,8 @@ export default function BurnoutWidget() {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '28px 0', justifyContent: 'center' }}>
-        <div style={{ width: '18px', height: '18px', border: '2px solid #e2e8f0', borderTop: '2px solid #6366f1', borderRadius: '50%' }} className="spin" />
-        <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>Loading…</span>
+        <div style={{ width: '18px', height: '18px', border: '2px solid var(--border)', borderTop: '2px solid #6366f1', borderRadius: '50%' }} className="spin" />
+        <span style={{ fontSize: '0.78rem', color: 'var(--text-m)' }}>Loading…</span>
       </div>
     );
   }
@@ -108,8 +108,8 @@ export default function BurnoutWidget() {
     return (
       <div style={{ textAlign: 'center', padding: '20px 8px' }}>
         <p style={{ fontSize: '1.75rem', margin: '0 0 8px' }}>🧘</p>
-        <p style={{ margin: '0 0 4px', fontSize: '0.85rem', fontWeight: 600, color: '#0f172a' }}>No Check-ins Yet</p>
-        <p style={{ margin: '0 0 14px', fontSize: '0.75rem', color: '#94a3b8', lineHeight: 1.5 }}>
+        <p style={{ margin: '0 0 4px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-h)' }}>No Check-ins Yet</p>
+        <p style={{ margin: '0 0 14px', fontSize: '0.75rem', color: 'var(--text-m)', lineHeight: 1.5 }}>
           Complete a burnout check-in to generate your mental health score and start tracking trends.
         </p>
         <Link to="/burnout" style={{
@@ -150,7 +150,7 @@ export default function BurnoutWidget() {
             <DirIcon size={13} color={dirColor} />
             <span style={{ fontSize: '0.72rem', fontWeight: 600, color: dirColor }}>{dirText}</span>
           </div>
-          <p style={{ margin: '3px 0 0', fontSize: '0.65rem', color: '#94a3b8' }}>
+          <p style={{ margin: '3px 0 0', fontSize: '0.65rem', color: 'var(--text-m)' }}>
             Updated {new Date(entry.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric' })}
           </p>
         </div>
@@ -159,7 +159,7 @@ export default function BurnoutWidget() {
       {/* 7-day trend chart */}
       {chartData.length > 1 ? (
         <>
-          <p style={{ margin: '0 0 6px', fontSize: '0.7rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <p style={{ margin: '0 0 6px', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-m)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             7-Day Trend
           </p>
           <ResponsiveContainer width="100%" height={100}>
@@ -171,8 +171,8 @@ export default function BurnoutWidget() {
                   <stop offset="100%" stopColor="#ef4444" />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 9 }} axisLine={false} tickLine={false} />
-              <Tooltip content={<HoverTooltip />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1 }} />
+              <XAxis dataKey="label" tick={{ fill: 'var(--text-m)', fontSize: 9 }} axisLine={false} tickLine={false} />
+              <Tooltip content={<HoverTooltip />} cursor={{ stroke: 'var(--border)', strokeWidth: 1 }} />
               <ReferenceLine y={40} stroke="#f59e0b" strokeDasharray="3 3" strokeOpacity={0.5} />
               <ReferenceLine y={70} stroke="#ef4444" strokeDasharray="3 3" strokeOpacity={0.5} />
               <Line
@@ -183,10 +183,10 @@ export default function BurnoutWidget() {
                   const { cx, cy, payload } = props;
                   return (
                     <circle key={payload.date} cx={cx} cy={cy} r={3}
-                      fill={riskColor(payload.risk_level)} stroke="#fff" strokeWidth={1.5} />
+                      fill={riskColor(payload.risk_level)} stroke="var(--bg-elevated)" strokeWidth={1.5} />
                   );
                 }}
-                activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
+                activeDot={{ r: 5, strokeWidth: 2, stroke: 'var(--bg-elevated)' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -206,7 +206,7 @@ export default function BurnoutWidget() {
           </div>
         </>
       ) : (
-        <p style={{ margin: '0 0 8px', fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.5 }}>
+        <p style={{ margin: '0 0 8px', fontSize: '0.72rem', color: 'var(--text-m)', lineHeight: 1.5 }}>
           Log more check-ins to see your 7-day trend.
         </p>
       )}
@@ -214,7 +214,7 @@ export default function BurnoutWidget() {
       <Link to="/burnout" style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
         marginTop: '14px', padding: '9px', borderRadius: '10px',
-        background: '#fef2f2', border: '1px solid #fecaca', color: '#ef4444',
+        background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444',
         fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none',
       }}>Full Report →</Link>
     </div>

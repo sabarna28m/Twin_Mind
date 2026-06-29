@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { BrainIcon } from '../components/TwinMindLogo';
 import {
   AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
-import LiveBadge from '../components/LiveBadge';
-import BackButton from '../components/BackButton';
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -54,7 +52,7 @@ function fmtMins(m: number) {
 }
 
 function heatColor(day: { has_entry: boolean; score: number } | null, inFuture: boolean): string {
-  if (inFuture || !day || !day.has_entry) return 'rgba(255,255,255,0.05)';
+  if (inFuture || !day || !day.has_entry) return 'var(--border)';
   const s = day.score;
   if (s >= 80) return '#6366f1';
   if (s >= 60) return 'rgba(99,102,241,0.72)';
@@ -114,12 +112,12 @@ function StudyHeatmap({ heatmap }: { heatmap: HeatmapDay[] }) {
         {/* Day labels */}
         {DAY_LABELS.map((lbl, i) => lbl && (
           <text key={i} x={LEFT - 4} y={TOP + i * STEP + CELL - 2}
-            textAnchor="end" fontSize="9" fill="#475569">{lbl}</text>
+            textAnchor="end" fontSize="9" fill="var(--text-m)">{lbl}</text>
         ))}
         {/* Month labels */}
         {monthLabels.map(ml => (
           <text key={ml.label + ml.col} x={LEFT + ml.col * STEP} y={13}
-            fontSize="9" fill="#64748b">{ml.label}</text>
+            fontSize="9" fill="var(--text-m)">{ml.label}</text>
         ))}
         {/* Cells */}
         {weeks.map((week, wi) =>
@@ -139,11 +137,11 @@ function StudyHeatmap({ heatmap }: { heatmap: HeatmapDay[] }) {
       </svg>
       {/* Legend */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '10px', marginLeft: `${LEFT}px` }}>
-        <span style={{ fontSize: '0.68rem', color: '#475569' }}>Less</span>
-        {['rgba(255,255,255,0.05)', 'rgba(99,102,241,0.22)', 'rgba(99,102,241,0.45)', 'rgba(99,102,241,0.72)', '#6366f1'].map(c => (
+        <span style={{ fontSize: '0.68rem', color: 'var(--text-m)' }}>Less</span>
+        {['var(--border)', 'rgba(99,102,241,0.22)', 'rgba(99,102,241,0.45)', 'rgba(99,102,241,0.72)', '#6366f1'].map(c => (
           <div key={c} style={{ width: 11, height: 11, borderRadius: 2, background: c }} />
         ))}
-        <span style={{ fontSize: '0.68rem', color: '#475569' }}>More</span>
+        <span style={{ fontSize: '0.68rem', color: 'var(--text-m)' }}>More</span>
       </div>
     </div>
   );
@@ -152,10 +150,10 @@ function StudyHeatmap({ heatmap }: { heatmap: HeatmapDay[] }) {
 // ── Chart tooltip ─────────────────────────────────────────────────────────
 
 const TOOLTIP_STYLE = {
-  background: '#0d1426',
-  border: '1px solid rgba(255,255,255,0.1)',
+  background: 'var(--bg-elevated)',
+  border: '1px solid var(--border)',
   borderRadius: '8px',
-  color: '#f1f5f9',
+  color: 'var(--text-h)',
   fontSize: '0.78rem',
   padding: '6px 10px',
 };
@@ -276,6 +274,9 @@ async function downloadReport(
 export default function Progress() {
   const { user, token } = useAuth();
   const { t } = useLanguage();
+  const { colorScheme } = useTheme();
+  const themeClass = colorScheme === 'dark' ? 'assessment-dark' : 'assessment-light';
+  
   const [summary, setSummary]   = useState<Summary | null>(null);
   const [legacy,  setLegacy]    = useState<LegacyAnalytics | null>(null);
   const [loading, setLoading]   = useState(true);
@@ -312,37 +313,20 @@ export default function Progress() {
     finally { setPdfBusy(false); }
   };
 
-  const maxSubjSessions = summary?.subject_performance[0]?.sessions ?? 1;
+  if (loading) {
+    return (
+      <div className={themeClass} style={{ ...s.shell, justifyContent: 'center', alignItems: 'center' }}>
+        <div className="spinner" style={{ width: 40, height: 40, borderWidth: 4 }} />
+      </div>
+    );
+  }
+
+  const maxSubjSessions = summary?.subject_performance.reduce((m, sub) => Math.max(m, sub.sessions), 1) ?? 1;
 
   return (
-    <div style={s.shell}>
+    <div className={themeClass} style={s.shell}>
       <div style={s.bgOrb} />
 
-      {/* Nav */}
-      <header style={s.nav}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <BackButton />
-          <BrainIcon size={24} />
-          <span style={s.navLogo}>TwinMind</span>
-          {wsConnected && <LiveBadge />}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            onClick={handleDownload}
-            disabled={pdfBusy || !summary}
-            style={{
-              padding: '0.38rem 0.9rem',
-              background: pdfBusy || !summary ? 'rgba(99,102,241,0.1)' : 'linear-gradient(135deg,#6366f1,#8b5cf6)',
-              color: '#fff', border: 'none', borderRadius: '8px',
-              fontSize: '0.78rem', fontWeight: 700, cursor: pdfBusy || !summary ? 'not-allowed' : 'pointer',
-              opacity: pdfBusy || !summary ? 0.5 : 1, transition: 'opacity 0.2s',
-              fontFamily: 'inherit',
-            }}
-          >
-            {pdfBusy ? t('progress_generating') : t('progress_download')}
-          </button>
-        </div>
-      </header>
 
       <main style={s.main}>
         <div style={{ marginBottom: '2rem' }}>
@@ -404,10 +388,10 @@ export default function Progress() {
                           <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                      <XAxis dataKey="week_label" tick={{ fill: '#475569', fontSize: 9 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-                      <YAxis domain={[0, 100]} tick={{ fill: '#475569', fontSize: 9 }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: '#94a3b8' }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="week_label" tick={{ fill: 'var(--text-m)', fontSize: 9 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                      <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-m)', fontSize: 9 }} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: 'var(--text-m)' }} />
                       <Area type="monotone" dataKey="overall_score" name="Score" stroke="#6366f1" fill="url(#wkGrad)" strokeWidth={2} dot={{ fill: '#6366f1', r: 3, strokeWidth: 0 }} />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -419,8 +403,8 @@ export default function Progress() {
                       { lbl: t('progress_avg_attend'), val: `${Math.round(summary.weekly_summaries.reduce((a,w)=>a+w.attendance,0)/summary.weekly_summaries.length)}%` },
                     ].map(m => (
                       <div key={m.lbl}>
-                        <p style={{ margin: 0, fontSize: '0.68rem', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{m.lbl}</p>
-                        <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#f1f5f9' }}>{m.val}</p>
+                        <p style={{ margin: 0, fontSize: '0.68rem', color: 'var(--text-m)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{m.lbl}</p>
+                        <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-h)' }}>{m.val}</p>
                       </div>
                     ))}
                   </div>
@@ -432,10 +416,10 @@ export default function Progress() {
                 <h2 style={s.cardTitle}>{t('progress_monthly')}</h2>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={summary.monthly_summaries} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                    <XAxis dataKey="month_label" tick={{ fill: '#475569', fontSize: 9 }} axisLine={false} tickLine={false} />
-                    <YAxis domain={[0, 100]} tick={{ fill: '#475569', fontSize: 9 }} axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: '#94a3b8' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                    <XAxis dataKey="month_label" tick={{ fill: 'var(--text-m)', fontSize: 9 }} axisLine={false} tickLine={false} />
+                    <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-m)', fontSize: 9 }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: 'var(--text-m)' }} />
                     <Bar dataKey="overall_score" name="Score" fill="#6366f1" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="study_hours"   name="Study Hrs" fill="rgba(59,130,246,0.55)" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -444,7 +428,7 @@ export default function Progress() {
                   {[['#6366f1', t('progress_avg_score_leg')], ['rgba(59,130,246,0.7)', t('simulate_study_hours')]].map(([c, lbl]) => (
                     <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                       <div style={{ width: 10, height: 10, borderRadius: 2, background: c }} />
-                      <span style={{ fontSize: '0.7rem', color: '#475569' }}>{lbl}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-m)' }}>{lbl}</span>
                     </div>
                   ))}
                 </div>
@@ -465,8 +449,8 @@ export default function Progress() {
                       return (
                         <div key={sub.subject}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
-                            <span style={{ fontSize: '0.82rem', color: '#cbd5e1', fontWeight: 500 }}>{sub.subject}</span>
-                            <span style={{ fontSize: '0.75rem', color: '#475569' }}>{sub.sessions} session{sub.sessions !== 1 ? 's' : ''} · {fmtMins(sub.total_minutes)}</span>
+                            <span style={{ fontSize: '0.82rem', color: 'var(--text-h)', fontWeight: 500 }}>{sub.subject}</span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-m)' }}>{sub.sessions} session{sub.sessions !== 1 ? 's' : ''} · {fmtMins(sub.total_minutes)}</span>
                           </div>
                           <div className="score-bar-track">
                             <div className="score-bar-fill" style={{ width: `${pct}%`, background: 'linear-gradient(90deg,#6366f1,#8b5cf6)' }} />
@@ -486,12 +470,12 @@ export default function Progress() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
                       <div style={{ padding: '0.7rem 0.9rem', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '10px' }}>
                         <p style={{ margin: '0 0 0.2rem', fontSize: '0.65rem', color: '#10b981', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Best Week</p>
-                        <p style={{ margin: '0 0 0.15rem', fontSize: '0.9rem', fontWeight: 700, color: '#f1f5f9' }}>{summary.best_week.week_label}</p>
+                        <p style={{ margin: '0 0 0.15rem', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-h)' }}>{summary.best_week.week_label}</p>
                         <p style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#10b981' }}>{summary.best_week.overall_score}</p>
                       </div>
                       <div style={{ padding: '0.7rem 0.9rem', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '10px' }}>
                         <p style={{ margin: '0 0 0.2rem', fontSize: '0.65rem', color: '#f59e0b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Needs Focus</p>
-                        <p style={{ margin: '0 0 0.15rem', fontSize: '0.9rem', fontWeight: 700, color: '#f1f5f9' }}>{summary.worst_week.week_label}</p>
+                        <p style={{ margin: '0 0 0.15rem', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-h)' }}>{summary.worst_week.week_label}</p>
                         <p style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#f59e0b' }}>{summary.worst_week.overall_score}</p>
                       </div>
                     </div>
@@ -565,30 +549,30 @@ const s: Record<string, React.CSSProperties> = {
     background: 'var(--glass-bg)', backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 50,
   },
-  navLogo: { fontSize: '1.05rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.3px' },
+  navLogo: { fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.3px' },
   main: {
     flex: 1, padding: '2.5rem 2rem', maxWidth: '1000px',
     width: '100%', margin: '0 auto', boxSizing: 'border-box', position: 'relative', zIndex: 1,
   },
-  pageTitle: { fontSize: '1.9rem', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.5px', marginBottom: '0.4rem' },
+  pageTitle: { fontSize: '1.9rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.5px', marginBottom: '0.4rem' },
   statsRow: {
     display: 'grid', gridTemplateColumns: 'repeat(4,1fr)',
     gap: '1rem', marginBottom: '1.25rem',
   },
   statCard: {
     padding: '1.1rem 1.25rem',
-    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+    background: 'var(--bg-elevated)', border: '1px solid var(--border)',
     borderRadius: '16px', backdropFilter: 'blur(20px)',
   },
   card: {
-    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+    background: 'var(--bg-elevated)', border: '1px solid var(--border)',
     borderRadius: '20px', padding: '1.5rem',
-    backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+    backdropFilter: 'blur(20px)', boxShadow: 'var(--glow-card)',
   },
   twoCol: {
     display: 'grid', gridTemplateColumns: '1fr 1fr',
     gap: '1.25rem', marginBottom: '1.25rem',
   },
-  cardTitle: { fontSize: '0.95rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '1rem', letterSpacing: '-0.1px' },
-  empty: { margin: 0, fontSize: '0.85rem', color: '#475569' },
+  cardTitle: { fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-h)', marginBottom: '1rem', letterSpacing: '-0.1px' },
+  empty: { margin: 0, fontSize: '0.85rem', color: 'var(--text-m)' },
 };

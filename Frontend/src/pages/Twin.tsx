@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
 import { BrainIcon } from '../components/TwinMindLogo';
 import { useWebSocket } from '../hooks/useWebSocket';
@@ -1450,6 +1451,8 @@ const x: Record<string, React.CSSProperties> = {
 export default function Twin() {
   const { user, token } = useAuth();
   const { t } = useLanguage();
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const [twin,         setTwin]         = useState<TwinState | null>(null);
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState('');
@@ -1491,7 +1494,7 @@ export default function Twin() {
   const avatarColor = progress ? getLevelColor(progress.level) : (twin ? RISK_COLOR[twin.risk_level] : '#6366f1');
 
   return (
-    <div style={s.shell}>
+    <div className={isDark ? 'assessment-dark' : 'assessment-light'} style={s.shell}>
       {/* Background orb */}
       <div style={s.bgOrb} />
 

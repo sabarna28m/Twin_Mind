@@ -7,6 +7,7 @@ import {
   ShieldCheck, AlertCircle, Wifi,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { useWebSocket } from '../hooks/useWebSocket';
 import LiveBadge from '../components/LiveBadge';
 import BackButton from '../components/BackButton';
@@ -455,6 +456,9 @@ const vc: Record<string, React.CSSProperties> = {
 /* ═══════════════════════════════════════ */
 export default function StudyVideos() {
   const { user, token, studentProfile } = useAuth();
+  const { colorScheme } = useTheme();
+  const themeClass = colorScheme === 'dark' ? 'assessment-dark' : 'assessment-light';
+  
   const quickTopics = studentProfile?.subjects ?? [];
   const wsConnected = useWebSocket(user?.id, token, () => {});
 
@@ -496,7 +500,7 @@ export default function StudyVideos() {
 
   /* ── Render ── */
   return (
-    <div style={s.shell}>
+    <div className={themeClass} style={s.shell}>
 
       {/* Navbar */}
       <header style={s.nav} className="nav-premium">

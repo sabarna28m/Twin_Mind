@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import api from '../../services/api';
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -67,6 +68,9 @@ interface Props {
 export default function PracticeQuiz({ onBack }: Props) {
   const { token } = useAuth();
   const { t } = useLanguage();
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
+  const themeClass = isDark ? 'assessment-dark' : 'assessment-light';
 
   const [subjects, setSubjects]         = useState<string[]>([]);
   const [subject, setSubject]           = useState('');
@@ -196,7 +200,7 @@ export default function PracticeQuiz({ onBack }: Props) {
 
   if (phase === 'generating') {
     return (
-      <div style={p.shell}>
+      <div className={themeClass} style={p.shell}>
         <header style={p.nav}>
           <button onClick={onBack} style={p.backBtn}>← Back</button>
           <span style={p.navTitle}>Practice Quiz</span>
@@ -222,7 +226,7 @@ export default function PracticeQuiz({ onBack }: Props) {
     const timerColor = timeLeft < 60 ? '#ef4444' : timeLeft < duration * 30 ? '#f59e0b' : '#6366f1';
 
     return (
-      <div style={p.shell}>
+      <div className={themeClass} style={p.shell}>
         <header style={p.nav}>
           <div style={p.navLeft}><span style={p.modeBadge}>📚 Practice</span></div>
           <span style={p.navTitle}>{subject}</span>
@@ -283,7 +287,7 @@ export default function PracticeQuiz({ onBack }: Props) {
     const grade = pct >= 90 ? 'Excellent!' : pct >= 75 ? 'Great job!' : pct >= 60 ? 'Good effort!' : pct >= 40 ? 'Keep practicing!' : 'Needs more work';
     const gradeColor = pct >= 75 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
     return (
-      <div style={p.shell}>
+      <div className={themeClass} style={p.shell}>
         <header style={p.nav}>
           <button onClick={onBack} style={p.backBtn}>← Back</button>
           <span style={p.navTitle}>Quiz Results</span>
@@ -358,7 +362,7 @@ export default function PracticeQuiz({ onBack }: Props) {
 
   // Setup phase
   return (
-    <div style={p.shell}>
+    <div className={themeClass} style={p.shell}>
       <header style={p.nav}>
         <button onClick={onBack} style={p.backBtn}>← Back</button>
         <span style={p.navTitle}>{t('quiz_title')} — Practice Mode</span>

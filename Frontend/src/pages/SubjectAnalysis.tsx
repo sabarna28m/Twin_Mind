@@ -5,7 +5,7 @@ import {
   ResponsiveContainer, ReferenceLine,
 } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
-import BackButton from '../components/BackButton';
+import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -133,7 +133,7 @@ function DetectionCard({ icon, label, subject, score, detail, color }: {
   icon: string; label: string; subject?: string; score?: number; detail: string; color: string;
 }) {
   return (
-    <div style={{ ...dc.card, borderColor: `${color}30`, background: `${color}08` }}>
+    <div style={{ ...dc.card, borderColor: `${color}60`, background: `${color}18` }}>
       <div style={{ ...dc.iconBox, background: `${color}22`, color }}>{icon}</div>
       <p style={{ ...dc.label, color: `${color}cc` }}>{label}</p>
       {subject && <p style={{ ...dc.subject, color }}>{subject}</p>}
@@ -148,11 +148,11 @@ function TrendTooltip({ active, payload, label }: { active?: boolean; payload?: 
   const { score, source } = payload[0].payload;
   const c = scoreColor(score);
   return (
-    <div style={{ background: 'rgba(15,23,42,0.96)', border: `1px solid ${c}40`, borderRadius: '10px', padding: '0.65rem 0.9rem' }}>
-      <p style={{ margin: '0 0 0.2rem', fontSize: '0.7rem', color: 'rgba(255,255,255,0.45)' }}>{label}</p>
+    <div style={{ background: 'var(--bg-elevated)', border: `1px solid ${c}40`, borderRadius: '10px', padding: '0.65rem 0.9rem' }}>
+      <p style={{ margin: '0 0 0.2rem', fontSize: '0.7rem', color: 'var(--text-m)' }}>{label}</p>
       <p style={{ margin: '0 0 0.15rem', fontSize: '1rem', fontWeight: 800, color: c }}>{score.toFixed(1)}%</p>
       <p style={{ margin: 0, fontSize: '0.7rem', color: c }}>{riskEmoji(score)} {riskLabel(score)}</p>
-      <p style={{ margin: '0.1rem 0 0', fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', textTransform: 'capitalize' }}>{source}</p>
+      <p style={{ margin: '0.1rem 0 0', fontSize: '0.68rem', color: 'var(--text-m)', textTransform: 'capitalize' }}>{source}</p>
     </div>
   );
 }
@@ -203,10 +203,10 @@ function SubjectModal({ s, recs, plan, onClose }: {
               <p style={md.sectionTitle}>Score History</p>
               <ResponsiveContainer width="100%" height={110}>
                 <LineChart data={trendData} margin={{ top: 5, right: 10, bottom: 0, left: -25 }}>
-                  <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
-                  <XAxis dataKey="dateLabel" tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }} axisLine={false} tickLine={false} />
-                  <YAxis domain={[0,100]} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }} axisLine={false} tickLine={false} />
-                  <Tooltip content={<TrendTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.06)' }} />
+                  <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
+                  <XAxis dataKey="dateLabel" tick={{ fill: 'var(--text-m)', fontSize: 9 }} axisLine={false} tickLine={false} />
+                  <YAxis domain={[0,100]} tick={{ fill: 'var(--text-m)', fontSize: 9 }} axisLine={false} tickLine={false} />
+                  <Tooltip content={<TrendTooltip />} cursor={{ stroke: 'var(--border)' }} />
                   <Line type="monotone" dataKey="score" stroke={c} strokeWidth={2}
                     dot={{ fill: c, r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
                 </LineChart>
@@ -256,7 +256,7 @@ function SubjectModal({ s, recs, plan, onClose }: {
               <p style={md.sectionTitle}>7-Day Recovery Plan</p>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.4rem' }}>
                 {plan.map(d => (
-                  <div key={d.day} style={{ display: 'flex', gap: '0.75rem', padding: '0.55rem 0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '9px' }}>
+                  <div key={d.day} style={{ display: 'flex', gap: '0.75rem', padding: '0.55rem 0.75rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '9px' }}>
                     <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: `${c}22`, border: `1px solid ${c}44`, color: c, fontWeight: 800, fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>D{d.day}</div>
                     <div>
                       <p style={{ margin: '0 0 0.12rem', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-h)' }}>{d.title}</p>
@@ -427,7 +427,7 @@ function RecordModal({
                 <div style={{ display: 'flex', gap: '0.3rem', marginTop: '0.35rem' }}>
                   {[1,2,3,4,5].map(n => (
                     <button key={n} type="button" onClick={() => setForm(f => ({ ...f, confidence: n }))}
-                      style={{ flex: 1, height: '32px', borderRadius: '6px', border: `1px solid ${form.confidence === n ? '#8b5cf6' : 'rgba(255,255,255,0.1)'}`, background: form.confidence === n ? 'rgba(139,92,246,0.25)' : 'transparent', color: form.confidence === n ? '#a78bfa' : 'var(--text)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700 }}
+                      style={{ flex: 1, height: '32px', borderRadius: '6px', border: `1px solid ${form.confidence === n ? '#8b5cf6' : 'var(--border)'}`, background: form.confidence === n ? 'rgba(139,92,246,0.25)' : 'transparent', color: form.confidence === n ? '#a78bfa' : 'var(--text)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700 }}
                     >{n}</button>
                   ))}
                 </div>
@@ -455,7 +455,7 @@ function RecordModal({
               {customTopics.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.4rem' }}>
                   {customTopics.map(t => (
-                    <div key={t.name} style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', padding: '0.35rem 0.6rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div key={t.name} style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', padding: '0.35rem 0.6rem', background: 'var(--bg-elevated)', borderRadius: '8px', border: '1px solid var(--border)' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-h)', width: '120px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }} title={t.name}>{t.name}</span>
                       <input type="range" min={0} max={100} value={t.score} onChange={e => setTopicScore(t.name, +e.target.value)} style={{ flex: 1, accentColor: scoreColor(t.score) }} />
                       <span style={{ fontSize: '0.75rem', fontWeight: 700, color: scoreColor(t.score), width: '32px', textAlign: 'right' as const }}>{t.score}</span>
@@ -494,6 +494,8 @@ function RecordModal({
 
 export default function SubjectAnalysis() {
   const { user, studentProfile } = useAuth();
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const profileSubjects = studentProfile?.subjects ?? [];
   const [analysis, setAnalysis]         = useState<Analysis | null>(null);
   const [loading, setLoading]           = useState(true);
@@ -572,18 +574,9 @@ export default function SubjectAnalysis() {
   }
 
   return (
-    <div style={p.page}>
+    <div className={isDark ? 'assessment-dark' : 'assessment-light'} style={p.page}>
       <div style={p.orb1} /><div style={p.orb2} />
 
-      {/* Top bar */}
-      <div style={p.topBar}>
-        <BackButton />
-        <div style={p.topCenter}>
-          <span style={{ fontSize: '1.2rem' }}>📊</span>
-          <h1 style={p.pageTitle}>Subject Analysis</h1>
-        </div>
-        <button style={p.addBtn} onClick={() => setShowAdd(true)}>+ Add Record</button>
-      </div>
 
       <div style={p.content}>
 
@@ -603,13 +596,13 @@ export default function SubjectAnalysis() {
         ) : analysis && withData.length > 0 ? (
           <>
             {/* ── AI SUMMARY CARD ── */}
-            <section style={{ background: 'rgba(4,8,22,0.93)', border: '1.5px solid rgba(99,102,241,0.28)', borderRadius: '20px', padding: '1.75rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', position: 'relative', overflow: 'hidden' }}>
+            <section style={{ background: 'var(--bg-elevated)', border: '1.5px solid rgba(99,102,241,0.28)', borderRadius: '20px', padding: '1.75rem', backdropFilter: 'blur(32px)', boxShadow: 'var(--glow-card)', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 0% 0%, rgba(99,102,241,0.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.9rem' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'rgba(99,102,241,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.95rem' }}>◈</div>
                 <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#818cf8', textTransform: 'uppercase' as const, letterSpacing: '0.1em' }}>AI Summary</span>
               </div>
-              <p style={{ margin: '0 0 1.1rem', fontSize: '0.92rem', color: '#cbd5e1', lineHeight: 1.75, padding: '1rem 1.15rem', background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.14)', borderRadius: '12px' }}>
+              <p style={{ margin: '0 0 1.1rem', fontSize: '0.92rem', color: 'var(--text-h)', lineHeight: 1.75, padding: '1rem 1.15rem', background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.14)', borderRadius: '12px' }}>
                 Based on your study history, quizzes, focus sessions, revisions, and Digital Twin simulations, these are your current subject strengths and weaknesses. {analysis.weakest && `Your weakest area is ${analysis.weakest.subject} (${analysis.weakest.avg_score.toFixed(0)}%) — prioritising this subject will have the highest impact on your overall score.`} {analysis.most_improved && analysis.most_improved.improvement != null && ` ${analysis.most_improved.subject} shows the strongest recent improvement (+${analysis.most_improved.improvement.toFixed(0)}%).`}
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '0.6rem' }}>
@@ -643,12 +636,12 @@ export default function SubjectAnalysis() {
                         <div style={{ display: 'flex', gap: '1.25rem', flexShrink: 0 }}>
                           <div style={{ textAlign: 'center' as const }}>
                             <p style={{ margin: '0 0 0.05rem', fontSize: '1.35rem', fontWeight: 900, color: c }}>{s.avg_score.toFixed(0)}%</p>
-                            <p style={{ margin: 0, fontSize: '0.6rem', color: '#64748b', textTransform: 'uppercase' as const, fontWeight: 700 }}>Current Score</p>
+                            <p style={{ margin: 0, fontSize: '0.6rem', color: 'var(--text-m)', textTransform: 'uppercase' as const, fontWeight: 700 }}>Current Score</p>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', color: '#374151', fontSize: '1rem', paddingTop: '0.1rem' }}>→</div>
                           <div style={{ textAlign: 'center' as const }}>
                             <p style={{ margin: '0 0 0.05rem', fontSize: '1.35rem', fontWeight: 900, color: '#10b981' }}>{tgt}%</p>
-                            <p style={{ margin: 0, fontSize: '0.6rem', color: '#64748b', textTransform: 'uppercase' as const, fontWeight: 700 }}>Target Score</p>
+                            <p style={{ margin: 0, fontSize: '0.6rem', color: 'var(--text-m)', textTransform: 'uppercase' as const, fontWeight: 700 }}>Target Score</p>
                           </div>
                         </div>
                       </div>
@@ -659,7 +652,7 @@ export default function SubjectAnalysis() {
                         <span style={{ ...p.statChip, color: '#f59e0b' }}>⏱ Study {s.recommended_daily_minutes} min/day for the next 5 days</span>
                         <span style={{ ...p.statChip, color: trendColor(s.trend) }}>{trendIcon(s.trend)} {s.trend}</span>
                       </div>
-                      <div style={{ paddingTop: '0.1rem', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'flex-end' }}>
+                      <div style={{ paddingTop: '0.1rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end' }}>
                         <button onClick={() => setSelected(s)} style={{ fontSize: '0.78rem', fontWeight: 700, color: c, background: `${c}10`, border: `1px solid ${c}25`, borderRadius: '8px', padding: '0.3rem 0.9rem', cursor: 'pointer', fontFamily: 'inherit' }}>
                           View Detailed Analysis →
                         </button>
@@ -695,13 +688,13 @@ export default function SubjectAnalysis() {
             {/* ── SUBJECT PRIORITY RANKING ── */}
             <section style={p.card}>
               <h2 style={p.cardTitle}>📋 Subject Priority Ranking</h2>
-              <p style={{ margin: '-0.4rem 0 0.9rem', fontSize: '0.78rem', color: '#64748b', lineHeight: 1.5 }}>AI-ranked by current score, days since last revision, quiz accuracy, focus time, and Digital Twin prediction.</p>
+              <p style={{ margin: '-0.4rem 0 0.9rem', fontSize: '0.78rem', color: 'var(--text-m)', lineHeight: 1.5 }}>AI-ranked by current score, days since last revision, quiz accuracy, focus time, and Digital Twin prediction.</p>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.45rem', marginTop: '0.85rem' }}>
                 {analysis.priority_ranking.map(item => {
                   const c = priorityColor(item.priority_label);
                   const barW = item.avg_score > 0 ? item.avg_score : 5;
                   return (
-                    <div key={item.subject} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.55rem 0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px' }}>
+                    <div key={item.subject} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.55rem 0.75rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '10px' }}>
                       <span style={{ fontWeight: 900, color: c, width: '22px', textAlign: 'center' as const, fontSize: '0.8rem' }}>#{item.rank}</span>
                       <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[item.subject] ?? '📚'}</span>
                       <span style={{ flex: 1, fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-h)' }}>{item.subject}</span>
@@ -744,22 +737,25 @@ export default function SubjectAnalysis() {
               <div style={p.cardHead}>
                 <h2 style={p.cardTitle}>📈 Performance Trend</h2>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' as const }}>
-                  {withData.map(s => (
-                    <button key={s.subject}
-                      onClick={() => setTrendSubject(s.subject)}
-                      style={{ ...p.trendTab, background: trendSubject === s.subject ? scoreColor(s.avg_score) + '22' : 'transparent', color: trendSubject === s.subject ? scoreColor(s.avg_score) : 'var(--text)', border: `1px solid ${trendSubject === s.subject ? scoreColor(s.avg_score) + '55' : 'rgba(255,255,255,0.1)'}` }}>
-                      {s.subject.split(' ')[0]}
-                    </button>
-                  ))}
+                  {withData.map(s => {
+                    const c = scoreColor(s.avg_score);
+                    return (
+                      <button key={s.subject}
+                        onClick={() => setTrendSubject(s.subject)}
+                        style={{ ...p.trendTab, background: trendSubject === s.subject ? 'var(--bg-hover)' : 'transparent', color: trendSubject === s.subject ? c : 'var(--text)', border: `1px solid ${trendSubject === s.subject ? c : 'var(--border)'}` }}>
+                        {s.subject.split(' ')[0]}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               {trendData.length > 1 ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart data={trendData} margin={{ top: 10, right: 16, bottom: 0, left: -20 }}>
-                    <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" />
-                    <XAxis dataKey="dateLabel" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <YAxis domain={[0,100]} tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <Tooltip content={<TrendTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.07)' }} />
+                    <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
+                    <XAxis dataKey="dateLabel" tick={{ fill: 'var(--text-m)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-m)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <Tooltip content={<TrendTooltip />} cursor={{ stroke: 'var(--border)' }} />
                     <ReferenceLine y={75} stroke="#10b981" strokeDasharray="4 4" strokeWidth={1} strokeOpacity={0.5} label={{ value: 'Strong', fill: '#10b981', fontSize: 9, position: 'right' }} />
                     <ReferenceLine y={50} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1} strokeOpacity={0.5} label={{ value: 'Avg', fill: '#f59e0b', fontSize: 9, position: 'right' }} />
                     <Line type="monotone" dataKey="score"
@@ -816,7 +812,7 @@ export default function SubjectAnalysis() {
                   const delta = hasPrev ? s.avg_score - s.previous_score! : null;
                   const deltaColor = delta == null ? '#94a3b8' : delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#94a3b8';
                   return (
-                    <div key={s.subject} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid rgba(255,255,255,0.08)`, borderRadius: '14px', padding: '1.1rem' }}>
+                    <div key={s.subject} style={{ background: 'var(--bg-elevated)', border: `1px solid var(--border)`, borderRadius: '14px', padding: '1.1rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                         <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[s.subject] ?? '📚'}</span>
                         <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-h)', flex: 1 }}>{s.subject}</span>
@@ -863,7 +859,7 @@ export default function SubjectAnalysis() {
                   const c = scoreColor(s.avg_score);
                   const tgt = targetScore(s);
                   return (
-                    <div key={s.subject} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${c}22`, borderRadius: '14px', padding: '1.1rem', position: 'relative', overflow: 'hidden' }}>
+                    <div key={s.subject} style={{ background: 'var(--bg-elevated)', border: `1px solid ${c}22`, borderRadius: '14px', padding: '1.1rem', position: 'relative', overflow: 'hidden' }}>
                       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: c, opacity: 0.7, borderRadius: '14px 14px 0 0' }} />
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.85rem' }}>
                         <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[s.subject] ?? '📚'}</span>
@@ -908,7 +904,7 @@ export default function SubjectAnalysis() {
                     const c = s ? scoreColor(s.avg_score) : '#6366f1';
                     const open = expandedPlan === subj;
                     return (
-                      <div key={subj} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${c}25`, borderRadius: '14px', overflow: 'hidden' }}>
+                      <div key={subj} style={{ background: 'var(--bg-elevated)', border: `1px solid ${c}25`, borderRadius: '14px', overflow: 'hidden' }}>
                         <button onClick={() => setExpandedPlan(open ? null : subj)} style={{ width: '100%', padding: '0.85rem 1.1rem', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontFamily: 'inherit' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                             <span style={{ fontSize: '1.1rem' }}>{SUBJECT_ICONS[subj] ?? '📚'}</span>
@@ -919,7 +915,7 @@ export default function SubjectAnalysis() {
                         {open && (
                           <div style={{ padding: '0 1.1rem 1.1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.4rem' }}>
                             {(plan as ActionPlanDay[]).map(d => (
-                              <div key={d.day} style={{ display: 'flex', gap: '0.75rem', padding: '0.6rem 0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '9px' }}>
+                              <div key={d.day} style={{ display: 'flex', gap: '0.75rem', padding: '0.6rem 0.75rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '9px' }}>
                                 <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: `${c}22`, border: `1px solid ${c}40`, color: c, fontWeight: 800, fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>D{d.day}</div>
                                 <div>
                                   <p style={{ margin: '0 0 0.1rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-h)' }}>{d.title}</p>
@@ -971,12 +967,12 @@ export default function SubjectAnalysis() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
               {records.map(rec => (
-                <div key={rec.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.85rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', flexWrap: 'wrap' as const }}>
+                <div key={rec.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.85rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '10px', flexWrap: 'wrap' as const }}>
                   <span style={{ fontSize: '1rem', flexShrink: 0 }}>{SUBJECT_ICONS[rec.subject] ?? '📚'}</span>
                   <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-h)', minWidth: '100px' }}>{rec.subject}</span>
                   <span style={{ fontSize: '0.78rem', color: 'var(--text)' }}>{rec.date}</span>
                   <span style={{ fontWeight: 800, fontSize: '0.9rem', color: scoreColor(rec.score), minWidth: '44px' }}>{rec.score.toFixed(0)}%</span>
-                  <span style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem', borderRadius: '99px', background: 'rgba(255,255,255,0.06)', color: 'var(--text)', textTransform: 'capitalize' as const }}>{rec.source.replace('_', ' ')}</span>
+                  <span style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem', borderRadius: '99px', background: 'var(--border)', color: 'var(--text)', textTransform: 'capitalize' as const }}>{rec.source.replace('_', ' ')}</span>
                   {rec.study_hours > 0 && (
                     <span style={{ fontSize: '0.72rem', color: '#06b6d4' }}>⏱ {rec.study_hours.toFixed(1)}h</span>
                   )}
@@ -1037,7 +1033,7 @@ const p: Record<string, React.CSSProperties> = {
   page: { minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-h)', fontFamily: 'inherit', position: 'relative', overflow: 'hidden' },
   orb1: { position: 'fixed', top: '-8%', right: '-5%', width: '450px', height: '450px', borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,0.07) 0%,transparent 70%)', pointerEvents: 'none', zIndex: 0 },
   orb2: { position: 'fixed', bottom: '5%', left: '-10%', width: '380px', height: '380px', borderRadius: '50%', background: 'radial-gradient(circle,rgba(16,185,129,0.05) 0%,transparent 70%)', pointerEvents: 'none', zIndex: 0 },
-  topBar: { position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.75rem', background: 'rgba(6,11,24,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' },
+  topBar: { position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.75rem', background: 'var(--glass-bg)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border)' },
   topCenter: { display: 'flex', alignItems: 'center', gap: '0.5rem' },
   pageTitle: { margin: 0, fontSize: '1.05rem', fontWeight: 800, background: 'linear-gradient(135deg,#6366f1,#06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
   addBtn: { padding: '0.38rem 0.9rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: '9px', color: '#fff', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' },
@@ -1047,7 +1043,7 @@ const p: Record<string, React.CSSProperties> = {
   emptyWrap: { display: 'flex', justifyContent: 'center', padding: '4rem 1rem' },
   emptyCard: { textAlign: 'center' as const, maxWidth: '440px' },
   addBigBtn: { padding: '0.75rem 2rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: '12px', color: '#fff', fontSize: '0.95rem', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(99,102,241,0.35)' },
-  card: { background: 'var(--glass-bg,rgba(255,255,255,0.04))', backdropFilter: 'blur(24px)', border: '1px solid var(--glass-border,rgba(255,255,255,0.08))', borderRadius: '20px', padding: '1.5rem', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' },
+  card: { background: 'var(--bg-elevated)', backdropFilter: 'blur(24px)', border: '1px solid var(--border)', borderRadius: '20px', padding: '1.5rem', boxShadow: 'var(--glow-card)' },
   cardHead: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' as const },
   cardTitle: { margin: '0 0 0.85rem', fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-h)' },
   detectionGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '0.85rem' },
@@ -1055,7 +1051,7 @@ const p: Record<string, React.CSSProperties> = {
   trendTab: { padding: '0.28rem 0.65rem', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' },
   recGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '0.85rem', marginTop: '0.85rem' },
   detailBtn: { padding: '0.35rem 0.85rem', background: 'transparent', border: '1px solid', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' },
-  statChip: { padding: '0.2rem 0.6rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '99px', fontSize: '0.72rem', fontWeight: 600 },
+  statChip: { padding: '0.2rem 0.6rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '99px', fontSize: '0.72rem', fontWeight: 600 },
 };
 
 const hm: Record<string, React.CSSProperties> = {
@@ -1068,7 +1064,7 @@ const hm: Record<string, React.CSSProperties> = {
 };
 
 const dc: Record<string, React.CSSProperties> = {
-  card: { background: 'rgba(255,255,255,0.03)', border: '1px solid', borderRadius: '16px', padding: '1.1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.35rem', alignItems: 'center', textAlign: 'center' as const },
+  card: { background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '16px', padding: '1.1rem', display: 'flex', flexDirection: 'column' as const, gap: '0.35rem', alignItems: 'center', textAlign: 'center' as const },
   iconBox: { width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.15rem', marginBottom: '0.15rem', flexShrink: 0 },
   label: { margin: 0, fontSize: '0.67rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const },
   subject: { margin: 0, fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-h)' },
@@ -1078,21 +1074,21 @@ const dc: Record<string, React.CSSProperties> = {
 
 const md: Record<string, React.CSSProperties> = {
   overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' },
-  panel: { background: 'var(--bg-elevated,#0f1a2e)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '22px', width: '100%', maxWidth: '640px', maxHeight: '88vh', display: 'flex', flexDirection: 'column' as const, overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.5)' },
-  header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', borderBottom: '1px solid', flexShrink: 0 },
+  panel: { background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '22px', width: '100%', maxWidth: '640px', maxHeight: '88vh', display: 'flex', flexDirection: 'column' as const, overflow: 'hidden', boxShadow: 'var(--glow-card)' },
+  header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', flexShrink: 0 },
   badge: { display: 'inline-block', padding: '0.15rem 0.5rem', borderRadius: '99px', fontSize: '0.68rem', fontWeight: 700, marginTop: '0.25rem' },
-  closeBtn: { background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', color: 'var(--text)', fontSize: '0.9rem', padding: '0.3rem 0.6rem', cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 },
+  closeBtn: { background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)', fontSize: '0.9rem', padding: '0.3rem 0.6rem', cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 },
   body: { flex: 1, overflowY: 'auto' as const, padding: '1.4rem 1.5rem' },
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.6rem', marginBottom: '1.25rem' },
-  statBox: { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '0.6rem 0.75rem', textAlign: 'center' as const },
+  statBox: { background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.6rem 0.75rem', textAlign: 'center' as const },
   statLabel: { margin: '0 0 0.2rem', fontSize: '0.65rem', color: 'var(--text)', opacity: 0.65 },
   statValue: { margin: 0, fontSize: '0.95rem', fontWeight: 800 },
-  sectionTitle: { margin: '0 0 0.65rem', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text)', textTransform: 'uppercase' as const, letterSpacing: '0.06em', opacity: 0.7 },
+  sectionTitle: { margin: '0 0 0.65rem', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-m)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' },
 };
 
 const af: Record<string, React.CSSProperties> = {
   row:  { display: 'flex', flexDirection: 'column' as const, gap: '0.3rem' },
   row2: { display: 'flex', gap: '0.75rem' },
   label: { fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-h)' },
-  input: { padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '9px', color: 'var(--text-h)', fontSize: '0.85rem', fontFamily: 'inherit', width: '100%', outline: 'none' },
+  input: { padding: '0.5rem 0.75rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '9px', color: 'var(--text-h)', fontSize: '0.85rem', fontFamily: 'inherit', width: '100%', outline: 'none' },
 };

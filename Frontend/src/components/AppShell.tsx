@@ -4,12 +4,13 @@ import {
   BookOpen, FileText, BarChart2, Trophy, Brain, Zap,
   MessageCircle, Layers, Menu, Rocket, Mic2, ChevronRight,
   Shield, TrendingUp, Dumbbell, Video, Calendar, ClipboardCheck,
-  LayoutDashboard, User, Award, LogOut, ChevronLeft,
+  LayoutDashboard, User, Award, LogOut, ChevronLeft, Sun, Moon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BrainIcon } from './TwinMindLogo';
 import { useAuth } from '../contexts/AuthContext';
 import { useSidebar } from '../contexts/SidebarContext';
+import { useTheme } from '../contexts/ThemeContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import NotificationBell from './NotificationBell';
 import MobileNav from './MobileNav';
@@ -54,13 +55,16 @@ function SidebarNavItem({ icon: Icon, label, to, active }: { icon: React.Compone
         style={{
           display: 'flex', alignItems: 'center', gap: '12px',
           padding: '10px 20px', margin: '2px 12px', borderRadius: '10px',
-          color: active ? '#00D4FF' : 'rgba(255,255,255,0.65)',
-          background: active ? 'rgba(0,212,255,0.1)' : 'transparent',
+          color: active ? '#FFFFFF' : 'rgba(255,255,255,0.70)',
+          background: active
+            ? 'linear-gradient(135deg, rgba(59,130,246,0.18), rgba(0,212,255,0.12))'
+            : 'transparent',
+          borderLeft: active ? '3px solid #3B82F6' : '3px solid transparent',
           fontSize: '0.875rem', fontWeight: active ? 600 : 400,
           transition: 'all 0.2s ease', cursor: 'pointer',
         }}
       >
-        <Icon size={18} style={{ opacity: active ? 1 : 0.6, flexShrink: 0 }} />
+        <Icon size={18} style={{ opacity: active ? 1 : 0.65, flexShrink: 0 }} />
         <span>{label}</span>
       </motion.div>
     </Link>
@@ -109,7 +113,7 @@ function SidebarAccordion({ icon: Icon, label, children, defaultOpen = false }: 
 
 const secLabel: React.CSSProperties = {
   padding: '16px 20px 6px', fontSize: '0.7rem', fontWeight: 600,
-  color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em',
+  color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.08em',
 };
 
 const NAV = {
@@ -139,9 +143,52 @@ const NAV = {
   ],
 };
 
+function ThemeToggle({ colorScheme, onToggle }: { colorScheme: 'light' | 'dark'; onToggle: () => void }) {
+  const isDark = colorScheme === 'dark';
+  return (
+    <button
+      onClick={onToggle}
+      title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      style={{
+        position: 'relative',
+        display: 'flex', alignItems: 'center',
+        width: 52, height: 28, borderRadius: 14,
+        background: isDark ? '#1E293B' : '#F1F5F9',
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#D1D5DB'}`,
+        cursor: 'pointer', padding: 0, flexShrink: 0,
+        transition: 'background 0.3s ease, border-color 0.3s ease',
+      }}
+    >
+      <Sun size={12} style={{
+        position: 'absolute', left: 7, top: '50%', transform: 'translateY(-50%)',
+        color: isDark ? '#475569' : '#F59E0B',
+        opacity: isDark ? 0.5 : 1,
+        transition: 'color 0.3s, opacity 0.3s',
+      }} />
+      <Moon size={12} style={{
+        position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)',
+        color: isDark ? '#00D4FF' : '#94A3B8',
+        opacity: isDark ? 1 : 0.5,
+        transition: 'color 0.3s, opacity 0.3s',
+      }} />
+      <motion.div
+        animate={{ x: isDark ? 26 : 2 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+        style={{
+          position: 'absolute', left: 0,
+          width: 22, height: 22, borderRadius: '50%',
+          background: '#FFFFFF',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+        }}
+      />
+    </button>
+  );
+}
+
 export default function AppShell() {
   const { user, logout } = useAuth();
   const { collapsed, toggleCollapsed, drawerOpen, setDrawerOpen } = useSidebar();
+  const { colorScheme, toggleColorScheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [challengeOpen, setChallengeOpen] = useState(false);
@@ -150,11 +197,13 @@ export default function AppShell() {
   const pageTitle   = PAGE_TITLES[location.pathname] ?? 'TwinMind';
   const isDashboard = location.pathname === '/dashboard';
   const isActive    = (path: string) => location.pathname === path;
+  const isDark      = colorScheme === 'dark';
 
   return (
     <div style={{
       display: 'flex', height: '100vh', overflow: 'hidden',
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      background: 'var(--ui-header-bg)',
     }}>
       <WeeklyChallengesModal isOpen={challengeOpen} onClose={() => setChallengeOpen(false)} />
       <MobileNav
@@ -165,14 +214,14 @@ export default function AppShell() {
         onLogout={logout}
       />
 
-      {/* ═══ FIXED LEFT SIDEBAR ═══ */}
+      {/* ═══ FIXED LEFT SIDEBAR (always dark) ═══ */}
       <motion.aside
         initial={false}
         animate={{ width: collapsed ? 0 : 280, opacity: collapsed ? 0 : 1 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="app-shell-sidebar"
         style={{
-          background: '#0F172A', color: '#fff', flexShrink: 0, overflow: 'hidden',
+          background: isDark ? '#0B1220' : '#0F172A', color: '#fff', flexShrink: 0, overflow: 'hidden',
           display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0,
           height: '100vh', zIndex: 100, borderRight: '1px solid rgba(255,255,255,0.06)',
         }}
@@ -244,14 +293,18 @@ export default function AppShell() {
         transition: 'margin-left 0.3s ease',
         display: 'flex', flexDirection: 'column',
         height: '100vh', overflow: 'hidden',
+        background: 'var(--ui-header-bg)',
       }}>
 
         {/* ═══ GLOBAL HEADER ═══ */}
         <header style={{
-          height: '64px', background: '#ffffff', borderBottom: '1px solid #e2e8f0',
+          height: '64px',
+          background: 'var(--ui-header-bg)',
+          borderBottom: '1px solid var(--ui-header-border)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 32px', flexShrink: 0, zIndex: 50,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          boxShadow: isDark ? '0 1px 0 rgba(255,255,255,0.05)' : '0 1px 3px rgba(0,0,0,0.04)',
+          transition: 'background 0.3s ease, border-color 0.3s ease',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {/* Desktop: collapse sidebar */}
@@ -259,7 +312,7 @@ export default function AppShell() {
               className="shell-ham-desk"
               onClick={toggleCollapsed}
               style={{
-                background: 'none', border: 'none', color: '#64748b', cursor: 'pointer',
+                background: 'none', border: 'none', color: 'var(--ui-text-muted)', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', padding: '6px',
               }}
             >
@@ -271,7 +324,7 @@ export default function AppShell() {
               onClick={() => setDrawerOpen(true)}
               aria-label="Open menu"
               style={{
-                background: 'none', border: 'none', color: '#64748b', cursor: 'pointer',
+                background: 'none', border: 'none', color: 'var(--ui-text-muted)', cursor: 'pointer',
                 display: 'none', alignItems: 'center', padding: '6px',
               }}
             >
@@ -282,27 +335,33 @@ export default function AppShell() {
               <button
                 onClick={() => navigate(-1)}
                 style={{
-                  background: 'none', border: 'none', color: '#64748b', cursor: 'pointer',
+                  background: 'none', border: 'none', color: 'var(--ui-text-muted)', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', padding: '4px', borderRadius: '6px',
                 }}
               >
                 <ChevronLeft size={20} />
               </button>
             )}
-            <h1 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 600, color: '#0f172a' }}>
+            <h1 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 600, color: 'var(--ui-text-h)', transition: 'color 0.3s ease' }}>
               {pageTitle}
             </h1>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <LanguageSwitcher />
+
+            {/* Light / Dark theme toggle */}
+            <ThemeToggle colorScheme={colorScheme} onToggle={toggleColorScheme} />
+
             <button
               onClick={() => setChallengeOpen(true)} title="Weekly Challenges"
               className="shell-hide-mobile"
               style={{
-                width: '36px', height: '36px', borderRadius: '10px', border: '1px solid #e2e8f0',
-                background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#64748b', cursor: 'pointer', transition: 'all 0.2s',
+                width: '36px', height: '36px', borderRadius: '10px',
+                border: '1px solid var(--ui-border)',
+                background: 'var(--ui-surface)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--ui-text-muted)', cursor: 'pointer', transition: 'all 0.2s',
               }}
             >
               <Dumbbell size={18} />
@@ -311,9 +370,11 @@ export default function AppShell() {
               to="/shield" title="Shield Center"
               className="shell-hide-mobile"
               style={{
-                width: '36px', height: '36px', borderRadius: '10px', border: '1px solid #e2e8f0',
-                background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#64748b', textDecoration: 'none', transition: 'all 0.2s',
+                width: '36px', height: '36px', borderRadius: '10px',
+                border: '1px solid var(--ui-border)',
+                background: 'var(--ui-surface)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--ui-text-muted)', textDecoration: 'none', transition: 'all 0.2s',
               }}
             >
               <Shield size={18} />
@@ -323,8 +384,11 @@ export default function AppShell() {
               to="/profile"
               style={{
                 width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden',
-                border: '2px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: '#dbeafe', textDecoration: 'none', flexShrink: 0,
+                border: '2px solid var(--ui-border)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: isDark ? '#1E3A5F' : '#DBEAFE',
+                textDecoration: 'none', flexShrink: 0,
+                transition: 'border-color 0.3s ease, background 0.3s ease',
               }}
             >
               {avatarSrc
@@ -338,7 +402,7 @@ export default function AppShell() {
         </header>
 
         {/* ═══ PAGE CONTENT ═══ */}
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div style={{ flex: 1, overflowY: 'auto', background: 'var(--ui-header-bg)', transition: 'background 0.3s ease' }}>
           <Outlet />
         </div>
       </div>

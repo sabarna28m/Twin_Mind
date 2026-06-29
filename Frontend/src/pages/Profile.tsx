@@ -1,8 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { BrainIcon } from '../components/TwinMindLogo';
 import { useTheme, THEMES } from '../contexts/ThemeContext';
 import TwoFactorModal from '../components/TwoFactorModal';
 import DeleteAccountModal from '../components/DeleteAccountModal';
@@ -400,16 +399,6 @@ export default function Profile() {
         }
       `}</style>
 
-      {/* ── Top nav bar ── */}
-      <header style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 1.5rem', height:'58px', borderBottom:'1px solid var(--card-border)', background: '#ffffff', backdropFilter: 'none', position:'sticky', top:0, zIndex:30, flexShrink:0 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:'0.65rem' }}>
-          <BrainIcon size={24} />
-          <Link to="/" style={{ fontSize:'1.05rem', fontWeight:900, color:'var(--primary)', textDecoration:'none', letterSpacing:'-0.5px' }}>TwinMind</Link>
-          <span style={{ width:'1px', height:'16px', background:'rgba(255,255,255,0.1)' }} />
-          <span style={{ fontSize:'0.82rem', fontWeight:600, color:'rgba(203,213,225,0.8)' }}>Profile & Settings</span>
-        </div>
-        <Link to="/dashboard" style={{ fontSize:'0.78rem', fontWeight:700, color:'var(--primary)', textDecoration:'none', padding:'0.32rem 0.85rem', border:'1px solid rgba(var(--primary-rgb),0.25)', borderRadius:'8px', transition:'all 0.18s' }}>← Dashboard</Link>
-      </header>
 
       {/* ── Profile completion banner ── */}
       <div style={{ padding:'0.9rem 1.5rem', background: '#ffffff', borderBottom:'1.5px solid rgba(var(--primary-rgb),0.15)', flexShrink:0, backdropFilter: 'none', WebkitBackdropFilter: 'none' }}>

@@ -4530,3 +4530,21 @@ html[data-color-scheme="light"] .dpt-link-btn {
 }
 html[data-color-scheme="light"] .dpt-svg-track { stroke: var(--border) !important; }
 
+/* Assessment Hub Overrides */
+.assessment-light {
+  --bg: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-surface: #FFFFFF;
+  --border: #BDBDBD;
+  --text-h: #000000;
+  --text-m: #1A1A1A;
+  --text: #444444;
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glow-card: 0 4px 16px rgba(0,0,0,0.06);
+  --assessment-icon: #1A1A1A;
+}
+
+.assessment-dark {
+  --glass-bg: var(--bg-elevated);
+  --assessment-icon: var(--text-m);
+}

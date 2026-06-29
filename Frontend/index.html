@@ -42,6 +42,9 @@
           var s=localStorage.getItem('twinmind-theme');
           var t=V.indexOf(s)!==-1?s:M[s]||(M[localStorage.getItem('theme')]||'galaxy-nexus');
           document.documentElement.setAttribute('data-theme',t);
+          /* Color scheme — prevents flash of wrong theme on load */
+          var cs=localStorage.getItem('tm_color_scheme')||'dark';
+          document.documentElement.setAttribute('data-color-scheme',cs);
         }catch(e){}
       })();
     </script>

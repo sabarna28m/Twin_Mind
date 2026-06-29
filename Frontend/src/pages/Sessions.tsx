@@ -1,11 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { Timer } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { BrainIcon } from '../components/TwinMindLogo';
 import { useWebSocket } from '../hooks/useWebSocket';
-import LiveBadge from '../components/LiveBadge';
-import BackButton from '../components/BackButton';
 import api from '../services/api';
 import type { Session } from '../types/sessions';
 import SessionTimer from '../components/sessions/SessionTimer';
@@ -107,21 +102,6 @@ export default function Sessions() {
   return (
     <div style={pg.shell}>
 
-      {/* Nav */}
-      <header style={pg.nav} className="nav-premium">
-        <div style={pg.navLeft}>
-          <BackButton />
-          <BrainIcon size={24} />
-          <Link to="/" style={pg.navLogo}>TwinMind</Link>
-          {wsConnected && <LiveBadge />}
-        </div>
-        <div style={pg.navRight}>
-          <div style={pg.pageTitlePill}>
-            <Timer size={14} color="#4338ca" />
-            <span>Focus Sessions</span>
-          </div>
-        </div>
-      </header>
 
       <main style={pg.main}>
         <div style={pg.content} className="animate-slide-up">
@@ -179,7 +159,7 @@ export default function Sessions() {
 }
 
 const pg: Record<string, React.CSSProperties> = {
-  shell: { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: '#f8f9fa', fontFamily: 'var(--sans)' },
+  shell: { minHeight: '100svh', display: 'flex', flexDirection: 'column', background: 'var(--bg)', fontFamily: 'var(--sans)' },
 
   nav: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -194,7 +174,7 @@ const pg: Record<string, React.CSSProperties> = {
     padding: '0.3rem 0.85rem', borderRadius: '99px',
     border: '1px solid rgba(0,212,255,0.2)',
     background: 'rgba(0,212,255,0.08)',
-    fontSize: '0.78rem', fontWeight: 700, color: '#4338ca', letterSpacing: '0.02em',
+    fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-h)', letterSpacing: '0.02em',
   },
 
   main: { flex: 1, display: 'flex', justifyContent: 'center', padding: '2rem 1.25rem 4rem', boxSizing: 'border-box' },
@@ -212,10 +192,10 @@ const pg: Record<string, React.CSSProperties> = {
   analyticsToggleBtn: {
     padding: '0.38rem 1.1rem', borderRadius: '99px',
     border: '1px solid rgba(0,212,255,0.2)',
-    background: 'rgba(0,212,255,0.15)', color: '#4338ca',
+    background: 'rgba(0,212,255,0.15)', color: 'var(--text-h)',
     fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
     transition: 'background 0.18s',
   },
 
-  divider: { height: '1px', background: '#e2e8f0' },
+  divider: { height: '1px', background: 'var(--border)' },
 };

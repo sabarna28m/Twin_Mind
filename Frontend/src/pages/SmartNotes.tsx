@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BackButton from '../components/BackButton';
 import api from '../services/api';
+import { useTheme } from '../contexts/ThemeContext';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -50,6 +51,7 @@ const PURPLE  = '#8b5cf6';
 const TEXT    = 'var(--text-h)';
 const MUTED   = 'var(--text-m)';
 const DIM     = 'var(--text)';
+const ACCENT  = 'var(--accent)';
 
 // ── Tiny helpers ──────────────────────────────────────────────────────────────
 
@@ -94,8 +96,8 @@ function renderMarkdown(md: string): string {
     .replace(/^#{1}\s+(.+)$/gm, '<h1 style="color:#00D4FF;margin:0.7rem 0 0.3rem;font-size:1.2rem">$1</h1>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code style="background:rgba(99,102,241,0.2);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:0.85em;color:#a78bfa">$1</code>')
-    .replace(/^\s*```[\w]*\n?([\s\S]*?)```/gm, '<pre style="background:rgba(0,0,0,0.35);border:1px solid rgba(99,102,241,0.2);border-radius:8px;padding:0.75rem;overflow-x:auto;font-family:monospace;font-size:0.83rem;color:#a78bfa;margin:0.5rem 0">$1</pre>')
+    .replace(/`([^`]+)`/g, '<code style="background:var(--sn-markdown-bg);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:0.85em;color:var(--sn-markdown-text)">$1</code>')
+    .replace(/^\s*```[\w]*\n?([\s\S]*?)```/gm, '<pre style="background:var(--sn-markdown-bg);border:1px solid var(--sn-markdown-border);border-radius:8px;padding:0.75rem;overflow-x:auto;font-family:monospace;font-size:0.83rem;color:var(--sn-markdown-text);margin:0.5rem 0">$1</pre>')
     .replace(/^\s*[-*]\s+(.+)$/gm, '<li style="margin-bottom:3px">$1</li>')
     .replace(/^\s*\d+\.\s+(.+)$/gm, '<li style="margin-bottom:3px">$1</li>')
     .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:#00D4FF;text-decoration:underline">$1</a>')
@@ -379,6 +381,9 @@ function TimelineView({ events }: { events: Array<{ type: string; title: string;
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function SmartNotes() {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
+  
   // View state
   const [view, setView]         = useState<MainView>('notes');
   const [activeId, setActiveId] = useState<number | null>(null);
@@ -655,15 +660,42 @@ export default function SmartNotes() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ minHeight: '100svh', background: BG, color: TEXT, fontFamily: '"Inter", system-ui, sans-serif', display: 'flex', flexDirection: 'column' }}>
+    <div className={isDark ? 'sn-dark' : 'sn-light'} style={{ minHeight: '100svh', background: BG, color: TEXT, fontFamily: '"Inter", system-ui, sans-serif', display: 'flex', flexDirection: 'column' }}>
       <style>{`
+        .sn-light {
+          --bg: #FFFFFF;
+          --bg-elevated: #FFFFFF;
+          --bg-surface: #FFFFFF;
+          --border: #BDBDBD;
+          --text-h: #000000;
+          --text-m: #1A1A1A;
+          --text: #444444;
+          --glass-bg: rgba(255, 255, 255, 0.95);
+          
+          --sn-icon: #000000;
+          --sn-dropdown-bg: #FFFFFF;
+          --sn-markdown-bg: #F3F4F6;
+          --sn-markdown-border: #9CA3AF;
+          --sn-markdown-text: #1A1A1A;
+          --sn-empty-icon: brightness(0);
+          --sn-gradient-fade: radial-gradient(ellipse at center, rgba(0,82,204,0.05) 0%, rgba(255,255,255,0) 70%);
+        }
+        .sn-dark {
+          --sn-icon: var(--text-m);
+          --sn-dropdown-bg: #0d1117;
+          --sn-markdown-bg: rgba(0,0,0,0.35);
+          --sn-markdown-border: rgba(99,102,241,0.2);
+          --sn-markdown-text: #a78bfa;
+          --sn-empty-icon: none;
+          --sn-gradient-fade: radial-gradient(ellipse at center, rgba(0,82,204,0.05) 0%, rgba(248,249,250,0) 70%);
+        }
         @keyframes spin { to { transform:rotate(360deg); } }
         * { scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
         *::-webkit-scrollbar { width:4px; height:4px; }
         *::-webkit-scrollbar-thumb { background:var(--border); border-radius:99px; }
         input,textarea,select { outline:none; }
         input:focus,textarea:focus,select:focus { border-color:rgba(99,102,241,0.5) !important; }
-        select option { background:#0d1117; color:#0f172a; }
+        select option { background:var(--sn-dropdown-bg); color:var(--text-h); }
         .note-card:hover { background:var(--bg-elevated) !important; }
         .ai-btn:hover { opacity:0.85; }
         .view-tab:hover { color:var(--text-h) !important; }
@@ -714,7 +746,7 @@ export default function SmartNotes() {
       </div>
 
       {/* ── Main content ── */}
-      <div style={{ position: 'absolute', top: '-20%', left: '50%', transform: 'translateX(-50%)', width: '120vw', height: '60vh', background: 'radial-gradient(ellipse at center, rgba(0,82,204,0.05) 0%, rgba(248,249,250,0) 70%)', pointerEvents: 'none', zIndex: 0 }} />
+      <div style={{ position: 'absolute', top: '-20%', left: '50%', transform: 'translateX(-50%)', width: '120vw', height: '60vh', background: 'var(--sn-gradient-fade)', pointerEvents: 'none', zIndex: 0 }} />
       <div style={{ flex: 1, overflow: 'hidden', display: 'flex', zIndex: 1, position: 'relative' }}>
 
         {/* ══════════════ NOTES VIEW ══════════════ */}
@@ -775,7 +807,7 @@ export default function SmartNotes() {
                   <div style={{ padding: '2rem', textAlign: 'center', color: MUTED, fontSize: '0.85rem' }}>Loading…</div>
                 ) : notes.length === 0 ? (
                   <div style={{ padding: '2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📝</div>
+                    <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem', filter: 'var(--sn-empty-icon)' }}>📝</div>
                     <div style={{ color: TEXT, fontWeight: 600, marginBottom: 4 }}>No notes yet</div>
                     <div style={{ color: MUTED, fontSize: '0.8rem', marginBottom: '1rem' }}>Create your first note to begin</div>
                     <button onClick={createNote} style={{ padding: '0.5rem 1.2rem', background: `linear-gradient(135deg,${INDIGO},${PURPLE})`, border: 'none', borderRadius: 8, color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.82rem' }}>+ Create Note</button>
@@ -794,7 +826,7 @@ export default function SmartNotes() {
             <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               {activeId === null ? (
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', color: DIM }}>
-                  <div style={{ fontSize: '3rem' }}>📓</div>
+                  <div style={{ fontSize: '3rem', filter: 'var(--sn-empty-icon)' }}>📓</div>
                   <div style={{ fontWeight: 600, color: MUTED }}>Select a note or create one</div>
                   <button onClick={createNote} style={{ padding: '0.55rem 1.5rem', background: `linear-gradient(135deg,${INDIGO},${PURPLE})`, border: 'none', borderRadius: 10, color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.88rem' }}>+ New Note</button>
                 </div>
