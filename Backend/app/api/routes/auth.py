@@ -41,7 +41,7 @@ from app.models.comm_twin import CommTwin
 from app.models.chat_session import ChatSession
 from app.models.mentor_conversation import MentorConversation
 from app.models.notification import Notification
-from app.models.google_token import GoogleToken
+from app.models.event import Event
 from app.models.quiz import QuizSession
 from app.models.skill_tree import NodeProgress, XPTransaction, SkillTreeAchievement
 from app.models.smart_plan_record import SmartPlanRecord
@@ -410,7 +410,7 @@ def delete_account(
     # 8. password reset tokens
     db.query(PasswordResetToken).filter(PasswordResetToken.user_id == user_id).delete(synchronize_session=False)
     # 9. Google OAuth tokens
-    db.query(GoogleToken).filter(GoogleToken.user_id == user_id).delete(synchronize_session=False)
+    db.query(Event).filter(Event.user_id == user_id).delete(synchronize_session=False)
     # 10. burnout entries
     db.query(BurnoutEntry).filter(BurnoutEntry.user_id == user_id).delete(synchronize_session=False)
     # 11. career twin state

@@ -9,13 +9,13 @@ import { WS_URL } from '../lib/config';
 export function useWebSocket(
   userId: number | undefined,
   token: string | null,
-  onCheckinUpdate: () => void,
+  onMessage: (msg: any) => void,
 ): boolean {
   const [connected, setConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   // Keep a stable ref so the effect never needs to re-run for callback changes
-  const cbRef = useRef(onCheckinUpdate);
-  cbRef.current = onCheckinUpdate;
+  const cbRef = useRef(onMessage);
+  cbRef.current = onMessage;
 
   useEffect(() => {
     if (!userId || !token) return;
@@ -34,8 +34,8 @@ export function useWebSocket(
 
       ws.onmessage = (event: MessageEvent) => {
         try {
-          const msg = JSON.parse(event.data as string) as { type: string };
-          if (msg.type === 'checkin_update') cbRef.current();
+          const msg = JSON.parse(event.data as string) as any;
+          cbRef.current(msg);
         } catch { /* ignore malformed messages */ }
       };
 

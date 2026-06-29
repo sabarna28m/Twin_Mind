@@ -15,6 +15,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 import NotificationBell from './NotificationBell';
 import MobileNav from './MobileNav';
 import WeeklyChallengesModal from './WeeklyChallengesModal';
+import GlobalNotificationListener from './GlobalNotificationListener';
 import { BACKEND_URL } from '../lib/config';
 
 const BACKEND = BACKEND_URL;
@@ -206,6 +207,7 @@ export default function AppShell() {
       background: 'var(--ui-header-bg)',
     }}>
       <WeeklyChallengesModal isOpen={challengeOpen} onClose={() => setChallengeOpen(false)} />
+      <GlobalNotificationListener />
       <MobileNav
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}

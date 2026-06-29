@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme, THEMES } from '../contexts/ThemeContext';
 import TwoFactorModal from '../components/TwoFactorModal';
 import DeleteAccountModal from '../components/DeleteAccountModal';
+import StudyCalendar from '../components/StudyCalendar';
 import api from '../services/api';
 import { BACKEND_URL } from '../lib/config';
 import {
@@ -19,9 +20,8 @@ const SECTIONS: { id: SectionId; icon: string; label: string }[] = [
   { id:'overview',      icon:'👤', label:'Profile Overview'   },
   { id:'learning',      icon:'📚', label:'Learning Profile'   },
   { id:'gamification',  icon:'🏆', label:'Gamification'       },
-  { id:'connected',     icon:'🔗', label:'Connected Accounts' },
+  { id:'connected',     icon:'📅', label:'Study Calendar'    },
   { id:'notifications', icon:'🔔', label:'Notifications'      },
-  { id:'appearance',    icon:'🎨', label:'Appearance'         },
   { id:'security',      icon:'🔒', label:'Security'           },
   { id:'insights',      icon:'📊', label:'Account Insights'   },
 ];
@@ -143,10 +143,7 @@ export default function Profile() {
   const [notifEmail,     setNotifEmail]     = useState(() => LS.getBool('notif_email', false));
   const [notifPush,      setNotifPush]      = useState(() => LS.getBool('notif_push', false));
 
-  // ── Appearance toggles ──
-  const [compactMode,  setCompactMode]  = useState(() => LS.getBool('compact', false));
-  const [animations,   setAnimations]   = useState(() => LS.getBool('animations', true));
-  const [particles,    setParticles]    = useState(() => LS.getBool('particles', true));
+  // ── Appearance toggles (Removed per request) ──
 
   // ── Status messages ──
   const [nameMsg,      setNameMsg]      = useState<{ ok: boolean; text: string }|null>(null);
@@ -213,8 +210,9 @@ export default function Profile() {
   // Calendar OAuth callback
   useEffect(() => {
     const cal = searchParams.get('calendar');
+    const detail = searchParams.get('detail');
     if (cal === 'connected') { setCalMsg({ ok:true, text:'Google Calendar connected!' }); setSearchParams({}, { replace:true }); setActiveSection('connected'); }
-    if (cal === 'error')     { setCalMsg({ ok:false, text:'Failed to connect Google Calendar.' }); setSearchParams({}, { replace:true }); }
+    if (cal === 'error')     { setCalMsg({ ok:false, text:`Failed to connect Google Calendar.${detail ? ' Reason: ' + detail : ''}` }); setSearchParams({}, { replace:true }); }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Lazy-load 2FA status when the security section is opened
@@ -666,155 +664,11 @@ export default function Profile() {
             </div>
           )}
 
-          {/* ═════════════ CONNECTED ACCOUNTS ═════════════ */}
+          {/* ═════════════ CONNECTED ACCOUNTS (STUDY CALENDAR) ═════════════ */}
           {activeSection === 'connected' && (
             <div key="connected" className="prof-section-anim">
-              <Section title="Google Calendar" icon="📅">
-                {calMsg && <p style={{ ...(calMsg.ok ? msgOk : msgErr), marginBottom:'0.25rem' }}>{calMsg.text}</p>}
-
-                {/* ── Loading skeleton ── */}
-                {calStatus === null && (
-                  <GCard>
-                    <div style={{ display:'flex', alignItems:'center', gap:'0.85rem' }}>
-                      <div style={{ width:'44px', height:'44px', borderRadius:'12px', background:'rgba(66,133,244,0.1)', flexShrink:0 }} />
-                      <div style={{ flex:1 }}>
-                        <div style={{ height:'14px', width:'140px', borderRadius:'6px', background:'#f8f9fa', marginBottom:'6px' }} />
-                        <div style={{ height:'11px', width:'90px', borderRadius:'6px', background:'rgba(255,255,255,0.05)' }} />
-                      </div>
-                      <div style={{ fontSize:'0.72rem', color:'rgba(203,213,225,0.5)' }}>Loading…</div>
-                    </div>
-                  </GCard>
-                )}
-
-                {/* ── Not configured (no client ID set) ── */}
-                {calStatus && !calStatus.configured && (
-                  <GCard>
-                    <div style={{ display:'flex', alignItems:'flex-start', gap:'0.85rem' }}>
-                      <div style={{ width:'44px', height:'44px', borderRadius:'12px', background:'rgba(66,133,244,0.1)', border:'1px solid rgba(66,133,244,0.18)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.35rem', flexShrink:0 }}>📅</div>
-                      <div>
-                        <p style={{ margin:'0 0 0.25rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Google Calendar</p>
-                        <p style={{ margin:0, fontSize:'0.78rem', color:'rgba(203,213,225,0.65)', lineHeight:1.55 }}>
-                          Google Calendar integration is not configured on this server. Add <code style={{ background:'#f8f9fa', padding:'1px 5px', borderRadius:'4px', fontSize:'0.75rem' }}>GOOGLE_CLIENT_ID</code> and <code style={{ background:'#f8f9fa', padding:'1px 5px', borderRadius:'4px', fontSize:'0.75rem' }}>GOOGLE_CLIENT_SECRET</code> to the backend environment.
-                        </p>
-                      </div>
-                    </div>
-                  </GCard>
-                )}
-
-                {/* ── Configured but not connected ── */}
-                {calStatus?.configured && !calStatus.connected && (
-                  <GCard style={{ background:'linear-gradient(135deg,rgba(66,133,244,0.05),rgba(0,0,0,0))', border:'1.5px solid rgba(66,133,244,0.18)' }}>
-                    {/* Header */}
-                    <div style={{ display:'flex', alignItems:'center', gap:'0.85rem', marginBottom:'1.25rem' }}>
-                      <div style={{ width:'48px', height:'48px', borderRadius:'14px', background:'rgba(66,133,244,0.12)', border:'1px solid rgba(66,133,244,0.22)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.4rem', flexShrink:0 }}>📅</div>
-                      <div style={{ flex:1 }}>
-                        <div style={{ display:'flex', alignItems:'center', gap:'0.55rem', marginBottom:'0.18rem' }}>
-                          <p style={{ margin:0, fontSize:'0.95rem', fontWeight:700, color: '#0f172a' }}>Google Calendar</p>
-                          <span style={{ fontSize:'0.68rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:'99px', background:'rgba(148,163,184,0.1)', border:'1px solid rgba(148,163,184,0.2)', color:'rgba(148,163,184,0.7)' }}>Not Connected</span>
-                        </div>
-                        <p style={{ margin:0, fontSize:'0.75rem', color:'rgba(203,213,225,0.65)' }}>Connect to sync your TwinMind schedule automatically</p>
-                      </div>
-                    </div>
-
-                    {/* What syncs */}
-                    <div style={{ marginBottom:'1.5rem' }}>
-                      <p style={{ margin:'0 0 0.65rem', fontSize:'0.72rem', fontWeight:700, color:'rgba(148,163,184,0.6)', textTransform:'uppercase', letterSpacing:'0.05em' }}>What syncs to your calendar</p>
-                      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem' }}>
-                        {[
-                          { icon:'📋', label:'Study Plans',          desc:'Scheduled sessions & topics' },
-                          { icon:'🔔', label:'Reminders',            desc:'Custom study alerts' },
-                          { icon:'🎤', label:'Interview Schedules',  desc:'Mock interview bookings' },
-                          { icon:'📌', label:'Learning Deadlines',   desc:'Assignment & goal due dates' },
-                        ].map(f => (
-                          <div key={f.label} style={{ display:'flex', alignItems:'flex-start', gap:'0.55rem', padding:'0.65rem 0.75rem', background:'rgba(255,255,255,0.03)', borderRadius:'99px', border:'1px solid rgba(255,255,255,0.06)' }}>
-                            <span style={{ fontSize:'1rem', flexShrink:0, marginTop:'1px' }}>{f.icon}</span>
-                            <div>
-                              <p style={{ margin:'0 0 0.08rem', fontSize:'0.8rem', fontWeight:600, color: '#475569' }}>{f.label}</p>
-                              <p style={{ margin:0, fontSize:'0.68rem', color:'rgba(148,163,184,0.6)' }}>{f.desc}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <button style={{ ...pri, width:'100%', justifyContent:'center', display:'flex', alignItems:'center', gap:'0.4rem' }} onClick={connectCalendar}>
-                      <span>Connect Google Calendar</span>
-                    </button>
-                  </GCard>
-                )}
-
-                {/* ── Connected ── */}
-                {calStatus?.connected && (
-                  <GCard style={{ background:'linear-gradient(135deg,rgba(16,185,129,0.04),rgba(0,0,0,0))', border:'1.5px solid rgba(16,185,129,0.18)' }}>
-                    {/* Header */}
-                    <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'1rem', marginBottom:'1.25rem', flexWrap:'wrap' }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:'0.85rem' }}>
-                        <div style={{ width:'48px', height:'48px', borderRadius:'14px', background:'rgba(16,185,129,0.1)', border:'1px solid rgba(16,185,129,0.22)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.4rem', flexShrink:0 }}>📅</div>
-                        <div>
-                          <div style={{ display:'flex', alignItems:'center', gap:'0.55rem', marginBottom:'0.18rem' }}>
-                            <p style={{ margin:0, fontSize:'0.95rem', fontWeight:700, color: '#0f172a' }}>Google Calendar</p>
-                            <span style={{ fontSize:'0.68rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:'99px', background:'rgba(16,185,129,0.12)', border:'1px solid rgba(16,185,129,0.3)', color:'#34d399' }}>● Connected</span>
-                          </div>
-                          <p style={{ margin:0, fontSize:'0.73rem', color:'rgba(148,163,184,0.65)' }}>
-                            {calStatus.connected_at
-                              ? `Connected ${new Date(calStatus.connected_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}`
-                              : 'Calendar integration active'}
-                          </p>
-                        </div>
-                      </div>
-                      {/* Disconnect */}
-                      {!disconnectConfirm
-                        ? <button style={{ ...sec, fontSize:'0.78rem', padding:'0.42rem 0.9rem', flexShrink:0 }} onClick={() => setDisconnectConfirm(true)}>Disconnect</button>
-                        : (
-                          <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', flexShrink:0 }}>
-                            <span style={{ fontSize:'0.75rem', color:'rgba(203,213,225,0.7)' }}>Remove calendar access?</span>
-                            <button style={{ ...sec, fontSize:'0.76rem', padding:'0.38rem 0.75rem', color:'#fca5a5', border:'1px solid rgba(239,68,68,0.3)', background:'rgba(239,68,68,0.08)' }}
-                              onClick={() => { disconnectCalendar(); setDisconnectConfirm(false); }}>Yes, disconnect</button>
-                            <button style={{ ...sec, fontSize:'0.76rem', padding:'0.38rem 0.75rem' }} onClick={() => setDisconnectConfirm(false)}>Cancel</button>
-                          </div>
-                        )
-                      }
-                    </div>
-
-                    {/* Synced features chips */}
-                    <div style={{ marginBottom:'1.1rem' }}>
-                      <p style={{ margin:'0 0 0.6rem', fontSize:'0.7rem', fontWeight:700, color:'rgba(148,163,184,0.55)', textTransform:'uppercase', letterSpacing:'0.05em' }}>Synced features</p>
-                      <div style={{ display:'flex', flexWrap:'wrap', gap:'0.45rem' }}>
-                        {['📋 Study Plans', '🔔 Reminders', '🎤 Interview Schedules', '📌 Learning Deadlines'].map(f => (
-                          <span key={f} style={{ fontSize:'0.75rem', fontWeight:600, padding:'0.28rem 0.7rem', borderRadius:'99px', background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.22)', color:'rgba(52,211,153,0.85)' }}>{f}</span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Last sync row */}
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.75rem 0', borderTop:'1px solid rgba(255,255,255,0.06)', borderBottom:'1px solid rgba(255,255,255,0.06)', marginBottom:'1.1rem', gap:'1rem', flexWrap:'wrap' }}>
-                      <div>
-                        <p style={{ margin:'0 0 0.08rem', fontSize:'0.78rem', fontWeight:600, color: '#475569' }}>Last synced</p>
-                        <p style={{ margin:0, fontSize:'0.72rem', color:'rgba(148,163,184,0.65)' }}>
-                          {lastSync
-                            ? new Date(lastSync).toLocaleString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
-                            : 'Never — click Sync to push your study plan'}
-                        </p>
-                      </div>
-                      <button style={{ ...pri, fontSize:'0.8rem', padding:'0.48rem 1rem', flexShrink:0 }} onClick={syncPlan} disabled={syncing}>
-                        {syncing ? 'Syncing…' : 'Sync Now'}
-                      </button>
-                    </div>
-
-                    {/* Add Reminder */}
-                    <form onSubmit={addReminder} style={{ display:'flex', flexDirection:'column', gap:'0.65rem' }}>
-                      <h4 style={{ margin:0, fontSize:'0.82rem', fontWeight:700, color: '#0f172a' }}>Add Study Reminder</h4>
-                      <input className="prof-inp" style={inp} placeholder="Reminder title" value={remTitle} onChange={e=>setRemTitle(e.target.value)} required />
-                      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.6rem' }}>
-                        <input className="prof-inp" type="date" style={inp} value={remDate} onChange={e=>setRemDate(e.target.value)} required />
-                        <input className="prof-inp" type="time" style={inp} value={remTime} onChange={e=>setRemTime(e.target.value)} required />
-                      </div>
-                      {remMsg && <p style={remMsg.ok ? msgOk : msgErr}>{remMsg.text}</p>}
-                      <button type="submit" style={{ ...pri, alignSelf:'flex-start' }} disabled={addingRem}>{addingRem ? 'Adding…' : 'Add Reminder'}</button>
-                    </form>
-                  </GCard>
-                )}
-
+              <Section title="Study Calendar" icon="📅">
+                <StudyCalendar />
               </Section>
             </div>
           )}
@@ -852,56 +706,6 @@ export default function Profile() {
                     ].map((item, i) => (
                       <div key={item.key} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 0', borderTop: i>0?'1px solid rgba(255,255,255,0.08)':'none', gap:'1rem' }}>
                         <div style={{ minWidth:0 }}>
-                          <p style={{ margin:'0 0 0.1rem', fontSize:'0.87rem', fontWeight:600, color: '#0f172a' }}>{item.label}</p>
-                          <p style={{ margin:0, fontSize:'0.72rem', color:'rgba(203,213,225,0.75)' }}>{item.desc}</p>
-                        </div>
-                        <Toggle on={item.val} onChange={v => { item.set(v); LS.setBool(item.key, v); }} />
-                      </div>
-                    ))}
-                  </div>
-                </GCard>
-              </Section>
-            </div>
-          )}
-
-          {/* ═════════════ APPEARANCE ═════════════ */}
-          {activeSection === 'appearance' && (
-            <div key="appearance" className="prof-section-anim">
-              <Section title="Appearance" icon="🎨">
-                <GCard>
-                  <h3 style={{ margin:'0 0 0.25rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Theme</h3>
-                  <p style={{ margin:'0 0 1rem', fontSize:'0.78rem', color:'rgba(203,213,225,0.75)' }}>Choose a visual theme that transforms your entire TwinMind experience.</p>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(190px,1fr))', gap:'0.7rem' }}>
-                    {THEMES.map(t => {
-                      const active = themeId === t.id;
-                      return (
-                        <button key={t.id} className="prof-theme-btn" onClick={() => setTheme(t.id)}
-                          style={{ background:active?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.02)', border:`1px solid ${active?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.08)'}`, borderRadius:'14px', padding:'0.9rem', cursor:'pointer', textAlign:'left', transition:'all 0.2s', position:'relative', boxShadow:active?`0 0 0 2px rgba(var(--primary-rgb),0.4), 0 4px 20px rgba(var(--primary-rgb),0.12)`:'none' }}>
-                          {active && <div style={{ position:'absolute', top:'8px', right:'8px', width:'20px', height:'20px', borderRadius:'50%', background:'var(--primary)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.68rem', color:'#fff', fontWeight:900, boxShadow:'0 0 8px rgba(var(--primary-rgb),0.6)' }}>✓</div>}
-                          <div style={{ display:'flex', gap:'4px', marginBottom:'0.55rem' }}>
-                            {t.swatches.map((c,i) => <div key={i} style={{ flex:1, height:'18px', borderRadius:'5px', background:c, border:'1px solid rgba(255,255,255,0.08)' }} />)}
-                          </div>
-                          <div style={{ display:'flex', alignItems:'center', gap:'0.35rem', marginBottom:'0.2rem' }}>
-                            <span style={{ fontSize:'1rem' }}>{t.icon}</span>
-                            <span style={{ fontWeight:700, fontSize:'0.82rem', color: '#0f172a' }}>{t.name}</span>
-                          </div>
-                          <p style={{ margin:0, fontSize:'0.67rem', color:'rgba(203,213,225,0.75)', lineHeight:1.45 }}>{t.description}</p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </GCard>
-
-                <GCard>
-                  <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color: '#0f172a' }}>Interface Preferences</h3>
-                  <div style={{ display:'flex', flexDirection:'column', gap:'0' }}>
-                    {[
-                      { key:'compact',    label:'Compact Mode',       desc:'Reduce spacing for a denser information layout',  val:compactMode, set:setCompactMode },
-                      { key:'animations', label:'Animations',         desc:'Enable smooth transitions and motion effects',    val:animations,  set:setAnimations  },
-                      { key:'particles',  label:'Particle Effects',   desc:'Background particle system on the dashboard',     val:particles,   set:setParticles   },
-                    ].map((item, i) => (
-                      <div key={item.key} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.85rem 0', borderTop:i>0?'1px solid rgba(255,255,255,0.05)':'none', gap:'1rem' }}>
-                        <div>
                           <p style={{ margin:'0 0 0.1rem', fontSize:'0.87rem', fontWeight:600, color: '#0f172a' }}>{item.label}</p>
                           <p style={{ margin:0, fontSize:'0.72rem', color:'rgba(203,213,225,0.75)' }}>{item.desc}</p>
                         </div>

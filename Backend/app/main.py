@@ -20,7 +20,7 @@ from app.models import chat_session  # noqa: F401
 from app.models import quiz  # noqa: F401
 from app.models import weekly_challenge  # noqa: F401
 from app.models import battle  # noqa: F401
-from app.models import google_token  # noqa: F401
+from app.models import event  # noqa: F401
 from app.models import burnout  # noqa: F401
 from app.models import subject_performance  # noqa: F401
 from app.models import smart_plan_record  # noqa: F401
@@ -31,7 +31,7 @@ from app.models import note_history  # noqa: F401
 from app.models import note_version  # noqa: F401
 from app.models import skill_tree  # noqa: F401
 from app.models import streak_shield  # noqa: F401
-from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes, notifications as notif_routes, quiz as quiz_routes, gamification as gamif_routes, battles as battle_routes, calendar as calendar_routes, smart_plan as smart_plan_routes
+from app.api.routes import health, auth, sessions, notes, materials, analytics, student_profile as sp_routes, learning_data as ld_routes, prediction as pred_routes, simulate as sim_routes, mentor as mentor_routes, twin as twin_routes, achievements as ach_routes, notifications as notif_routes, quiz as quiz_routes, gamification as gamif_routes, battles as battle_routes, events as events_routes, smart_plan as smart_plan_routes
 from app.api.routes import streak_protection as shield_routes
 from app.api.routes import websocket as ws_routes
 from app.api.routes import videos as video_routes
@@ -65,10 +65,37 @@ def _run_2fa_migration() -> None:
 
 _run_2fa_migration()
 
+# Idempotent migration - adds new notification columns to existing events table if absent
+def _run_events_migration() -> None:
+    try:
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("""
+                ALTER TABLE events
+                    ADD COLUMN IF NOT EXISTS reminder_minutes_before INTEGER NOT NULL DEFAULT -1,
+                    ADD COLUMN IF NOT EXISTS notification_sent       BOOLEAN NOT NULL DEFAULT FALSE,
+                    ADD COLUMN IF NOT EXISTS last_notified_at        TIMESTAMPTZ;
+            """))
+            conn.commit()
+    except Exception as e:
+        print(f"Events migration skipped or failed (safe to ignore if table doesn't exist yet): {e}")
+
+_run_events_migration()
+
 app = FastAPI(
     title=settings.app_name,
     debug=settings.debug,
 )
+
+from app.services.scheduler import start_scheduler, stop_scheduler
+
+@app.on_event("startup")
+async def startup_event():
+    start_scheduler()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    stop_scheduler()
 
 app.add_middleware(
     CORSMiddleware,
@@ -95,7 +122,7 @@ app.include_router(notif_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(quiz_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(gamif_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(battle_routes.router, prefix=settings.api_v1_prefix)
-app.include_router(calendar_routes.router, prefix=settings.api_v1_prefix)
+app.include_router(events_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(smart_plan_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(video_routes.router, prefix=settings.api_v1_prefix)
 app.include_router(burnout_routes.router, prefix=settings.api_v1_prefix)
