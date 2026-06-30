@@ -135,10 +135,10 @@ function NotificationCard({
   return (
     <div
       onClick={() => !notif.is_read && onRead(notif.id)}
+      className={notif.is_read ? 'nb-card' : 'nb-card-unread'}
       style={{
         ...nc.card,
         borderLeft: `3px solid ${pColor}`,
-        background: notif.is_read ? 'transparent' : `${pColor}09`,
         cursor: notif.is_read ? 'default' : 'pointer',
       }}
     >
@@ -183,7 +183,6 @@ function NotificationCard({
 const nc: Record<string, React.CSSProperties> = {
   card: {
     padding: '0.85rem 1rem',
-    borderBottom: '1px solid var(--border)',
     transition: 'background 0.14s',
     borderRadius: 0,
   },
@@ -257,9 +256,9 @@ const nc: Record<string, React.CSSProperties> = {
     gap: '0.2rem',
     padding: '0.22rem 0.6rem',
     borderRadius: '6px',
-    border: '1px solid rgba(99,102,241,0.35)',
-    background: 'rgba(99,102,241,0.1)',
-    color: '#818cf8',
+    border: '1px solid #4f46e5',
+    background: '#1e1b4b',
+    color: '#a5b4fc',
     fontSize: '0.72rem',
     fontWeight: 600,
     cursor: 'pointer',
@@ -279,8 +278,8 @@ function DailySummaryCard({
   const [open, setOpen] = useState(true);
 
   return (
-    <div style={ds.wrap}>
-      <div style={ds.header} onClick={() => setOpen(o => !o)}>
+    <div className="nb-summary" style={ds.wrap}>
+      <div className="nb-summary-hdr" style={ds.header} onClick={() => setOpen(o => !o)}>
         <Brain size={14} color="#00D4FF" />
         <span style={ds.headerLabel}>Daily AI Summary</span>
         <button onClick={e => { e.stopPropagation(); onRefresh(); }} style={ds.refreshBtn} title="Refresh" disabled={loading}>
@@ -308,7 +307,7 @@ function DailySummaryCard({
                 { label: 'Burnout', value: summary.burnout_risk },
                 ...(summary.focus_score != null ? [{ label: 'Focus', value: `${Math.round(summary.focus_score)}%` }] : []),
               ].map(item => (
-                <div key={item.label} style={ds.stat}>
+                <div key={item.label} className="nb-stat" style={ds.stat}>
                   <span style={ds.statVal}>{item.value}</span>
                   <span style={ds.statLabel}>{item.label}</span>
                 </div>
@@ -322,7 +321,7 @@ function DailySummaryCard({
                 </li>
               ))}
             </ul>
-            <div style={ds.recommendation}>
+            <div className="nb-rec" style={ds.recommendation}>
               <Brain size={12} color="#00D4FF" style={{ flexShrink: 0, marginTop: 2 }} />
               <span style={ds.recText}>{summary.recommendation}</span>
             </div>
@@ -341,8 +340,6 @@ const ds: Record<string, React.CSSProperties> = {
   wrap: {
     margin: '0.75rem 0.75rem 0',
     borderRadius: '12px',
-    background: 'rgba(0,212,255,0.06)',
-    border: '1px solid rgba(0,212,255,0.18)',
     overflow: 'hidden',
   },
   header: {
@@ -351,7 +348,6 @@ const ds: Record<string, React.CSSProperties> = {
     gap: '0.5rem',
     padding: '0.65rem 0.85rem',
     cursor: 'pointer',
-    borderBottom: '1px solid rgba(0,212,255,0.1)',
   },
   headerLabel: {
     flex: 1,
@@ -420,8 +416,6 @@ const ds: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     padding: '0.3rem 0.5rem',
     borderRadius: '8px',
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.08)',
     minWidth: '44px',
   },
   statVal: { fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-h)' },
@@ -447,8 +441,6 @@ const ds: Record<string, React.CSSProperties> = {
     gap: '0.4rem',
     padding: '0.5rem 0.65rem',
     borderRadius: '8px',
-    background: 'rgba(0,212,255,0.06)',
-    border: '1px solid rgba(0,212,255,0.12)',
     alignItems: 'flex-start',
   },
   recText: { fontSize: '0.75rem', color: 'var(--text-h)', lineHeight: 1.5 },
@@ -606,6 +598,27 @@ export default function NotificationBell() {
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* ── Solid notification panel (overrides particle-theme transparency) ── */
+        .nb-drawer { background: #0D1729 !important; border-left: 1px solid #1E3050 !important; }
+        html[data-color-scheme="light"] .nb-drawer { background: #FFFFFF !important; border-left: 1px solid #E2E8F0 !important; }
+        .nb-card { background: #162032 !important; border-bottom: 1px solid #1E3050 !important; }
+        .nb-card-unread { background: #1B2D48 !important; border-bottom: 1px solid #1E3050 !important; }
+        html[data-color-scheme="light"] .nb-card { background: #F8FAFC !important; border-bottom: 1px solid #E2E8F0 !important; }
+        html[data-color-scheme="light"] .nb-card-unread { background: #FFFFFF !important; border-bottom: 1px solid #E2E8F0 !important; }
+        .nb-summary { background: #142030 !important; border: 1px solid #1E3A6B !important; }
+        html[data-color-scheme="light"] .nb-summary { background: #EFF6FF !important; border: 1px solid #BFDBFE !important; }
+        .nb-summary-hdr { border-bottom: 1px solid #1E3A6B !important; }
+        html[data-color-scheme="light"] .nb-summary-hdr { border-bottom: 1px solid #BFDBFE !important; }
+        .nb-stat { background: #1B2D48 !important; border: 1px solid #2D4570 !important; }
+        html[data-color-scheme="light"] .nb-stat { background: #F1F5F9 !important; border: 1px solid #CBD5E1 !important; }
+        .nb-rec { background: #142030 !important; border: 1px solid #1E3A6B !important; }
+        html[data-color-scheme="light"] .nb-rec { background: #EFF6FF !important; border: 1px solid #BFDBFE !important; }
+        .nb-hdr-sep { border-bottom: 1px solid #1E3050 !important; }
+        html[data-color-scheme="light"] .nb-hdr-sep { border-bottom: 1px solid #E2E8F0 !important; }
+        .nb-tab-sep { border-bottom: 1px solid #1E3050 !important; }
+        html[data-color-scheme="light"] .nb-tab-sep { border-bottom: 1px solid #E2E8F0 !important; }
+        .nb-ftr-sep { border-top: 1px solid #1E3050 !important; }
+        html[data-color-scheme="light"] .nb-ftr-sep { border-top: 1px solid #E2E8F0 !important; }
       `}</style>
 
       {/* Overlay */}
@@ -639,10 +652,10 @@ export default function NotificationBell() {
 
       {/* Drawer */}
       {open && (
-        <div ref={drawerRef} style={b.drawer}>
+        <div ref={drawerRef} className="nb-drawer" style={b.drawer}>
 
           {/* Drawer header */}
-          <div style={b.drawerHeader}>
+          <div className="nb-hdr-sep" style={b.drawerHeader}>
             <div style={b.drawerTitle}>
               <BellRing size={16} color="#00D4FF" />
               <span style={b.drawerTitleText}>AI Notifications</span>
@@ -681,15 +694,15 @@ export default function NotificationBell() {
           />
 
           {/* Category tabs */}
-          <div style={b.tabsWrap}>
+          <div className="nb-tab-sep" style={b.tabsWrap}>
             {CATEGORY_TABS.map(tab => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 style={{
                   ...b.tab,
-                  background:   activeTab === tab.key ? 'rgba(99,102,241,0.2)' : 'transparent',
-                  borderColor:  activeTab === tab.key ? 'rgba(99,102,241,0.5)' : 'transparent',
+                  background:   activeTab === tab.key ? '#312e81' : 'transparent',
+                  borderColor:  activeTab === tab.key ? '#6366f1' : 'transparent',
                   color:        activeTab === tab.key ? '#818cf8' : 'var(--text)',
                   fontWeight:   activeTab === tab.key ? 700 : 400,
                 }}
@@ -706,7 +719,7 @@ export default function NotificationBell() {
           <div style={b.list}>
             {filtered.length === 0 ? (
               <div style={b.empty}>
-                <Bell size={28} color="rgba(255,255,255,0.15)" />
+                <Bell size={28} color="var(--text)" style={{ opacity: 0.35 }} />
                 <p style={b.emptyTitle}>
                   {activeTab === 'all' ? 'No notifications yet' : `No ${activeTab.replace('_', ' ')} alerts`}
                 </p>
@@ -737,7 +750,7 @@ export default function NotificationBell() {
 
           {/* Footer analytics hint */}
           {notifications.length > 0 && (
-            <div style={b.footer}>
+            <div className="nb-ftr-sep" style={b.footer}>
               <Trash2 size={11} />
               <span>{notifications.length} total · Swipe cards to dismiss</span>
             </div>
@@ -783,7 +796,7 @@ const b: Record<string, React.CSSProperties> = {
     boxShadow: '0 0 0 2px var(--bg), 0 0 8px rgba(239,68,68,0.5)',
   },
 
-  /* Drawer */
+  /* Drawer — background/border set via .nb-drawer CSS class (solid, particle-theme-safe) */
   drawer: {
     position: 'fixed',
     top: 0,
@@ -791,14 +804,10 @@ const b: Record<string, React.CSSProperties> = {
     width: '400px',
     maxWidth: '95vw',
     height: '100dvh',
-    background: 'var(--bg-surface)',
-    borderLeft: '1px solid var(--border)',
     zIndex: 999,
     display: 'flex',
     flexDirection: 'column',
-    boxShadow: '-8px 0 40px rgba(0,0,0,0.45)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '-8px 0 40px rgba(0,0,0,0.6)',
     animation: 'drawerIn 0.22s ease',
   },
   drawerHeader: {
@@ -826,9 +835,9 @@ const b: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     padding: '0.12rem 0.45rem',
     borderRadius: '999px',
-    background: 'rgba(239,68,68,0.15)',
-    border: '1px solid rgba(239,68,68,0.35)',
-    color: '#fca5a5',
+    background: '#7f1d1d',
+    border: '1px solid #ef4444',
+    color: '#fecaca',
   },
   drawerActions: {
     display: 'flex',
@@ -854,9 +863,9 @@ const b: Record<string, React.CSSProperties> = {
     gap: '0.28rem',
     padding: '0.3rem 0.7rem',
     borderRadius: '8px',
-    border: '1px solid rgba(0,212,255,0.35)',
-    background: 'rgba(0,212,255,0.1)',
-    color: '#00D4FF',
+    border: '1px solid #0891b2',
+    background: '#0c4a6e',
+    color: '#7dd3fc',
     fontSize: '0.72rem',
     fontWeight: 700,
     cursor: 'pointer',
@@ -905,7 +914,8 @@ const b: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     padding: '0 0.25rem',
     borderRadius: '999px',
-    background: 'rgba(255,255,255,0.12)',
+    background: '#374151',
+    color: '#F9FAFB',
     lineHeight: 1.4,
   },
 
