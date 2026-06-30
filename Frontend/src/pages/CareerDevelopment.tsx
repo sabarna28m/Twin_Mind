@@ -96,9 +96,9 @@ interface Analytics {
 // ── Theme ─────────────────────────────────────────────────────────────────────
 
 const BG     = 'transparent';
-const CARD   = 'rgba(255,255,255,0.04)';
-const CARD2  = 'rgba(255,255,255,0.06)';
-const BORDER = '1px solid rgba(255,255,255,0.08)';
+const CARD   = 'var(--bg-elevated)';
+const CARD2  = 'var(--bg-surface)';
+const BORDER = '1px solid var(--border)';
 const CYAN   = '#00D4FF';
 const INDIGO = '#6366f1';
 const GREEN  = '#10b981';
@@ -106,9 +106,9 @@ const AMBER  = '#f59e0b';
 const RED    = '#ef4444';
 const PURPLE = '#8b5cf6';
 const PINK   = '#ec4899';
-const TEXT   = '#f1f5f9';
-const MUTED  = '#94a3b8';
-const DIM    = '#475569';
+const TEXT   = 'var(--text-h)';
+const MUTED  = 'var(--text)';
+const DIM    = 'var(--text-m)';
 
 const TABS = [
   { id: 'twin',            label: 'Career Twin',    icon: '🤖' },
@@ -1673,7 +1673,7 @@ function SkillGapSection() {
         <div style={{ flex:1 }}>
           <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:5 }}>Target Career / Role</div>
           <select value={target} onChange={e=>setTarget(e.target.value)}
-            style={{ width:'100%', background:'#1F2937', border:'1px solid #4B5563', borderRadius:10, padding:'0.65rem 1rem', color:'#FFFFFF', fontSize:'0.88rem' }} className="form-select">
+            className="form-select" style={{ background:'var(--bg-elevated)', border:BORDER, borderRadius:10, padding:'0.65rem 1rem', color:TEXT, fontSize:'0.88rem' }}>
             {CAREER_OPTIONS.map(o=><option key={o} value={o}>{o}</option>)}
           </select>
         </div>
@@ -1884,7 +1884,7 @@ function RoadmapSection() {
         <div style={{ flex:1 }}>
           <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:5 }}>Target Career</div>
           <select value={target} onChange={e=>setTarget(e.target.value)}
-            style={{ width:'100%', background:'#1F2937', border:'1px solid #4B5563', borderRadius:10, padding:'0.65rem 1rem', color:'#FFFFFF', fontSize:'0.88rem' }} className="form-select">
+            className="form-select" style={{ background:'var(--bg-elevated)', border:BORDER, borderRadius:10, padding:'0.65rem 1rem', color:TEXT, fontSize:'0.88rem' }}>
             {CAREER_OPTIONS.map(o=><option key={o} value={o}>{o}</option>)}
           </select>
         </div>
@@ -2119,19 +2119,22 @@ export default function CareerDevelopment() {
   }, [activeTab]);
 
   return (
-    <div style={{ minHeight:'100svh', background:BG, color:TEXT, fontFamily:'system-ui,-apple-system,sans-serif' }}>
+    <div className="career-dev-page" style={{ minHeight:'100svh', background:BG, color:TEXT, fontFamily:'system-ui,-apple-system,sans-serif' }}>
       <style>{`
         @keyframes spin  { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-        * { scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.1) transparent; }
-        *::-webkit-scrollbar { width:4px; height:4px; }
-        *::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
+        .career-dev-page * { scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.1) transparent; }
+        .career-dev-page *::-webkit-scrollbar { width:4px; height:4px; }
+        .career-dev-page *::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
         input,textarea { outline:none; }
         input:focus,textarea:focus { border-color:rgba(99,102,241,0.5) !important; }
+        
+        html[data-color-scheme="light"] .career-dev-page * { scrollbar-color:#CBD5E1 transparent; }
+        html[data-color-scheme="light"] .career-dev-page *::-webkit-scrollbar-thumb { background:#CBD5E1; }
       `}</style>
 
       {/* Header */}
-      <div style={{ borderBottom:BORDER, padding:'0.9rem 1.5rem', display:'flex', alignItems:'center', gap:'1rem', background:'var(--glass-bg)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', position:'sticky', top:0, zIndex:50 }}>
+      <div className="career-dev-header" style={{ borderBottom:BORDER, padding:'0.9rem 1.5rem', display:'flex', alignItems:'center', gap:'1rem', background:'var(--glass-bg)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', position:'sticky', top:0, zIndex:50 }}>
         <BackButton />
         <div>
           <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
@@ -2146,7 +2149,7 @@ export default function CareerDevelopment() {
       </div>
 
       {/* Tab bar */}
-      <div style={{ overflowX:'auto', borderBottom:BORDER, background:'var(--glass-bg)', backdropFilter:'blur(16px)', position:'sticky', top:62, zIndex:40 }}>
+      <div className="career-dev-tabbar" style={{ overflowX:'auto', borderBottom:BORDER, background:'var(--glass-bg)', backdropFilter:'blur(16px)', position:'sticky', top:62, zIndex:40 }}>
         <div style={{ display:'flex', minWidth:'max-content', padding:'0 1.5rem' }}>
           {TABS.map(tab=>{
             const active = activeTab===tab.id;

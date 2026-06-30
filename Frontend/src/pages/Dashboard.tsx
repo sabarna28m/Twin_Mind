@@ -131,7 +131,7 @@ function StudyAreaChart({ data }: { data: { date: string; hours: number; label: 
           const y = py + chartH - g * chartH;
           return (
             <g key={i}>
-              <line x1={px} y1={y} x2={w - px} y2={y} style={{ stroke: 'var(--ui-border)' }} strokeWidth="0.5" strokeDasharray="4,4" />
+              <line x1={px} y1={y} x2={w - px} y2={y} style={{ stroke: 'var(--ui-text-muted)', opacity: 0.4 }} strokeWidth="1.5" strokeDasharray="4,4" />
               <text x={px - 8} y={y + 4} textAnchor="end" fontSize="10" style={{ fill: 'var(--ui-text-muted)' }}>{(max * g).toFixed(1)}h</text>
             </g>
           );

@@ -108,53 +108,119 @@
    ══════════════════════════════ */
 
 html[data-color-scheme="light"] {
-  --bg:          #F8FAFC;
+  --bg:          #F1F5F9;
   --bg-surface:  #FFFFFF;
   --bg-elevated: #FFFFFF;
 
-  --text:   #374151;
-  --text-m: #1F2937;
-  --text-h: #111827;
+  --text:   #333333;
+  --text-m: #555555;
+  --text-h: #111111;
 
-  --border:        #E5E7EB;
-  --border-subtle: #F3F4F6;
+  --border:        #D1D5DB;
+  --border-subtle: #D1D5DB;
 
   /* ── UI System Variables (light mode) ── */
-  --ui-bg:                #FFFFFF;
+  --ui-bg:                #F1F5F9;
   --ui-header-bg:         #FFFFFF;
-  --ui-header-border:     #E5E7EB;
+  --ui-header-border:     #D1D5DB;
   --ui-surface:           #FFFFFF;
-  --ui-surface-elevated:  #F9FAFB;
-  --ui-border:            #E5E7EB;
-  --ui-card-shadow:       0 2px 12px rgba(0,0,0,0.05);
-  --ui-text:              #374151;
-  --ui-text-muted:        #6B7280;
-  --ui-text-h:            #111827;
+  --ui-surface-elevated:  #FFFFFF;
+  --ui-border:            #D1D5DB;
+  --ui-card-shadow:       0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --ui-text:              #333333;
+  --ui-text-muted:        #555555;
+  --ui-text-h:            #111111;
 
   --accent:        #2563EB;
   --accent-bg:     rgba(37,99,235,0.08);
-  --accent-border: rgba(37,99,235,0.3);
-  --shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+  --accent-border: rgba(37,99,235,0.5);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 
-  --glass-bg:     rgba(255,255,255,0.95);
-  --glass-border: rgba(203,213,225,0.8);
+  --glass-bg:     rgba(255,255,255,0.98);
+  --glass-border: rgba(209,213,219,1);
   --glass-blur:   16px;
 
-  --glow-card: 0 4px 16px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  --glow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --glow-primary: none;
   --glow-accent:  none;
   --glow-green:   none;
   --card-bg:           #FFFFFF;
-  --card-border:       #E5E7EB;
-  --card-shadow:       0 2px 12px rgba(0,0,0,0.05);
-  --card-hover-border: rgba(59,130,246,0.5);
-  --card-hover-shadow: 0 8px 32px rgba(0,0,0,0.10), 0 0 0 1px rgba(59,130,246,0.3);
+  --card-border:       #D1D5DB;
+  --card-shadow:       0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --card-hover-border: #3B82F6;
+  --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(59,130,246,0.3);
   --input-bg:     #FFFFFF;
-  --input-border: #E5E7EB;
-  --chart-grid:        rgba(0,0,0,0.06);
-  --chart-tooltip-bg:  rgba(255,255,255,0.98);
+  --input-border: #D1D5DB;
+  --chart-grid:        rgba(0,0,0,0.15);
+  --chart-tooltip-bg:  #FFFFFF;
 
   color-scheme: light;
+}
+
+/* ── GLOBAL LIGHT MODE FIXES (Force Visibility) ── */
+html[data-color-scheme="light"] #root {
+  filter: contrast(1.05) saturate(1.1);
+}
+
+/* Force dark text globally where faded variables were used */
+html[data-color-scheme="light"] [style*="color: var(--text)"],
+html[data-color-scheme="light"] [style*="color:var(--text)"] { color: #333333 !important; }
+html[data-color-scheme="light"] [style*="color: var(--text-m)"],
+html[data-color-scheme="light"] [style*="color:var(--text-m)"] { color: #555555 !important; }
+html[data-color-scheme="light"] [style*="color: var(--text-h)"],
+html[data-color-scheme="light"] [style*="color:var(--text-h)"] { color: #111111 !important; font-weight: 600 !important; }
+
+/* Global Card & Border fix */
+html[data-color-scheme="light"] div[style*="var(--bg-elevated)"],
+html[data-color-scheme="light"] div[style*="var(--bg-surface)"] {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+  border-color: #D1D5DB !important;
+}
+html[data-color-scheme="light"] div[style*="border: 1px solid"] {
+  border-color: #D1D5DB !important;
+}
+
+/* Fix hardcoded dark-mode inline styles (rgba(255,255,255,0.x)) globally */
+html[data-color-scheme="light"] [style*="background:rgba(255,255,255"],
+html[data-color-scheme="light"] [style*="background: rgba(255,255,255"],
+html[data-color-scheme="light"] [style*="background: 'rgba(255,255,255"] {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+}
+
+html[data-color-scheme="light"] [style*="border:1px solid rgba(255,255,255"],
+html[data-color-scheme="light"] [style*="border: 1px solid rgba(255,255,255"],
+html[data-color-scheme="light"] [style*="border-top: 1px solid rgba(255,255,255"],
+html[data-color-scheme="light"] [style*="borderTop: '1px solid rgba(255,255,255"],
+html[data-color-scheme="light"] [style*="border: 1px solid 'rgba(255,255,255"] {
+  border-color: #D1D5DB !important;
+}
+
+html[data-color-scheme="light"] [style*="border: 2px dashed rgba(255,255,255"],
+html[data-color-scheme="light"] [style*="border:2px dashed rgba(255,255,255"] {
+  border-color: #9CA3AF !important; /* gray-400 for dashed borders */
+}
+
+/* Force Header and Selects to be light */
+html[data-color-scheme="light"] .career-dev-header,
+html[data-color-scheme="light"] .career-dev-tabbar {
+  background: rgba(255, 255, 255, 0.98) !important;
+}
+html[data-color-scheme="light"] .career-dev-page select {
+  background: #FFFFFF !important;
+  color: #111111 !important;
+  border-color: #D1D5DB !important;
+}
+
+/* Global Tabs fix for Twin pages */
+html[data-color-scheme="light"] button[style*="solid transparent"] {
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+html[data-color-scheme="light"] button[style*="border-bottom: 2px solid"]:not([style*="solid transparent"]) {
+  color: #000000 !important;
+  font-weight: 600 !important;
+  border-bottom-width: 3px !important;
 }
 
 html[data-color-scheme="light"] body,

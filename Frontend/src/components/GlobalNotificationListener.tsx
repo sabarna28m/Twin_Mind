@@ -88,11 +88,11 @@ export default function GlobalNotificationListener() {
       position: 'fixed',
       bottom: '24px',
       right: '24px',
-      background: '#ffffff',
+      background: 'var(--bg-elevated)',
       borderLeft: '4px solid #3b82f6',
       padding: '16px 20px',
       borderRadius: '8px',
-      boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+      boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
       zIndex: 99999,
       animation: 'slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
       display: 'flex',
@@ -107,15 +107,15 @@ export default function GlobalNotificationListener() {
         }
       `}</style>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>{toast.title}</h4>
+        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-h)' }}>{toast.title}</h4>
         <button 
           onClick={() => setToast(prev => prev ? { ...prev, visible: false } : null)}
-          style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1 }}
+          style={{ background: 'transparent', border: 'none', color: 'var(--text-m)', cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1 }}
         >
           ×
         </button>
       </div>
-      <p style={{ margin: 0, fontSize: '0.85rem', color: '#475569', lineHeight: 1.4 }}>{toast.message}</p>
+      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text)', lineHeight: 1.4 }}>{toast.message}</p>
     </div>
   );
 }

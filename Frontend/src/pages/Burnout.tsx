@@ -498,23 +498,21 @@ export default function Burnout() {
         </div>
 
         {/* ── AI Recommendations ── */}
-        {(displayedRecs.length > 0 || preview.score > 0) && (
-          <section id="recommendations" style={p.card}>
-            <h2 style={p.cardTitle}>💡 {t('burnout_recs')}</h2>
-            <div style={p.recGrid} className="burnout-rec-grid">
-              {(displayedRecs.length > 0
-                ? displayedRecs.map((r, i) => ({ icon: ['😴','☕','💛','⚡','🗓','📚','✅','💧'][i % 8], title: ['Wellbeing Tip', 'Recovery', 'Focus', 'Energy', 'Rest Day', 'Study Load', 'Great Work', 'Hydration'][i % 8], text: r }))
-                : getRecommendations(studyH, sleepH, breaks, mood, energy, streak)
-              ).map((rec, i) => (
-                <div key={i} style={p.recCard} className="animate-slide-up">
-                  <div style={p.recIconWrap}><span style={{ fontSize: '1.5rem' }}>{rec.icon}</span></div>
-                  <h3 style={p.recTitle}>{rec.title}</h3>
-                  <p style={p.recText}>{rec.text}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+        <section id="recommendations" style={p.card}>
+          <h2 style={p.cardTitle}>💡 {t('burnout_recs')}</h2>
+          <div style={p.recGrid} className="burnout-rec-grid">
+            {(displayedRecs.length > 0
+              ? displayedRecs.map((r, i) => ({ icon: ['😴','☕','💛','⚡','🗓','📚','✅','💧'][i % 8], title: ['Wellbeing Tip', 'Recovery', 'Focus', 'Energy', 'Rest Day', 'Study Load', 'Great Work', 'Hydration'][i % 8], text: r }))
+              : getRecommendations(studyH, sleepH, breaks, mood, energy, streak)
+            ).map((rec, i) => (
+              <div key={i} style={p.recCard} className="animate-slide-up">
+                <div style={p.recIconWrap}><span style={{ fontSize: '1.5rem' }}>{rec.icon}</span></div>
+                <h3 style={p.recTitle}>{rec.title}</h3>
+                <p style={p.recText}>{rec.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* ── AI Twin Message ── */}
         {(displayedTwin || displayed) && (
@@ -566,10 +564,10 @@ export default function Burnout() {
                     <stop offset="100%" stopColor="#ef4444" />
                   </linearGradient>
                 </defs>
-                <CartesianGrid stroke={isDark ? "rgba(255,255,255,0.05)" : "#E5E7EB"} strokeDasharray="3 3" />
+                <CartesianGrid stroke={isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.15)"} strokeDasharray="3 3" />
                 <XAxis dataKey="dateLabel" tick={{ fill: isDark ? 'rgba(255,255,255,0.4)' : '#6B7280', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis domain={[0, 100]} tick={{ fill: isDark ? 'rgba(255,255,255,0.4)' : '#6B7280', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<BurnoutTooltip isDark={isDark} />} cursor={{ stroke: isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB', strokeWidth: 1 }} />
+                <Tooltip content={<BurnoutTooltip isDark={isDark} />} cursor={{ stroke: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.2)', strokeWidth: 1 }} />
                 <ReferenceLine y={40} stroke="#10b981" strokeDasharray="4 4" strokeWidth={1} strokeOpacity={0.5} />
                 <ReferenceLine y={70} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1} strokeOpacity={0.5} />
                 <Line
