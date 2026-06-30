@@ -8,7 +8,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { GOOGLE_CLIENT_ID } from '../lib/config';
 import CustomCaptcha from '../components/CustomCaptcha';
 import PasswordInput from '../components/PasswordInput';
-import TwinMindLogo from '../components/TwinMindLogo';
 import './Home.css'; // SaaSable design tokens
 
 const fadeUp = {
@@ -97,7 +96,7 @@ export default function Login() {
         <motion.div initial="hidden" animate="visible" variants={fadeUp} className="w-full max-w-[380px] mx-auto flex flex-col pt-8 pb-12">
           <div className="flex flex-col items-center mb-6">
             <Link to="/" className="mb-4">
-              <TwinMindLogo size={44} variant="auth" />
+              <img src="/assets/twinmind-logo.png" alt="TwinMind" style={{ width: 80, height: 'auto', display: 'block', borderRadius: 12 }} />
             </Link>
             <div className="w-14 h-14 rounded-2xl bg-blue-50 border-2 border-blue-100 flex items-center justify-center text-2xl mb-4">
               🔐
