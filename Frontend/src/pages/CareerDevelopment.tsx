@@ -2119,7 +2119,7 @@ export default function CareerDevelopment() {
   }, [activeTab]);
 
   return (
-    <div className="career-dev-page" style={{ minHeight:'100svh', background:BG, color:TEXT, fontFamily:'system-ui,-apple-system,sans-serif' }}>
+    <div className="career-dev-page" style={{ minHeight:'100svh', background:BG, color:TEXT, fontFamily:'var(--sans)' }}>
       <style>{`
         @keyframes spin  { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }

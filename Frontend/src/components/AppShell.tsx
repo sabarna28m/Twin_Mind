@@ -202,7 +202,7 @@ export default function AppShell() {
   return (
     <div style={{
       display: 'flex', height: '100vh', overflow: 'hidden',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      fontFamily: "var(--sans)",
       background: 'var(--ui-header-bg)',
     }}>
       <WeeklyChallengesModal isOpen={challengeOpen} onClose={() => setChallengeOpen(false)} />

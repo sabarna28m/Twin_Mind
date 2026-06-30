@@ -360,7 +360,7 @@ export default function Profile() {
   const LEARNING_STYLES = ['Visual', 'Reading/Writing', 'Audio', 'Practical'];
 
   return (
-    <div style={{ minHeight:'100svh', background:'var(--bg)', display:'flex', flexDirection:'column', fontFamily:"'Inter', sans-serif", position:'relative' }}>
+    <div style={{ minHeight:'100svh', background:'var(--bg)', display:'flex', flexDirection:'column', fontFamily:'var(--sans)', position:'relative' }}>
       <div className="prof-scrim" />
       <div className="prof-above-scrim">
       <style>{`

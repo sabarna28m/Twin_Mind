@@ -752,7 +752,7 @@ export default function SkillTree() {
 
       <div style={{
         minHeight: '100vh', background: C.bg, color: C.text,
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        fontFamily: "var(--sans)",
         display: 'flex', flexDirection: 'column',
       }}>
 

@@ -167,7 +167,7 @@ export default function Quiz() {
 const s: Record<string, React.CSSProperties> = {
   shell: {
     minHeight: '100svh', background: 'var(--bg)',
-    display: 'flex', flexDirection: 'column', fontFamily: "'Inter', sans-serif",
+    display: 'flex', flexDirection: 'column', fontFamily: 'var(--sans)',
   },
   topBar: {
     borderBottom: '1px solid var(--border)',

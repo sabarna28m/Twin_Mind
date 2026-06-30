@@ -660,7 +660,7 @@ export default function SmartNotes() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className={isDark ? 'sn-dark' : 'sn-light'} style={{ minHeight: '100svh', background: BG, color: TEXT, fontFamily: '"Inter", system-ui, sans-serif', display: 'flex', flexDirection: 'column' }}>
+    <div className={isDark ? 'sn-dark' : 'sn-light'} style={{ minHeight: '100svh', background: BG, color: TEXT, fontFamily: 'var(--sans)', display: 'flex', flexDirection: 'column' }}>
       <style>{`
         .sn-light {
           --bg: #FFFFFF;

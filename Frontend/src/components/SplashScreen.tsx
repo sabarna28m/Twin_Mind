@@ -82,7 +82,7 @@ export default function SplashScreen() {
           textTransform: 'uppercase',
           color: 'rgba(148,163,184,0.5)',
           fontWeight: 600,
-          fontFamily: "'Inter', system-ui, sans-serif",
+          fontFamily: "var(--sans)",
         }}>
           AI Learning Platform
         </p>

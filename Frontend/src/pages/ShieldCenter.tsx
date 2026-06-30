@@ -248,7 +248,7 @@ const p: Record<string, React.CSSProperties> = {
     minHeight: '100svh',
     background: 'var(--bg-surface)',
     color: 'var(--text-h)',
-    fontFamily: '"Inter", system-ui, sans-serif',
+    fontFamily: 'var(--sans)',
     position: 'relative',
     overflowX: 'hidden',
   },
