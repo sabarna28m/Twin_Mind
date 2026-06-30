@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
-import { BrainIcon } from '../components/TwinMindLogo';
 import { useWebSocket } from '../hooks/useWebSocket';
 import TwinHeroBanner from '../components/TwinHeroBanner';
 import LiveBadge from '../components/LiveBadge';
@@ -1502,7 +1501,9 @@ export default function Twin() {
       <header style={s.nav}>
         <div style={s.navLeft}>
           <BackButton />
-          <BrainIcon size={24} />
+          <div style={{ width: 28, height: 20, overflow: 'hidden', flexShrink: 0 }}>
+            <img src="/assets/twinmind-logo.png" alt="" style={{ width: 28, height: 'auto', display: 'block' }} />
+          </div>
           <span style={s.navLogo}>TwinMind</span>
           {wsConnected && <LiveBadge />}
         </div>

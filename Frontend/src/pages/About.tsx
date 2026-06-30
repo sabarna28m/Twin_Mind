@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import TwinMindLogo from '../components/TwinMindLogo';
 import { Sparkles, UserCircle2, BrainCircuit, HeartPulse } from 'lucide-react';
 import './Home.css';
 
@@ -53,7 +52,9 @@ export default function About() {
       <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4 pointer-events-none">
         <nav className={`pointer-events-auto flex items-center justify-between px-6 py-3 w-full max-w-6xl transition-all duration-300 ${navScrolled ? 'saasable-nav' : ''}`}>
           <Link to="/" className="flex items-center gap-2 text-slate-900 no-underline font-bold text-xl">
-            <TwinMindLogo size={24} variant="compact" />
+            <div style={{ width: 32, height: 23, overflow: 'hidden', flexShrink: 0 }}>
+              <img src="/assets/twinmind-logo.png" alt="TwinMind" style={{ width: 32, height: 'auto', display: 'block' }} />
+            </div>
             <span>TwinMind</span>
           </Link>
           

@@ -3,7 +3,6 @@ import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { API_URL } from '../lib/config';
-import TwinMindLogo from '../components/TwinMindLogo';
 
 const API = API_URL;
 
@@ -39,7 +38,7 @@ export default function ForgotPassword() {
 
       <div className="glass animate-slide-up" style={s.card}>
         <div style={s.logoWrap}>
-          <TwinMindLogo size={44} variant="auth" />
+          <img src="/assets/twinmind-logo.png" alt="TwinMind" style={{ width: 80, height: 'auto', display: 'block', borderRadius: 12 }} />
         </div>
         <p style={s.tagline}>{t('login_tagline')}</p>
         <h2 style={s.title}>{t('forgot_title')}</h2>

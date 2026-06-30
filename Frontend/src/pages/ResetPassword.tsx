@@ -5,7 +5,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { API_URL } from '../lib/config';
 import PasswordInput from '../components/PasswordInput';
 import PasswordStrength from '../components/PasswordStrength';
-import TwinMindLogo from '../components/TwinMindLogo';
 
 const API = API_URL;
 
@@ -55,7 +54,7 @@ export default function ResetPassword() {
       <div style={s.page}>
         <div className="glass" style={s.card}>
           <div style={s.logoWrap}>
-            <TwinMindLogo size={44} variant="auth" />
+            <img src="/assets/twinmind-logo.png" alt="TwinMind" style={{ width: 80, height: 'auto', display: 'block', borderRadius: 12 }} />
           </div>
           <div style={s.error}>Invalid or missing reset token. Please request a new reset link.</div>
           <p style={{ ...s.footer, marginTop: '1rem' }}>
@@ -73,7 +72,7 @@ export default function ResetPassword() {
 
       <div className="glass animate-slide-up" style={s.card}>
         <div style={s.logoWrap}>
-          <TwinMindLogo size={44} variant="auth" />
+          <img src="/assets/twinmind-logo.png" alt="TwinMind" style={{ width: 80, height: 'auto', display: 'block', borderRadius: 12 }} />
         </div>
         <p style={s.tagline}>{t('login_tagline')}</p>
         <h2 style={s.title}>{t('reset_title')}</h2>

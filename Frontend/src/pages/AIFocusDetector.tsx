@@ -6,7 +6,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { BrainIcon } from '../components/TwinMindLogo';
 import {
   Eye, Brain, AlertTriangle, Camera, CameraOff,
   Play, Square, Trophy, Zap, Activity, Award,
@@ -751,7 +750,9 @@ export default function AIFocusDetector() {
       <header style={s.nav} className="nav-premium">
         <div style={s.navLeft}>
           <BackButton />
-          <BrainIcon size={24} />
+          <div style={{ width: 28, height: 20, overflow: 'hidden', flexShrink: 0 }}>
+            <img src="/assets/twinmind-logo.png" alt="" style={{ width: 28, height: 'auto', display: 'block' }} />
+          </div>
           <Link to="/" style={s.navLogo}>TwinMind</Link>
         </div>
         <div style={s.navRight}>

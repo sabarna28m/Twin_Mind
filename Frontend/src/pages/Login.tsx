@@ -157,7 +157,7 @@ export default function Login() {
       <motion.div initial="hidden" animate="visible" variants={fadeUp} className="w-full max-w-[380px] mx-auto flex flex-col pt-4 pb-12">
         <div className="flex flex-col items-center mb-8">
           <Link to="/" className="mb-6">
-            <TwinMindLogo size={44} variant="auth" />
+            <img src="/assets/twinmind-logo.png" alt="TwinMind" style={{ width: 80, height: 'auto', display: 'block', borderRadius: 12 }} />
           </Link>
           <h2 className="text-[1.85rem] font-bold text-slate-900 tracking-tight">{t('login_title') || 'Welcome back'}</h2>
         </div>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import BackButton from '../components/BackButton';
-import { BrainIcon } from '../components/TwinMindLogo';
 import StreakShieldCard from '../components/StreakShieldCard';
 import { XPStoreProvider, useXPStore } from '../contexts/XPStoreContext';
 import type { ShopItem } from '../contexts/XPStoreContext';
@@ -109,7 +108,9 @@ function ShieldCenterContent() {
       <header style={p.nav}>
         <div style={p.navLeft}>
           <BackButton />
-          <BrainIcon size={24} />
+          <div style={{ width: 28, height: 20, overflow: 'hidden', flexShrink: 0 }}>
+            <img src="/assets/twinmind-logo.png" alt="" style={{ width: 28, height: 'auto', display: 'block' }} />
+          </div>
           <Link to="/" style={p.navLogo}>TwinMind</Link>
         </div>
         <div style={p.xpBadge}>
