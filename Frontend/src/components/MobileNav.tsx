@@ -5,7 +5,6 @@ import {
   Zap, MessageCircle, Layers, Sword, Video, User, LogOut,
   Rocket, Mic2, Shield, TrendingUp, ShoppingBag,
 } from 'lucide-react';
-import { BrainIcon } from './TwinMindLogo';
 
 interface NavItem {
   to:    string;
@@ -109,7 +108,14 @@ export default function MobileNav({ isOpen, onClose, userName, avatarSrc, onLogo
         {/* Header */}
         <div style={st.drawerHeader}>
           <div style={st.drawerLogo}>
-            <BrainIcon size={22} />
+            {/* Logo PNG clipped to symbol only */}
+            <div style={{ width: 30, height: 22, overflow: 'hidden', flexShrink: 0 }}>
+              <img
+                src="/assets/twinmind-logo.png"
+                alt="TwinMind logo"
+                style={{ width: 30, height: 'auto', display: 'block' }}
+              />
+            </div>
             <span style={st.logoText}>TwinMind</span>
           </div>
           <button style={st.closeBtn} onClick={onClose} aria-label="Close menu">

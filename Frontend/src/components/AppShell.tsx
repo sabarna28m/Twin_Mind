@@ -7,7 +7,6 @@ import {
   LayoutDashboard, User, Award, LogOut, ChevronLeft, Sun, Moon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BrainIcon } from './TwinMindLogo';
 import { useAuth } from '../contexts/AuthContext';
 import { useSidebar } from '../contexts/SidebarContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -233,7 +232,14 @@ export default function AppShell() {
           padding: '24px 24px 20px', display: 'flex', alignItems: 'center', gap: '12px',
           borderBottom: '1px solid rgba(255,255,255,0.08)',
         }}>
-          <BrainIcon size={28} />
+          {/* Logo PNG clipped to symbol only (text at bottom ~28% is hidden) */}
+          <div style={{ width: 40, height: 29, overflow: 'hidden', flexShrink: 0 }}>
+            <img
+              src="/assets/twinmind-logo.png"
+              alt="TwinMind logo"
+              style={{ width: 40, height: 'auto', display: 'block' }}
+            />
+          </div>
           <span style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em' }}>TwinMind</span>
         </div>
 
