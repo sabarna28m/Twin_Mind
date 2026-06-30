@@ -1,5 +1,3 @@
-import TwinMindLogo from './TwinMindLogo';
-
 export default function SplashScreen() {
   return (
     <div style={{
@@ -58,13 +56,22 @@ export default function SplashScreen() {
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{
             position: 'absolute',
-            inset: '-44px',
+            inset: '-52px',
             borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(0,212,255,0.2) 0%, rgba(168,85,247,0.1) 55%, transparent 75%)',
             animation: 'breathe 3.5s ease-in-out infinite',
             pointerEvents: 'none',
           }} />
-          <TwinMindLogo size={80} variant="stacked" />
+          <img
+            src="/assets/twinmind-logo.png"
+            alt="TwinMind"
+            style={{
+              width: 110,
+              height: 'auto',
+              display: 'block',
+              filter: 'drop-shadow(0 0 24px rgba(0,212,255,0.35)) drop-shadow(0 0 12px rgba(168,85,247,0.25))',
+            }}
+          />
         </div>
 
         {/* Tagline */}
