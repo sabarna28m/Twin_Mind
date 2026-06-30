@@ -229,18 +229,27 @@ export default function AppShell() {
       >
         {/* Brand */}
         <div style={{
-          padding: '24px 24px 20px', display: 'flex', alignItems: 'center', gap: '12px',
+          padding: '24px 24px 20px',
           borderBottom: '1px solid rgba(255,255,255,0.08)',
         }}>
-          {/* Logo PNG clipped to symbol only (text at bottom ~28% is hidden) */}
-          <div style={{ width: 40, height: 29, overflow: 'hidden', flexShrink: 0 }}>
-            <img
-              src="/assets/twinmind-logo.png"
-              alt="TwinMind logo"
-              style={{ width: 40, height: 'auto', display: 'block' }}
-            />
-          </div>
-          <span style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em' }}>TwinMind</span>
+          <Link
+            to="/"
+            className="brand-link"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '12px',
+              textDecoration: 'none', color: 'inherit',
+            }}
+          >
+            {/* Logo PNG clipped to symbol only (text at bottom ~28% is hidden) */}
+            <div style={{ width: 40, height: 29, overflow: 'hidden', flexShrink: 0 }}>
+              <img
+                src="/assets/twinmind-logo.png"
+                alt="TwinMind logo"
+                style={{ width: 40, height: 'auto', display: 'block' }}
+              />
+            </div>
+            <span style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em' }}>TwinMind</span>
+          </Link>
         </div>
 
         {/* Nav */}
@@ -423,6 +432,8 @@ export default function AppShell() {
           .shell-ham-mob      { display: flex !important; }
           .shell-hide-mobile  { display: none !important; }
         }
+        .brand-link { cursor: pointer; transition: opacity 0.18s ease, transform 0.18s ease; }
+        .brand-link:hover { opacity: 0.82; transform: scale(1.02); }
       `}</style>
     </div>
   );
