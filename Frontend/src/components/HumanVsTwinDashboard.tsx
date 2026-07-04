@@ -1,8 +1,9 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, ReferenceLine,
 } from 'recharts';
+import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -138,6 +139,17 @@ function MetricCard({ m, icon }: { m: MetricComparison; icon: string }) {
 // ── Main dashboard ────────────────────────────────────────────────────────
 
 export default function HumanVsTwinDashboard() {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
+  const glassStyle = {
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+  };
+
   const [data,    setData]    = useState<ComparisonData | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab,     setTab]     = useState<'study' | 'quiz' | 'sessions'>('study');
@@ -150,9 +162,8 @@ export default function HumanVsTwinDashboard() {
   }, []);
 
   const card: React.CSSProperties = {
-    background: '#ffffff', border: '1px solid #e2e8f0',
+    ...glassStyle,
     borderRadius: '24px', padding: '1.5rem',
-    backdropFilter: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
   };
   const fullWidth: React.CSSProperties = { gridColumn: '1 / -1' };
   const sectionTitle: React.CSSProperties = {
@@ -210,7 +221,7 @@ export default function HumanVsTwinDashboard() {
   return (
     <>
       {/* ── 1. Status + Accuracy header ── */}
-      <div style={{ ...card, ...fullWidth }}>
+      <div className="synth-hover-card" style={{ ...card, ...fullWidth }}>
         {/* Section header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '1.15rem' }}></span>
@@ -269,7 +280,7 @@ export default function HumanVsTwinDashboard() {
       </div>
 
       {/* ── 2. Side-by-side metric comparison cards ── */}
-      <div style={{ ...card, ...fullWidth }}>
+      <div className="synth-hover-card" style={{ ...card, ...fullWidth }}>
         <p style={sectionTitle}>Side-by-Side Comparison</p>
         <p style={sectionSub}>Your actual behavior vs what the Digital Twin predicted. The "match" score shows how accurate the prediction was.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.75rem' }} className="mob-mid-row">
@@ -295,7 +306,7 @@ export default function HumanVsTwinDashboard() {
       </div>
 
       {/* ── 3. Prediction vs Reality charts ── */}
-      <div style={{ ...card, ...fullWidth }}>
+      <div className="synth-hover-card" style={{ ...card, ...fullWidth }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.6rem' }}>
           <div>
             <p style={sectionTitle}>Prediction vs Reality</p>
@@ -338,7 +349,7 @@ export default function HumanVsTwinDashboard() {
       <div style={{ ...fullWidth, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="mob-twin-row">
 
         {/* Accuracy Trend */}
-        <div style={card}>
+        <div className="synth-hover-card" style={card}>
           <p style={sectionTitle}>Accuracy Trend</p>
           <p style={sectionSub}>How the Twin's prediction accuracy has improved over time.</p>
           {data.accuracy_trend.length < 2 ? (
@@ -371,7 +382,7 @@ export default function HumanVsTwinDashboard() {
         </div>
 
         {/* AI Insights */}
-        <div style={card}>
+        <div className="synth-hover-card" style={card}>
           <p style={sectionTitle}>AI Insights</p>
           <p style={sectionSub}>Observations generated from comparing actual behavior with Twin predictions.</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
@@ -389,7 +400,7 @@ export default function HumanVsTwinDashboard() {
 
       {/* ── 5. Prediction History Timeline ── */}
       {data.prediction_history.length > 0 && (
-        <div style={{ ...card, ...fullWidth }}>
+        <div className="synth-hover-card" style={{ ...card, ...fullWidth }}>
           <p style={sectionTitle}>Prediction History Timeline</p>
           <p style={sectionSub}>Notable events where the Twin's predictions diverged significantly from your actual behavior.</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
@@ -425,7 +436,7 @@ export default function HumanVsTwinDashboard() {
 
       {/* ── 6. Difference Analysis ── */}
       {(data.exceeded_predictions.length + data.missed_predictions.length + data.twin_incorrect_assumptions.length + data.newly_learned_patterns.length) > 0 && (
-        <div style={{ ...card, ...fullWidth }}>
+        <div className="synth-hover-card" style={{ ...card, ...fullWidth }}>
           <p style={sectionTitle}>Difference Analysis</p>
           <p style={sectionSub}>Where you outperformed the Twin's model, where you fell short, incorrect assumptions, and what the Twin has recently learned.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0.75rem' }} className="mob-twin-row">

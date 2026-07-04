@@ -1518,6 +1518,14 @@ export default function Twin() {
   const { t } = useLanguage();
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
+  const glassStyle = {
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+  };
   const [twin,         setTwin]         = useState<TwinState | null>(null);
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState('');
@@ -1564,7 +1572,7 @@ export default function Twin() {
       <div style={s.bgOrb} />
 
       {/* Navbar */}
-      <header style={s.nav}>
+      <header style={{ ...s.nav, ...glassStyle }}>
         <div style={s.navLeft}>
           <BackButton />
           <div style={{ width: 28, height: 20, overflow: 'hidden', flexShrink: 0 }}>
@@ -1601,7 +1609,7 @@ export default function Twin() {
 
             {/* ── Level & XP card ── */}
             {progress && (
-              <div style={{ ...s.card, ...s.fullWidth, marginBottom: 0 }} className="animate-slide-up">
+              <div style={{ ...s.card, ...s.fullWidth, marginBottom: 0, ...glassStyle }} className="synth-hover-card animate-slide-up">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' as const }}>
                   {/* Level badge */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
@@ -1682,7 +1690,7 @@ export default function Twin() {
             )}
 
             {/* Avatar card */}
-            <div style={s.avatarCard} className="animate-slide-up mob-twin-avatar">
+            <div style={{ ...s.avatarCard, ...glassStyle }} className="synth-hover-card animate-slide-up mob-twin-avatar">
               {/* Avatar with rings + particles */}
               <div style={{ position: 'relative', width: '130px', height: '130px', marginBottom: '1rem' }}>
                 <Particles riskLevel={twin.risk_level} />
@@ -1779,7 +1787,7 @@ export default function Twin() {
             </div>
 
             {/* Vitals card */}
-            <div style={s.card} className="animate-slide-up mob-twin-vitals">
+            <div style={{ ...s.card, ...glassStyle }} className="synth-hover-card animate-slide-up mob-twin-vitals">
               <h3 style={s.cardTitle}>Twin Vitals</h3>
               <ScoreBar label="Overall Score"       value={twin.overall_score}    grad={SCORE_GRADS[0]} delay={0} />
               <ScoreBar label="Academic Performance" value={twin.academic_score}   grad={SCORE_GRADS[1]} delay={100} />
