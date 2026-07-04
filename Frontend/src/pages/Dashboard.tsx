@@ -125,8 +125,8 @@ function StudyAreaChart({ data }: { data: { date: string; hours: number; label: 
       <svg viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }} preserveAspectRatio="xMidYMid meet">
         <defs>
           <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#00D4FF" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#00D4FF" stopOpacity="0.02" />
+            <stop offset="0%" stopColor="#0a0a0a" stopOpacity="0.1" />
+            <stop offset="100%" stopColor="#0a0a0a" stopOpacity="0.0" />
           </linearGradient>
         </defs>
         {/* Grid lines */}
@@ -142,11 +142,11 @@ function StudyAreaChart({ data }: { data: { date: string; hours: number; label: 
         {/* Area */}
         <path d={areaPath} fill="url(#areaGrad)" />
         {/* Line */}
-        <path d={linePath} fill="none" stroke="#00D4FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={linePath} fill="none" stroke="#0a0a0a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         {/* Dots */}
         {points.map((p, i) => (
           <g key={i}>
-            <circle cx={p.x} cy={p.y} r="4" style={{ fill: 'var(--ui-surface)', stroke: '#00D4FF' }} strokeWidth="2" />
+            <circle cx={p.x} cy={p.y} r="4" style={{ fill: 'var(--ui-surface)', stroke: '#0a0a0a' }} strokeWidth="2" />
             <text x={p.x} y={py + chartH + 16} textAnchor="middle" fontSize="11" style={{ fill: 'var(--ui-text-muted)' }} fontWeight="500">{data[i].label}</text>
           </g>
         ))}
@@ -191,19 +191,23 @@ function KPICard({ icon: Icon, label, value, unit, gradient, trend, delay }: {
   return (
     <motion.div
       variants={fadeUp}
-      whileHover={{ y: -6, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
+      className="synth-hover-card"
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       style={{
-        background: gradient, borderRadius: '16px', padding: '24px',
-        color: '#fff', position: 'relative', overflow: 'hidden', cursor: 'default',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+        background: `linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.75)), ${gradient}`, 
+        borderRadius: '16px', padding: '24px',
+        color: 'var(--ui-text-h)', position: 'relative', overflow: 'hidden', cursor: 'default',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
+        border: '1px solid rgba(255, 255, 255, 0.4)',
+        backdropFilter: 'blur(24px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(150%)',
         animationDelay: delay + 'ms',
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
         <div style={{
-          width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(255,255,255,0.2)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(0,0,0,0.05)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0a0a0a'
         }}>
           <Icon size={22} />
         </div>
@@ -220,7 +224,7 @@ function KPICard({ icon: Icon, label, value, unit, gradient, trend, delay }: {
       {/* Decorative circle */}
       <div style={{
         position: 'absolute', top: '-20px', right: '-20px', width: '100px', height: '100px',
-        borderRadius: '50%', background: 'rgba(255,255,255,0.08)',
+        borderRadius: '50%', background: 'rgba(0,0,0,0.02)',
       }} />
     </motion.div>
   );
@@ -331,11 +335,13 @@ export default function Dashboard() {
   void wsConnected; void calEvents; void noteCount; void badgeCount;
 
   const cardStyle = {
-    background: 'var(--ui-surface)',
+    background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
     borderRadius: '16px',
-    border: '1px solid var(--ui-border)',
-    boxShadow: 'var(--ui-card-shadow)',
-    transition: 'background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
+    border: '1px solid rgba(255, 255, 255, 0.5)',
+    boxShadow: '0 8px 32px rgba(0, 212, 255, 0.08)',
+    backdropFilter: 'blur(24px) saturate(150%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    transition: 'all 0.3s ease',
   };
 
   return (
@@ -349,7 +355,7 @@ export default function Dashboard() {
           {/* ═══ ROW 1: GREETING + DIGITAL TWIN ═══ */}
           <motion.div variants={fadeUp} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'stretch' }} className="mob-hero-grid">
             {/* Greeting Card */}
-            <div style={{ ...cardStyle, padding: '28px', display: 'flex', flexDirection: 'column' }}>
+            <div className="synth-hover-card" style={{ ...cardStyle, padding: '28px', display: 'flex', flexDirection: 'column' }}>
               <p style={{ margin: '0 0 4px', fontSize: '0.875rem', color: 'var(--ui-text-muted)' }}>{greeting}</p>
               <h2 style={{ margin: '0 0 4px', fontSize: '1.75rem', fontWeight: 700, color: 'var(--ui-text-h)', letterSpacing: '-0.02em' }}>
                 {firstName}
@@ -396,15 +402,15 @@ export default function Dashboard() {
               {/* Quote */}
               <div style={{
                 padding: '14px 16px',
-                background: isDark ? 'rgba(0,212,255,0.06)' : '#f0f9ff',
-                borderLeft: '3px solid #00D4FF',
+                background: 'rgba(0,0,0,0.03)',
+                borderLeft: '3px solid #0a0a0a',
                 borderRadius: '0 10px 10px 0', marginTop: 'auto',
                 transition: 'background 0.3s ease',
               }}>
                 <p style={{ margin: '0 0 4px', fontSize: '0.8rem', color: 'var(--ui-text)', lineHeight: 1.5, fontStyle: 'italic' }}>
                   "{quote.text}"
                 </p>
-                <p style={{ margin: 0, fontSize: '0.7rem', color: '#00D4FF', fontWeight: 600 }}>— {quote.author}</p>
+                <p style={{ margin: 0, fontSize: '0.7rem', color: '#0a0a0a', fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase' }}>— {quote.author}</p>
               </div>
             </div>
 
@@ -426,7 +432,7 @@ export default function Dashboard() {
           <motion.section variants={fadeUp}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Activity size={20} color="#00D4FF" />
+                <Activity size={20} color="#0a0a0a" />
                 <h2 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700, color: 'var(--ui-text-h)' }}>Analytics & Insights</h2>
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
@@ -435,12 +441,13 @@ export default function Dashboard() {
                     padding: '6px 14px', borderRadius: '8px',
                     border: '1px solid var(--ui-border)',
                     background: i === 0
-                      ? (isDark ? 'rgba(0,212,255,0.15)' : '#0f172a')
+                      ? '#0a0a0a'
                       : 'var(--ui-surface)',
                     color: i === 0
-                      ? (isDark ? '#00D4FF' : '#fff')
+                      ? '#fff'
                       : 'var(--ui-text-muted)',
-                    fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer',
+                    fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer',
+                    fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.04em',
                     transition: 'all 0.2s',
                   }}>{tab}</button>
                 ))}
@@ -449,7 +456,7 @@ export default function Dashboard() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '20px', alignItems: 'start' }} className="mob-wellness-grid">
               {/* LEFT: Chart */}
-              <div style={{ ...cardStyle, padding: '24px' }}>
+              <div className="synth-hover-card" style={{ ...cardStyle, padding: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                   <div>
                     <h3 style={{ margin: '0 0 2px', fontSize: '0.95rem', fontWeight: 600, color: 'var(--ui-text-h)' }}>Study Activity</h3>
@@ -483,8 +490,9 @@ export default function Dashboard() {
                     <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--ui-text-h)', marginBottom: '4px' }}>{t('no_data_title') || 'No Data Yet'}</p>
                     <p style={{ fontSize: '0.8rem', color: 'var(--ui-text-muted)', marginBottom: '16px' }}>{t('no_data_sub') || 'Log a check-in to activate your study chart'}</p>
                     <Link to="/checkin" style={{
-                      display: 'inline-block', padding: '8px 20px', background: '#00D4FF', color: '#fff',
-                      borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none',
+                      display: 'inline-block', padding: '8px 20px', background: '#0a0a0a', color: '#fff',
+                      borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none',
+                      fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.04em'
                     }}>Log Check-in</Link>
                   </div>
                 )}
@@ -494,7 +502,7 @@ export default function Dashboard() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* Focus Score */}
                 <motion.div
-                  whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
+                  className="synth-hover-card"
                   style={{
                     ...cardStyle, padding: '20px',
                     display: 'flex', alignItems: 'center', gap: '16px',
@@ -502,7 +510,7 @@ export default function Dashboard() {
                 >
                   {focusScore > 0 ? (
                     <>
-                      <CircularProgress pct={focusScore} color="#10b981" />
+                      <CircularProgress pct={focusScore} color="#0a0a0a" />
                       <div>
                         <p style={{ margin: '0 0 2px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--ui-text-h)' }}>Focus Score</p>
                         <p style={{ margin: '0 0 2px', fontSize: '0.75rem', color: focusScore >= 70 ? '#10b981' : '#f59e0b', fontWeight: 600 }}>
@@ -526,7 +534,7 @@ export default function Dashboard() {
 
                 {/* Study Consistency */}
                 <motion.div
-                  whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
+                  className="synth-hover-card"
                   style={{
                     ...cardStyle, padding: '20px',
                     display: 'flex', alignItems: 'center', gap: '16px',
@@ -534,7 +542,7 @@ export default function Dashboard() {
                 >
                   {consistencyScore > 0 ? (
                     <>
-                      <CircularProgress pct={consistencyScore} color="#7C3AED" />
+                      <CircularProgress pct={consistencyScore} color="#0a0a0a" />
                       <div>
                         <p style={{ margin: '0 0 2px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--ui-text-h)' }}>Study Consistency</p>
                         <p style={{ margin: '0 0 2px', fontSize: '0.75rem', color: consistencyScore >= 70 ? '#10b981' : '#f59e0b', fontWeight: 600 }}>
@@ -557,9 +565,9 @@ export default function Dashboard() {
                 </motion.div>
 
                 {/* Burnout Risk Monitor */}
-                <div style={{ ...cardStyle, padding: '20px' }}>
+                <div className="synth-hover-card" style={{ ...cardStyle, padding: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                    <Heart size={16} color="#ef4444" />
+                    <Heart size={16} color="#0a0a0a" />
                     <h3 style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: 'var(--ui-text-h)' }}>Burnout Risk Monitor</h3>
                   </div>
                   <BurnoutWidget />

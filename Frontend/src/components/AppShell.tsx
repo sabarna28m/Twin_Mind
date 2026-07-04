@@ -57,9 +57,9 @@ function SidebarNavItem({ icon: Icon, label, to, active }: { icon: React.Compone
           padding: '10px 20px', margin: '2px 12px', borderRadius: '10px',
           color: active ? '#FFFFFF' : 'rgba(255,255,255,0.70)',
           background: active
-            ? 'linear-gradient(135deg, rgba(59,130,246,0.18), rgba(0,212,255,0.12))'
+            ? 'linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(255, 255, 255, 0.12))'
             : 'transparent',
-          borderLeft: active ? '3px solid #3B82F6' : '3px solid transparent',
+          borderLeft: active ? '3px solid rgba(56, 189, 248, 0.6)' : '3px solid transparent',
           fontSize: '0.875rem', fontWeight: active ? 600 : 400,
           transition: 'all 0.2s ease', cursor: 'pointer',
         }}
@@ -222,7 +222,12 @@ export default function AppShell() {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="app-shell-sidebar"
         style={{
-          background: isDark ? '#0B1220' : '#0F172A', color: '#fff', flexShrink: 0, overflow: 'hidden',
+          background: isDark 
+            ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%), rgba(11, 18, 32, 0.75)'
+            : 'linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(124, 58, 237, 0.04) 100%), rgba(15, 23, 42, 0.85)',
+          backdropFilter: 'blur(24px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+          color: '#fff', flexShrink: 0, overflow: 'hidden',
           display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0,
           height: '100vh', zIndex: 100, borderRight: '1px solid rgba(255,255,255,0.06)',
         }}

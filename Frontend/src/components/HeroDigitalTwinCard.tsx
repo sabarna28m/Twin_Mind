@@ -84,7 +84,7 @@ export default function HeroDigitalTwinCard() {
   const s = getStyles(isDark);
 
   return (
-    <div style={s.wrap}>
+    <div style={s.wrap} className="synth-hover-card">
       <div style={s.accentLine} />
 
       {/* Header */}
@@ -183,14 +183,16 @@ function getStyles(isDark: boolean): Record<string, React.CSSProperties> {
   return {
     wrap: {
       position: 'relative', overflow: 'hidden',
-      background: isDark ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.75)',
-      backdropFilter: 'blur(16px)',
-      WebkitBackdropFilter: 'blur(16px)',
-      border: `1px solid ${isDark ? 'rgba(255,255,255,0.10)' : 'rgba(226, 232, 240, 0.9)'}`,
+      background: isDark
+        ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+        : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+      backdropFilter: 'blur(24px) saturate(150%)',
+      WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+      border: `1px solid ${isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255, 255, 255, 0.5)'}`,
       borderRadius: '1.5rem', padding: '1.75rem',
       boxShadow: isDark
         ? '0 20px 25px -5px rgba(0,0,0,0.3), 0 8px 10px -6px rgba(0,0,0,0.2)'
-        : '0 20px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01)',
+        : '0 8px 32px rgba(0, 212, 255, 0.08)',
       display: 'flex', flexDirection: 'column', gap: '1.1rem',
       height: '100%', boxSizing: 'border-box',
       transition: 'background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',

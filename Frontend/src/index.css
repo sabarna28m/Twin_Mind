@@ -251,6 +251,17 @@ html[data-color-scheme="light"] .action-card:hover {
   border-color: rgba(0,212,255,0.25);
   box-shadow: 0 4px 20px rgba(0,212,255,0.08);
 }
+
+html[data-color-scheme="light"] .synth-hover-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+html[data-color-scheme="light"] .synth-hover-card:hover {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.3) 0%, rgba(124, 58, 237, 0.25) 100%), rgba(255, 255, 255, 0.45) !important;
+  border-color: rgba(0, 212, 255, 0.4) !important;
+  box-shadow: 0 16px 40px rgba(0, 212, 255, 0.18), 0 0 0 1px rgba(0, 212, 255, 0.15) !important;
+  transform: translateY(-4px) !important;
+}
+
 html[data-color-scheme="light"] .nav-link { color: #475569; }
 html[data-color-scheme="light"] .nav-link:hover { color: #0F172A; background: rgba(0,0,0,0.05); }
 html[data-color-scheme="light"] .nav-link svg { opacity: 1; }

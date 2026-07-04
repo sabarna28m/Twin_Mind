@@ -104,11 +104,11 @@ function MissionRow({
       style={{
         ...mr.item,
         borderColor: mission.completed
-          ? 'rgba(16,185,129,0.35)'
-          : 'rgba(255,255,255,0.07)',
+          ? 'rgba(16,185,129,0.45)'
+          : 'rgba(0,0,0,0.06)',
         background: mission.completed
-          ? 'rgba(16,185,129,0.06)'
-          : 'rgba(255,255,255,0.03)',
+          ? 'rgba(16,185,129,0.12)'
+          : 'rgba(255,255,255,0.45)',
         opacity: mission.completed ? 0.88 : 1,
       }}
     >
@@ -193,9 +193,9 @@ const mr: Record<string, React.CSSProperties> = {
   item: {
     display: 'flex', alignItems: 'flex-start', gap: '0.75rem',
     padding: '0.8rem 0.85rem',
-    background: '#ffffff',
+    background: 'rgba(255, 255, 255, 0.45)',
     border: '1px solid', borderRadius: '13px',
-    transition: 'border-color 0.35s, background 0.35s, opacity 0.35s',
+    transition: 'border-color 0.35s, background 0.35s, opacity 0.35s, transform 0.3s',
   },
   statusIcon: {
     width: '34px', height: '34px', minWidth: '34px',
@@ -405,7 +405,7 @@ export default function SmartDailyMission({ layout = 'vertical' }: { layout?: 'v
   }, []);
 
   return (
-    <div style={dm.wrap}>
+    <div style={dm.wrap} className="synth-hover-card">
       <div style={dm.orb} />
       <ConfettiBurst key={confettiKey} active={showConfetti} />
       <div style={{ position: 'relative', zIndex: 30 }}>
@@ -509,13 +509,13 @@ export default function SmartDailyMission({ layout = 'vertical' }: { layout?: 'v
 const dm: Record<string, React.CSSProperties> = {
   wrap: {
     position: 'relative', overflow: 'hidden',
-    background: 'rgba(255, 255, 255, 0.75)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-    border: '1px solid rgba(226, 232, 240, 0.9)',
-    borderRadius: '1.5rem', padding: '1.5rem',
+    background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: '1px solid rgba(255, 255, 255, 0.5)',
+    borderRadius: '16px', padding: '1.5rem',
     display: 'flex', flexDirection: 'column', gap: '0.85rem',
-    boxShadow: '0 20px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01)',
+    boxShadow: '0 8px 32px rgba(0, 212, 255, 0.08)',
   },
   orb: { display: 'none' },
   header: {

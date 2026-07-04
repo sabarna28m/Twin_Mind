@@ -186,9 +186,11 @@
 .synth-input {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid var(--synth-gray-300);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: var(--synth-radius);
-  background: var(--synth-white);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   color: var(--synth-black);
   font-family: var(--synth-font-sans);
   font-size: 0.9375rem;
@@ -197,6 +199,7 @@
 
 .synth-input:focus {
   outline: none;
+  background: rgba(255, 255, 255, 0.7);
   border-color: var(--synth-black);
   box-shadow: 0 0 0 1px var(--synth-black);
 }
