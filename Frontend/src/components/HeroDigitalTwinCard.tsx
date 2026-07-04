@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Zap, Target, Bot, ExternalLink } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
 
@@ -137,7 +138,7 @@ export default function HeroDigitalTwinCard() {
           {/* Strengths / Weaknesses */}
           <div style={s.swRow}>
             <div style={s.swCard}>
-              <span style={s.swIcon}>💪</span>
+              <Zap size={20} style={{ color: '#10b981', flexShrink: 0 }} />
               <div>
                 <p style={s.swLabel}>Strongest</p>
                 <p style={s.swValue}>{strongName}</p>
@@ -148,7 +149,7 @@ export default function HeroDigitalTwinCard() {
               background: isDark ? 'rgba(239,68,68,0.10)' : 'rgba(239,68,68,0.06)',
               borderColor: isDark ? 'rgba(239,68,68,0.20)' : 'rgba(239,68,68,0.15)',
             }}>
-              <span style={s.swIcon}>🎯</span>
+              <Target size={20} style={{ color: '#fca5a5', flexShrink: 0 }} />
               <div>
                 <p style={s.swLabel}>Priority Focus</p>
                 <p style={{ ...s.swValue, color: '#fca5a5' }}>{weakName}</p>
@@ -162,13 +163,13 @@ export default function HeroDigitalTwinCard() {
           {/* Action buttons */}
           <div style={s.btnRow}>
             <Link to="/twin" style={s.primaryBtn}>
-              ◈ Open Digital Twin
+              <ExternalLink size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />Open Digital Twin
             </Link>
             <Link to="/simulate" style={s.secondaryBtn}>
-              ⚡ What-If Simulator
+              <Zap size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />What-If Simulator
             </Link>
             <Link to="/mentor" style={s.ghostBtn}>
-              🤖 AI Mentor
+              <Bot size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />AI Mentor
             </Link>
           </div>
         </>

@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine,
 } from 'recharts';
+import { TrendingUp, Calendar, FileText, Tag, Clock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
@@ -58,13 +59,13 @@ interface SubjectRecord {
 
 // ── Constants ──────────────────────────────────────────────────────────
 
-// Icons for well-known subjects — custom subjects fall back to 📚
+// Icons for well-known subjects — custom subjects fall back to 
 const SUBJECT_ICONS: Record<string,string> = {
-  'Mathematics':'∑','Physics':'⚛','Chemistry':'⚗',
-  'Biology':'🧬','English':'📖','Computer Science':'💻',
-  'Machine Learning':'🤖','Computer Networks':'🌐','DBMS':'🗄',
-  'Operating Systems':'⚙','Data Structures':'🌲','Algorithms':'🔍',
-  'Software Engineering':'🛠','Chemistry Lab':'🧪','Economics':'📈',
+  'Mathematics':'∑','Physics':'','Chemistry':'',
+  'Biology':'','English':'','Computer Science':'',
+  'Machine Learning':'','Computer Networks':'','DBMS':'',
+  'Operating Systems':'','Data Structures':'','Algorithms':'',
+  'Software Engineering':'','Chemistry Lab':'','Economics':'',
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -73,7 +74,7 @@ function scoreColor(s: number) { return s >= 75 ? '#10b981' : s >= 50 ? '#f59e0b
 function scoreBg(s: number)    { return s >= 75 ? 'rgba(16,185,129,0.12)' : s >= 50 ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)' }
 function scoreBorder(s: number){ return s >= 75 ? 'rgba(16,185,129,0.3)'  : s >= 50 ? 'rgba(245,158,11,0.3)'  : 'rgba(239,68,68,0.3)' }
 function riskLabel(s: number)  { return s >= 75 ? 'Strong' : s >= 50 ? 'Average' : 'Weak' }
-function riskEmoji(s: number)  { return s >= 75 ? '🟢' : s >= 50 ? '🟡' : '🔴' }
+function riskEmoji(s: number)  { return s >= 75 ? '' : s >= 50 ? '' : '' }
 function trendIcon(t: string)  { return t === 'improving' ? '↑' : t === 'declining' ? '↓' : '→' }
 function trendColor(t: string) { return t === 'improving' ? '#10b981' : t === 'declining' ? '#ef4444' : '#94a3b8' }
 function confLabel(c: number)  { return ['','Very Low','Low','Medium','High','Very High'][Math.round(c)] ?? 'Medium' }
@@ -110,7 +111,7 @@ function HeatmapCell({ s, onClick }: { s: SubjectSummary; onClick: () => void })
         cursor: 'pointer',
       }}
     >
-      <div style={{ ...hm.cellIcon, color: c }}>{SUBJECT_ICONS[s.subject] ?? '📚'}</div>
+      <div style={{ ...hm.cellIcon, color: c }}>{SUBJECT_ICONS[s.subject] ?? ''}</div>
       <p style={hm.cellName}>{s.subject}</p>
       {hasData ? (
         <>
@@ -168,7 +169,7 @@ function SubjectModal({ s, recs, plan, onClose }: {
         {/* Header */}
         <div style={{ ...md.header, borderBottomColor: `${c}30`, background: `linear-gradient(135deg, ${c}12, transparent)` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '1.75rem' }}>{SUBJECT_ICONS[s.subject] ?? '📚'}</span>
+            <span style={{ fontSize: '1.75rem' }}>{SUBJECT_ICONS[s.subject] ?? ''}</span>
             <div>
               <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-h)' }}>{s.subject}</h2>
               <span style={{ ...md.badge, background: `${c}22`, color: c, border: `1px solid ${c}44` }}>
@@ -176,7 +177,7 @@ function SubjectModal({ s, recs, plan, onClose }: {
               </span>
             </div>
           </div>
-          <button style={md.closeBtn} onClick={onClose}>✕</button>
+          <button style={md.closeBtn} onClick={onClose}></button>
         </div>
 
         <div style={md.body}>
@@ -355,16 +356,16 @@ function RecordModal({
       <div style={{ ...md.panel, maxWidth: '520px' }} onClick={e => e.stopPropagation()}>
         <div style={{ ...md.header, borderBottomColor: 'rgba(99,102,241,0.25)' }}>
           <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--text-h)' }}>
-            {isEdit ? '✏️ Edit Record' : '+ Add Performance Record'}
+            {isEdit ? ' Edit Record' : '+ Add Performance Record'}
           </h2>
-          <button style={md.closeBtn} onClick={onClose}>✕</button>
+          <button style={md.closeBtn} onClick={onClose}></button>
         </div>
         <div style={{ ...md.body, paddingBottom: '1.5rem' }}>
 
           {/* Success flash */}
           {saved && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.75rem 1rem', marginBottom: '1rem', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '10px', color: '#34d399', fontSize: '0.875rem', fontWeight: 600 }}>
-              <span style={{ fontSize: '1.1rem' }}>✓</span>
+              <span style={{ fontSize: '1.1rem' }}></span>
               Record {isEdit ? 'updated' : 'saved'} successfully!
             </div>
           )}
@@ -460,7 +461,7 @@ function RecordModal({
                       <input type="range" min={0} max={100} value={t.score} onChange={e => setTopicScore(t.name, +e.target.value)} style={{ flex: 1, accentColor: scoreColor(t.score) }} />
                       <span style={{ fontSize: '0.75rem', fontWeight: 700, color: scoreColor(t.score), width: '32px', textAlign: 'right' as const }}>{t.score}</span>
                       <button type="button" onClick={() => removeTopic(t.name)} aria-label={`Remove ${t.name}`}
-                        style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.85rem', padding: '0 0.1rem', lineHeight: 1, flexShrink: 0 }}>✕</button>
+                        style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.85rem', padding: '0 0.1rem', lineHeight: 1, flexShrink: 0 }}></button>
                     </div>
                   ))}
                 </div>
@@ -481,7 +482,7 @@ function RecordModal({
             <button type="submit" disabled={saving || saved || profileSubjects.length === 0}
               style={{ padding: '0.75rem', background: saved ? 'rgba(16,185,129,0.2)' : 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: saved ? '1px solid rgba(16,185,129,0.4)' : 'none', borderRadius: '12px', color: saved ? '#34d399' : '#fff', fontSize: '0.9rem', fontWeight: 800, cursor: (saving || saved || profileSubjects.length === 0) ? 'not-allowed' : 'pointer', opacity: profileSubjects.length === 0 ? 0.5 : 1, fontFamily: 'inherit' }}
             >
-              {saved ? '✓ Saved!' : saving ? 'Saving…' : isEdit ? '✓ Update Record' : '+ Save Record'}
+              {saved ? ' Saved!' : saving ? 'Saving…' : isEdit ? ' Update Record' : '+ Save Record'}
             </button>
           </form>
         </div>
@@ -584,7 +585,7 @@ export default function SubjectAnalysis() {
         {notifications.map((n, i) => (
           <div key={i} style={p.notifBar} className="animate-slide-up">
             <span style={{ flex: 1, fontSize: '0.82rem', color: 'var(--text-h)' }}>{n}</span>
-            <button style={p.notifX} onClick={() => setNotifications(ns => ns.filter((_, j) => j !== i))}>✕</button>
+            <button style={p.notifX} onClick={() => setNotifications(ns => ns.filter((_, j) => j !== i))}></button>
           </div>
         ))}
 
@@ -606,16 +607,16 @@ export default function SubjectAnalysis() {
                 Based on your study history, quizzes, focus sessions, revisions, and Digital Twin simulations, these are your current subject strengths and weaknesses. {analysis.weakest && `Your weakest area is ${analysis.weakest.subject} (${analysis.weakest.avg_score.toFixed(0)}%) — prioritising this subject will have the highest impact on your overall score.`} {analysis.most_improved && analysis.most_improved.improvement != null && ` ${analysis.most_improved.subject} shows the strongest recent improvement (+${analysis.most_improved.improvement.toFixed(0)}%).`}
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '0.6rem' }}>
-                <span style={{ ...p.statChip, color: '#ef4444' }}>🔴 Weakest: {analysis.weakest?.subject ?? '—'}</span>
-                <span style={{ ...p.statChip, color: '#10b981' }}>🟢 Strongest: {analysis.strongest?.subject ?? '—'}</span>
-                <span style={{ ...p.statChip, color: '#06b6d4' }}>📈 Most Improved: {analysis.most_improved?.subject ?? '—'}</span>
-                <span style={{ ...p.statChip, color: '#f59e0b' }}>⏰ Neglected: {analysis.neglected?.subject ?? '—'}</span>
+                <span style={{ ...p.statChip, color: '#ef4444' }}>Weakest: {analysis.weakest?.subject ?? '—'}</span>
+                <span style={{ ...p.statChip, color: '#10b981' }}>Strongest: {analysis.strongest?.subject ?? '—'}</span>
+                <span style={{ ...p.statChip, color: '#06b6d4', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><TrendingUp size={12} /> Most Improved: {analysis.most_improved?.subject ?? '—'}</span>
+                <span style={{ ...p.statChip, color: '#f59e0b' }}>Neglected: {analysis.neglected?.subject ?? '—'}</span>
               </div>
             </section>
 
             {/* ── SUBJECT OVERVIEW ── */}
             <section style={p.card}>
-              <h2 style={{ ...p.cardTitle, marginBottom: '1.1rem' }}>📚 Subject Overview</h2>
+              <h2 style={{ ...p.cardTitle, marginBottom: '1.1rem' }}> Subject Overview</h2>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '1rem' }}>
                 {withData.map(s => {
                   const c = scoreColor(s.avg_score);
@@ -626,7 +627,7 @@ export default function SubjectAnalysis() {
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap' as const, gap: '0.75rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                           <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: `${c}18`, border: `1.5px solid ${c}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', flexShrink: 0 }}>
-                            {SUBJECT_ICONS[s.subject] ?? '📚'}
+                            {SUBJECT_ICONS[s.subject] ?? ''}
                           </div>
                           <div>
                             <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem', fontWeight: 800, color: 'var(--text-h)' }}>{s.subject}</h3>
@@ -647,9 +648,9 @@ export default function SubjectAnalysis() {
                       </div>
                       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' as const, alignItems: 'center' }}>
                         {s.days_since_activity != null && (
-                          <span style={{ ...p.statChip, color: s.days_since_activity > 5 ? '#ef4444' : '#94a3b8' }}>📅 Last studied: {s.days_since_activity === 0 ? 'Today' : `${s.days_since_activity} day${s.days_since_activity === 1 ? '' : 's'} ago`}</span>
+                          <span style={{ ...p.statChip, color: s.days_since_activity > 5 ? '#ef4444' : '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><Calendar size={11} /> Last studied: {s.days_since_activity === 0 ? 'Today' : `${s.days_since_activity} day${s.days_since_activity === 1 ? '' : 's'} ago`}</span>
                         )}
-                        <span style={{ ...p.statChip, color: '#f59e0b' }}>⏱ Study {s.recommended_daily_minutes} min/day for the next 5 days</span>
+                        <span style={{ ...p.statChip, color: '#f59e0b', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><Clock size={11} /> Study {s.recommended_daily_minutes} min/day for the next 5 days</span>
                         <span style={{ ...p.statChip, color: trendColor(s.trend) }}>{trendIcon(s.trend)} {s.trend}</span>
                       </div>
                       <div style={{ paddingTop: '0.1rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end' }}>
@@ -665,29 +666,29 @@ export default function SubjectAnalysis() {
 
             {/* ── IMPROVEMENT OPPORTUNITIES (6 cards) ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(170px,1fr))', gap: '0.85rem' }} className="subj-det-grid">
-              <DetectionCard icon="🔴" label="Weakest Subject" color="#ef4444"
+              <DetectionCard icon="WK" label="Weakest Subject" color="#ef4444"
                 subject={analysis.weakest?.subject} score={analysis.weakest?.avg_score}
                 detail={analysis.weakest ? `${analysis.weakest.study_hours.toFixed(1)}h studied` : 'No data'} />
-              <DetectionCard icon="📈" label="Most Improved" color="#06b6d4"
+              <DetectionCard icon="UP" label="Most Improved" color="#06b6d4"
                 subject={analysis.most_improved?.subject}
                 detail={analysis.most_improved?.improvement != null ? `+${analysis.most_improved.improvement.toFixed(0)}% since last record` : 'No improvement data yet'} />
-              <DetectionCard icon="⏰" label="Most Neglected" color="#f59e0b"
+              <DetectionCard icon="NG" label="Most Neglected" color="#f59e0b"
                 subject={analysis.neglected?.subject}
                 detail={analysis.neglected?.days_since_activity != null ? `${analysis.neglected.days_since_activity} days without activity` : 'All subjects active'} />
-              <DetectionCard icon="🚀" label="Fastest Growing" color="#8b5cf6"
+              <DetectionCard icon="FG" label="Fastest Growing" color="#8b5cf6"
                 subject={fastestGrowing?.subject}
                 detail={fastestGrowing?.improvement != null ? `+${fastestGrowing.improvement.toFixed(0)}% recent gain` : 'Keep all subjects active'} />
-              <DetectionCard icon="🎯" label="Highest Accuracy" color="#10b981"
+              <DetectionCard icon="AC" label="Highest Accuracy" color="#10b981"
                 subject={highestAccuracy?.subject} score={highestAccuracy?.avg_score}
                 detail={highestAccuracy ? `Trend: ${highestAccuracy.trend}` : 'No data'} />
-              <DetectionCard icon="🧠" label="Most Focused" color="#ec4899"
+              <DetectionCard icon="FC" label="Most Focused" color="#ec4899"
                 subject={highestFocus?.subject}
                 detail={highestFocus ? `${highestFocus.study_hours.toFixed(1)}h total focused study` : 'Log sessions to track focus'} />
             </div>
 
             {/* ── SUBJECT PRIORITY RANKING ── */}
             <section style={p.card}>
-              <h2 style={p.cardTitle}>📋 Subject Priority Ranking</h2>
+              <h2 style={p.cardTitle}> Subject Priority Ranking</h2>
               <p style={{ margin: '-0.4rem 0 0.9rem', fontSize: '0.78rem', color: 'var(--text-m)', lineHeight: 1.5 }}>AI-ranked by current score, days since last revision, quiz accuracy, focus time, and Digital Twin prediction.</p>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.45rem', marginTop: '0.85rem' }}>
                 {analysis.priority_ranking.map(item => {
@@ -696,7 +697,7 @@ export default function SubjectAnalysis() {
                   return (
                     <div key={item.subject} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.55rem 0.75rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '10px' }}>
                       <span style={{ fontWeight: 900, color: c, width: '22px', textAlign: 'center' as const, fontSize: '0.8rem' }}>#{item.rank}</span>
-                      <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[item.subject] ?? '📚'}</span>
+                      <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[item.subject] ?? ''}</span>
                       <span style={{ flex: 1, fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-h)' }}>{item.subject}</span>
                       <div style={{ width: '120px', height: '5px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden' }}>
                         <div style={{ height: '100%', width: `${barW}%`, background: scoreColor(item.avg_score), borderRadius: '99px', transition: 'width 0.7s ease' }} />
@@ -716,7 +717,7 @@ export default function SubjectAnalysis() {
             {/* ── Subject Heatmap ── */}
             <section style={p.card}>
               <div style={p.cardHead}>
-                <h2 style={p.cardTitle}>🗺 Subject Heatmap</h2>
+                <h2 style={p.cardTitle}> Subject Heatmap</h2>
                 <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' as const }}>
                   {[['#10b981','Strong >75%'],['#f59e0b','Average 50–75%'],['#ef4444','Weak <50%']].map(([c,l]) => (
                     <span key={l} style={{ fontSize: '0.65rem', fontWeight: 600, color: c, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -735,7 +736,7 @@ export default function SubjectAnalysis() {
             {/* ── Trend Chart ── */}
             <section style={p.card}>
               <div style={p.cardHead}>
-                <h2 style={p.cardTitle}>📈 Performance Trend</h2>
+                <h2 style={p.cardTitle}> Performance Trend</h2>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' as const }}>
                   {withData.map(s => {
                     const c = scoreColor(s.avg_score);
@@ -773,7 +774,7 @@ export default function SubjectAnalysis() {
             {/* ── AI RECOMMENDATIONS ── */}
             {withData.some(s => (analysis.recommendations[s.subject] ?? []).length > 0) && (
               <section style={p.card}>
-                <h2 style={p.cardTitle}>💡 AI Recommendations</h2>
+                <h2 style={p.cardTitle}> AI Recommendations</h2>
                 <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.85rem', marginTop: '0.75rem' }}>
                   {withData.map(s => {
                     const recs = analysis.recommendations[s.subject] ?? [];
@@ -782,7 +783,7 @@ export default function SubjectAnalysis() {
                     return (
                       <div key={s.subject} style={{ background: `${c}07`, border: `1px solid ${c}22`, borderRadius: '14px', padding: '1.15rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                          <span style={{ fontSize: '1.1rem' }}>{SUBJECT_ICONS[s.subject] ?? '📚'}</span>
+                          <span style={{ fontSize: '1.1rem' }}>{SUBJECT_ICONS[s.subject] ?? ''}</span>
                           <span style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-h)', flex: 1 }}>{s.subject}</span>
                           <span style={{ fontWeight: 800, color: c, fontSize: '0.85rem' }}>{s.avg_score.toFixed(0)}%</span>
                         </div>
@@ -803,7 +804,7 @@ export default function SubjectAnalysis() {
 
             {/* ── TREND ANALYSIS ── */}
             <section style={p.card}>
-              <h2 style={p.cardTitle}>📊 Trend Analysis</h2>
+              <h2 style={p.cardTitle}> Trend Analysis</h2>
               <p style={{ margin: '-0.4rem 0 1rem', fontSize: '0.78rem', color: '#64748b' }}>Score change from previous record to current performance.</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '0.85rem' }}>
                 {withData.map(s => {
@@ -814,7 +815,7 @@ export default function SubjectAnalysis() {
                   return (
                     <div key={s.subject} style={{ background: 'var(--bg-elevated)', border: `1px solid var(--border)`, borderRadius: '14px', padding: '1.1rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                        <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[s.subject] ?? '📚'}</span>
+                        <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[s.subject] ?? ''}</span>
                         <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-h)', flex: 1 }}>{s.subject}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -862,7 +863,7 @@ export default function SubjectAnalysis() {
                     <div key={s.subject} style={{ background: 'var(--bg-elevated)', border: `1px solid ${c}22`, borderRadius: '14px', padding: '1.1rem', position: 'relative', overflow: 'hidden' }}>
                       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: c, opacity: 0.7, borderRadius: '14px 14px 0 0' }} />
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.85rem' }}>
-                        <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[s.subject] ?? '📚'}</span>
+                        <span style={{ fontSize: '1rem' }}>{SUBJECT_ICONS[s.subject] ?? ''}</span>
                         <span style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-h)' }}>{s.subject}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.75rem', marginBottom: '0.55rem' }}>
@@ -897,7 +898,7 @@ export default function SubjectAnalysis() {
             {/* ── Action Plans ── */}
             {Object.keys(analysis.action_plans).length > 0 && (
               <section style={p.card}>
-                <h2 style={p.cardTitle}>🗓 AI Recovery Plans</h2>
+                <h2 style={p.cardTitle}> AI Recovery Plans</h2>
                 <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.65rem', marginTop: '0.85rem' }}>
                   {Object.entries(analysis.action_plans).map(([subj, plan]) => {
                     const s = analysis.subjects.find(x => x.subject === subj);
@@ -907,7 +908,7 @@ export default function SubjectAnalysis() {
                       <div key={subj} style={{ background: 'var(--bg-elevated)', border: `1px solid ${c}25`, borderRadius: '14px', overflow: 'hidden' }}>
                         <button onClick={() => setExpandedPlan(open ? null : subj)} style={{ width: '100%', padding: '0.85rem 1.1rem', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontFamily: 'inherit' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                            <span style={{ fontSize: '1.1rem' }}>{SUBJECT_ICONS[subj] ?? '📚'}</span>
+                            <span style={{ fontSize: '1.1rem' }}>{SUBJECT_ICONS[subj] ?? ''}</span>
                             <span style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-h)' }}>{subj} — 7-Day Recovery Plan</span>
                           </div>
                           <span style={{ color: c, fontWeight: 700, fontSize: '0.8rem' }}>{open ? '▲ Hide' : '▼ Show'}</span>
@@ -935,7 +936,7 @@ export default function SubjectAnalysis() {
         ) : profileSubjects.length === 0 && records.length === 0 ? (
           <div style={p.emptyWrap}>
             <div style={p.emptyCard}>
-              <p style={{ fontSize: '3.5rem', margin: '0 0 1rem' }}>📚</p>
+              <p style={{ fontSize: '3.5rem', margin: '0 0 1rem' }}></p>
               <h2 style={{ margin: '0 0 0.6rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-h)' }}>No subjects configured yet</h2>
               <p style={{ margin: '0 0 1.75rem', fontSize: '0.87rem', color: 'var(--text)', lineHeight: 1.65, maxWidth: '380px' }}>
                 Add your subjects in your profile to activate Subject Analysis, the performance heatmap, AI weakness detection, and personalized recovery plans.
@@ -948,7 +949,7 @@ export default function SubjectAnalysis() {
         ) : records.length === 0 ? (
           <div style={p.emptyWrap}>
             <div style={p.emptyCard}>
-              <p style={{ fontSize: '3.5rem', margin: '0 0 1rem' }}>📊</p>
+              <p style={{ fontSize: '3.5rem', margin: '0 0 1rem' }}></p>
               <h2 style={{ margin: '0 0 0.6rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-h)' }}>No performance data yet</h2>
               <p style={{ margin: '0 0 1.75rem', fontSize: '0.87rem', color: 'var(--text)', lineHeight: 1.65, maxWidth: '380px' }}>
                 Add your first subject record to unlock your personal performance heatmap, AI weakness detection, topic analysis, and recovery plans.
@@ -962,22 +963,22 @@ export default function SubjectAnalysis() {
         {records.length > 0 && (
           <section style={p.card}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem', flexWrap: 'wrap' as const, gap: '0.5rem' }}>
-              <h2 style={{ ...p.cardTitle, margin: 0 }}>📝 All Records ({records.length})</h2>
+              <h2 style={{ ...p.cardTitle, margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}><FileText size={16} /> All Records ({records.length})</h2>
               <button style={p.addBtn} onClick={() => setShowAdd(true)}>+ Add Record</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.5rem' }}>
               {records.map(rec => (
                 <div key={rec.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.85rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '10px', flexWrap: 'wrap' as const }}>
-                  <span style={{ fontSize: '1rem', flexShrink: 0 }}>{SUBJECT_ICONS[rec.subject] ?? '📚'}</span>
+                  <span style={{ fontSize: '1rem', flexShrink: 0 }}>{SUBJECT_ICONS[rec.subject] ?? ''}</span>
                   <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-h)', minWidth: '100px' }}>{rec.subject}</span>
                   <span style={{ fontSize: '0.78rem', color: 'var(--text)' }}>{rec.date}</span>
                   <span style={{ fontWeight: 800, fontSize: '0.9rem', color: scoreColor(rec.score), minWidth: '44px' }}>{rec.score.toFixed(0)}%</span>
                   <span style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem', borderRadius: '99px', background: 'var(--border)', color: 'var(--text)', textTransform: 'capitalize' as const }}>{rec.source.replace('_', ' ')}</span>
                   {rec.study_hours > 0 && (
-                    <span style={{ fontSize: '0.72rem', color: '#06b6d4' }}>⏱ {rec.study_hours.toFixed(1)}h</span>
+                    <span style={{ fontSize: '0.72rem', color: '#06b6d4', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}><Clock size={11} />{rec.study_hours.toFixed(1)}h</span>
                   )}
                   {rec.topics.length > 0 && (
-                    <span style={{ fontSize: '0.72rem', color: '#8b5cf6' }}>🏷 {rec.topics.length} topic{rec.topics.length !== 1 ? 's' : ''}</span>
+                    <span style={{ fontSize: '0.72rem', color: '#8b5cf6', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}><Tag size={11} /> {rec.topics.length} topic{rec.topics.length !== 1 ? 's' : ''}</span>
                   )}
                   {rec.notes && (
                     <span style={{ fontSize: '0.72rem', color: 'var(--text)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const, opacity: 0.6 }} title={rec.notes}>"{rec.notes}"</span>
@@ -986,12 +987,12 @@ export default function SubjectAnalysis() {
                     <button
                       onClick={() => setEditRecord(rec)}
                       style={{ padding: '0.25rem 0.65rem', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', borderRadius: '7px', color: '#818cf8', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
-                    >✏️ Edit</button>
+                    > Edit</button>
                     <button
                       onClick={() => deleteRecord(rec.id)}
                       disabled={deletingId === rec.id}
                       style={{ padding: '0.25rem 0.65rem', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '7px', color: '#f87171', fontSize: '0.72rem', fontWeight: 700, cursor: deletingId === rec.id ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: deletingId === rec.id ? 0.5 : 1 }}
-                    >{deletingId === rec.id ? '…' : '🗑 Delete'}</button>
+                    >{deletingId === rec.id ? '…' : ' Delete'}</button>
                   </div>
                 </div>
               ))}

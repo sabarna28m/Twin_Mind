@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿﻿﻿import { useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -61,14 +61,14 @@ type Difficulty     = 'easy' | 'medium' | 'hard' | 'mixed';
 const ACCEPT = '.pdf,.png,.jpg,.jpeg,.gif,.webp,.txt,.docx,.pptx,.doc';
 
 const ANALYSIS_TABS: { key: AnalysisTab; icon: string; label: string }[] = [
-  { key: 'summary',     icon: '📋', label: 'Summary'     },
-  { key: 'chapters',    icon: '📖', label: 'Chapters'    },
-  { key: 'flashcards',  icon: '🃏', label: 'Flashcards'  },
-  { key: 'questions',   icon: '❓', label: 'Questions'   },
-  { key: 'definitions', icon: '📚', label: 'Definitions' },
-  { key: 'exam',        icon: '📝', label: 'Exam Notes'  },
-  { key: 'mindmap',     icon: '🗺', label: 'Mind Map'    },
-  { key: 'revision',    icon: '🔄', label: 'Revision'    },
+  { key: 'summary',     icon: '', label: 'Summary'     },
+  { key: 'chapters',    icon: '', label: 'Chapters'    },
+  { key: 'flashcards',  icon: '', label: 'Flashcards'  },
+  { key: 'questions',   icon: '', label: 'Questions'   },
+  { key: 'definitions', icon: '', label: 'Definitions' },
+  { key: 'exam',        icon: '', label: 'Exam Notes'  },
+  { key: 'mindmap',     icon: '', label: 'Mind Map'    },
+  { key: 'revision',    icon: '', label: 'Revision'    },
 ];
 
 const Q_TYPE_OPTIONS: { key: QType; label: string }[] = [
@@ -85,12 +85,12 @@ const DIFF_COLORS: Record<string, string> = {
 
 /* ── Helpers ────────────────────────────────────────────────────────────────── */
 function fileIcon(mime: string) {
-  if (mime === 'application/pdf')    return '📄';
-  if (mime.startsWith('image/'))     return '🖼';
-  if (mime.startsWith('text/'))      return '📝';
-  if (mime.includes('word'))         return '📘';
-  if (mime.includes('presentation')) return '📊';
-  return '📎';
+  if (mime === 'application/pdf')    return '';
+  if (mime.startsWith('image/'))     return '';
+  if (mime.startsWith('text/'))      return '';
+  if (mime.includes('word'))         return '';
+  if (mime.includes('presentation')) return '';
+  return '';
 }
 function fmtSize(b: number) {
   if (b < 1048576) return `${(b / 1024).toFixed(1)} KB`;
@@ -123,7 +123,7 @@ function Flashcard({ front, back, index, total }: { front: string; back: string;
         <div>
           <p style={{ margin: '0 0 0.35rem', fontSize: '0.6rem', fontWeight: 800,
             color: flipped ? '#a78bfa' : '#00D4FF', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
-            {flipped ? '✓ Answer' : '? Question'}
+            {flipped ? 'Answer' : '? Question'}
           </p>
           <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 600,
             color: 'var(--text-h)', lineHeight: 1.5 }}>
@@ -258,7 +258,7 @@ function ReviewCard({ q, userAnswer }: { q: QuizQuestion; userAnswer: string | u
         <span style={{ ...qs.chip, color: dc, borderColor: `${dc}40`, background: `${dc}10` }}>{q.difficulty}</span>
         {isObj && (
           <span style={{ fontSize: '0.72rem', fontWeight: 800, color: isCorrect ? '#34d399' : '#f87171' }}>
-            {isCorrect ? '✓ Correct' : '✗ Incorrect'}
+            {isCorrect ? 'Correct' : 'Incorrect'}
           </span>
         )}
         {!isObj && <span style={{ fontSize: '0.68rem', color: '#a78bfa', fontWeight: 600 }}>Self-review</span>}
@@ -516,7 +516,7 @@ export default function StudyResources() {
 
           {currentQ < questions.length - 1
             ? <button onClick={() => setCurrentQ(c => c + 1)} style={s.primaryBtn}>Next →</button>
-            : <button onClick={() => setPageView('results')} style={{ ...s.primaryBtn, background: 'linear-gradient(135deg,#10b981,#34d399)' }}>Submit ✓</button>
+            : <button onClick={() => setPageView('results')} style={{ ...s.primaryBtn, background: 'linear-gradient(135deg,#10b981,#34d399)' }}>Submit</button>
           }
         </div>
       </div>
@@ -534,22 +534,20 @@ export default function StudyResources() {
           <p style={{ margin: '0 0 0.4rem', fontSize: '2.8rem', fontWeight: 900, color: sc,
             textShadow: `0 0 28px ${sc}50` }}>{pct}%</p>
           <p style={{ margin: '0 0 0.25rem', fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-h)' }}>
-            {pct >= 80 ? '🏆 Excellent!' : pct >= 65 ? '👍 Good Job!' : pct >= 50 ? '📖 Keep Practicing' : '💪 Need More Study'}
+            {pct >= 80 ? 'Excellent!' : pct >= 65 ? 'Good Job!' : pct >= 50 ? 'Keep Practicing' : 'Need More Study'}
           </p>
           <p style={{ margin: '0 0 1.25rem', fontSize: '0.75rem', color: 'var(--text)' }}>
             {correct} / {objective.length} correct
             {questions.length > objective.length && ` · ${questions.length - objective.length} subjective (self-review)`}
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.65rem', flexWrap: 'wrap' as const }}>
-            <button onClick={() => { setCurrentQ(0); setAnswers({}); setPageView('quiz'); }} style={s.outlineBtn}>
-              🔄 Retake Quiz
-            </button>
+            <button onClick={() => { setCurrentQ(0); setAnswers({}); setPageView('quiz'); }} style={s.outlineBtn}>Retake Quiz</button>
             <button onClick={() => setPageView('library')} style={s.primaryBtn}>
               ← Back to Library
             </button>
           </div>
         </div>
-        <p style={s.sectionHead}>📋 Review</p>
+        <p style={s.sectionHead}>Review</p>
         {questions.map(q => <ReviewCard key={q.id} q={q} userAnswer={answers[q.id]} />)}
       </div>
     );
@@ -578,7 +576,7 @@ export default function StudyResources() {
           </div>
         ) : (
           <>
-            <span style={{ fontSize: '1.5rem' }}>☁</span>
+            <span style={{ fontSize: '1.5rem' }}></span>
             <p style={s.dropLabel}>{dragOver ? 'Drop to upload' : 'Upload Study Material'}</p>
             <p style={s.dropHint}>PDF · DOCX · PPT · TXT · Images · max 20 MB · click or drag-and-drop</p>
           </>
@@ -589,7 +587,7 @@ export default function StudyResources() {
       {/* ── Library header ── */}
       {!libLoading && (
         <div style={s.libHeader}>
-          <input style={s.searchInput} placeholder="🔍  Search library…"
+          <input style={s.searchInput} placeholder="Search library…"
             value={search} onChange={e => setSearch(e.target.value)} />
           <span style={s.libCount}>{filtered.length} file{filtered.length !== 1 ? 's' : ''}</span>
           {materials.length > 0 && (
@@ -598,8 +596,8 @@ export default function StudyResources() {
               cursor: analyzeAllProgress ? 'wait' : 'pointer',
             }}>
               {analyzeAllProgress
-                ? `⏳ ${analyzeAllProgress.done}/${analyzeAllProgress.total} analyzed…`
-                : '🤖 Analyze All'}
+                ? `${analyzeAllProgress.done}/${analyzeAllProgress.total} analyzed…`
+                : 'Analyze All'}
             </button>
           )}
         </div>
@@ -608,7 +606,7 @@ export default function StudyResources() {
       {/* ── Empty state ── */}
       {!libLoading && filtered.length === 0 && (
         <div style={s.emptyState}>
-          <p style={{ fontSize: '2.2rem', margin: '0 0 0.6rem' }}>📂</p>
+          <p style={{ fontSize: '2.2rem', margin: '0 0 0.6rem' }}></p>
           <p style={s.emptyTitle}>{search ? 'No files match your search.' : 'Your study library is empty.'}</p>
           <p style={s.emptyHint}>
             {search
@@ -648,8 +646,8 @@ export default function StudyResources() {
                         <span>Analyzing…</span>
                       </div>
                     )}
-                    {st === 'done'  && <span style={s.statusDone}>✓ Analysis Complete</span>}
-                    {st === 'error' && <span style={s.statusError}>✗ Failed — click Analyze to retry</span>}
+                    {st === 'done'  && <span style={s.statusDone}>Analysis Complete</span>}
+                    {st === 'error' && <span style={s.statusError}>Failed — click Analyze to retry</span>}
                   </div>
                 </div>
 
@@ -657,9 +655,7 @@ export default function StudyResources() {
                 <div style={s.matActions}>
                   <button
                     onClick={() => fetchAndOpen(m.id, m.original_name, m.mime_type, false)}
-                    style={s.actionBtn} title="View file in browser">
-                    👁 View
-                  </button>
+                    style={s.actionBtn} title="View file in browser">View</button>
 
                   <button
                     onClick={() => {
@@ -678,7 +674,7 @@ export default function StudyResources() {
                       opacity:     st === 'analyzing' ? 0.5 : 1,
                     }}
                     title={st === 'done' ? 'Open analysis panel' : 'Analyze with AI'}>
-                    {st === 'done' ? '📋 Analysis' : st === 'analyzing' ? '⏳ …' : '🤖 Analyze'}
+                    {st === 'done' ? 'Analysis' : st === 'analyzing' ? '…' : 'Analyze'}
                   </button>
 
                   <button
@@ -689,9 +685,7 @@ export default function StudyResources() {
 
                   <button onClick={() => deleteMaterial(m.id)}
                     style={{ ...s.actionBtn, color: 'rgba(239,68,68,0.55)', borderColor: 'rgba(239,68,68,0.18)', background: 'transparent' }}
-                    title="Delete file">
-                    ✕
-                  </button>
+                    title="Delete file"></button>
                 </div>
               </div>
             );
@@ -707,16 +701,16 @@ export default function StudyResources() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={s.analysisPanelTitle}>{fileIcon(selected.mime_type)} {selected.original_name}</p>
               <p style={s.analysisPanelMeta}>
-                {selStatus === 'analyzing' && '⏳ Processing with AI…'}
-                {selStatus === 'done'      && '✓ Analysis Complete — select a tab below'}
-                {selStatus === 'error'     && '✗ Analysis failed'}
+                {selStatus === 'analyzing' && 'Processing with AI…'}
+                {selStatus === 'done'      && 'Analysis Complete — select a tab below'}
+                {selStatus === 'error'     && 'Analysis failed'}
               </p>
             </div>
             <div style={{ display: 'flex', gap: '0.35rem', flexShrink: 0 }}>
               {selStatus !== 'analyzing' && (
-                <button onClick={() => analyzeOne(selected)} style={s.reAnalyzeBtn}>🔄 Re-analyze</button>
+                <button onClick={() => analyzeOne(selected)} style={s.reAnalyzeBtn}>Re-analyze</button>
               )}
-              <button onClick={() => { setSelected(null); setShowQuizPanel(false); }} style={s.closePanelBtn}>✕</button>
+              <button onClick={() => { setSelected(null); setShowQuizPanel(false); }} style={s.closePanelBtn}></button>
             </div>
           </div>
 
@@ -741,14 +735,14 @@ export default function StudyResources() {
               {/* Workflow indicator */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' as const, padding: '0.45rem 0.7rem', background: 'var(--bg-elevated)', borderRadius: '9px' }}>
                 {[
-                  { icon: '☁',  label: 'Uploaded',     done: true  },
-                  { icon: '🤖', label: 'Analyzed',      done: true  },
-                  { icon: '📋', label: 'Review Content', done: false },
-                  { icon: '🧠', label: 'Generate Quiz', done: false },
+                  { icon: '',  label: 'Uploaded',     done: true  },
+                  { icon: '', label: 'Analyzed',      done: true  },
+                  { icon: '', label: 'Review Content', done: false },
+                  { icon: '', label: 'Generate Quiz', done: false },
                 ].map((step, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                     <div style={{ width: '20px', height: '20px', borderRadius: '50%', fontSize: '0.58rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0, background: step.done ? '#10b981' : 'rgba(0,212,255,0.14)', color: step.done ? '#fff' : '#00D4FF', border: `1.5px solid ${step.done ? '#10b981' : 'rgba(0,212,255,0.35)'}` }}>
-                      {step.done ? '✓' : step.icon}
+                      {step.done ? '' : step.icon}
                     </div>
                     <span style={{ fontSize: '0.6rem', fontWeight: 600, color: step.done ? '#34d399' : 'var(--text)' }}>{step.label}</span>
                     {i < 3 && <span style={{ color: '#cbd5e1', fontSize: '0.6rem' }}>→</span>}
@@ -777,31 +771,31 @@ export default function StudyResources() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                     {selAnalysis.quick_summary && (
                       <div>
-                        <p style={s.sectionHead}>⚡ Quick Summary</p>
+                        <p style={s.sectionHead}>Quick Summary</p>
                         <ul style={s.ul}>{selAnalysis.quick_summary.map((pt, i) => <li key={i} style={s.li}>{pt}</li>)}</ul>
                       </div>
                     )}
                     {selAnalysis.detailed_summary && (
                       <div>
-                        <p style={s.sectionHead}>📄 Detailed Summary</p>
+                        <p style={s.sectionHead}>Detailed Summary</p>
                         <p style={s.body}>{selAnalysis.detailed_summary}</p>
                       </div>
                     )}
                     {(selAnalysis.topics ?? []).length > 0 && (
                       <div>
-                        <p style={s.sectionHead}>🏷 Main Topics</p>
+                        <p style={s.sectionHead}>Main Topics</p>
                         <div style={s.chipRow}>{selAnalysis.topics!.map((t, i) => <span key={i} style={s.topicChip}>{t}</span>)}</div>
                       </div>
                     )}
                     {(selAnalysis.keywords ?? []).length > 0 && (
                       <div>
-                        <p style={s.sectionHead}>🔑 Keywords</p>
+                        <p style={s.sectionHead}>Keywords</p>
                         <div style={s.chipRow}>{selAnalysis.keywords!.map((k, i) => <span key={i} style={s.kwChip}>{k}</span>)}</div>
                       </div>
                     )}
                     {(selAnalysis.important_concepts ?? []).length > 0 && (
                       <div>
-                        <p style={s.sectionHead}>💡 Key Concepts</p>
+                        <p style={s.sectionHead}>Key Concepts</p>
                         <div style={s.chipRow}>{selAnalysis.important_concepts!.map((c, i) => <span key={i} style={s.conceptChip}>{c}</span>)}</div>
                       </div>
                     )}
@@ -837,7 +831,7 @@ export default function StudyResources() {
 
                 {aTab === 'questions' && (
                   <div>
-                    <p style={s.sectionHead}>❓ Important Questions</p>
+                    <p style={s.sectionHead}>Important Questions</p>
                     {(selAnalysis.important_questions ?? []).length === 0
                       ? <p style={s.hint}>No questions generated.</p>
                       : <ol style={{ margin: 0, paddingLeft: '1.2rem' }}>
@@ -863,7 +857,7 @@ export default function StudyResources() {
 
                 {aTab === 'exam' && (
                   <div>
-                    <p style={s.sectionHead}>📝 Exam-Focused Notes</p>
+                    <p style={s.sectionHead}>Exam-Focused Notes</p>
                     <p style={s.body}>{selAnalysis.exam_notes ?? 'No exam notes generated.'}</p>
                   </div>
                 )}
@@ -874,7 +868,7 @@ export default function StudyResources() {
 
                 {aTab === 'revision' && (
                   <div>
-                    <p style={s.sectionHead}>🔄 Revision Notes</p>
+                    <p style={s.sectionHead}>Revision Notes</p>
                     <p style={s.body}>{selAnalysis.revision_notes ?? 'No revision notes generated.'}</p>
                   </div>
                 )}
@@ -882,9 +876,7 @@ export default function StudyResources() {
 
               {/* ── Generate Quiz CTA ── */}
               {!showQuizPanel && (
-                <button onClick={() => setShowQuizPanel(true)} style={s.generateQuizBtn}>
-                  🧠 Generate Quiz from This Analysis
-                </button>
+                <button onClick={() => setShowQuizPanel(true)} style={s.generateQuizBtn}>Generate Quiz from This Analysis</button>
               )}
 
               {/* ── Quiz Config Panel ── */}
@@ -892,10 +884,10 @@ export default function StudyResources() {
                 <div style={s.quizConfigPanel}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
                     <div>
-                      <p style={{ margin: '0 0 0.1rem', fontWeight: 800, fontSize: '0.88rem', color: 'var(--text-h)' }}>🧠 Generate Quiz</p>
+                      <p style={{ margin: '0 0 0.1rem', fontWeight: 800, fontSize: '0.88rem', color: 'var(--text-h)' }}>Generate Quiz</p>
                       <p style={{ margin: 0, fontSize: '0.66rem', color: 'var(--text)' }}>Quiz based on AI-analyzed content from this material</p>
                     </div>
-                    <button onClick={() => setShowQuizPanel(false)} style={s.closePanelBtn}>✕</button>
+                    <button onClick={() => setShowQuizPanel(false)} style={s.closePanelBtn}></button>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
@@ -953,7 +945,7 @@ export default function StudyResources() {
                     <button onClick={generateQuiz} disabled={generating} style={{
                       ...s.primaryBtn, opacity: generating ? 0.6 : 1, cursor: generating ? 'wait' : 'pointer',
                     }}>
-                      {generating ? '⏳ Generating…' : '✨ Generate Quiz'}
+                      {generating ? 'Generating…' : 'Generate Quiz'}
                     </button>
 
                     {generating && (

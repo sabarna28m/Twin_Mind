@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+﻿﻿import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface TourStep {
@@ -19,13 +19,13 @@ const STEPS: TourStep[] = [
     target: 'profile',
     title: 'Complete Your Profile',
     desc: 'Set your course, semester, academic goals, and learning preferences so TwinMind can personalise every recommendation specifically for you.',
-    icon: '👤',
+    icon: '',
   },
   {
     target: 'checkin',
     title: 'Log Your First Check-in',
     desc: 'Daily check-ins are the heartbeat of TwinMind. Log your study hours, attendance, sleep, and stress levels to keep your Digital Twin accurate.',
-    icon: '✓',
+    icon: '',
   },
   {
     target: 'twin',
@@ -37,25 +37,25 @@ const STEPS: TourStep[] = [
     target: 'mentor',
     title: 'Try the AI Mentor',
     desc: 'Chat with your personalised AI mentor for study strategies, stress management tips, and advice grounded in your actual academic data.',
-    icon: '💬',
+    icon: '',
   },
   {
     target: 'predict',
     title: 'Predict Your Score',
     desc: 'Our ML model uses your study habits, attendance, and performance history to predict your exam score — with actionable recommendations to improve it.',
-    icon: '🎯',
+    icon: '',
   },
   {
     target: 'simulate',
     title: 'Simulate What-If Scenarios',
     desc: 'Explore how changing your study hours, attendance, or sleep would affect your predicted score. Plan smarter with data-driven simulations.',
-    icon: '⚡',
+    icon: '',
   },
   {
     target: 'quiz',
     title: 'Take a Quiz',
     desc: 'Test your knowledge with AI-generated quizzes tailored to your subjects. Track your performance over time and identify areas to improve.',
-    icon: '🧠',
+    icon: '',
   },
 ];
 
@@ -326,7 +326,7 @@ export default function TutorialOverlay() {
                     </button>
                   )}
                   <button onClick={next} style={{ padding: '0.42rem 1.1rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 3px 12px rgba(99,102,241,0.45)' }}>
-                    {step === STEPS.length - 1 ? 'Finish! 🎉' : 'Next →'}
+                    {step === STEPS.length - 1 ? 'Finish!' : 'Next →'}
                   </button>
                 </div>
               </div>
@@ -364,7 +364,7 @@ export default function TutorialOverlay() {
             animation: 'tm-pop 0.45s cubic-bezier(0.34,1.56,0.64,1)',
             position: 'relative',
           }}>
-            <div style={{ fontSize: '3.6rem', lineHeight: 1, marginBottom: '0.6rem' }}>🎉</div>
+            <div style={{ fontSize: '3.6rem', lineHeight: 1, marginBottom: '0.6rem' }}></div>
             <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--text-h)', margin: '0 0 0.5rem', letterSpacing: '-0.5px' }}>
               You're all set!
             </h2>
@@ -401,9 +401,7 @@ export default function TutorialOverlay() {
               color: '#fff', fontSize: '0.95rem', fontWeight: 700,
               cursor: 'pointer', fontFamily: 'inherit',
               boxShadow: '0 6px 24px rgba(99,102,241,0.55)',
-            }}>
-              Let's Go! 🚀
-            </button>
+            }}>Let's Go!</button>
           </div>
         </div>
       )}

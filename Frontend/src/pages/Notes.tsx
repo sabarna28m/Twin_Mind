@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { FileText } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -169,7 +170,7 @@ export default function Notes() {
         <div style={s.editor}>
           {activeId === null ? (
             <div style={s.editorEmpty}>
-              <p style={s.editorEmptyIcon}>📝</p>
+              <FileText size={40} style={{ color: 'var(--text-m)', marginBottom: '0.5rem' }} />
               <p style={s.editorEmptyTitle}>{t('notes_empty')}</p>
               <p style={s.editorEmptyHint}>{t('notes_empty_sub')}</p>
               <button onClick={createNote} style={s.editorNewBtn}>{t('notes_new')}</button>

@@ -37,7 +37,7 @@ export default function PasswordInput({ value, onChange, ...rest }: Props) {
     <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
       <input
         {...rest}
-        className="dark-input"
+        className={rest.className || "synth-input"}
         type={visible ? 'text' : 'password'}
         value={value}
         onChange={e => onChange(e.target.value)}
@@ -64,7 +64,7 @@ export default function PasswordInput({ value, onChange, ...rest }: Props) {
           transition: 'color 0.15s',
           flexShrink: 0,
         }}
-        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#00D4FF'; }}
+        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#171717'; }}
         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#64748b'; }}
       >
         {visible ? <EyeClosed /> : <EyeOpen />}

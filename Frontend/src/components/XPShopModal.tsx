@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+﻿import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useXPStore } from '../contexts/XPStoreContext';
 import type { ShopItem } from '../contexts/XPStoreContext';
@@ -22,22 +22,22 @@ interface ShopItemDef {
 
 const ITEMS: ShopItemDef[] = [
   {
-    key: 'shield', icon: '🛡️', nameKey: 'shop_shield_name', tagKey: 'shop_shield_tag',
+    key: 'shield', icon: '', nameKey: 'shop_shield_name', tagKey: 'shop_shield_tag',
     desc: 'Auto-activates when you miss a single check-in. Keeps your streak alive silently.',
     priceKey: 'shield', accentHex: '#6366f1',
   },
   {
-    key: 'premium_shield', icon: '🛡️', nameKey: 'shop_premium_name', tagKey: 'shop_premium_tag',
+    key: 'premium_shield', icon: '', nameKey: 'shop_premium_name', tagKey: 'shop_premium_tag',
     desc: 'Covers up to 3 consecutive missed days. Perfect for weekends and travel.',
     priceKey: 'premium_shield', accentHex: '#a78bfa', badge: 'PREMIUM',
   },
   {
-    key: 'streak_freeze', icon: '🔥', nameKey: 'shop_freeze_name', tagKey: 'shop_freeze_tag',
+    key: 'streak_freeze', icon: '', nameKey: 'shop_freeze_name', tagKey: 'shop_freeze_tag',
     desc: 'Manually freeze your streak for today. Use it when you know you\'ll miss a day.',
     priceKey: 'streak_freeze', accentHex: '#f97316',
   },
   {
-    key: 'double_xp', icon: '⭐', nameKey: 'shop_double_name', tagKey: 'shop_double_tag',
+    key: 'double_xp', icon: '2x', nameKey: 'shop_double_name', tagKey: 'shop_double_tag',
     desc: 'Every activity awards double XP for the next 24 hours. Stack it with a quiz marathon.',
     priceKey: 'double_xp', accentHex: '#f59e0b', badge: 'HOT',
   },
@@ -116,7 +116,7 @@ export default function XPShopModal({ isOpen, onClose }: Props) {
           {/* Header */}
           <div style={m.header}>
             <div style={m.headerLeft}>
-              <span style={m.shopIcon}>🛒</span>
+              <span style={m.shopIcon}></span>
               <div>
                 <h2 style={m.title}>{t('shop_modal_title')}</h2>
                 <p style={m.subtitle}>{t('shop_modal_sub')}</p>
@@ -124,10 +124,10 @@ export default function XPShopModal({ isOpen, onClose }: Props) {
             </div>
             <div style={m.headerRight}>
               <div style={m.xpBadge}>
-                <span style={m.xpIcon}>⚡</span>
+                <span style={m.xpIcon}></span>
                 <span style={m.xpAmount}>{avail.toLocaleString()} XP</span>
               </div>
-              <button style={m.closeBtn} onClick={onClose} aria-label="Close">✕</button>
+              <button style={m.closeBtn} onClick={onClose} aria-label="Close"></button>
             </div>
           </div>
 
@@ -135,7 +135,7 @@ export default function XPShopModal({ isOpen, onClose }: Props) {
           {lastMsg && (
             <div style={{ ...m.msgBar, borderColor: lastMsg.ok ? 'rgba(16,185,129,0.35)' : 'rgba(239,68,68,0.35)', color: lastMsg.ok ? '#10b981' : '#ef4444' }}>
               {lastMsg.text}
-              <button onClick={clearMsg} style={m.msgClose}>✕</button>
+              <button onClick={clearMsg} style={m.msgClose}></button>
             </div>
           )}
 
@@ -193,7 +193,7 @@ export default function XPShopModal({ isOpen, onClose }: Props) {
           {/* Footer */}
           <div style={m.footer}>
             <p style={m.footerNote}>
-              🏆 Earn XP by checking in daily, completing quizzes, and hitting streak milestones.
+               Earn XP by checking in daily, completing quizzes, and hitting streak milestones.
             </p>
             <Link to="/shop" style={m.fullPageLink} onClick={onClose}>
               {t('shop_view_full')}

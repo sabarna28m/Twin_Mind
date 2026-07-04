@@ -16,13 +16,12 @@ interface NavItem {
 interface NavGroup {
   id:    string;
   label: string;
-  emoji: string;
   items: NavItem[];
 }
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    id: 'learning', label: 'Learning', emoji: '📚',
+    id: 'learning', label: 'Learning',
     items: [
       { to: '/sessions',     Icon: BookOpen,    label: 'Sessions'      },
       { to: '/notes',        Icon: FileText,    label: 'Smart Notes'   },
@@ -31,7 +30,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    id: 'performance', label: 'Performance', emoji: '📊',
+    id: 'performance', label: 'Performance',
     items: [
       { to: '/progress',     Icon: BarChart2,   label: 'Progress'      },
       { to: '/achievements', Icon: Trophy,      label: 'Achievements'  },
@@ -40,19 +39,19 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    id: 'checkin', label: 'Check-in', emoji: '✅',
+    id: 'checkin', label: 'Check-in',
     items: [
       { to: '/checkin',      Icon: CheckSquare, label: 'Daily Check-in' },
     ],
   },
   {
-    id: 'shop', label: 'XP Shop', emoji: '🛒',
+    id: 'shop', label: 'XP Shop',
     items: [
       { to: '/shop',         Icon: ShoppingBag, label: 'XP Shop'        },
     ],
   },
   {
-    id: 'ai', label: 'AI Tools', emoji: '🤖',
+    id: 'ai', label: 'AI Tools',
     items: [
       { to: '/twin',         Icon: Layers,        label: 'Twin AI'      },
       { to: '/career',       Icon: Rocket,        label: 'Career AI'    },
@@ -145,7 +144,6 @@ export default function MobileNav({ isOpen, onClose, userName, avatarSrc, onLogo
           {NAV_GROUPS.map(group => (
             <div key={group.id} style={st.group}>
               <div style={st.groupHeader}>
-                <span style={st.groupEmoji}>{group.emoji}</span>
                 <span style={st.groupLabel}>{group.label}</span>
               </div>
               <div style={st.groupItems}>
@@ -259,7 +257,6 @@ const st: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'center', gap: '0.45rem',
     padding: '0.55rem 0.7rem 0.3rem',
   },
-  groupEmoji: { fontSize: '0.9rem' },
   groupLabel: {
     fontSize: '0.62rem', fontWeight: 800, letterSpacing: '0.1em',
     textTransform: 'uppercase' as const, color: 'rgba(148,163,184,0.5)',

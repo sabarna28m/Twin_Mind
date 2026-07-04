@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+﻿import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import api from '../services/api';
 import type { WeeklyChallengeData, GamificationProgress } from '../utils/gamification';
 
@@ -13,31 +13,31 @@ interface Notif         { id:string; icon:string; title:string; body:string; }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CATS = [
-  { key:'study',    label:'Study Hours',      icon:'⏱',  color:'#6366f1' },
-  { key:'quiz',     label:'Quiz Performance', icon:'🎯', color:'#00D4FF' },
-  { key:'subject',  label:'Subject Mastery',  icon:'📖', color:'#10b981' },
-  { key:'streak',   label:'Consistency',      icon:'🔥', color:'#f59e0b' },
-  { key:'career',   label:'Career Dev',       icon:'💼', color:'#8b5cf6' },
-  { key:'wellness', label:'Wellness',         icon:'🧘', color:'#ec4899' },
+  { key:'study',    label:'Study Hours',      icon:'TM',  color:'#6366f1' },
+  { key:'quiz',     label:'Quiz Performance', icon:'QZ', color:'#00D4FF' },
+  { key:'subject',  label:'Subject Mastery',  icon:'SM', color:'#10b981' },
+  { key:'streak',   label:'Consistency',      icon:'SK', color:'#f59e0b' },
+  { key:'career',   label:'Career Dev',       icon:'CD', color:'#8b5cf6' },
+  { key:'wellness', label:'Wellness',         icon:'WL', color:'#ec4899' },
 ];
 
 const GOAL_CATALOG: GoalTemplate[] = [
-  { id:'sh_10',  text:'Study 10 hours this week',          tracker:'study_hours',   target:10,  category:'study',    xp:100, icon:'⏱'  },
-  { id:'sh_15',  text:'Study 15 hours this week',          tracker:'study_hours',   target:15,  category:'study',    xp:150, icon:'⏱'  },
-  { id:'sh_20',  text:'Study 20 hours this week',          tracker:'study_hours',   target:20,  category:'study',    xp:200, icon:'⏱'  },
-  { id:'qz_5',   text:'Complete 5 quizzes this week',      tracker:'quiz_count',    target:5,   category:'quiz',     xp:80,  icon:'🎯' },
-  { id:'qz_10',  text:'Complete 10 quizzes this week',     tracker:'quiz_count',    target:10,  category:'quiz',     xp:150, icon:'🎯' },
-  { id:'ci_5',   text:'Log 5 check-ins this week',         tracker:'checkin_days',  target:5,   category:'streak',   xp:100, icon:'✅'  },
-  { id:'ci_7',   text:'Check in every day this week',      tracker:'checkin_days',  target:7,   category:'streak',   xp:180, icon:'✅'  },
-  { id:'sk_7',   text:'Maintain a 7-day streak',           tracker:'streak_days',   target:7,   category:'streak',   xp:200, icon:'🔥'  },
-  { id:'sk_14',  text:'Maintain a 14-day streak',          tracker:'streak_days',   target:14,  category:'streak',   xp:350, icon:'🔥'  },
-  { id:'sk_30',  text:'Maintain a 30-day streak',          tracker:'streak_days',   target:30,  category:'streak',   xp:500, icon:'🔥'  },
-  { id:'nt_5',   text:'Create 5 smart notes this week',    tracker:'note_count',    target:5,   category:'subject',  xp:80,  icon:'📝'  },
-  { id:'nt_10',  text:'Create 10 smart notes this week',   tracker:'note_count',    target:10,  category:'subject',  xp:150, icon:'📝'  },
+  { id:'sh_10',  text:'Study 10 hours this week',          tracker:'study_hours',   target:10,  category:'study',    xp:100, icon:'TM'  },
+  { id:'sh_15',  text:'Study 15 hours this week',          tracker:'study_hours',   target:15,  category:'study',    xp:150, icon:'TM'  },
+  { id:'sh_20',  text:'Study 20 hours this week',          tracker:'study_hours',   target:20,  category:'study',    xp:200, icon:'TM'  },
+  { id:'qz_5',   text:'Complete 5 quizzes this week',      tracker:'quiz_count',    target:5,   category:'quiz',     xp:80,  icon:'QZ' },
+  { id:'qz_10',  text:'Complete 10 quizzes this week',     tracker:'quiz_count',    target:10,  category:'quiz',     xp:150, icon:'QZ' },
+  { id:'ci_5',   text:'Log 5 check-ins this week',         tracker:'checkin_days',  target:5,   category:'streak',   xp:100, icon:'SK'   },
+  { id:'ci_7',   text:'Check in every day this week',      tracker:'checkin_days',  target:7,   category:'streak',   xp:180, icon:'SK'   },
+  { id:'sk_7',   text:'Maintain a 7-day streak',           tracker:'streak_days',   target:7,   category:'streak',   xp:200, icon:'SK'   },
+  { id:'sk_14',  text:'Maintain a 14-day streak',          tracker:'streak_days',   target:14,  category:'streak',   xp:350, icon:'SK'   },
+  { id:'sk_30',  text:'Maintain a 30-day streak',          tracker:'streak_days',   target:30,  category:'streak',   xp:500, icon:'SK'   },
+  { id:'nt_5',   text:'Create 5 smart notes this week',    tracker:'note_count',    target:5,   category:'subject',  xp:80,  icon:'SM'   },
+  { id:'nt_10',  text:'Create 10 smart notes this week',   tracker:'note_count',    target:10,  category:'subject',  xp:150, icon:'SM'  },
   { id:'ss_3',   text:'Complete 3 study sessions',         tracker:'session_count', target:3,   category:'study',    xp:90,  icon:'▶'   },
   { id:'ss_5',   text:'Complete 5 study sessions',         tracker:'session_count', target:5,   category:'study',    xp:130, icon:'▶'   },
-  { id:'bd_1',   text:'Earn 1 new achievement badge',      tracker:'badge_earned',  target:1,   category:'career',   xp:120, icon:'🏅'  },
-  { id:'bd_3',   text:'Earn 3 new achievement badges',     tracker:'badge_earned',  target:3,   category:'career',   xp:250, icon:'🏅'  },
+  { id:'bd_1',   text:'Earn 1 new achievement badge',      tracker:'badge_earned',  target:1,   category:'career',   xp:120, icon:'CD'   },
+  { id:'bd_3',   text:'Earn 3 new achievement badges',     tracker:'badge_earned',  target:3,   category:'career',   xp:250, icon:'CD'   },
 ];
 
 const TRACKER_META: Record<TrackerKey,{unit:string;label:string}> = {
@@ -51,10 +51,10 @@ const TRACKER_META: Record<TrackerKey,{unit:string;label:string}> = {
 };
 
 const REWARD_TIERS = [
-  { pct:25,  label:'Bronze',  icon:'🥉', color:'#cd7f32', xp:100 },
-  { pct:50,  label:'Silver',  icon:'🥈', color:'#c0c0c0', xp:200 },
-  { pct:75,  label:'Gold',    icon:'🥇', color:'#ffd700', xp:350 },
-  { pct:100, label:'Diamond', icon:'💎', color:'#00D4FF', xp:500 },
+  { pct:25,  label:'Bronze',  icon:'BR', color:'#cd7f32', xp:100 },
+  { pct:50,  label:'Silver',  icon:'SV', color:'#c0c0c0', xp:200 },
+  { pct:75,  label:'Gold',    icon:'GD', color:'#ffd700', xp:350 },
+  { pct:100, label:'Diamond', icon:'DM', color:'#00D4FF', xp:500 },
 ];
 
 const WC_KEY = 'twinmind_wc_v2';
@@ -135,7 +135,7 @@ function GoalCard({ g, cur, pct, status, onRemove }: { g:GoalTemplate; cur:numbe
   const cat  = CATS.find(c => c.key===g.category)!;
   const meta = TRACKER_META[g.tracker];
   const sm = status==='completed'
-    ? { label:'Completed ✓', color:'#10b981', bg:'rgba(16,185,129,0.12)' }
+    ? { label:'Completed ', color:'#10b981', bg:'rgba(16,185,129,0.12)' }
     : status==='in_progress'
     ? { label:'In Progress',  color:'#f59e0b', bg:'rgba(245,158,11,0.1)'  }
     : { label:'Not Started',  color:'#64748b', bg:'#f1f5f9' };
@@ -151,7 +151,7 @@ function GoalCard({ g, cur, pct, status, onRemove }: { g:GoalTemplate; cur:numbe
             <span style={{fontSize:'0.63rem',color:'#f59e0b',fontWeight:700}}>+{g.xp} XP</span>
           </div>
         </div>
-        <button onClick={onRemove} style={{background:'none',border:'none',color:'#cbd5e1',cursor:'pointer',padding:'0.15rem 0.25rem',borderRadius:'5px',fontSize:'0.78rem',flexShrink:0,lineHeight:1,fontFamily:'inherit'}}>✕</button>
+        <button onClick={onRemove} style={{background:'none',border:'none',color:'#cbd5e1',cursor:'pointer',padding:'0.15rem 0.25rem',borderRadius:'5px',fontSize:'0.78rem',flexShrink:0,lineHeight:1,fontFamily:'inherit'}}></button>
       </div>
       <div>
         <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.28rem'}}>
@@ -286,7 +286,7 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
     setWeekState(updated);
     newly.forEach((g,i) => setTimeout(() => {
       triggerCelebration(g.text, g.xp);
-      pushNotif('🎉', 'Challenge Completed!', `${g.text} — +${g.xp} XP`);
+      pushNotif('', 'Challenge Completed!', `${g.text} — +${g.xp} XP`);
     }, i*700));
   }, [progressData, weekState, activeGoals, triggerCelebration, pushNotif]);
 
@@ -297,7 +297,7 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
     if (alreadyDone) awardedRef.current[g.id] = true;
     const updated = { ...weekState, activeGoalIds:[...weekState.activeGoalIds, g.id], awardedXP:updAward };
     saveState(updated); setWeekState(updated);
-    pushNotif('✅', 'Challenge Added!', g.text);
+    pushNotif('', 'Challenge Added!', g.text);
     setTab('week');
   }
 
@@ -351,11 +351,11 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
       {celebrating && (
         <div style={{position:'fixed',inset:0,display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000,pointerEvents:'none'}}>
           <div style={{background:'#ffffff',border:'1px solid rgba(0,212,255,0.45)',borderRadius:'28px',padding:'2.25rem 3rem',textAlign:'center',backdropFilter:'blur(32px)',boxShadow:'0 0 80px rgba(0,212,255,0.2),0 24px 64px rgba(0,0,0,0.1)',animation:'cel-pop 0.45s cubic-bezier(0.175,0.885,0.32,1.275) forwards',maxWidth:'360px',width:'90%'}}>
-            <div style={{fontSize:'3.5rem',marginBottom:'0.6rem'}}>🎉</div>
+            <div style={{fontSize:'3.5rem',marginBottom:'0.6rem'}}></div>
             <p style={{margin:'0 0 0.2rem',fontSize:'1.05rem',fontWeight:900,color:'#0f172a',letterSpacing:'-0.2px'}}>Weekly Challenge Completed!</p>
             <p style={{margin:'0 0 0.65rem',fontSize:'0.85rem',color:'#475569',lineHeight:1.45}}>{celebMsg}</p>
             <p style={{margin:'0 0 0.2rem',fontSize:'1.25rem',fontWeight:900,color:'#00D4FF'}}>+{celebXP} XP</p>
-            <p style={{margin:0,fontSize:'0.78rem',color:'#64748b'}}>🏆 Badge Unlocked · Keep going!</p>
+            <p style={{margin:0,fontSize:'0.78rem',color:'#64748b'}}> Badge Unlocked · Keep going!</p>
           </div>
         </div>
       )}
@@ -380,7 +380,7 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
           {/* Header */}
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'1.25rem 1.75rem',borderBottom:'1px solid #e2e8f0',flexShrink:0}}>
             <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}>
-              <div style={{width:'40px',height:'40px',borderRadius:'11px',flexShrink:0,background:'linear-gradient(135deg,#00D4FF,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.15rem',boxShadow:'0 4px 18px rgba(0,212,255,0.35)'}}>🏋️</div>
+              <div style={{width:'40px',height:'40px',borderRadius:'11px',flexShrink:0,background:'linear-gradient(135deg,#00D4FF,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.15rem',boxShadow:'0 4px 18px rgba(0,212,255,0.35)'}}></div>
               <div>
                 <h2 style={{margin:0,fontSize:'1.05rem',fontWeight:900,color:'#0f172a',letterSpacing:'-0.3px'}}>Weekly Challenges</h2>
                 <p style={{margin:0,fontSize:'0.67rem',color:'#64748b',fontWeight:500}}>{weekLabel} · Fully Automated Tracking</p>
@@ -391,14 +391,14 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
             </div>
             <div style={{display:'flex',alignItems:'center',gap:'0.6rem'}}>
               <button onClick={loadData} disabled={loading} style={{background:'#f1f5f9',border:'1px solid #e2e8f0',borderRadius:'8px',color:'#475569',fontSize:'0.7rem',fontWeight:600,cursor:'pointer',padding:'0.26rem 0.6rem',fontFamily:'inherit',transition:'all 0.18s'}}>{loading?'⟳ Syncing…':'⟳ Refresh'}</button>
-              <button onClick={onClose} style={{background:'transparent',border:'none',color:'#64748b',fontSize:'1.3rem',cursor:'pointer',padding:'0.25rem 0.45rem',borderRadius:'8px',lineHeight:1,fontFamily:'inherit'}}>✕</button>
+              <button onClick={onClose} style={{background:'transparent',border:'none',color:'#64748b',fontSize:'1.3rem',cursor:'pointer',padding:'0.25rem 0.45rem',borderRadius:'8px',lineHeight:1,fontFamily:'inherit'}}></button>
             </div>
           </div>
 
           {/* Tabs */}
           <div style={{display:'flex',gap:'0.25rem',padding:'0.65rem 1.75rem',borderBottom:'1px solid #e2e8f0',flexShrink:0}}>
             {(['week','catalog','rewards'] as const).map((k,i)=>{
-              const m=[['📊','This Week'],['➕','Add Goals'],['🏆','Rewards']][i];
+              const m=[['','This Week'],['','Add Goals'],['','Rewards']][i];
               const active=tab===k;
               return (
                 <button key={k} onClick={()=>setTab(k)} style={{display:'flex',alignItems:'center',gap:'0.4rem',padding:'0.4rem 0.88rem',borderRadius:'10px',background:active?'rgba(0,212,255,0.12)':'transparent',border:active?'1px solid rgba(0,212,255,0.35)':'1px solid transparent',color:active?'#00D4FF':'#64748b',fontSize:'0.8rem',fontWeight:active?700:500,cursor:'pointer',fontFamily:'inherit',transition:'all 0.18s'}}>
@@ -420,9 +420,9 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                   <div style={{flex:1,display:'flex',flexDirection:'column',gap:'0.85rem'}}>
                     <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'0.65rem'}}>
                       {[
-                        {icon:'✅',v:`${completedGoals.length}/${totalGoals}`,l:'Completed',   c:'#10b981'},
-                        {icon:'⭐',v:`+${totalXPEarned}`,                      l:'XP Earned',   c:'#f59e0b'},
-                        {icon:'🔥',v:`${inProgressGoals.length}`,              l:'In Progress', c:'#00D4FF'},
+                        {icon:'OK',v:`${completedGoals.length}/${totalGoals}`,l:'Completed',   c:'#10b981'},
+                        {icon:'+XP',v:`+${totalXPEarned}`,                      l:'XP Earned',   c:'#f59e0b'},
+                        {icon:'IP',v:`${inProgressGoals.length}`,              l:'In Progress', c:'#00D4FF'},
                       ].map(s=>(
                         <div key={s.l} style={{textAlign:'center',padding:'0.55rem 0.4rem',background:'#f8fafc',borderRadius:'12px',border:`1px solid ${s.c}22`}}>
                           <p style={{margin:'0 0 0.15rem',fontSize:'0.95rem'}}>{s.icon}</p>
@@ -449,7 +449,7 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                 {/* Empty state */}
                 {totalGoals===0 && (
                   <div style={{textAlign:'center',padding:'2.5rem 1rem'}}>
-                    <p style={{fontSize:'2.5rem',margin:'0 0 0.65rem'}}>🏋️</p>
+                    <p style={{fontSize:'2.5rem',margin:'0 0 0.65rem'}}></p>
                     <p style={{margin:'0 0 0.35rem',fontSize:'0.9rem',fontWeight:700,color:'#475569'}}>No active challenges</p>
                     <p style={{margin:'0 0 1.1rem',fontSize:'0.78rem',color:'#64748b'}}>All progress is tracked automatically — just add goals from the catalog</p>
                     <button onClick={()=>setTab('catalog')} style={{padding:'0.52rem 1.4rem',background:'linear-gradient(135deg,#00D4FF,#7C3AED)',border:'none',borderRadius:'12px',color:'#fff',fontSize:'0.82rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit',boxShadow:'0 4px 18px rgba(0,212,255,0.3)'}}>Browse Goal Catalog →</button>
@@ -538,7 +538,7 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                             background:done?'rgba(16,185,129,0.1)':isActive?'#f1f5f9':`${cat.color}1c`,
                             border:`1px solid ${done?'rgba(16,185,129,0.3)':isActive?'#e2e8f0':cat.color+'45'}`,
                             color:done?'#10b981':isActive?'#64748b':cat.color}}>
-                            {done?'✓ Completed':isActive?'✓ Tracking':'+ Track This Goal'}
+                            {done?' Completed':isActive?' Tracking':'+ Track This Goal'}
                           </button>
                         </div>
                       );
@@ -578,7 +578,7 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                               <div style={{height:'100%',width:`${unlocked?100:tierPct}%`,background:unlocked?r.color:`linear-gradient(90deg,${r.color},${r.color}88)`,borderRadius:'99px',transition:'width 0.7s ease',boxShadow:unlocked?`0 0 8px ${r.color}55`:undefined}}/>
                             </div>
                           </div>
-                          <span style={{fontSize:'1.05rem',flexShrink:0,opacity:unlocked?1:0}}>{unlocked?'✅':''}</span>
+                          <span style={{fontSize:'1.05rem',flexShrink:0,opacity:unlocked?1:0}}>{unlocked?'':''}</span>
                         </div>
                       );
                     })}
@@ -591,10 +591,10 @@ export default function WeeklyChallengesModal({ isOpen, onClose }: { isOpen:bool
                     <p style={{...sLbl,marginBottom:'0.65rem'}}>LIVE PROGRESS METRICS</p>
                     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'0.5rem'}}>
                       {[
-                        {icon:'⏱',l:'Study Hours',  v:progressData.study_hours,  u:'h',     c:'#6366f1'},
-                        {icon:'🎯',l:'Quizzes',      v:progressData.quiz_count,   u:'',      c:'#00D4FF'},
-                        {icon:'✅',l:'Check-ins',    v:progressData.checkin_days, u:' days', c:'#10b981'},
-                        {icon:'🔥',l:'Streak',       v:progressData.streak_days,  u:' days', c:'#f59e0b'},
+                        {icon:'TM',l:'Study Hours',  v:progressData.study_hours,  u:'h',     c:'#6366f1'},
+                        {icon:'QZ',l:'Quizzes',      v:progressData.quiz_count,   u:'',      c:'#00D4FF'},
+                        {icon:'CI',l:'Check-ins',    v:progressData.checkin_days, u:' days', c:'#10b981'},
+                        {icon:'SK',l:'Streak',       v:progressData.streak_days,  u:' days', c:'#f59e0b'},
                       ].map(m=>(
                         <div key={m.l} style={{padding:'0.85rem',background:'#f8fafc',border:`1px solid ${m.c}22`,borderRadius:'12px',textAlign:'center'}}>
                           <p style={{margin:'0 0 0.2rem',fontSize:'1.1rem'}}>{m.icon}</p>

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Flame, Zap } from 'lucide-react';
 import { getLevelColor, getLevelGradient, LEVEL_NAMES } from '../utils/gamification';
 
 // Deterministic confetti
@@ -106,7 +107,7 @@ export default function LevelUpCelebration(props: Props) {
           </>
         ) : (
           <>
-            <div style={{ fontSize: '3.5rem', marginBottom: '0.75rem', lineHeight: 1 }}>🔥</div>
+            <Flame size={56} style={{ marginBottom: '0.75rem', color }} />
             <p style={{ margin: '0 0 0.3rem', fontSize: '0.7rem', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               Streak Milestone!
             </p>
@@ -130,7 +131,7 @@ export default function LevelUpCelebration(props: Props) {
             boxShadow: `0 6px 24px ${color}50`,
           }}
         >
-          {props.type === 'level_up' ? 'Keep Going! 🚀' : 'Amazing! 🔥'}
+          {props.type === 'level_up' ? <><Zap size={14} style={{ display:'inline', marginRight:4, verticalAlign:'middle' }} />Keep Going!</> : <><Flame size={14} style={{ display:'inline', marginRight:4, verticalAlign:'middle' }} />Amazing!</>}
         </button>
 
         <p style={{ margin: '0.9rem 0 0', fontSize: '0.7rem', color: 'var(--text)', opacity: 0.5 }}>

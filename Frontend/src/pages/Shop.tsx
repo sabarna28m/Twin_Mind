@@ -1,4 +1,6 @@
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ShoppingCart, Flame, Shield } from 'lucide-react';
 import { XPStoreProvider, useXPStore } from '../contexts/XPStoreContext';
 import type { ShopItem } from '../contexts/XPStoreContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -16,7 +18,7 @@ interface ItemDef {
 
 const SHOP_ITEMS: ItemDef[] = [
   {
-    key: 'shield', icon: '🛡️', nameKey: 'shop_shield_name', tagKey: 'shop_shield_tag',
+    key: 'shield', icon: '', nameKey: 'shop_shield_name', tagKey: 'shop_shield_tag',
     desc: [
       'Auto-activates silently when you miss a single check-in.',
       'Keeps your streak alive without any action from you.',
@@ -25,7 +27,7 @@ const SHOP_ITEMS: ItemDef[] = [
     priceKey: 'shield', accent: '#6366f1',
   },
   {
-    key: 'premium_shield', icon: '🛡️', nameKey: 'shop_premium_name', tagKey: 'shop_premium_tag',
+    key: 'premium_shield', icon: '', nameKey: 'shop_premium_name', tagKey: 'shop_premium_tag',
     desc: [
       'Covers up to 3 consecutive missed check-in days.',
       'Perfect for travel, weekends, or exam cram weeks.',
@@ -34,7 +36,7 @@ const SHOP_ITEMS: ItemDef[] = [
     priceKey: 'premium_shield', accent: '#a78bfa', badge: 'PREMIUM',
   },
   {
-    key: 'streak_freeze', icon: '🔥', nameKey: 'shop_freeze_name', tagKey: 'shop_freeze_tag',
+    key: 'streak_freeze', icon: '', nameKey: 'shop_freeze_name', tagKey: 'shop_freeze_tag',
     desc: [
       'Activate when you know you\'ll miss a day in advance.',
       'Freezes your streak for the rest of today (UTC).',
@@ -43,7 +45,7 @@ const SHOP_ITEMS: ItemDef[] = [
     priceKey: 'streak_freeze', accent: '#f97316',
   },
   {
-    key: 'double_xp', icon: '⭐', nameKey: 'shop_double_name', tagKey: 'shop_double_tag',
+    key: 'double_xp', icon: '2x', nameKey: 'shop_double_name', tagKey: 'shop_double_tag',
     desc: [
       'Every activity awards double XP for 24 hours.',
       'Stack with a quiz marathon for maximum gains.',
@@ -86,11 +88,11 @@ function ShopContent() {
     if (!status) return '';
     if (key === 'shield')         return `${status.shield_count}/5 owned`;
     if (key === 'premium_shield') return `${status.premium_shield_count}/5 owned`;
-    if (key === 'streak_freeze')  return status.streak_freeze_active ? '🟢 Active today' : 'Not active';
+    if (key === 'streak_freeze')  return status.streak_freeze_active ? ' Active today' : 'Not active';
     if (key === 'double_xp') {
       if (status.double_xp_active && status.double_xp_expires) {
         const mins = Math.max(0, Math.floor((new Date(status.double_xp_expires).getTime() - Date.now()) / 60000));
-        return `🟢 Active · ${mins}m left`;
+        return `Active · ${mins}m left`;
       }
       return 'Not active';
     }
@@ -104,7 +106,7 @@ function ShopContent() {
         {/* Hero */}
         <div style={p.hero}>
           <div style={p.heroOrb} />
-          <h1 style={p.heading}>🛒 {t('shop_title')}</h1>
+          <h1 style={{ ...p.heading, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}><ShoppingCart size={28} /> {t('shop_title')}</h1>
           <p style={p.heroSub}>{t('shop_subtitle')}</p>
         </div>
 
@@ -122,17 +124,17 @@ function ShopContent() {
               </p>
             </div>
             <div style={{ textAlign: 'right' as const }}>
-              <p style={p.balLabel}>🔥 {t('shop_streak')}</p>
+              <p style={{ ...p.balLabel, display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Flame size={13} style={{ color: '#f97316' }} /> {t('shop_streak')}</p>
               <p style={{ ...p.balValue, color: '#f97316', fontSize: '1.2rem' }}>
                 {status?.streak_days ?? 0} {t('shop_days')}
               </p>
             </div>
           </div>
           <div style={p.balShields}>
-            <span style={p.shieldChip}>🛡️ ×{status?.shield_count ?? 0}</span>
-            <span style={p.shieldChip}>🛡️✨ ×{status?.premium_shield_count ?? 0}</span>
-            {status?.streak_freeze_active && <span style={{ ...p.shieldChip, borderColor: 'rgba(249,115,22,0.3)', color: '#f97316' }}>🔥 Freeze Active</span>}
-            {status?.double_xp_active     && <span style={{ ...p.shieldChip, borderColor: 'rgba(245,158,11,0.3)', color: '#f59e0b' }}>⭐ 2× XP Active</span>}
+            <span style={{ ...p.shieldChip, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}><Shield size={12} /> ×{status?.shield_count ?? 0}</span>
+            <span style={{ ...p.shieldChip, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}><Shield size={12} style={{ color: '#a78bfa' }} /> P ×{status?.premium_shield_count ?? 0}</span>
+            {status?.streak_freeze_active && <span style={{ ...p.shieldChip, borderColor: 'rgba(249,115,22,0.3)', color: '#f97316' }}> Freeze Active</span>}
+            {status?.double_xp_active     && <span style={{ ...p.shieldChip, borderColor: 'rgba(245,158,11,0.3)', color: '#f59e0b' }}> 2× XP Active</span>}
           </div>
         </div>
 
@@ -140,7 +142,7 @@ function ShopContent() {
         {lastMsg && (
           <div style={{ ...p.msg, borderColor: lastMsg.ok ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)', color: lastMsg.ok ? '#10b981' : '#ef4444' }}>
             {lastMsg.text}
-            <button onClick={clearMsg} style={p.msgX}>✕</button>
+            <button onClick={clearMsg} style={p.msgX}></button>
           </div>
         )}
 
@@ -206,14 +208,14 @@ function ShopContent() {
         <div style={p.sectionHead}>{t('shop_earn_guide')}</div>
         <div style={p.earnGrid}>
           {[
-            { icon: '📋', act: 'Daily Check-in',   xp: '10 XP each'        },
-            { icon: '📝', act: 'Quiz Session',      xp: '20 XP each'        },
-            { icon: '⭐', act: 'Score 80%+',       xp: '+30 XP bonus'      },
-            { icon: '🔥', act: 'Streak Day',       xp: '+5 XP/day'         },
-            { icon: '🏆', act: 'Achievement',      xp: '+50 XP each'       },
-            { icon: '✅', act: '7-Day Streak',     xp: '+50 XP milestone'  },
-            { icon: '👑', act: '30-Day Streak',    xp: '+150 XP milestone' },
-            { icon: '🚀', act: '100-Day Streak',   xp: '+500 XP milestone' },
+            { icon: '', act: 'Daily Check-in',   xp: '10 XP each'        },
+            { icon: '', act: 'Quiz Session',      xp: '20 XP each'        },
+            { icon: '', act: 'Score 80%+',       xp: '+30 XP bonus'      },
+            { icon: '', act: 'Streak Day',       xp: '+5 XP/day'         },
+            { icon: '', act: 'Achievement',      xp: '+50 XP each'       },
+            { icon: '', act: '7-Day Streak',     xp: '+50 XP milestone'  },
+            { icon: '', act: '30-Day Streak',    xp: '+150 XP milestone' },
+            { icon: '', act: '100-Day Streak',   xp: '+500 XP milestone' },
           ].map(({ icon, act, xp }) => (
             <div key={act} style={p.earnItem}>
               <span style={{ fontSize: '1.1rem' }}>{icon}</span>
@@ -229,9 +231,9 @@ function ShopContent() {
         <div style={p.sectionHead}>{t('shop_free_shields')}</div>
         <div style={p.freeList}>
           {[
-            { icon: '⚔️', name: 'Week Warrior',  streak: 7,   reward: '+1 Shield' },
-            { icon: '👑', name: 'Month Master',  streak: 30,  reward: '+2 Shields' },
-            { icon: '🚀', name: 'Unstoppable',   streak: 100, reward: '+3 Shields' },
+            { icon: '', name: 'Week Warrior',  streak: 7,   reward: '+1 Shield' },
+            { icon: '', name: 'Month Master',  streak: 30,  reward: '+2 Shields' },
+            { icon: '', name: 'Unstoppable',   streak: 100, reward: '+3 Shields' },
           ].map(row => (
             <div key={row.name} style={p.freeRow}>
               <span style={{ fontSize: '1.5rem' }}>{row.icon}</span>

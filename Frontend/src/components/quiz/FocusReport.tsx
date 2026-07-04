@@ -1,4 +1,4 @@
-import type { IntegrityWarning } from '../../services/integrityEngine';
+﻿import type { IntegrityWarning } from '../../services/integrityEngine';
 import { MAX_WARNINGS } from '../../services/integrityEngine';
 
 interface Props {
@@ -16,11 +16,11 @@ interface Props {
 }
 
 const WARNING_ICONS: Record<string, string> = {
-  tab_switch:       '🔀',
-  face_absent:      '👁',
-  distracted:       '😵',
-  suspicious_audio: '🔊',
-  multiple_faces:   '👥',
+  tab_switch:       '',
+  face_absent:      '',
+  distracted:       '',
+  suspicious_audio: '',
+  multiple_faces:   '',
 };
 
 function formatTime(secs: number) {
@@ -74,7 +74,7 @@ export default function FocusReport({
 
           {terminated && (
             <div style={r.terminatedBanner}>
-              ⚠️ Session terminated after {MAX_WARNINGS} integrity warnings
+              Session terminated after {MAX_WARNINGS} integrity warnings
             </div>
           )}
 
@@ -108,7 +108,7 @@ export default function FocusReport({
             </div>
             <p style={{ margin: '0.4rem 0 0', fontSize: '0.72rem', color: 'var(--text)' }}>
               {warnings.length === 0
-                ? '✅ No integrity violations — clean session.'
+                ? ' No integrity violations — clean session.'
                 : `${warnings.length} of ${MAX_WARNINGS} warnings triggered.`}
             </p>
           </div>
@@ -117,11 +117,11 @@ export default function FocusReport({
         {/* ── Warning breakdown ── */}
         {warnings.length > 0 && (
           <div style={r.card}>
-            <h2 style={r.sectionTitle}>⚠️ Warning Breakdown</h2>
+            <h2 style={r.sectionTitle}>Warning Breakdown</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.25rem' }}>
               {Object.entries(warningTypes).map(([type, count]) => (
                 <div key={type} style={r.warnRow}>
-                  <span style={{ fontSize: '1rem' }}>{WARNING_ICONS[type] ?? '⚠️'}</span>
+                  <span style={{ fontSize: '1rem' }}>{WARNING_ICONS[type] ?? ''}</span>
                   <span style={{ flex: 1, fontSize: '0.82rem', color: 'var(--text-h)', fontWeight: 600 }}>
                     {type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                   </span>
@@ -135,7 +135,7 @@ export default function FocusReport({
               {warnings.map((w, i) => (
                 <div key={w.id} style={r.warnItem}>
                   <span style={r.warnNum}>{i + 1}</span>
-                  <span style={{ fontSize: '0.85rem' }}>{WARNING_ICONS[w.type] ?? '⚠️'}</span>
+                  <span style={{ fontSize: '0.85rem' }}>{WARNING_ICONS[w.type] ?? ''}</span>
                   <span style={{ flex: 1, fontSize: '0.78rem', color: 'var(--text-h)' }}>{w.message}</span>
                   <span style={r.warnTime}>{fmtTs(w.ts)}</span>
                 </div>
@@ -147,7 +147,7 @@ export default function FocusReport({
         {/* ── AI insight ── */}
         <div style={r.insightCard}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '1.1rem' }}>🧠</span>
+            <span style={{ fontSize: '1.1rem' }}></span>
             <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#00D4FF' }}>AI Focus Insight</span>
           </div>
           <p style={r.insightText}>

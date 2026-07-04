@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Gift, Lock, CheckCircle, Zap, Star } from 'lucide-react';
 import api from '../services/api';
 import {
   generateDailyMissions,
@@ -16,9 +17,9 @@ import {
 /* ─────────────────────────────────────────────────────────────────────────────
    Confetti burst — pure CSS, spawned once when all primary missions complete
    ─────────────────────────────────────────────────────────────────────────────*/
-const CONFETTI_EMOJI = ['🎉', '⭐', '✨', '🎊', '💫', '🌟', '🔥', '🏆'];
+const CONFETTI_COLORS = ['#6366f1','#10b981','#f59e0b','#ef4444','#a78bfa','#34d399','#fbbf24','#3b82f6'];
 const CONFETTI_ITEMS = Array.from({ length: 18 }, (_, i) => ({
-  emoji:    CONFETTI_EMOJI[i % CONFETTI_EMOJI.length],
+  color:    CONFETTI_COLORS[i % CONFETTI_COLORS.length],
   left:     `${Math.round((i / 18) * 100 + (i % 3) * 2)}%`,
   delay:    `${(i * 0.07).toFixed(2)}s`,
   duration: `${(1.0 + (i % 4) * 0.2).toFixed(1)}s`,
@@ -32,10 +33,8 @@ function ConfettiBurst({ active }: { active: boolean }) {
         <span
           key={i}
           className="mission-confetti-item"
-          style={{ ...cf.item, left: c.left, animationDuration: c.duration, animationDelay: c.delay }}
-        >
-          {c.emoji}
-        </span>
+          style={{ ...cf.item, left: c.left, animationDuration: c.duration, animationDelay: c.delay, background: c.color, borderRadius: '50%', width: 8, height: 8, display: 'inline-block' }}
+        />
       ))}
     </div>
   );
@@ -59,7 +58,7 @@ function XPToast({ toasts }: { toasts: ToastItem[] }) {
     <>
       {toasts.map(t => (
         <div key={t.key} className="xp-toast-anim" style={xp.wrap}>
-          ⭐ +{t.xp} XP
+          <Star size={12} style={{ display: 'inline', marginRight: '0.2rem', verticalAlign: 'middle' }} /> +{t.xp} XP
         </div>
       ))}
     </>
@@ -417,7 +416,7 @@ export default function SmartDailyMission({ layout = 'vertical' }: { layout?: 'v
       <div style={dm.header}>
         <div>
           <div style={dm.tagRow}>
-            <span style={{ fontSize: '0.85rem' }}>⚡</span>
+            <Zap size={14} style={{ color: 'var(--accent)' }} />
             <span style={dm.tag}>DAILY MISSION</span>
           </div>
           <p style={dm.title}>Today's Mission</p>
@@ -477,10 +476,10 @@ export default function SmartDailyMission({ layout = 'vertical' }: { layout?: 'v
               borderColor: allPrimaryDone ? 'rgba(245,158,11,0.35)' : 'rgba(245,158,11,0.12)',
             }}
           >
-            <span style={{ fontSize: '0.8rem' }}>🎁</span>
+            <Gift size={14} style={{ flexShrink:0 }} />
             <span>Bonus Mission</span>
             {!allPrimaryDone && (
-              <span style={dm.bonusLock}>🔒 Complete all primary missions first</span>
+              <span style={{ ...dm.bonusLock, display:'flex', alignItems:'center', gap:3 }}><Lock size={10} style={{ flexShrink:0 }} /> Complete all primary missions first</span>
             )}
             <span style={dm.bonusXPPill}>+{bonus.xpReward} XP</span>
             <span style={{ marginLeft: 'auto', fontSize: '0.7rem', opacity: 0.5 }}>
@@ -498,7 +497,7 @@ export default function SmartDailyMission({ layout = 'vertical' }: { layout?: 'v
       {/* ── All-done banner ── */}
       {allPrimaryDone && !loading && (
         <div style={dm.doneBanner} className="animate-fade-in">
-          🎉 All missions complete! <strong>+{earnedXP} XP earned today</strong>
+          <CheckCircle size={16} style={{ display:'inline', marginRight:6, verticalAlign:'middle', color:'#10b981' }} />All missions complete! <strong>+{earnedXP} XP earned today</strong>
           {evalBonus.completed && ' · Bonus unlocked!'}
         </div>
       )}

@@ -61,8 +61,8 @@ export default function Register() {
   }
 
   return (
-    <div className="saasable-root flex items-center justify-center p-6 min-h-screen">
-      <motion.div initial="hidden" animate="visible" variants={fadeUp} className="w-full max-w-[380px] mx-auto flex flex-col pt-4 pb-12">
+    <div className="synth-root flex items-center justify-center p-6 min-h-screen">
+      <motion.div initial="hidden" animate="visible" variants={fadeUp} className="synth-auth-card flex flex-col mx-auto">
         <div className="flex flex-col items-center mb-8">
           <Link to="/" className="mb-6">
             <img src="/assets/twinmind-logo.png" alt="TwinMind" style={{ width: 80, height: 'auto', display: 'block', borderRadius: 12 }} />
@@ -80,7 +80,7 @@ export default function Register() {
           <label className="flex flex-col gap-2">
             <span className="text-[0.8rem] font-bold text-slate-700">{t('register_fullname') || 'Full Name'}</span>
             <input 
-              className="dark-input" 
+              className="synth-input" 
               type="text" 
               value={fullName}
               onChange={e => setFullName(e.target.value)}
@@ -93,7 +93,7 @@ export default function Register() {
           <label className="flex flex-col gap-2">
             <span className="text-[0.8rem] font-bold text-slate-700">{t('register_email') || 'Email'}</span>
             <input 
-              className="dark-input" 
+              className="synth-input" 
               type="email" 
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -126,7 +126,7 @@ export default function Register() {
           </div>
 
           <button
-            className="saasable-btn-primary w-full justify-center py-3.5 rounded-xl font-bold text-[0.95rem] mt-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20"
+            className="synth-btn-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             type="submit"
             disabled={loading || !captchaValid}
           >

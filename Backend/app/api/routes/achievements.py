@@ -64,25 +64,25 @@ BADGES: list[dict[str, Any]] = [
 
     # ── ONBOARDING ──────────────────────────────────────────────────────────
     {
-        "id": "first_step", "name": "First Step", "icon": "🌱",
+        "id": "first_step", "name": "First Step", "icon": "",
         "description": "Log your very first daily check-in.",
         "color": "#10b981", "category": "onboarding",
         "xp_reward": 25, "rarity": "common", "progress_target": 1, "hidden": False,
     },
     {
-        "id": "session_starter", "name": "Session Starter", "icon": "⏱️",
+        "id": "session_starter", "name": "Session Starter", "icon": "",
         "description": "Complete your first study session.",
         "color": "#00D4FF", "category": "onboarding",
         "xp_reward": 25, "rarity": "common", "progress_target": 1, "hidden": False,
     },
     {
-        "id": "knowledge_explorer", "name": "Knowledge Explorer", "icon": "🧭",
+        "id": "knowledge_explorer", "name": "Knowledge Explorer", "icon": "",
         "description": "Upload your first study material.",
         "color": "#34d399", "category": "onboarding",
         "xp_reward": 25, "rarity": "common", "progress_target": 1, "hidden": False,
     },
     {
-        "id": "quiz_rookie", "name": "Quiz Rookie", "icon": "📝",
+        "id": "quiz_rookie", "name": "Quiz Rookie", "icon": "",
         "description": "Complete your first practice quiz.",
         "color": "#a78bfa", "category": "onboarding",
         "xp_reward": 25, "rarity": "common", "progress_target": 1, "hidden": False,
@@ -90,25 +90,25 @@ BADGES: list[dict[str, Any]] = [
 
     # ── STUDY SESSIONS ──────────────────────────────────────────────────────
     {
-        "id": "focus_builder", "name": "Focus Builder", "icon": "🔥",
+        "id": "focus_builder", "name": "Focus Builder", "icon": "",
         "description": "Complete 5 study sessions.",
         "color": "#f97316", "category": "sessions",
         "xp_reward": 50, "rarity": "common", "progress_target": 5, "hidden": False,
     },
     {
-        "id": "deep_worker", "name": "Deep Worker", "icon": "🧠",
+        "id": "deep_worker", "name": "Deep Worker", "icon": "",
         "description": "Complete a single study session lasting 60 minutes or more.",
         "color": "#00D4FF", "category": "sessions",
         "xp_reward": 75, "rarity": "rare", "progress_target": 1, "hidden": False,
     },
     {
-        "id": "overachiever", "name": "Overachiever", "icon": "⚡",
+        "id": "overachiever", "name": "Overachiever", "icon": "",
         "description": "Log 8+ study hours in a single day via check-in.",
         "color": "#8b5cf6", "category": "sessions",
         "xp_reward": 100, "rarity": "rare", "progress_target": 1, "hidden": False,
     },
     {
-        "id": "marathon_learner", "name": "Marathon Learner", "icon": "🏃",
+        "id": "marathon_learner", "name": "Marathon Learner", "icon": "",
         "description": "Accumulate 10 total study hours across all sessions.",
         "color": "#22d3ee", "category": "sessions",
         "xp_reward": 100, "rarity": "rare", "progress_target": 10, "hidden": False,
@@ -122,25 +122,25 @@ BADGES: list[dict[str, Any]] = [
 
     # ── QUIZ PERFORMANCE ────────────────────────────────────────────────────
     {
-        "id": "perfect_score", "name": "Perfect Score", "icon": "💯",
+        "id": "perfect_score", "name": "Perfect Score", "icon": "",
         "description": "Achieve a quiz or exam score above 90%.",
         "color": "#ec4899", "category": "quiz",
         "xp_reward": 75, "rarity": "rare", "progress_target": 1, "hidden": False,
     },
     {
-        "id": "focused_mind", "name": "Focused Mind", "icon": "👁️",
+        "id": "focused_mind", "name": "Focused Mind", "icon": "",
         "description": "Score above 80% in any practice quiz.",
         "color": "#7C3AED", "category": "quiz",
         "xp_reward": 50, "rarity": "common", "progress_target": 1, "hidden": False,
     },
     {
-        "id": "quiz_champion", "name": "Quiz Champion", "icon": "🏆",
+        "id": "quiz_champion", "name": "Quiz Champion", "icon": "",
         "description": "Complete 10 practice quizzes.",
         "color": "#f59e0b", "category": "quiz",
         "xp_reward": 100, "rarity": "rare", "progress_target": 10, "hidden": False,
     },
     {
-        "id": "accuracy_expert", "name": "Accuracy Expert", "icon": "🎯",
+        "id": "accuracy_expert", "name": "Accuracy Expert", "icon": "",
         "description": "Score 85% or higher in at least 5 different quizzes.",
         "color": "#10b981", "category": "quiz",
         "xp_reward": 150, "rarity": "epic", "progress_target": 5, "hidden": False,
@@ -148,25 +148,25 @@ BADGES: list[dict[str, Any]] = [
 
     # ── CONSISTENCY & STREAKS ───────────────────────────────────────────────
     {
-        "id": "consistent", "name": "Consistent", "icon": "📅",
+        "id": "consistent", "name": "Consistent", "icon": "",
         "description": "Check in for 5 consecutive days.",
         "color": "#f59e0b", "category": "streaks",
         "xp_reward": 50, "rarity": "common", "progress_target": 5, "hidden": False,
     },
     {
-        "id": "week_warrior", "name": "Week Warrior", "icon": "⚔️",
+        "id": "week_warrior", "name": "Week Warrior", "icon": "",
         "description": "Maintain a 7-day check-in streak.",
         "color": "#6366f1", "category": "streaks",
         "xp_reward": 100, "rarity": "rare", "progress_target": 7, "hidden": False,
     },
     {
-        "id": "month_master", "name": "Month Master", "icon": "👑",
+        "id": "month_master", "name": "Month Master", "icon": "",
         "description": "Maintain a 30-day check-in streak.",
         "color": "#f59e0b", "category": "streaks",
         "xp_reward": 300, "rarity": "epic", "progress_target": 30, "hidden": False,
     },
     {
-        "id": "unstoppable", "name": "Unstoppable", "icon": "🚀",
+        "id": "unstoppable", "name": "Unstoppable", "icon": "",
         "description": "Maintain a 100-day check-in streak.",
         "color": "#eab308", "category": "streaks",
         "xp_reward": 1000, "rarity": "legendary", "progress_target": 100, "hidden": False,
@@ -174,19 +174,19 @@ BADGES: list[dict[str, Any]] = [
 
     # ── MATERIALS & NOTES ───────────────────────────────────────────────────
     {
-        "id": "collector", "name": "Collector", "icon": "📚",
+        "id": "collector", "name": "Collector", "icon": "",
         "description": "Upload 10 study materials to your library.",
         "color": "#34d399", "category": "materials",
         "xp_reward": 100, "rarity": "rare", "progress_target": 10, "hidden": False,
     },
     {
-        "id": "smart_note_creator", "name": "Smart Note Creator", "icon": "✍️",
+        "id": "smart_note_creator", "name": "Smart Note Creator", "icon": "",
         "description": "Create 20 smart notes.",
         "color": "#22d3ee", "category": "materials",
         "xp_reward": 100, "rarity": "rare", "progress_target": 20, "hidden": False,
     },
     {
-        "id": "revision_pro", "name": "Revision Pro", "icon": "🔄",
+        "id": "revision_pro", "name": "Revision Pro", "icon": "",
         "description": "Create smart notes on 7 different days.",
         "color": "#a78bfa", "category": "materials",
         "xp_reward": 100, "rarity": "rare", "progress_target": 7, "hidden": False,
@@ -194,25 +194,25 @@ BADGES: list[dict[str, Any]] = [
 
     # ── AI FEATURES ─────────────────────────────────────────────────────────
     {
-        "id": "mentor_seeker", "name": "Mentor Seeker", "icon": "🤖",
+        "id": "mentor_seeker", "name": "Mentor Seeker", "icon": "",
         "description": "Send 10 messages to the AI Mentor.",
         "color": "#6366f1", "category": "ai",
         "xp_reward": 75, "rarity": "rare", "progress_target": 10, "hidden": False,
     },
     {
-        "id": "twin_builder", "name": "Twin Builder", "icon": "🪞",
+        "id": "twin_builder", "name": "Twin Builder", "icon": "",
         "description": "Complete your student profile setup.",
         "color": "#8b5cf6", "category": "ai",
         "xp_reward": 50, "rarity": "common", "progress_target": 1, "hidden": False,
     },
     {
-        "id": "predictor", "name": "Predictor", "icon": "📈",
+        "id": "predictor", "name": "Predictor", "icon": "",
         "description": "Log 3 check-ins to unlock AI performance predictions.",
         "color": "#3b82f6", "category": "ai",
         "xp_reward": 40, "rarity": "common", "progress_target": 3, "hidden": False,
     },
     {
-        "id": "community_twin", "name": "Community Twin", "icon": "🤝",
+        "id": "community_twin", "name": "Community Twin", "icon": "",
         "description": "Start your first Comm Twin session.",
         "color": "#f43f5e", "category": "ai",
         "xp_reward": 50, "rarity": "common", "progress_target": 1, "hidden": False,
@@ -220,19 +220,19 @@ BADGES: list[dict[str, Any]] = [
 
     # ── PROGRESS & ANALYTICS ────────────────────────────────────────────────
     {
-        "id": "wellness_hero", "name": "Wellness Hero", "icon": "💪",
+        "id": "wellness_hero", "name": "Wellness Hero", "icon": "",
         "description": "Sleep 8+ hours for 7 consecutive days (via check-in).",
         "color": "#10b981", "category": "progress",
         "xp_reward": 100, "rarity": "rare", "progress_target": 7, "hidden": False,
     },
     {
-        "id": "xp_hunter", "name": "XP Hunter", "icon": "⭐",
+        "id": "xp_hunter", "name": "XP Hunter", "icon": "",
         "description": "Earn 1,000 total XP on the platform.",
         "color": "#f59e0b", "category": "progress",
         "xp_reward": 200, "rarity": "epic", "progress_target": 1000, "hidden": False,
     },
     {
-        "id": "level_up", "name": "Level Up", "icon": "🏅",
+        "id": "level_up", "name": "Level Up", "icon": "",
         "description": "Reach Level 5.",
         "color": "#6366f1", "category": "progress",
         "xp_reward": 200, "rarity": "epic", "progress_target": 5, "hidden": False,
@@ -240,13 +240,13 @@ BADGES: list[dict[str, Any]] = [
 
     # ── SOCIAL & COMMUNITY ──────────────────────────────────────────────────
     {
-        "id": "challenger", "name": "Challenger", "icon": "⚡",
+        "id": "challenger", "name": "Challenger", "icon": "",
         "description": "Complete your first battle.",
         "color": "#f43f5e", "category": "social",
         "xp_reward": 50, "rarity": "common", "progress_target": 1, "hidden": False,
     },
     {
-        "id": "competitor", "name": "Competitor", "icon": "🥇",
+        "id": "competitor", "name": "Competitor", "icon": "",
         "description": "Win 3 battles.",
         "color": "#eab308", "category": "social",
         "xp_reward": 150, "rarity": "rare", "progress_target": 3, "hidden": False,
@@ -254,19 +254,19 @@ BADGES: list[dict[str, Any]] = [
 
     # ── MASTERY ─────────────────────────────────────────────────────────────
     {
-        "id": "subject_master", "name": "Subject Master", "icon": "🎓",
+        "id": "subject_master", "name": "Subject Master", "icon": "",
         "description": "Complete 25 study sessions in a single subject.",
         "color": "#eab308", "category": "mastery",
         "xp_reward": 500, "rarity": "legendary", "progress_target": 25, "hidden": False,
     },
     {
-        "id": "learning_machine", "name": "Learning Machine", "icon": "⚙️",
+        "id": "learning_machine", "name": "Learning Machine", "icon": "",
         "description": "Unlock any 15 achievements.",
         "color": "#a855f7", "category": "mastery",
         "xp_reward": 300, "rarity": "epic", "progress_target": 15, "hidden": False,
     },
     {
-        "id": "twinmind_legend", "name": "TwinMind Legend", "icon": "🌌",
+        "id": "twinmind_legend", "name": "TwinMind Legend", "icon": "",
         "description": "Unlock all achievements. The ultimate TwinMind challenge.",
         "color": "#eab308", "category": "mastery",
         "xp_reward": 2000, "rarity": "legendary", "progress_target": 35, "hidden": False,
@@ -274,25 +274,25 @@ BADGES: list[dict[str, Any]] = [
 
     # ── HIDDEN / SECRET ─────────────────────────────────────────────────────
     {
-        "id": "early_bird", "name": "Early Bird", "icon": "🌅",
+        "id": "early_bird", "name": "Early Bird", "icon": "",
         "description": "Submit a check-in before 8 AM.",
         "color": "#f59e0b", "category": "hidden",
         "xp_reward": 75, "rarity": "rare", "progress_target": 1, "hidden": True,
     },
     {
-        "id": "night_owl", "name": "Night Owl", "icon": "🌙",
+        "id": "night_owl", "name": "Night Owl", "icon": "",
         "description": "Complete a study session after 11 PM.",
         "color": "#6366f1", "category": "hidden",
         "xp_reward": 75, "rarity": "rare", "progress_target": 1, "hidden": True,
     },
     {
-        "id": "comeback_kid", "name": "Comeback Kid", "icon": "🔄",
+        "id": "comeback_kid", "name": "Comeback Kid", "icon": "",
         "description": "Resume studying after a 7-day break.",
         "color": "#10b981", "category": "hidden",
         "xp_reward": 75, "rarity": "rare", "progress_target": 1, "hidden": True,
     },
     {
-        "id": "weekend_warrior", "name": "Weekend Warrior", "icon": "🗓️",
+        "id": "weekend_warrior", "name": "Weekend Warrior", "icon": "",
         "description": "Complete study activity on both Saturday and Sunday.",
         "color": "#f43f5e", "category": "hidden",
         "xp_reward": 75, "rarity": "rare", "progress_target": 1, "hidden": True,

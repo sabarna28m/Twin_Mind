@@ -17,11 +17,11 @@ export interface ParticleStyleMeta {
 }
 
 export const PARTICLE_STYLES: ParticleStyleMeta[] = [
-  { id: 'neural-network', name: 'Neural Net',    icon: '🧠', description: 'Connected brain nodes with synaptic pulses' },
-  { id: 'constellation',  name: 'Constellation', icon: '✨', description: 'Moving star clusters with light connections' },
-  { id: 'data-streams',   name: 'Data Streams',  icon: '⚡', description: 'Flowing data particles with directional trails' },
-  { id: 'floating-orbs',  name: 'Floating Orbs', icon: '🫧', description: 'Glowing spheres drifting through space' },
-  { id: 'cyber-grid',     name: 'Cyber Grid',    icon: '🔲', description: 'Grid-based energy network with disruption fields' },
+  { id: 'neural-network', name: 'Neural Net',    icon: 'NN', description: 'Connected brain nodes with synaptic pulses' },
+  { id: 'constellation',  name: 'Constellation', icon: 'CS', description: 'Moving star clusters with light connections' },
+  { id: 'data-streams',   name: 'Data Streams',  icon: 'DS', description: 'Flowing data particles with directional trails' },
+  { id: 'floating-orbs',  name: 'Floating Orbs', icon: 'FO', description: 'Glowing spheres drifting through space' },
+  { id: 'cyber-grid',     name: 'Cyber Grid',    icon: 'CG', description: 'Grid-based energy network with disruption fields' },
 ];
 
 // Default particle style per theme

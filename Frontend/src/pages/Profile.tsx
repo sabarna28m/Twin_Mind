@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
-import type { FormEvent } from 'react';
+import type { FormEvent, ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { User, BookOpen, Trophy, Calendar, Bell, Lock, BarChart2, Flame, Medal, FileText, Target } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme, THEMES } from '../contexts/ThemeContext';
 import TwoFactorModal from '../components/TwoFactorModal';
@@ -16,14 +17,14 @@ import {
 const BACKEND = BACKEND_URL;
 type SectionId = 'overview'|'learning'|'gamification'|'connected'|'notifications'|'appearance'|'security'|'insights';
 
-const SECTIONS: { id: SectionId; icon: string; label: string }[] = [
-  { id:'overview',      icon:'👤', label:'Profile Overview'   },
-  { id:'learning',      icon:'📚', label:'Learning Profile'   },
-  { id:'gamification',  icon:'🏆', label:'Gamification'       },
-  { id:'connected',     icon:'📅', label:'Study Calendar'    },
-  { id:'notifications', icon:'🔔', label:'Notifications'      },
-  { id:'security',      icon:'🔒', label:'Security'           },
-  { id:'insights',      icon:'📊', label:'Account Insights'   },
+const SECTIONS: { id: SectionId; icon: ReactNode; label: string }[] = [
+  { id:'overview',      icon:<User size={16} />,      label:'Profile Overview'   },
+  { id:'learning',      icon:<BookOpen size={16} />,  label:'Learning Profile'   },
+  { id:'gamification',  icon:<Trophy size={16} />,    label:'Gamification'       },
+  { id:'connected',     icon:<Calendar size={16} />,  label:'Study Calendar'    },
+  { id:'notifications', icon:<Bell size={16} />,      label:'Notifications'      },
+  { id:'security',      icon:<Lock size={16} />,      label:'Security'           },
+  { id:'insights',      icon:<BarChart2 size={16} />, label:'Account Insights'   },
 ];
 
 const LS = {
@@ -50,11 +51,11 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
 }
 
 /* ── Section wrapper ── */
-function Section({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
+function Section({ title, icon, children }: { title: string; icon: ReactNode; children: React.ReactNode }) {
   return (
     <div>
       <div style={{ display:'flex', alignItems:'center', gap:'0.7rem', marginBottom:'1.6rem' }}>
-        <div style={{ width:'38px', height:'38px', borderRadius:'11px', background:'rgba(var(--primary-rgb),0.18)', border:'1px solid rgba(var(--primary-rgb),0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.05rem', flexShrink:0, boxShadow:'0 4px 12px rgba(var(--primary-rgb),0.15)' }}>{icon}</div>
+        <div style={{ width:'38px', height:'38px', borderRadius:'11px', background:'rgba(var(--primary-rgb),0.18)', border:'1px solid rgba(var(--primary-rgb),0.25)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 4px 12px rgba(var(--primary-rgb),0.15)', color:'var(--primary)' }}>{icon}</div>
         <h2 style={{ margin:0, fontSize:'1.2rem', fontWeight:800, color: 'var(--text-h)', letterSpacing:'-0.3px' }}>{title}</h2>
       </div>
       <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>{children}</div>
@@ -407,7 +408,7 @@ export default function Profile() {
             <span style={{ fontSize:'0.65rem', fontWeight:800, color: 'var(--text-m)', textTransform:'uppercase', letterSpacing:'0.1em', display:'block' }}>Profile Strength</span>
             <div style={{ display:'flex', alignItems:'center', gap:'0.55rem', marginTop:'0.2rem' }}>
               <span style={{ fontSize:'1.6rem', fontWeight:900, color:completionColor, lineHeight:1, textShadow:`0 0 18px ${completionColor}88` }}>{completionPct}%</span>
-              {completionPct === 100 && <span style={{ fontSize:'0.72rem', background:'linear-gradient(135deg,#ffd700,#f59e0b)', padding:'0.15rem 0.6rem', borderRadius:'99px', color:'var(--text-h)', fontWeight:800, boxShadow:'0 0 14px rgba(255,215,0,0.45)' }}>✨ Complete</span>}
+              {completionPct === 100 && <span style={{ fontSize:'0.72rem', background:'linear-gradient(135deg,#ffd700,#f59e0b)', padding:'0.15rem 0.6rem', borderRadius:'99px', color:'var(--text-h)', fontWeight:800, boxShadow:'0 0 14px rgba(255,215,0,0.45)' }}>Complete</span>}
             </div>
           </div>
           <div style={{ flex:1, height:'10px', background:'var(--bg)', borderRadius:'99px', overflow:'hidden', boxShadow:'inset 0 1px 4px rgba(0,0,0,0.45)' }}>
@@ -427,7 +428,7 @@ export default function Profile() {
             return (
               <button key={sec.id} className={`prof-nav-item prof-sidebar-item`} onClick={() => setActiveSection(sec.id)}
                 style={{ display:'flex', alignItems:'center', gap:'0.65rem', padding:'0.62rem 0.88rem', borderRadius:'11px', border:'none', background:active?'rgba(var(--primary-rgb),0.16)':'transparent', color:active?'var(--primary)':'var(--text-m)', fontFamily:'inherit', cursor:'pointer', textAlign:'left', transition:'all 0.15s', width:'100%', boxShadow:active?`inset 0 0 0 1.5px rgba(var(--primary-rgb),0.3), 0 4px 16px rgba(var(--primary-rgb),0.12)`:'none', fontWeight: active ? 700 : 500 }}>
-                <span style={{ fontSize:'0.95rem', flexShrink:0 }}>{sec.icon}</span>
+                <span style={{ display:'flex', alignItems:'center', flexShrink:0 }}>{sec.icon}</span>
                 <span className="prof-sidebar-label" style={{ fontSize:'0.81rem', lineHeight:1.2 }}>{sec.label}</span>
                 {active && <div style={{ marginLeft:'auto', width:'3px', height:'22px', borderRadius:'99px', background:'var(--primary)', flexShrink:0, boxShadow:'0 0 8px rgba(var(--primary-rgb),0.8)' }} />}
               </button>
@@ -444,14 +445,14 @@ export default function Profile() {
           {/* ═════════════ OVERVIEW ═════════════ */}
           {activeSection === 'overview' && (
             <div key="overview" className="prof-section-anim">
-              <Section title="Profile Overview" icon="👤">
+              <Section title="Profile Overview" icon={<User size={18} />}>
 
                 {/* Avatar hero card */}
                 <GCard style={{ display:'flex', alignItems:'flex-start', gap:'1.75rem', background:'linear-gradient(135deg,rgba(var(--primary-rgb),0.09),rgba(124,58,237,0.06))', border:'1.5px solid rgba(var(--primary-rgb),0.25)' }}>
                   <div style={{ position:'relative', flexShrink:0 }}>
                     <div onClick={() => !avatarUploading && fileInputRef.current?.click()} title="Click to change" style={{ width:'106px', height:'106px', borderRadius:'50%', cursor:'pointer', overflow:'hidden', border:'3px solid rgba(var(--primary-rgb),0.45)', boxShadow:'0 0 0 1px rgba(var(--primary-rgb),0.2), 0 0 32px rgba(var(--primary-rgb),0.35)', position:'relative' }}>
                       {avatarSrc ? <img src={avatarSrc} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} /> : <div style={{ width:'100%', height:'100%', background:'linear-gradient(135deg,rgba(var(--primary-rgb),0.25),rgba(124,58,237,0.3))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2.1rem', fontWeight:800, color:'var(--primary)' }}>{initials}</div>}
-                      <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', opacity:0, transition:'opacity 0.15s', fontSize:'1.4rem', borderRadius:'50%' }} className="avatar-overlay">📷</div>
+                      <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', opacity:0, transition:'opacity 0.15s', borderRadius:'50%' }} className="avatar-overlay"><User size={28} color="#fff" /></div>
                     </div>
                     <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display:'none' }} onChange={handleAvatarChange} />
                     {avatarUploading && <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.6)', borderRadius:'50%', fontSize:'0.85rem', color:'#fff', fontWeight:700 }}>Uploading…</div>}
@@ -468,7 +469,7 @@ export default function Profile() {
                     </div>
                     <p style={{ margin:'0 0 0.45rem', fontSize:'0.88rem', color: 'var(--text)', fontWeight:500 }}>{user?.email}</p>
                     {studentProfile?.course && <p style={{ margin:'0 0 0.2rem', fontSize:'0.82rem', color:'var(--primary)', fontWeight:700 }}>{studentProfile.course}{studentProfile.semester ? ` · ${studentProfile.semester}` : ''}</p>}
-                    {studentProfile?.institution && <p style={{ margin:0, fontSize:'0.78rem', color: 'var(--text-m)', fontWeight:500 }}>🏛 {studentProfile.institution}</p>}
+                    {studentProfile?.institution && <p style={{ margin:0, fontSize:'0.78rem', color: 'var(--text-m)', fontWeight:500 }}>{studentProfile.institution}</p>}
                     {avatarMsg && <p style={avatarMsg.ok ? msgOk : msgErr}>{avatarMsg.text}</p>}
                   </div>
                   <div style={{ display:'flex', flexDirection:'column', gap:'0.4rem', alignItems:'flex-end', flexShrink:0 }}>
@@ -483,15 +484,15 @@ export default function Profile() {
                 {/* Stat chips row */}
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))', gap:'0.7rem' }}>
                   {[
-                    { icon:'⭐', label:'Total XP',       value:gamProgress ? `${gamProgress.xp.toLocaleString()} XP` : '—', color:'#f59e0b' },
-                    { icon:'🔥', label:'Current Streak',  value:gamProgress ? `${gamProgress.streak_days} days` : '—',       color:'#ef4444' },
-                    { icon:'🏅', label:'Badges Earned',   value:`${badgeCount}`,                                               color:'#8b5cf6' },
-                    { icon:'▶',  label:'Sessions',        value:`${sessionCount}`,                                             color:'#00D4FF' },
-                    { icon:'📝', label:'Smart Notes',     value:`${noteCount}`,                                               color:'#10b981' },
-                    { icon:'⏱', label:'Study Hours',     value:`${totalHours}h`,                                             color:'#6366f1' },
+                    { icon:<Target size={22} />,   label:'Total XP',       value:gamProgress ? `${gamProgress.xp.toLocaleString()} XP` : '—', color:'#f59e0b' },
+                    { icon:<Flame size={22} />,    label:'Current Streak',  value:gamProgress ? `${gamProgress.streak_days} days` : '—',       color:'#ef4444' },
+                    { icon:<Medal size={22} />,    label:'Badges Earned',   value:`${badgeCount}`,                                               color:'#8b5cf6' },
+                    { icon:<Trophy size={22} />,   label:'Sessions',        value:`${sessionCount}`,                                             color:'#00D4FF' },
+                    { icon:<FileText size={22} />, label:'Smart Notes',     value:`${noteCount}`,                                               color:'#10b981' },
+                    { icon:<Calendar size={22} />, label:'Study Hours',     value:`${totalHours}h`,                                             color:'#6366f1' },
                   ].map(s => (
                     <GCard key={s.label} style={{ textAlign:'center', padding:'1rem 0.75rem', border:`1.5px solid ${s.color}44`, boxShadow:`0 8px 28px rgba(0,0,0,0.6), 0 0 0 1px ${s.color}18, 0 0 20px ${s.color}12` }}>
-                      <p style={{ margin:'0 0 0.28rem', fontSize:'1.3rem' }}>{s.icon}</p>
+                      <p style={{ margin:'0 0 0.28rem', display:'flex', alignItems:'center', justifyContent:'center', color:s.color }}>{s.icon}</p>
                       <p style={{ margin:'0 0 0.12rem', fontSize:'1.45rem', fontWeight:900, color:s.color, lineHeight:1, textShadow:`0 0 14px ${s.color}88` }}>{s.value}</p>
                       <p style={{ margin:0, fontSize:'0.62rem', color: 'var(--text-m)', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>{s.label}</p>
                     </GCard>
@@ -536,7 +537,7 @@ export default function Profile() {
           {/* ═════════════ LEARNING ═════════════ */}
           {activeSection === 'learning' && (
             <div key="learning" className="prof-section-anim">
-              <Section title="Learning Profile" icon="📚">
+              <Section title="Learning Profile" icon={<BookOpen size={18} />}>
                 <GCard>
                   <form onSubmit={saveLearning} style={{ display:'flex', flexDirection:'column', gap:'0.9rem' }}>
                     <div className="prof-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
@@ -599,7 +600,7 @@ export default function Profile() {
           {/* ═════════════ GAMIFICATION ═════════════ */}
           {activeSection === 'gamification' && (
             <div key="gamification" className="prof-section-anim">
-              <Section title="Gamification Profile" icon="🏆">
+              <Section title="Gamification Profile" icon={<Trophy size={18} />}>
                 {gamProgress && (
                   <>
                     {/* Level card */}
@@ -647,13 +648,13 @@ export default function Profile() {
                     {/* Stats grid */}
                     <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))', gap:'0.7rem' }}>
                       {[
-                        { icon:'🔥', label:'Current Streak',   value:`${gamProgress.streak_days} days`, color:'#ef4444' },
-                        { icon:'⭐', label:'Total XP',          value:gamProgress.xp.toLocaleString(),   color:'#f59e0b' },
-                        { icon:'🏅', label:'Badges Earned',     value:`${badgeCount}`,                   color:'#8b5cf6' },
-                        { icon:'🎯', label:'Quizzes Taken',     value:`${gamProgress.breakdown.quizzes}`, color:'#6366f1' },
+                        { icon:<Flame size={22} />,  label:'Current Streak',   value:`${gamProgress.streak_days} days`, color:'#ef4444' },
+                        { icon:<Target size={22} />, label:'Total XP',          value:gamProgress.xp.toLocaleString(),   color:'#f59e0b' },
+                        { icon:<Medal size={22} />,  label:'Badges Earned',     value:`${badgeCount}`,                   color:'#8b5cf6' },
+                        { icon:<Trophy size={22} />, label:'Quizzes Taken',     value:`${gamProgress.breakdown.quizzes}`, color:'#6366f1' },
                       ].map(s => (
                         <GCard key={s.label} style={{ textAlign:'center', padding:'1.1rem 0.75rem', border:`1.5px solid ${s.color}44`, boxShadow:`0 8px 28px rgba(0,0,0,0.6), 0 0 18px ${s.color}14` }}>
-                          <p style={{ margin:'0 0 0.3rem', fontSize:'1.5rem' }}>{s.icon}</p>
+                          <p style={{ margin:'0 0 0.3rem', display:'flex', alignItems:'center', justifyContent:'center', color:s.color }}>{s.icon}</p>
                           <p style={{ margin:'0 0 0.12rem', fontSize:'1.45rem', fontWeight:900, color:s.color, lineHeight:1, textShadow:`0 0 14px ${s.color}88` }}>{s.value}</p>
                           <p style={{ margin:0, fontSize:'0.63rem', color: 'var(--text-m)', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>{s.label}</p>
                         </GCard>
@@ -669,7 +670,7 @@ export default function Profile() {
           {/* ═════════════ CONNECTED ACCOUNTS (STUDY CALENDAR) ═════════════ */}
           {activeSection === 'connected' && (
             <div key="connected" className="prof-section-anim">
-              <Section title="Study Calendar" icon="📅">
+              <Section title="Study Calendar" icon={<Calendar size={18} />}>
                 <StudyCalendar />
               </Section>
             </div>
@@ -678,7 +679,7 @@ export default function Profile() {
           {/* ═════════════ NOTIFICATIONS ═════════════ */}
           {activeSection === 'notifications' && (
             <div key="notifications" className="prof-section-anim">
-              <Section title="Notification Settings" icon="🔔">
+              <Section title="Notification Settings" icon={<Bell size={18} />}>
                 <GCard>
                   <h3 style={{ margin:'0 0 1rem', fontSize:'0.92rem', fontWeight:700, color: 'var(--text-h)' }}>In-App Notifications</h3>
                   <div style={{ display:'flex', flexDirection:'column', gap:'0' }}>
@@ -723,7 +724,7 @@ export default function Profile() {
           {/* ═════════════ SECURITY ═════════════ */}
           {activeSection === 'security' && (
             <div key="security" className="prof-section-anim">
-              <Section title="Security" icon="🔒">
+              <Section title="Security" icon={<Lock size={18} />}>
 
                 {/* Account security overview */}
                 <GCard style={{ background:'linear-gradient(135deg,rgba(var(--primary-rgb),0.06),rgba(0,0,0,0))', border:'1px solid var(--border)' }}>
@@ -775,7 +776,7 @@ export default function Profile() {
                         { label:'Number',           met: /\d/.test(newPw)        },
                       ].map(req => (
                         <span key={req.label} style={{ fontSize:'0.7rem', fontWeight:600, color: newPw.length > 0 ? (req.met ? '#34d399' : 'rgba(148,163,184,0.45)') : 'rgba(148,163,184,0.4)', display:'flex', alignItems:'center', gap:'0.28rem', transition:'color 0.18s' }}>
-                          <span style={{ fontSize:'0.6rem' }}>{newPw.length > 0 ? (req.met ? '✓' : '○') : '○'}</span>
+                          <span style={{ fontSize:'0.6rem', fontWeight:900 }}>{newPw.length > 0 ? (req.met ? '✓' : '·') : '·'}</span>
                           {req.label}
                         </span>
                       ))}
@@ -876,7 +877,7 @@ export default function Profile() {
                   <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'1.25rem', flexWrap:'wrap' }}>
                     <div style={{ flex:1, minWidth:'200px' }}>
                       <div style={{ display:'flex', alignItems:'center', gap:'0.6rem', marginBottom:'0.45rem' }}>
-                        <span style={{ fontSize:'1rem' }}>⚠</span>
+                        <Lock size={16} color="#ef4444" />
                         <h3 style={{ margin:0, fontSize:'0.92rem', fontWeight:700, color:'#ef4444' }}>Danger Zone</h3>
                       </div>
                       <p style={{ margin:'0 0 0.35rem', fontSize:'0.78rem', color:'rgba(239,68,68,0.65)', lineHeight:1.55, maxWidth:'48ch' }}>
@@ -921,18 +922,18 @@ export default function Profile() {
           {/* ═════════════ INSIGHTS ═════════════ */}
           {activeSection === 'insights' && (
             <div key="insights" className="prof-section-anim">
-              <Section title="Account Insights" icon="📊">
+              <Section title="Account Insights" icon={<BarChart2 size={18} />}>
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))', gap:'0.7rem' }}>
                   {[
-                    { icon:'⏱', label:'Total Study Hours',    value:`${totalHours}h`,    color:'#6366f1' },
-                    { icon:'▶', label:'Sessions Completed',  value:`${sessionCount}`,    color:'#00D4FF' },
-                    { icon:'📝', label:'Notes Created',       value:`${noteCount}`,       color:'#10b981' },
-                    { icon:'🏅', label:'Badges Earned',       value:`${badgeCount}`,      color:'#8b5cf6' },
-                    { icon:'🎯', label:'Quizzes Taken',       value:`${gamProgress?.breakdown.quizzes ?? 0}`, color:'#f59e0b' },
-                    { icon:'📅', label:'Avg Attendance',      value:`${avgAtt}%`,         color:'#ec4899' },
+                    { icon:<BookOpen size={22} />, label:'Total Study Hours',    value:`${totalHours}h`,    color:'#6366f1' },
+                    { icon:<Trophy size={22} />,   label:'Sessions Completed',  value:`${sessionCount}`,    color:'#00D4FF' },
+                    { icon:<FileText size={22} />, label:'Notes Created',       value:`${noteCount}`,       color:'#10b981' },
+                    { icon:<Medal size={22} />,    label:'Badges Earned',       value:`${badgeCount}`,      color:'#8b5cf6' },
+                    { icon:<Target size={22} />,   label:'Quizzes Taken',       value:`${gamProgress?.breakdown.quizzes ?? 0}`, color:'#f59e0b' },
+                    { icon:<Calendar size={22} />, label:'Avg Attendance',      value:`${avgAtt}%`,         color:'#ec4899' },
                   ].map(s => (
                     <GCard key={s.label} style={{ textAlign:'center', padding:'1.1rem 0.75rem', border:`1.5px solid ${s.color}44`, boxShadow:`0 8px 28px rgba(0,0,0,0.6), 0 0 18px ${s.color}14` }}>
-                      <p style={{ margin:'0 0 0.28rem', fontSize:'1.35rem' }}>{s.icon}</p>
+                      <p style={{ margin:'0 0 0.28rem', display:'flex', alignItems:'center', justifyContent:'center', color:s.color }}>{s.icon}</p>
                       <p style={{ margin:'0 0 0.12rem', fontSize:'1.45rem', fontWeight:900, color:s.color, lineHeight:1, textShadow:`0 0 14px ${s.color}88` }}>{s.value}</p>
                       <p style={{ margin:0, fontSize:'0.62rem', color: 'var(--text-m)', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>{s.label}</p>
                     </GCard>

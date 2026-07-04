@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield } from 'lucide-react';
+import { Shield, Zap } from 'lucide-react';
 import BackButton from '../components/BackButton';
 import StreakShieldCard from '../components/StreakShieldCard';
 import { XPStoreProvider, useXPStore } from '../contexts/XPStoreContext';
@@ -20,7 +20,7 @@ interface ItemDef {
 
 const SHOP_ITEMS: ItemDef[] = [
   {
-    key: 'shield', icon: '🛡️', nameKey: 'shop_shield_name', tagKey: 'shop_shield_tag',
+    key: 'shield', icon: '', nameKey: 'shop_shield_name', tagKey: 'shop_shield_tag',
     desc: [
       'Auto-activates silently on miss',
       'Keeps your streak alive',
@@ -29,7 +29,7 @@ const SHOP_ITEMS: ItemDef[] = [
     priceKey: 'shield', accent: '#0052cc',
   },
   {
-    key: 'premium_shield', icon: '🛡️', nameKey: 'shop_premium_name', tagKey: 'shop_premium_tag',
+    key: 'premium_shield', icon: '', nameKey: 'shop_premium_name', tagKey: 'shop_premium_tag',
     desc: [
       'Covers up to 3 missed days',
       'Perfect for travel or exams',
@@ -38,7 +38,7 @@ const SHOP_ITEMS: ItemDef[] = [
     priceKey: 'premium_shield', accent: '#0052cc', badge: 'PREMIUM',
   },
   {
-    key: 'streak_freeze', icon: '🔥', nameKey: 'shop_freeze_name', tagKey: 'shop_freeze_tag',
+    key: 'streak_freeze', icon: '', nameKey: 'shop_freeze_name', tagKey: 'shop_freeze_tag',
     desc: [
       'Activate in advance',
       'Freezes streak for the day (UTC)',
@@ -47,7 +47,7 @@ const SHOP_ITEMS: ItemDef[] = [
     priceKey: 'streak_freeze', accent: '#f97316',
   },
   {
-    key: 'double_xp', icon: '⭐', nameKey: 'shop_double_name', tagKey: 'shop_double_tag',
+    key: 'double_xp', icon: '2x', nameKey: 'shop_double_name', tagKey: 'shop_double_tag',
     desc: [
       'Double XP for 24 hours',
       'Stack with a quiz marathon',
@@ -114,7 +114,7 @@ function ShieldCenterContent() {
           <Link to="/" style={p.navLogo}>TwinMind</Link>
         </div>
         <div style={p.xpBadge}>
-          <span style={{color: '#4338ca'}}>⚡</span>
+          <Zap size={14} style={{color: '#4338ca'}} />
           <span style={p.xpAmt}>{availXp.toLocaleString()} XP</span>
         </div>
       </header>
@@ -138,7 +138,7 @@ function ShieldCenterContent() {
         {lastMsg && (
           <div style={{ ...p.msg, borderColor: lastMsg.ok ? '#10b981' : '#ef4444', color: lastMsg.ok ? '#047857' : '#b91c1c', background: lastMsg.ok ? '#ecfdf5' : '#fef2f2' }}>
             {lastMsg.text}
-            <button onClick={clearMsg} style={p.msgX}>✕</button>
+            <button onClick={clearMsg} style={p.msgX}></button>
           </div>
         )}
 
@@ -185,12 +185,12 @@ function ShieldCenterContent() {
                 <ul style={p.descList}>
                   {item.desc.map(d => (
                     <li key={d} style={p.descItem}>
-                      <span style={p.checkMark}>✓</span> {d}
+                      <span style={p.checkMark}></span> {d}
                     </li>
                   ))}
                   {/* Mock excluded feature for SaaSable aesthetic */}
                   <li style={{...p.descItem, color: '#94a3b8'}}>
-                    <span style={p.crossMark}>✕</span> Unlimited uses
+                    <span style={p.crossMark}></span> Unlimited uses
                   </li>
                 </ul>
 
@@ -216,9 +216,9 @@ function ShieldCenterContent() {
         {/* Free shields milestones */}
         <div style={p.freeList}>
           {[
-            { icon: '⚔️', name: 'Week Warrior',  streak: 7,   reward: '+1 Shield' },
-            { icon: '👑', name: 'Month Master',  streak: 30,  reward: '+2 Shields' },
-            { icon: '🚀', name: 'Unstoppable',   streak: 100, reward: '+3 Shields' },
+            { icon: '', name: 'Week Warrior',  streak: 7,   reward: '+1 Shield' },
+            { icon: '', name: 'Month Master',  streak: 30,  reward: '+2 Shields' },
+            { icon: '', name: 'Unstoppable',   streak: 100, reward: '+3 Shields' },
           ].map(row => (
             <div key={row.name} style={p.freeRow}>
               <span style={{ fontSize: '1.5rem' }}>{row.icon}</span>

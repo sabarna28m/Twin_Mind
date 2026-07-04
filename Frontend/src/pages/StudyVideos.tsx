@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   Video, Search, ExternalLink, Play, X, Clock, Eye,
   Calendar, Sparkles, BookOpen, ChevronRight, Star,
-  ShieldCheck, AlertCircle, Wifi,
+  ShieldCheck, AlertCircle, Wifi, GraduationCap,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -707,7 +707,7 @@ export default function StudyVideos() {
           {/* Empty initial state */}
           {!result && !loading && !error && (
             <div style={s.emptyState} className="animate-fade-in">
-              <div style={s.emptyIcon}>🎓</div>
+              <div style={s.emptyIcon}><GraduationCap size={48} style={{ color: 'var(--text-m)' }} /></div>
               <p style={s.emptyTitle}>Find the best educational videos</p>
               <p style={s.emptyHint}>
                 Type any study topic above or click a quick topic to get AI-ranked YouTube recommendations.

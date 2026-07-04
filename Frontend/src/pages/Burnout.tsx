@@ -3,6 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine,
 } from 'recharts';
+import { AlertTriangle, Bell, BookOpen, BarChart2, Calendar, CheckCircle, Coffee, Droplets, Flame, Heart, Moon, TrendingUp, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -51,12 +52,6 @@ function riskLabel(risk: string) {
   return 'Low Risk';
 }
 
-function riskEmoji(risk: string) {
-  if (risk === 'high')   return '🔴';
-  if (risk === 'medium') return '🟡';
-  return '🟢';
-}
-
 function calcBurnout(
   studyH: number, sleepH: number, breaks: number,
   streak: number, mood: number, energy: number,
@@ -76,36 +71,37 @@ function calcBurnout(
 function getRecommendations(
   studyH: number, sleepH: number, breaks: number,
   mood: number, energy: number, streak: number,
-): { icon: string; title: string; text: string }[] {
-  const recs: { icon: string; title: string; text: string }[] = [];
+): { iconIdx: number; title: string; text: string }[] {
+  const recs: { iconIdx: number; title: string; text: string }[] = [];
   if (studyH > 8 && sleepH < 6) {
-    recs.push({ icon: '😴', title: 'Sleep & Study Balance', text: `Reduce study time by 1–2 hours and aim for at least 7 hours of sleep tonight. Sleep debt compounds quickly.` });
+    recs.push({ iconIdx: 0, title: 'Sleep & Study Balance', text: `Reduce study time by 1–2 hours and aim for at least 7 hours of sleep tonight. Sleep debt compounds quickly.` });
   } else if (studyH > 8) {
-    recs.push({ icon: '📚', title: 'Study Load', text: `${studyH.toFixed(0)}h of study is intensive. Cap tomorrow's session at 6–7h for sustainable learning.` });
+    recs.push({ iconIdx: 5, title: 'Study Load', text: `${studyH.toFixed(0)}h of study is intensive. Cap tomorrow's session at 6–7h for sustainable learning.` });
   } else if (sleepH < 6) {
-    recs.push({ icon: '😴', title: 'Sleep Deficit', text: `Only ${sleepH.toFixed(0)}h of sleep reduces memory consolidation. Prioritise 7–8 hours tonight.` });
+    recs.push({ iconIdx: 0, title: 'Sleep Deficit', text: `Only ${sleepH.toFixed(0)}h of sleep reduces memory consolidation. Prioritise 7–8 hours tonight.` });
   }
   if (breaks < 2) {
-    recs.push({ icon: '☕', title: 'Take More Breaks', text: 'Use the Pomodoro technique: 25 min focused work, 5 min break. A 15-min break every 90 minutes keeps you sharp.' });
+    recs.push({ iconIdx: 1, title: 'Take More Breaks', text: 'Use the Pomodoro technique: 25 min focused work, 5 min break. A 15-min break every 90 minutes keeps you sharp.' });
   }
   if (mood <= 2) {
-    recs.push({ icon: '💛', title: 'Mood Support', text: 'Shift to lighter revision tasks today — re-reading notes rather than tackling new material. Gentle progress counts.' });
+    recs.push({ iconIdx: 2, title: 'Mood Support', text: 'Shift to lighter revision tasks today — re-reading notes rather than tackling new material. Gentle progress counts.' });
   }
   if (energy <= 2) {
-    recs.push({ icon: '⚡', title: 'Energy Recovery', text: 'A 20-minute walk or light stretching restores mental clarity better than caffeine. Try it before your next session.' });
+    recs.push({ iconIdx: 3, title: 'Energy Recovery', text: 'A 20-minute walk or light stretching restores mental clarity better than caffeine. Try it before your next session.' });
   }
   if (streak > 10) {
-    recs.push({ icon: '🗓', title: 'Rest Day Needed', text: `${streak} consecutive study days is impressive. Schedule one planned rest day this week — recovery accelerates retention.` });
+    recs.push({ iconIdx: 4, title: 'Rest Day Needed', text: `${streak} consecutive study days is impressive. Schedule one planned rest day this week — recovery accelerates retention.` });
   }
   if (recs.length === 0) {
-    recs.push({ icon: '✅', title: 'Great Balance', text: 'Your metrics look healthy. Consistent, sustainable effort compounds over time. Keep your current routine.' });
-    recs.push({ icon: '💧', title: 'Stay Hydrated', text: 'Stay hydrated and take short movement breaks to sustain energy and focus throughout your sessions.' });
+    recs.push({ iconIdx: 6, title: 'Great Balance', text: 'Your metrics look healthy. Consistent, sustainable effort compounds over time. Keep your current routine.' });
+    recs.push({ iconIdx: 7, title: 'Stay Hydrated', text: 'Stay hydrated and take short movement breaks to sustain energy and focus throughout your sessions.' });
   }
   return recs;
 }
 
-const MOOD_EMOJIS = ['😔', '😕', '😐', '😊', '😄'];
-const ENERGY_ICONS = ['🪫', '🔋', '⚡', '⚡⚡', '🚀'];
+const MOOD_LABELS  = ['Low', 'Fair', 'OK', 'Good', 'Great'];
+const ENERGY_LABELS = ['1', '2', '3', '4', '5'];
+const REC_ICONS = [<Moon size={20} />, <Coffee size={20} />, <Heart size={20} />, <Zap size={20} />, <Calendar size={20} />, <BookOpen size={20} />, <CheckCircle size={20} />, <Droplets size={20} />];
 
 // ── Circular Progress SVG ──────────────────────────────────────────────
 
@@ -169,7 +165,7 @@ function BurnoutTooltip({ active, payload, label, isDark }: {
         {burnout_score} <span style={{ fontSize: '0.72rem', fontWeight: 400 }}>/ 100</span>
       </p>
       <p style={{ margin: '0.2rem 0 0', fontSize: '0.72rem', color: riskColor(risk_level) }}>
-        {riskEmoji(risk_level)} {riskLabel(risk_level)}
+        {riskLabel(risk_level)}
       </p>
     </div>
   );
@@ -201,7 +197,7 @@ export default function Burnout() {
   const [trend, setTrend]         = useState<TrendPoint[]>([]);
   const [trendDays, setTrendDays] = useState<7 | 30>(7);
   const [alertDismissed, setAlertDismissed] = useState(false);
-  const [notifications, setNotifications]   = useState<{ id: number; icon: string; text: string }[]>([]);
+  const [notifications, setNotifications]   = useState<{ id: number; text: string }[]>([]);
   const [loading, setLoading]     = useState(true);
 
   // Live preview
@@ -226,15 +222,15 @@ export default function Burnout() {
   // Build notifications from latest entry
   useEffect(() => {
     if (!latest) return;
-    const notes: { id: number; icon: string; text: string }[] = [];
+    const notes: { id: number; text: string }[] = [];
     if (latest.risk_level === 'high') {
-      notes.push({ id: 1, icon: '🔔', text: 'Burnout Risk Increased — your latest check-in shows high risk.' });
+      notes.push({ id: 1, text: 'Burnout Risk Increased — your latest check-in shows high risk.' });
     }
     if (latest.sleep_hours < 6) {
-      notes.push({ id: 2, icon: '🔔', text: `Sleep Deficit Detected — only ${latest.sleep_hours}h of sleep recorded.` });
+      notes.push({ id: 2, text: `Sleep Deficit Detected — only ${latest.sleep_hours}h of sleep recorded.` });
     }
     if (latest.study_hours > 9) {
-      notes.push({ id: 3, icon: '🔔', text: `Recovery Break Recommended — ${latest.study_hours}h study session detected.` });
+      notes.push({ id: 3, text: `Recovery Break Recommended — ${latest.study_hours}h study session detected.` });
     }
     setNotifications(notes);
   }, [latest]);
@@ -278,7 +274,7 @@ export default function Burnout() {
   const displayedTwin = analysis?.twin_message ?? '';
 
   const showAlertBanner = !alertDismissed && displayedRisk === 'high' && (displayedAlerts.length > 0 || displayed != null);
-  const alertMsg = displayedAlerts[0] ?? '⚠️ Your burnout risk is high. Consider taking a break today.';
+  const alertMsg = displayedAlerts[0] ?? 'Your burnout risk is high. Consider taking a break today.';
 
   const trendFormatted = trend.map(p => ({
     ...p,
@@ -302,7 +298,7 @@ export default function Burnout() {
         {showAlertBanner && (
           <div style={p.alertBanner} className="animate-slide-up">
             <div style={p.alertLeft}>
-              <span style={p.alertIcon}>⚠️</span>
+              <AlertTriangle size={20} style={{ color: '#ef4444', flexShrink: 0 }} />
               <div>
                 <p style={p.alertTitle}>{t('burnout_alert_title')}</p>
                 <p style={p.alertMsg}>{alertMsg}</p>
@@ -329,7 +325,7 @@ export default function Burnout() {
               <h2 style={p.cardTitle}>{t('burnout_score_title')}</h2>
               {displayed && (
                 <span style={{ ...p.riskBadge, background: `${riskColor(displayedRisk)}22`, color: riskColor(displayedRisk), border: `1px solid ${riskColor(displayedRisk)}44` }}>
-                  {riskEmoji(displayedRisk)} {riskLabel(displayedRisk)}
+                  {riskLabel(displayedRisk)}
                 </span>
               )}
             </div>
@@ -356,7 +352,7 @@ export default function Burnout() {
                       border: `1px solid ${displayedRisk === r ? riskColor(r) : 'rgba(255,255,255,0.08)'}44`,
                       color: displayedRisk === r ? riskColor(r) : 'var(--text)',
                     }}>
-                      {riskEmoji(r)} {riskLabel(r)}
+                      {riskLabel(r)}
                     </div>
                   ))}
                 </div>
@@ -401,8 +397,8 @@ export default function Burnout() {
               {/* Study Hours */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>📚 {t('burnout_study_h')}</label>
-                  <span style={p.fieldVal}>{studyH.toFixed(1)}h {studyH > 8 && <span style={p.warnTag}>⚠ High</span>}</span>
+                  <label style={p.fieldLabel}>{t('burnout_study_h')}</label>
+                  <span style={p.fieldVal}>{studyH.toFixed(1)}h {studyH > 8 && <span style={p.warnTag}>High</span>}</span>
                 </div>
                 <input type="range" min={0} max={16} step={0.5} value={studyH}
                   onChange={e => setStudyH(parseFloat(e.target.value))} style={p.slider} />
@@ -412,8 +408,8 @@ export default function Burnout() {
               {/* Sleep Hours */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>😴 {t('burnout_sleep_h')}</label>
-                  <span style={p.fieldVal}>{sleepH.toFixed(1)}h {sleepH < 6 && <span style={p.warnTag}>⚠ Low</span>}</span>
+                  <label style={p.fieldLabel}>{t('burnout_sleep_h')}</label>
+                  <span style={p.fieldVal}>{sleepH.toFixed(1)}h {sleepH < 6 && <span style={p.warnTag}>Low</span>}</span>
                 </div>
                 <input type="range" min={0} max={12} step={0.5} value={sleepH}
                   onChange={e => setSleepH(parseFloat(e.target.value))} style={p.slider} />
@@ -423,8 +419,8 @@ export default function Burnout() {
               {/* Breaks */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>☕ {t('burnout_breaks')}</label>
-                  <span style={p.fieldVal}>{breaks} {breaks < 2 && <span style={p.warnTag}>⚠ Low</span>}</span>
+                  <label style={p.fieldLabel}>{t('burnout_breaks')}</label>
+                  <span style={p.fieldVal}>{breaks} {breaks < 2 && <span style={p.warnTag}>Low</span>}</span>
                 </div>
                 <div style={p.counter}>
                   <button type="button" style={p.counterBtn} onClick={() => setBreaks(b => Math.max(0, b - 1))}>−</button>
@@ -436,16 +432,16 @@ export default function Burnout() {
               {/* Mood */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>💛 {t('burnout_mood')}</label>
+                  <label style={p.fieldLabel}>{t('burnout_mood')}</label>
                   <span style={p.fieldVal}>{mood}/5</span>
                 </div>
                 <div style={p.emojiRow}>
-                  {MOOD_EMOJIS.map((em, i) => (
+                  {MOOD_LABELS.map((lbl, i) => (
                     <button
                       key={i} type="button"
-                      style={{ ...p.emojiBtn, background: mood === i + 1 ? 'rgba(99,102,241,0.25)' : 'rgba(255,255,255,0.05)', border: `1px solid ${mood === i + 1 ? 'rgba(99,102,241,0.6)' : 'rgba(255,255,255,0.1)'}`, transform: mood === i + 1 ? 'scale(1.18)' : 'scale(1)' }}
+                      style={{ ...p.emojiBtn, fontSize: '0.65rem', fontWeight: 700, background: mood === i + 1 ? 'rgba(99,102,241,0.25)' : 'rgba(255,255,255,0.05)', border: `1px solid ${mood === i + 1 ? 'rgba(99,102,241,0.6)' : 'rgba(255,255,255,0.1)'}`, transform: mood === i + 1 ? 'scale(1.18)' : 'scale(1)' }}
                       onClick={() => setMood(i + 1)}
-                    >{em}</button>
+                    >{lbl}</button>
                   ))}
                 </div>
               </div>
@@ -453,16 +449,16 @@ export default function Burnout() {
               {/* Energy */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>⚡ {t('burnout_energy')}</label>
+                  <label style={p.fieldLabel}>{t('burnout_energy')}</label>
                   <span style={p.fieldVal}>{energy}/5</span>
                 </div>
                 <div style={p.emojiRow}>
-                  {ENERGY_ICONS.map((ic, i) => (
+                  {ENERGY_LABELS.map((lbl, i) => (
                     <button
                       key={i} type="button"
-                      style={{ ...p.emojiBtn, background: energy === i + 1 ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.05)', border: `1px solid ${energy === i + 1 ? 'rgba(245,158,11,0.5)' : 'rgba(255,255,255,0.1)'}`, transform: energy === i + 1 ? 'scale(1.18)' : 'scale(1)' }}
+                      style={{ ...p.emojiBtn, fontSize: '0.65rem', fontWeight: 700, background: energy === i + 1 ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.05)', border: `1px solid ${energy === i + 1 ? 'rgba(245,158,11,0.5)' : 'rgba(255,255,255,0.1)'}`, transform: energy === i + 1 ? 'scale(1.18)' : 'scale(1)' }}
                       onClick={() => setEnergy(i + 1)}
-                    >{ic}</button>
+                    >{lbl}</button>
                   ))}
                 </div>
               </div>
@@ -470,8 +466,8 @@ export default function Burnout() {
               {/* Streak */}
               <div style={p.field}>
                 <div style={p.fieldHead}>
-                  <label style={p.fieldLabel}>🔥 {t('burnout_streak_days')}</label>
-                  <span style={p.fieldVal}>{streak}d {streak > 10 && <span style={p.warnTag}>⚠ Long</span>}</span>
+                  <label style={p.fieldLabel}><Flame size={13} style={{ display: 'inline', marginRight: 4, color: '#f59e0b', verticalAlign: 'middle' }} />{t('burnout_streak_days')}</label>
+                  <span style={p.fieldVal}>{streak}d {streak > 10 && <span style={p.warnTag}>Long</span>}</span>
                 </div>
                 <div style={p.counter}>
                   <button type="button" style={p.counterBtn} onClick={() => setStreak(s => Math.max(0, s - 1))}>−</button>
@@ -484,7 +480,7 @@ export default function Burnout() {
               <div style={{ ...p.previewBar, borderColor: `${riskColor(preview.risk)}44`, background: `${riskColor(preview.risk)}0d` }}>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text)' }}>Live score estimate:</span>
                 <span style={{ fontWeight: 800, color: riskColor(preview.risk), fontSize: '0.95rem' }}>
-                  {preview.score}/100 — {riskEmoji(preview.risk)} {riskLabel(preview.risk)}
+                  {preview.score}/100 — {riskLabel(preview.risk)}
                 </span>
               </div>
 
@@ -499,14 +495,14 @@ export default function Burnout() {
 
         {/* ── AI Recommendations ── */}
         <section id="recommendations" style={p.card}>
-          <h2 style={p.cardTitle}>💡 {t('burnout_recs')}</h2>
+          <h2 style={p.cardTitle}>{t('burnout_recs')}</h2>
           <div style={p.recGrid} className="burnout-rec-grid">
             {(displayedRecs.length > 0
-              ? displayedRecs.map((r, i) => ({ icon: ['😴','☕','💛','⚡','🗓','📚','✅','💧'][i % 8], title: ['Wellbeing Tip', 'Recovery', 'Focus', 'Energy', 'Rest Day', 'Study Load', 'Great Work', 'Hydration'][i % 8], text: r }))
+              ? displayedRecs.map((r, i) => ({ iconIdx: i % 8, title: ['Wellbeing Tip', 'Recovery', 'Focus', 'Energy', 'Rest Day', 'Study Load', 'Great Work', 'Hydration'][i % 8], text: r }))
               : getRecommendations(studyH, sleepH, breaks, mood, energy, streak)
             ).map((rec, i) => (
               <div key={i} style={p.recCard} className="animate-slide-up">
-                <div style={p.recIconWrap}><span style={{ fontSize: '1.5rem' }}>{rec.icon}</span></div>
+                <div style={p.recIconWrap}>{REC_ICONS[rec.iconIdx]}</div>
                 <h3 style={p.recTitle}>{rec.title}</h3>
                 <p style={p.recText}>{rec.text}</p>
               </div>
@@ -537,7 +533,7 @@ export default function Burnout() {
         {/* ── Burnout Trend ── */}
         <section style={p.card}>
           <div style={p.cardHead}>
-            <h2 style={p.cardTitle}>📈 {t('burnout_trend')}</h2>
+            <h2 style={p.cardTitle}><TrendingUp size={16} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle', color: '#6366f1' }} />{t('burnout_trend')}</h2>
             <div style={p.toggleGroup}>
               {([7, 30] as const).map(d => (
                 <button key={d} style={{ ...p.toggleBtn, background: trendDays === d ? 'rgba(99,102,241,0.25)' : 'transparent', color: trendDays === d ? '#818cf8' : 'var(--text)', border: `1px solid ${trendDays === d ? 'rgba(99,102,241,0.5)' : 'rgba(255,255,255,0.1)'}` }}
@@ -550,7 +546,7 @@ export default function Burnout() {
 
           {trendFormatted.length === 0 ? (
             <div style={p.emptyChart}>
-              <p style={{ fontSize: '2rem', margin: '0 0 0.5rem' }}>📊</p>
+              <BarChart2 size={32} style={{ margin: '0 0 0.5rem', color: 'var(--text-m)' }} />
               <p style={{ margin: 0, color: 'var(--text)', fontSize: '0.9rem' }}>No trend data yet.</p>
               <p style={{ margin: '0.35rem 0 0', color: 'var(--text)', fontSize: '0.8rem', opacity: 0.6 }}>Submit a check-in to start tracking your burnout trend.</p>
             </div>
@@ -601,11 +597,11 @@ export default function Burnout() {
         {/* ── Notifications ── */}
         {notifications.length > 0 && (
           <section style={p.card}>
-            <h2 style={p.cardTitle}>🔔 Notifications</h2>
+            <h2 style={p.cardTitle}><Bell size={16} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle', color: '#6366f1' }} />Notifications</h2>
             <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.55rem' }}>
               {notifications.map(n => (
                 <div key={n.id} style={p.notifCard}>
-                  <span style={p.notifIcon}>{n.icon}</span>
+                  <Bell size={14} style={{ color: '#6366f1', flexShrink: 0 }} />
                   <p style={p.notifText}>{n.text}</p>
                   <button style={p.notifDismiss} onClick={() => setNotifications(ns => ns.filter(x => x.id !== n.id))}>✕</button>
                 </div>

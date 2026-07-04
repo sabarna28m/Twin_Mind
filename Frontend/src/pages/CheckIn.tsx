@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -229,9 +229,9 @@ export default function CheckIn() {
       try {
         const { data: sc } = await api.post<ShieldCheckResult>('/streak-protection/check');
         if (sc.shield_used) {
-          setShieldMsg(`🛡️ Streak Shield activated! Your ${sc.streak_days}-day streak is protected. (${sc.shield_count} shield${sc.shield_count !== 1 ? 's' : ''} left)`);
+          setShieldMsg(`Streak Shield activated! Your ${sc.streak_days}-day streak is protected. (${sc.shield_count} shield${sc.shield_count !== 1 ? 's' : ''} left)`);
         } else if (sc.recovery_set) {
-          setShieldMsg('⚡ You missed a check-in. Recover your streak within 24 hours in the Streak Protection panel.');
+          setShieldMsg('You missed a check-in. Recover your streak within 24 hours in the Streak Protection panel.');
         }
       } catch { /* non-critical */ }
     } catch (err: unknown) {
@@ -269,7 +269,7 @@ export default function CheckIn() {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem',
         }}>
           <span style={{ fontSize: '0.82rem', color: '#e2e8f0', lineHeight: 1.4 }}>{shieldMsg}</span>
-          <button onClick={() => setShieldMsg(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1rem', flexShrink: 0, fontFamily: 'inherit' }}>✕</button>
+          <button onClick={() => setShieldMsg(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1rem', flexShrink: 0, fontFamily: 'inherit' }}></button>
         </div>
       )}
 
@@ -411,7 +411,7 @@ export default function CheckIn() {
                         </span>
                       </td>
                       <td style={s.td} className="ci-td">
-                        <button onClick={() => handleDelete(e.id)} style={s.deleteBtn} title="Delete">✕</button>
+                        <button onClick={() => handleDelete(e.id)} style={s.deleteBtn} title="Delete"></button>
                       </td>
                     </tr>
                   ))}
@@ -434,7 +434,7 @@ export default function CheckIn() {
                     <p style={s.surveyTitle}>{t('checkin_survey_title')}</p>
                     <p style={s.surveySub}>{t('checkin_survey_sub')}</p>
                   </div>
-                  <button onClick={() => setShowSurvey(false)} style={s.surveyClose}>✕</button>
+                  <button onClick={() => setShowSurvey(false)} style={s.surveyClose}></button>
                 </div>
 
                 <div style={s.progressWrap}>
@@ -506,7 +506,7 @@ export default function CheckIn() {
               <>
                 <div style={s.surveyHeader}>
                   <p style={s.surveyTitle}>{t('checkin_survey_complete')}</p>
-                  <button onClick={() => setShowSurvey(false)} style={s.surveyClose}>✕</button>
+                  <button onClick={() => setShowSurvey(false)} style={s.surveyClose}></button>
                 </div>
 
                 <div style={s.resultsWrap}>

@@ -73,9 +73,9 @@ export function useXPStore(): XPStoreState {
 
 function purchaseSuccessMsg(item: ShopItem): string {
   switch (item) {
-    case 'shield':         return '🛡️ Streak Shield purchased! It will auto-activate if you miss a day.';
-    case 'premium_shield': return '🛡️ Premium Shield purchased! Covers up to 3 missed days.';
-    case 'streak_freeze':  return '🔥 Streak Freeze activated for today!';
-    case 'double_xp':      return '⭐ Double XP Boost active for 24 hours!';
+    case 'shield':         return 'Streak Shield purchased! It will auto-activate if you miss a day.';
+    case 'premium_shield': return 'Premium Shield purchased! Covers up to 3 missed days.';
+    case 'streak_freeze':  return 'Streak Freeze activated for today!';
+    case 'double_xp':      return 'Double XP Boost active for 24 hours!';
   }
 }

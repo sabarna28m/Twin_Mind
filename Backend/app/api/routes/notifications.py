@@ -276,7 +276,7 @@ def generate_ai_notifications(
             reference_key=item.get("reference_key"),
             priority=item.get("priority", "informational"),
             category=item.get("category"),
-            emoji=item.get("emoji", "🔔"),
+            emoji=item.get("emoji", ""),
             title=item.get("title"),
             action_url=item.get("action_url"),
         )
@@ -347,7 +347,7 @@ Return ONLY valid JSON with exactly these fields:
                 f"Streak: {snapshot['streak_days']} days",
                 f"Burnout risk: {snapshot['burnout_risk']}",
             ],
-            "mood_emoji": "📊",
+            "mood_emoji": "",
             "recommendation": "Log your check-in to keep your streak alive.",
             "study_hours": snapshot["avg_study_hours_7d"],
             "focus_score": snapshot["focus_score"],

@@ -1,4 +1,4 @@
-import type { IntegrityWarning } from '../../services/integrityEngine';
+﻿import type { IntegrityWarning } from '../../services/integrityEngine';
 import { MAX_WARNINGS } from '../../services/integrityEngine';
 
 interface Props {
@@ -12,11 +12,11 @@ interface Props {
 }
 
 const WARNING_ICONS: Record<string, string> = {
-  tab_switch:       '🔀',
-  face_absent:      '👁',
-  distracted:       '😵',
-  suspicious_audio: '🔊',
-  multiple_faces:   '👥',
+  tab_switch:       '',
+  face_absent:      '',
+  distracted:       '',
+  suspicious_audio: '',
+  multiple_faces:   '',
 };
 
 export default function WarningSystem({ warnings, latestWarning, onDismiss, terminated, onTerminationAcknowledge, quizScore, totalQuestions }: Props) {
@@ -45,12 +45,12 @@ export default function WarningSystem({ warnings, latestWarning, onDismiss, term
       {/* Latest warning toast */}
       {latestWarning && !terminated && (
         <div style={w.toast} className="animate-slide-up">
-          <span style={{ fontSize: '1.1rem' }}>{WARNING_ICONS[latestWarning.type] ?? '⚠️'}</span>
+          <span style={{ fontSize: '1.1rem' }}>{WARNING_ICONS[latestWarning.type] ?? ''}</span>
           <div style={{ flex: 1 }}>
             <p style={w.toastTitle}>Warning {count} of {MAX_WARNINGS}</p>
             <p style={w.toastMsg}>{latestWarning.message}</p>
           </div>
-          <button onClick={onDismiss} style={w.dismissBtn}>✕</button>
+          <button onClick={onDismiss} style={w.dismissBtn}></button>
         </div>
       )}
 
@@ -58,7 +58,7 @@ export default function WarningSystem({ warnings, latestWarning, onDismiss, term
       {terminated && (
         <div style={w.overlay}>
           <div style={w.modal}>
-            <div style={w.modalIcon}>🚫</div>
+            <div style={w.modalIcon}></div>
             <h2 style={w.modalTitle}>Exam Session Terminated</h2>
             <p style={w.modalSub}>
               You have received {MAX_WARNINGS} integrity warnings. Your exam session has been automatically ended.

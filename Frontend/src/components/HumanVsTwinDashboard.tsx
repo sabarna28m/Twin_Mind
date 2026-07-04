@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import {
   ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, ReferenceLine,
@@ -174,7 +174,7 @@ export default function HumanVsTwinDashboard() {
 
   if (!data || !data.has_sufficient_data) return (
     <div style={{ ...card, gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
-      <p style={{ fontSize: '2.5rem', margin: '0 0 0.75rem' }}>🧠</p>
+      <p style={{ fontSize: '2.5rem', margin: '0 0 0.75rem' }}></p>
       <p style={{ margin: '0 0 0.4rem', fontSize: '0.92rem', fontWeight: 700, color: '#0f172a' }}>Activating Human vs Twin Analysis</p>
       <p style={{ margin: '0 0 1.25rem', fontSize: '0.82rem', color: '#475569', lineHeight: 1.6, maxWidth: '360px', marginLeft: 'auto', marginRight: 'auto' }}>
         {data?.data_points === 1
@@ -199,12 +199,12 @@ export default function HumanVsTwinDashboard() {
     ? (data.accuracy_delta > 0 ? '#10b981' : '#ef4444') : '#475569';
 
   const metrics: { m: MetricComparison; icon: string }[] = [
-    { m: data.study_hours,    icon: '⏱' },
-    { m: data.focus_sessions, icon: '🎯' },
-    { m: data.consistency,    icon: '📅' },
-    { m: data.knowledge_growth, icon: '🧠' },
-    { m: data.notes_created,  icon: '📝' },
-    ...(data.quiz_score ? [{ m: data.quiz_score, icon: '✅' }] : []),
+    { m: data.study_hours,    icon: 'TM' },
+    { m: data.focus_sessions, icon: '' },
+    { m: data.consistency,    icon: '' },
+    { m: data.knowledge_growth, icon: '' },
+    { m: data.notes_created,  icon: '' },
+    ...(data.quiz_score ? [{ m: data.quiz_score, icon: '' }] : []),
   ];
 
   return (
@@ -213,7 +213,7 @@ export default function HumanVsTwinDashboard() {
       <div style={{ ...card, ...fullWidth }}>
         {/* Section header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '1.15rem' }}>🧠</span>
+          <span style={{ fontSize: '1.15rem' }}></span>
           <h3 style={{ ...sectionTitle, marginBottom: 0 }}>Human vs Digital Twin Analysis</h3>
           <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '99px', background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)', color: '#00D4FF', marginLeft: 'auto' }}>
             Live · {data.data_points} data pts
@@ -378,7 +378,7 @@ export default function HumanVsTwinDashboard() {
             {data.ai_insights.map((insight, i) => (
               <div key={i} style={{ display: 'flex', gap: '0.6rem', padding: '0.75rem', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.14)', borderRadius: '12px' }}>
                 <span style={{ fontSize: '1rem', flexShrink: 0, marginTop: '1px' }}>
-                  {i === 0 ? '🎯' : i === 1 ? '📊' : i === 2 ? '🔮' : i === 3 ? '⚡' : '💡'}
+                  {i === 0 ? '' : i === 1 ? '' : i === 2 ? '' : i === 3 ? '' : ''}
                 </span>
                 <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b', lineHeight: 1.6 }}>{insight}</p>
               </div>
@@ -400,7 +400,7 @@ export default function HumanVsTwinDashboard() {
                 <div key={i} style={{ display: 'flex', gap: '0.75rem', paddingBottom: i < data.prediction_history.length - 1 ? '0.85rem' : 0 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
                     <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: `${c}15`, border: `1px solid ${c}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', flexShrink: 0 }}>
-                      {better ? '📈' : '📉'}
+                      {better ? '' : ''}
                     </div>
                     {i < data.prediction_history.length - 1 && <div style={{ width: '1px', flex: 1, background: '#f8f9fa', marginTop: '4px' }} />}
                   </div>
@@ -430,10 +430,10 @@ export default function HumanVsTwinDashboard() {
           <p style={sectionSub}>Where you outperformed the Twin's model, where you fell short, incorrect assumptions, and what the Twin has recently learned.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0.75rem' }} className="mob-twin-row">
             {[
-              { title: '✅ You Exceeded Predictions', items: data.exceeded_predictions, color: '#10b981' },
-              { title: '⚠️ Missed Predictions',       items: data.missed_predictions,   color: '#f59e0b' },
-              { title: '🔄 Twin\'s Incorrect Assumptions', items: data.twin_incorrect_assumptions, color: '#ef4444' },
-              { title: '🧠 Newly Learned Patterns',   items: data.newly_learned_patterns, color: '#818cf8' },
+              { title: 'You Exceeded Predictions', items: data.exceeded_predictions, color: '#10b981' },
+              { title: 'Missed Predictions',       items: data.missed_predictions,   color: '#f59e0b' },
+              { title: "Twin's Incorrect Assumptions", items: data.twin_incorrect_assumptions, color: '#ef4444' },
+              { title: 'Newly Learned Patterns',   items: data.newly_learned_patterns, color: '#818cf8' },
             ].filter(s => s.items.length > 0).map(section => (
               <div key={section.title} style={{ padding: '0.9rem', background: `${section.color}06`, border: `1px solid ${section.color}20`, borderRadius: '14px' }}>
                 <p style={{ margin: '0 0 0.6rem', fontSize: '0.72rem', fontWeight: 700, color: section.color }}>{section.title}</p>

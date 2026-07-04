@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+﻿import { useEffect, useState, useMemo } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -29,16 +29,16 @@ const RARITY_META: Record<string, { label: string; color: string; glow: string }
 const RARITY_ORDER: Record<string, number> = { legendary: 4, epic: 3, rare: 2, common: 1 };
 
 const CATEGORY_META: Record<string, { label: string; icon: string; color: string }> = {
-  onboarding: { label: 'Onboarding', icon: '🌱', color: '#10b981' },
-  sessions:   { label: 'Sessions',   icon: '⏱️',  color: '#00D4FF' },
-  quiz:       { label: 'Quiz',       icon: '📝',  color: '#7C3AED' },
-  streaks:    { label: 'Streaks',    icon: '🔥',  color: '#f59e0b' },
-  materials:  { label: 'Materials',  icon: '📚',  color: '#34d399' },
-  ai:         { label: 'AI',         icon: '🤖',  color: '#6366f1' },
-  progress:   { label: 'Progress',   icon: '📊',  color: '#3b82f6' },
-  social:     { label: 'Social',     icon: '⚔️',  color: '#f43f5e' },
-  mastery:    { label: 'Mastery',    icon: '🏆',  color: '#eab308' },
-  hidden:     { label: 'Secrets',    icon: '🔮',  color: '#8b5cf6' },
+  onboarding: { label: 'Onboarding', icon: 'ON', color: '#10b981' },
+  sessions:   { label: 'Sessions',   icon: 'TM',  color: '#00D4FF' },
+  quiz:       { label: 'Quiz',       icon: 'QZ', color: '#7C3AED' },
+  streaks:    { label: 'Streaks',    icon: 'SK', color: '#f59e0b' },
+  materials:  { label: 'Materials',  icon: 'MT', color: '#34d399' },
+  ai:         { label: 'AI',         icon: 'AI', color: '#6366f1' },
+  progress:   { label: 'Progress',   icon: 'PR', color: '#3b82f6' },
+  social:     { label: 'Social',     icon: 'SC', color: '#f43f5e' },
+  mastery:    { label: 'Mastery',    icon: 'MS', color: '#eab308' },
+  hidden:     { label: 'Secrets',    icon: '?',  color: '#8b5cf6' },
 };
 
 const CATEGORY_TABS = ['all', 'onboarding', 'sessions', 'quiz', 'streaks', 'materials', 'ai', 'progress', 'social', 'mastery', 'hidden'];
@@ -60,7 +60,7 @@ function NewBadgeBanner({ badges, onDismiss }: { badges: Achievement[]; onDismis
         : 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(0,212,255,0.06))',
     }} className="animate-fade-in">
       <div style={nb.left}>
-        <span style={{ fontSize: '1.5rem' }}>{isLegendary ? '🎊' : '🎉'}</span>
+        <span style={{ fontSize: '1.5rem' }}>{isLegendary ? 'LEGEND' : 'NEW'}</span>
         <div>
           <p style={nb.title}>
             {badges.length === 1
@@ -72,7 +72,7 @@ function NewBadgeBanner({ badges, onDismiss }: { badges: Achievement[]; onDismis
           )}
         </div>
       </div>
-      <button onClick={onDismiss} style={nb.dismiss}>✕</button>
+      <button onClick={onDismiss} style={nb.dismiss}></button>
     </div>
   );
 }
@@ -107,7 +107,7 @@ function NextGoalPanel({ badges }: { badges: Achievement[] }) {
 
   return (
     <div style={ng.wrap}>
-      <p style={ng.title}>🎯 Next Goals</p>
+      <p style={ng.title}> Next Goals</p>
       <div style={ng.list}>
         {candidates.map(b => {
           const rm = RARITY_META[b.rarity];
@@ -199,8 +199,8 @@ function BadgeCard({ badge, isNew }: { badge: Achievement; isNew: boolean }) {
         filter: !badge.earned ? 'grayscale(0.7)' : 'none',
         opacity: !badge.earned ? (isSecret ? 0.35 : 0.5) : 1,
       }}>
-        <span style={bc.icon}>{isSecret ? '❓' : badge.icon}</span>
-        {!badge.earned && !isSecret && <span style={bc.lockOverlay}>🔒</span>}
+        <span style={bc.icon}>{isSecret ? '' : badge.icon}</span>
+        {!badge.earned && !isSecret && <span style={bc.lockOverlay}></span>}
       </div>
 
       {/* Name */}
@@ -232,10 +232,10 @@ function BadgeCard({ badge, isNew }: { badge: Achievement; isNew: boolean }) {
       {/* Status chip */}
       {badge.earned ? (
         <div style={{ ...bc.earnedChip, borderColor: rm.color + '55', color: rm.color, background: rm.color + '14' }}>
-          ✓ Earned{badge.earned_at ? ` · ${formatDate(badge.earned_at)}` : ''}
+           Earned{badge.earned_at ? ` · ${formatDate(badge.earned_at)}` : ''}
         </div>
       ) : isSecret ? (
-        <div style={bc.secretChip}>🔮 Secret Achievement</div>
+        <div style={bc.secretChip}> Secret Achievement</div>
       ) : (
         <div style={bc.lockedChip}>
           <span style={{ color: rm.color, fontWeight: 800 }}>+{badge.xp_reward} XP</span>
@@ -456,7 +456,7 @@ export default function Achievements() {
         <div className="ach-tabs" style={s.tabs}>
           {CATEGORY_TABS.map(cat => {
             const meta = cat === 'all'
-              ? { label: 'All', icon: '✨' }
+              ? { label: 'All', icon: '' }
               : CATEGORY_META[cat];
             const active = category === cat;
             const catCount = cat === 'all'
@@ -488,7 +488,7 @@ export default function Achievements() {
         {/* ── Search + Sort ── */}
         <div style={s.controlRow}>
           <div style={s.searchWrap}>
-            <span style={s.searchIcon}>🔍</span>
+            <span style={s.searchIcon}></span>
             <input
               type="text"
               placeholder="Search achievements…"
@@ -497,7 +497,7 @@ export default function Achievements() {
               style={s.searchInput}
             />
             {search && (
-              <button onClick={() => setSearch('')} style={s.searchClear}>✕</button>
+              <button onClick={() => setSearch('')} style={s.searchClear}></button>
             )}
           </div>
 
@@ -529,7 +529,7 @@ export default function Achievements() {
           </div>
         ) : filtered.length === 0 && unearnedSecrets.length === 0 ? (
           <div style={s.empty}>
-            <p style={s.emptyIcon}>🔍</p>
+            <p style={s.emptyIcon}></p>
             <p style={s.emptyText}>No achievements match your search.</p>
           </div>
         ) : (
@@ -546,7 +546,7 @@ export default function Achievements() {
             {unearnedSecrets.length > 0 && (
               <div style={{ marginTop: '2rem' }}>
                 <div style={s.sectionHeader}>
-                  <span>🔮</span>
+                  <span></span>
                   <p style={s.sectionTitle}>Secret Achievements</p>
                   <span style={s.sectionBadge}>{unearnedSecrets.length} hidden</span>
                 </div>

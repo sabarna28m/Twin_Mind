@@ -1,4 +1,4 @@
-import { createContext, useContext, useLayoutEffect, useState } from 'react';
+﻿import { createContext, useContext, useLayoutEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 export type ThemeId =
@@ -25,7 +25,7 @@ export const THEMES: ThemeMeta[] = [
   {
     id: 'galaxy-nexus',
     name: 'Galaxy Nexus',
-    icon: '🌌',
+    icon: '',
     tagline: 'Futuristic AI OS',
     description: 'Deep space nebula, moving stars, neon holographics',
     isDark: true,
@@ -34,7 +34,7 @@ export const THEMES: ThemeMeta[] = [
   {
     id: 'sakura-dream',
     name: 'Sakura Dream',
-    icon: '🌸',
+    icon: '',
     tagline: 'Calm & focused',
     description: 'Cherry blossoms, rose-gold glow, soft petals',
     isDark: true,
@@ -43,7 +43,7 @@ export const THEMES: ThemeMeta[] = [
   {
     id: 'inferno',
     name: 'Inferno',
-    icon: '🔥',
+    icon: '',
     tagline: 'High-performance mode',
     description: 'Fire particles, energy sparks, amber glow',
     isDark: true,
@@ -52,7 +52,7 @@ export const THEMES: ThemeMeta[] = [
   {
     id: 'arctic-aurora',
     name: 'Arctic Aurora',
-    icon: '❄️',
+    icon: '',
     tagline: 'Clean & intelligent',
     description: 'Northern lights, frost glass, snow particles',
     isDark: true,
@@ -61,7 +61,7 @@ export const THEMES: ThemeMeta[] = [
   {
     id: 'nature-pulse',
     name: 'Nature Pulse',
-    icon: '🌲',
+    icon: '',
     tagline: 'Growth & development',
     description: 'Forest canopy, floating leaves, organic flow',
     isDark: true,
@@ -70,7 +70,7 @@ export const THEMES: ThemeMeta[] = [
   {
     id: 'cyberpunk-neo',
     name: 'Cyberpunk Neo',
-    icon: '🤖',
+    icon: '',
     tagline: 'Next-gen AI lab',
     description: 'Digital rain, cyber grid, neon holographic panels',
     isDark: true,
@@ -79,7 +79,7 @@ export const THEMES: ThemeMeta[] = [
   {
     id: 'ocean-intelligence',
     name: 'Ocean Intelligence',
-    icon: '🌊',
+    icon: '',
     tagline: 'Deep thinking & reflection',
     description: 'Rising bubbles, bioluminescence, ocean depth glow',
     isDark: true,
@@ -88,7 +88,7 @@ export const THEMES: ThemeMeta[] = [
   {
     id: 'neural-brain',
     name: 'Neural Brain',
-    icon: '🧠',
+    icon: '',
     tagline: 'Inside your Digital Twin',
     description: 'Live neural network, synapse pulses, knowledge flow',
     isDark: true,

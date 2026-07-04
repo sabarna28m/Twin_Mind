@@ -16,13 +16,13 @@ const PRESETS = [
 ] as const;
 
 const COACH_MSGS = {
-  ready:     ['Set a title, choose a subject, and enter the zone. 🎯',
+  ready:     ['Set a title, choose a subject, and enter the zone.',
               'Deep work begins with a single session. Ready when you are.'],
   start:     ['Great start! Your brain is warming up — stay with it.',
               'Focus session initiated. Tracking your progress.'],
   min5:      ['First 5 minutes done. Deep focus kicks in now — keep going.',
               'You\'re entering the flow state. This is where real learning happens!'],
-  min15:     ['15 minutes of deep focus. You\'re in the zone. 🔥',
+  min15:     ['15 minutes of deep focus. You\'re in the zone.',
               'Flow state achieved. Excellent concentration — don\'t stop!'],
   min25:     ['25 minutes! Pomodoro complete. Take a 5-minute break.',
               'Excellent deep work session. Your brain is absorbing information well.'],
@@ -32,8 +32,8 @@ const COACH_MSGS = {
               'World-class focus for 60 minutes. Rest first.'],
   paused:    ['Session paused. Breathe. Resume when ready — I\'ll be here.',
               'Take a moment, then come back stronger. You\'re doing great.'],
-  completed: ['🎉 Session complete! You crushed it. Saved to your history.',
-              '✅ Excellent work! Your focus score is looking strong today.'],
+  completed: ['Session complete! You crushed it. Saved to your history.',
+              'Excellent work! Your focus score is looking strong today.'],
 };
 
 type Status = 'ready' | 'running' | 'paused' | 'completed';
@@ -177,7 +177,7 @@ export default function SessionTimer({ subjects, onComplete }: Props) {
     setShowDone(true);
 
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      new Notification('Focus Session Complete! 🎉', {
+      new Notification('Focus Session Complete!', {
         body: `${sessionTitle || 'Focus Session'} — ${fmtDuration(startDurRef.current)} of deep work.`,
       });
     }
@@ -233,7 +233,7 @@ export default function SessionTimer({ subjects, onComplete }: Props) {
       {/* Completion banner */}
       {showDone && (
         <div style={s.doneBanner} className="animate-slide-up">
-          ✅ {saving ? 'Saving session…' : 'Session saved!'} Great work!
+          {saving ? 'Saving session…' : 'Session saved!'} Great work!
         </div>
       )}
 

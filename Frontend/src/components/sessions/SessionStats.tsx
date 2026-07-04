@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+import { Clock, CheckCircle, BarChart2, Flame, Trophy, Target } from 'lucide-react';
 import type { Session } from '../../types/sessions';
 
 interface Props { sessions: Session[]; }
@@ -50,13 +52,13 @@ export default function SessionStats({ sessions }: Props) {
     ? Math.round((completed.length / sessions.length) * 100)
     : 0;
 
-  const stats = [
-    { icon: '⏱', value: totalHours, unit: 'h', label: 'Total Hours',    color: '#00D4FF' },
-    { icon: '✅', value: String(completed.length), unit: '', label: 'Sessions Done', color: '#10b981' },
-    { icon: '📊', value: avgMins > 0 ? `${avgMins}m` : '—', unit: '', label: 'Avg Duration', color: '#f59e0b' },
-    { icon: '🔥', value: String(streak),  unit: 'd', label: 'Streak',     color: '#ef4444' },
-    { icon: '🏆', value: String(longest), unit: 'd', label: 'Best Streak', color: '#a78bfa' },
-    { icon: '🎯', value: `${compRate}%`, unit: '', label: 'Completion',   color: '#34d399' },
+  const stats: { icon: ReactNode; value: string; unit: string; label: string; color: string }[] = [
+    { icon: <Clock size={18} />,       value: totalHours, unit: 'h', label: 'Total Hours',    color: '#00D4FF' },
+    { icon: <CheckCircle size={18} />, value: String(completed.length), unit: '', label: 'Sessions Done', color: '#10b981' },
+    { icon: <BarChart2 size={18} />,   value: avgMins > 0 ? `${avgMins}m` : '—', unit: '', label: 'Avg Duration', color: '#f59e0b' },
+    { icon: <Flame size={18} />,       value: String(streak),  unit: 'd', label: 'Streak',     color: '#ef4444' },
+    { icon: <Trophy size={18} />,      value: String(longest), unit: 'd', label: 'Best Streak', color: '#a78bfa' },
+    { icon: <Target size={18} />,      value: `${compRate}%`, unit: '', label: 'Completion',   color: '#34d399' },
   ];
 
   return (
@@ -65,7 +67,7 @@ export default function SessionStats({ sessions }: Props) {
       <div style={s.grid}>
         {stats.map(st => (
           <div key={st.label} style={s.cell} className="glass-panel">
-            <span style={s.icon}>{st.icon}</span>
+            <span style={{ ...s.icon, display: 'flex', color: st.color }}>{st.icon}</span>
             <p style={{ ...s.val, color: st.color }}>{st.value}{st.unit}</p>
             <p style={s.lbl}>{st.label}</p>
           </div>

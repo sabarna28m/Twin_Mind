@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { User } from 'lucide-react';
 
 export default function FocusZoneHero() {
   return (
@@ -39,8 +40,8 @@ export default function FocusZoneHero() {
             ))}
           </div>
           <div style={fz.btnRow}>
-            <Link to="/ai-focus" style={fz.primaryBtn}>👁 Start AI Focus Session</Link>
-            <Link to="/focus"    style={fz.secondaryBtn}>⏱ Classic Timer</Link>
+            <Link to="/ai-focus" style={fz.primaryBtn}>Start AI Focus Session</Link>
+            <Link to="/focus"    style={fz.secondaryBtn}>Classic Timer</Link>
           </div>
         </div>
 
@@ -55,7 +56,7 @@ export default function FocusZoneHero() {
 
             {/* Camera frame */}
             <div style={fz.camFrame}>
-              <span style={{ fontSize: '2.75rem', opacity: 0.25 }}>👤</span>
+              <User size={44} style={{ opacity: 0.25, color: '#00D4FF' }} />
               {/* Focus rings */}
               <div style={fz.ring1} />
               <div style={fz.ring2} />

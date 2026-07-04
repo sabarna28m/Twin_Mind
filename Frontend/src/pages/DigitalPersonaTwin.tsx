@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+﻿import { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -243,11 +243,11 @@ function EmptyState({ twin, profile, subjects, learningData }: { twin:TwinState|
   const done = items.filter(i => i.done).length;
   return (
     <div style={{ ...C, padding:'1.75rem', background:'rgba(99,102,241,0.04)', border:'1px solid rgba(99,102,241,0.18)' }}>
-      <SectionHead icon="🏗️" title="Your Twin is Still Learning" desc={`Complete ${items.length-done} more step${items.length-done!==1?'s':''} to fully activate your Digital Persona Twin.`} color="#6366f1" />
+      <SectionHead icon="" title="Your Twin is Still Learning" desc={`Complete ${items.length-done} more step${items.length-done!==1?'s':''} to fully activate your Digital Persona Twin.`} color="#6366f1" />
       <div style={{ display:'flex', flexDirection:'column', gap:'0.45rem', marginBottom:'1rem' }}>
         {items.map(item => (
           <div key={item.label} className="dpt-checklist-item" style={{ display:'flex', alignItems:'center', gap:'0.75rem', padding:'0.6rem 0.85rem', background:`rgba(255,255,255,${item.done?'0.04':'0.02'})`, border:`1px solid ${item.done?'rgba(16,185,129,0.2)':'rgba(255,255,255,0.06)'}`, borderRadius:11 }}>
-            <span style={{ fontSize:'0.95rem', flexShrink:0 }}>{item.done?'✅':'☐'}</span>
+            <span style={{ fontSize:'0.95rem', flexShrink:0 }}>{item.done?'':''}</span>
             <span className={item.done ? 'dpt-todo-text dpt-todo-done' : 'dpt-todo-text'} style={{ fontSize:'0.8rem', color:item.done?'#34d399':'#94a3b8', fontWeight:item.done?700:500, textDecoration:item.done?'line-through':'none', opacity:item.done?0.75:1 }}>{item.label}</span>
           </div>
         ))}
@@ -341,10 +341,10 @@ function HeroSection({ fid, twin, user, onNavigate }: {
               ◈ Ask My Twin
             </button>
             <button onClick={()=>onNavigate('overview')} className="dpt-btn-ghost" style={{ padding:'0.65rem 1.2rem', borderRadius:12, background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.28)', color:'#818cf8', fontWeight:700, fontSize:'0.82rem', cursor:'pointer', fontFamily:'inherit' }}>
-              🏗️ Build My Twin
+               Build My Twin
             </button>
             <Link to="/twin" className="dpt-link-btn" style={{ padding:'0.65rem 1.2rem', borderRadius:12, background: '#f8f9fa', border: '1px solid #e2e8f0', color: '#475569', fontWeight:600, fontSize:'0.82rem', textDecoration:'none', display:'flex', alignItems:'center', gap:'0.35rem' }}>
-              📊 Evolution Dashboard
+               Evolution Dashboard
             </Link>
           </div>
         </div>
@@ -390,15 +390,15 @@ type DPTTab = 'overview' | 'identity' | 'persona' | 'memory' | 'graph' | 'intell
 
 const TABS: {key:DPTTab; icon:string; label:string; color:string}[] = [
   {key:'overview',     icon:'◈',  label:'Overview',       color: '#0052cc'},
-  {key:'identity',     icon:'🧬', label:'Identity',       color:'#06b6d4'},
-  {key:'persona',      icon:'🧠', label:'Persona',        color: '#0052cc'},
-  {key:'memory',       icon:'💾', label:'Memory',         color:'#f59e0b'},
-  {key:'graph',        icon:'🕸️', label:'Knowledge Graph',color:'#10b981'},
-  {key:'intelligence', icon:'🔮', label:'Intelligence',   color:'#ec4899'},
-  {key:'privacy',      icon:'🔒', label:'Privacy',        color: '#475569'},
-  {key:'evolution',    icon:'📈', label:'Evolution',      color:'#818cf8'},
-  {key:'comparison',   icon:'⚖️', label:'Comparison',     color:'#34d399'},
-  {key:'simulator',    icon:'🎯', label:'Decision Sim',   color:'#a78bfa'},
+  {key:'identity',     icon:'', label:'Identity',       color:'#06b6d4'},
+  {key:'persona',      icon:'', label:'Persona',        color: '#0052cc'},
+  {key:'memory',       icon:'', label:'Memory',         color:'#f59e0b'},
+  {key:'graph',        icon:'', label:'Knowledge Graph',color:'#10b981'},
+  {key:'intelligence', icon:'', label:'Intelligence',   color:'#ec4899'},
+  {key:'privacy',      icon:'', label:'Privacy',        color: '#475569'},
+  {key:'evolution',    icon:'', label:'Evolution',      color:'#818cf8'},
+  {key:'comparison',   icon:'', label:'Comparison',     color:'#34d399'},
+  {key:'simulator',    icon:'', label:'Decision Sim',   color:'#a78bfa'},
 ];
 
 function TabBar({ active, setActive, sticky=false }: { active:DPTTab; setActive:(t:DPTTab)=>void; sticky?:boolean }) {
@@ -450,7 +450,7 @@ function BuildMyTwinPanel({ profile, onSave }: { profile:DPTProfile; onSave:(p:D
     return (
       <div style={{ ...C, border:'1px solid rgba(16,185,129,0.2)', background:'rgba(16,185,129,0.04)' }}>
         <div style={{ display:'flex', gap:'1rem', alignItems:'center' }}>
-          <span style={{ fontSize:'2.5rem' }}>✅</span>
+          <span style={{ fontSize:'2.5rem' }}></span>
           <div>
             <p style={{ margin:0, fontSize:'1rem', fontWeight:800, color:'#10b981' }}>Interview Complete — Twin Calibrated</p>
             <p style={{ margin:'0.2rem 0 0', fontSize:'0.78rem', color: '#64748b' }}>Your Digital Persona Twin profile has been fully calibrated. Fidelity improves continuously as you use the platform.</p>
@@ -489,7 +489,7 @@ function BuildMyTwinPanel({ profile, onSave }: { profile:DPTProfile; onSave:(p:D
 
   return (
     <div style={{ ...C, border:'1px solid rgba(99,102,241,0.22)' }}>
-      <SectionHead icon="🏗️" title="Build My Twin" desc="Answer questions to calibrate your Digital Persona Twin. Each answer improves fidelity and personalises all predictions and simulations." color="#6366f1" badge={`${pct}%`} />
+      <SectionHead icon="" title="Build My Twin" desc="Answer questions to calibrate your Digital Persona Twin. Each answer improves fidelity and personalises all predictions and simulations." color="#6366f1" badge={`${pct}%`} />
       <div style={{ marginBottom:'1.25rem' }}>
         <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'0.35rem' }}>
           <span style={{ fontSize:'0.7rem', color: '#64748b', fontWeight:600 }}>{answered.length}/{INTERVIEW.length} questions answered</span>
@@ -505,7 +505,7 @@ function BuildMyTwinPanel({ profile, onSave }: { profile:DPTProfile; onSave:(p:D
             const q=INTERVIEW.find(i=>i.id===id);
             return q?(
               <div key={id} style={{ marginBottom:'0.3rem', fontSize:'0.7rem', color: '#64748b', display:'flex', gap:'0.4rem' }}>
-                <span style={{ color:'#34d399', flexShrink:0 }}>✓</span>
+                <span style={{ color:'#34d399', flexShrink:0 }}></span>
                 <span><strong style={{ color: '#64748b' }}>{q.category}:</strong> <span style={{ color:'#818cf8' }}>{profile.interview.answers[id]?.slice(0,50)}{profile.interview.answers[id]?.length>50?'…':''}</span></span>
               </div>
             ):null;
@@ -548,7 +548,7 @@ function IdentityTab({ profile, user }: { profile:DPTProfile; user:{full_name?:s
   const p=profile.identity, ia=profile.interview.answers;
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
-      <SectionHead icon="🧬" title="Identity Model" desc="Your core identity profile — personal goals, career aspirations, interests, and values, built from your interview answers and platform activity." color="#06b6d4" />
+      <SectionHead icon="" title="Identity Model" desc="Your core identity profile — personal goals, career aspirations, interests, and values, built from your interview answers and platform activity." color="#06b6d4" />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.25rem' }}>
         <div style={C}>
           <div style={{ display:'flex', alignItems:'center', gap:'0.85rem', marginBottom:'1.1rem', padding:'0.85rem', background:'rgba(6,182,212,0.07)', border:'1px solid rgba(6,182,212,0.18)', borderRadius:14 }}>
@@ -600,11 +600,11 @@ function PersonaTab({ profile, twin, burnout, learningData, streakData, progress
   const ia=profile.interview.answers, streak=streakData?.streak_days??0;
   const noteSessions=learningData.filter(d=>d.notes_created>0).length, total=learningData.length;
   const THINK: Record<string,{icon:string;color:string;desc:string}> = {
-    analytical:{icon:'📊',color: '#0052cc',desc:'You rely on data, logic, and systematic reasoning. You prefer to analyse before acting.'},
-    practical: {icon:'🔧',color:'#06b6d4',desc:'You focus on real-world solutions. Efficiency and pragmatism drive your decisions.'},
-    creative:  {icon:'💡',color:'#f59e0b',desc:'You think innovatively, connect ideas across domains, and enjoy exploring novel solutions.'},
-    strategic: {icon:'♟️',color: '#0052cc',desc:'You see the big picture. Long-term planning and systems thinking define your approach.'},
-    mixed:     {icon:'🔄',color:'#10b981',desc:'You adapt your thinking style to context. Versatile and flexible across domains.'},
+    analytical:{icon:'',color: '#0052cc',desc:'You rely on data, logic, and systematic reasoning. You prefer to analyse before acting.'},
+    practical: {icon:'',color:'#06b6d4',desc:'You focus on real-world solutions. Efficiency and pragmatism drive your decisions.'},
+    creative:  {icon:'',color:'#f59e0b',desc:'You think innovatively, connect ideas across domains, and enjoy exploring novel solutions.'},
+    strategic: {icon:'',color: '#0052cc',desc:'You see the big picture. Long-term planning and systems thinking define your approach.'},
+    mixed:     {icon:'',color:'#10b981',desc:'You adapt your thinking style to context. Versatile and flexible across domains.'},
   };
   const tk=profile.cognitive.thinkingStyle, tm=THINK[tk];
   const P={
@@ -628,10 +628,10 @@ function PersonaTab({ profile, twin, burnout, learningData, streakData, progress
   const ds=SM[lStyle]??(noteSessions>total*0.6?'Reading Learner':total>5?'Practice Learner':'Mixed Learner');
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
-      <SectionHead icon="🧠" title="Persona Model" desc="How your twin understands your personality, cognitive style, communication patterns, and emotional state." color="#8b5cf6" />
+      <SectionHead icon="" title="Persona Model" desc="How your twin understands your personality, cognitive style, communication patterns, and emotional state." color="#8b5cf6" />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.25rem' }}>
         <div style={C}>
-          <p style={{ margin:'0 0 0.85rem', fontSize:'0.8rem', fontWeight:800, color: '#0f172a' }}>🧬 Cognitive Profile</p>
+          <p style={{ margin:'0 0 0.85rem', fontSize:'0.8rem', fontWeight:800, color: '#0f172a' }}> Cognitive Profile</p>
           <div style={{ padding:'0.85rem 1rem', background:`${tm.color}0d`, border:`1px solid ${tm.color}25`, borderRadius:14, marginBottom:'1rem', display:'flex', gap:'0.75rem' }}>
             <span style={{ fontSize:'1.5rem' }}>{tm.icon}</span>
             <div>
@@ -645,13 +645,13 @@ function PersonaTab({ profile, twin, burnout, learningData, streakData, progress
           {!ia.thinking_style && <p style={{ color:'#334155', fontSize:'0.78rem', marginTop:'0.5rem' }}>Answer the thinking style question to calibrate your cognitive model.</p>}
         </div>
         <div style={C}>
-          <p style={{ margin:'0 0 0.85rem', fontSize:'0.8rem', fontWeight:800, color: '#0f172a' }}>⚡ Personality Traits (0–100)</p>
+          <p style={{ margin:'0 0 0.85rem', fontSize:'0.8rem', fontWeight:800, color: '#0f172a' }}> Personality Traits (0–100)</p>
           {Object.entries(P).map(([trait,score])=><ScoreBar key={trait} label={trait} value={score} color={PC[trait]??'#6366f1'} />)}
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.25rem' }}>
         <div style={C}>
-          <p style={{ margin:'0 0 0.85rem', fontSize:'0.8rem', fontWeight:800, color: '#0f172a' }}>💭 Emotional State <span style={{ fontSize:'0.6rem', color:'#334155', fontStyle:'italic' }}>(confidence estimates)</span></p>
+          <p style={{ margin:'0 0 0.85rem', fontSize:'0.8rem', fontWeight:800, color: '#0f172a' }}> Emotional State <span style={{ fontSize:'0.6rem', color:'#334155', fontStyle:'italic' }}>(confidence estimates)</span></p>
           <ScoreBar label="Motivation Level"  value={mot} color="#f59e0b" />
           <ScoreBar label="Engagement Level"  value={eng} color="#6366f1" />
           <ScoreBar label="Focus Probability" value={fs}  color="#10b981" />
@@ -659,7 +659,7 @@ function PersonaTab({ profile, twin, burnout, learningData, streakData, progress
           {burnout && <ScoreBar label="Burnout Pressure" value={burnout.burnout_score} color={burnout.risk_level==='high'?'#ef4444':burnout.risk_level==='medium'?'#f59e0b':'#10b981'} note={burnout.risk_level.toUpperCase()} />}
         </div>
         <div style={C}>
-          <p style={{ margin:'0 0 0.85rem', fontSize:'0.8rem', fontWeight:800, color: '#0f172a' }}>📚 Communication & Learning</p>
+          <p style={{ margin:'0 0 0.85rem', fontSize:'0.8rem', fontWeight:800, color: '#0f172a' }}> Communication & Learning</p>
           <div style={{ marginBottom:'1rem', padding:'0.65rem 1rem', background:'rgba(139,92,246,0.08)', border:'1px solid rgba(139,92,246,0.2)', borderRadius:13 }}>
             <p style={LB}>Detected Learning Style</p>
             <p style={{ margin:0, fontSize:'1rem', fontWeight:800, color:'#c4b5fd' }}>{ds}</p>
@@ -682,11 +682,11 @@ function PersonaTab({ profile, twin, burnout, learningData, streakData, progress
 function MemoryTab({ profile, twin, progress, streakData }:
   { profile:DPTProfile; twin:TwinState|null; progress:GamificationProgress|null; streakData:StreakStatus|null }) {
   const TC: Record<DPTMemory['type'],{icon:string;color:string;label:string}> = {
-    semantic:   {icon:'🧠',color: '#0052cc',label:'Semantic — Facts about you'},
-    preference: {icon:'⭐',color:'#f59e0b',label:'Preference — Likes & dislikes'},
-    goal:       {icon:'🎯',color:'#10b981',label:'Goal — Objectives & progress'},
-    experience: {icon:'📖',color:'#f97316',label:'Experience — Events & milestones'},
-    learning:   {icon:'📚',color:'#06b6d4',label:'Learning — Academic history'},
+    semantic:   {icon:'',color: '#0052cc',label:'Semantic — Facts about you'},
+    preference: {icon:'',color:'#f59e0b',label:'Preference — Likes & dislikes'},
+    goal:       {icon:'',color:'#10b981',label:'Goal — Objectives & progress'},
+    experience: {icon:'',color:'#f97316',label:'Experience — Events & milestones'},
+    learning:   {icon:'',color:'#06b6d4',label:'Learning — Academic history'},
   };
   const auto: DPTMemory[] = [];
   if (twin?.data_points) auto.push({id:'a_dp',type:'learning',content:`${twin.data_points} learning sessions logged. Academic score: ${Math.round(twin.overall_score)}/100.`,date:new Date().toISOString().slice(0,10),category:'Learning History'});
@@ -698,7 +698,7 @@ function MemoryTab({ profile, twin, progress, streakData }:
   const byType=(Object.keys(TC) as DPTMemory['type'][]).reduce((acc,t)=>{ acc[t]=all.filter(m=>m.type===t); return acc; }, {} as Record<string,DPTMemory[]>);
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
-      <SectionHead icon="💾" title="Memory System" desc="Your twin's long-term memory — semantic facts, preferences, goals, experiences, and learning history stored across 5 memory types." color="#f59e0b" />
+      <SectionHead icon="" title="Memory System" desc="Your twin's long-term memory — semantic facts, preferences, goals, experiences, and learning history stored across 5 memory types." color="#f59e0b" />
       <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:'0.6rem' }}>
         {(Object.entries(TC) as [DPTMemory['type'],typeof TC[DPTMemory['type']]][]).map(([type,cfg])=>(
           <div key={type} style={{ padding:'0.85rem', background:`${cfg.color}0a`, border:`1px solid ${cfg.color}1e`, borderRadius:14, textAlign:'center' as const }}>
@@ -771,7 +771,7 @@ function KnowledgeGraphTab({ profile, twin, subjects, progress }:
   if(progress&&progress.level>1) place([`Level ${progress.level}`],'achievement','#f97316',205,12);
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
-      <SectionHead icon="🕸️" title="Knowledge Graph" desc="A dynamic graph connecting your identity, goals, subjects, skills, habits, and achievements. Updates automatically as you log data." color="#10b981" />
+      <SectionHead icon="" title="Knowledge Graph" desc="A dynamic graph connecting your identity, goals, subjects, skills, habits, and achievements. Updates automatically as you log data." color="#10b981" />
       <div style={C}>
         <div style={{ position:'relative', overflow:'hidden', borderRadius:14, background: '#ffffff', border: '1px solid #e2e8f0' }}>
           <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display:'block' }}>
@@ -812,9 +812,9 @@ function IntelligenceTab({ profile, twin, subjects, burnout, streakData }:
     if(ql.includes('career')||ql.includes('enjoy')&&ql.includes('field'))
       return `◈ Persona Simulation: Career Fit Analysis\n\nBased on your ${tk} thinking style and interests in "${ia.interests??subjects?.strongest?.subject??'your field'}":\n\n• Best-fit roles: Careers requiring ${tk==='analytical'?'systematic problem-solving and data analysis':tk==='practical'?'hands-on execution and real-world impact':tk==='creative'?'innovation, design, and novel thinking':'strategic planning and systems oversight'}.\n• Values fit: You prioritise "${ia.values??'growth'}" — seek organisations that reflect this.\n• Confidence: ${twin?`Academic score ${Math.round(twin.academic_score)}/100 suggests ${twin.academic_score>=70?'strong preparation':'continued growth needed'} for your target field.`:'Log more data for career confidence score.'}`;
     if(ql.includes('deadline')||ql.includes('pressure'))
-      return `◈ Persona Simulation: Deadline Response\n\nAs a ${tk} thinker, your deadline response:\n\n• Cognitive: ${tk==='analytical'?'Break task into prioritised components.':tk==='practical'?'Identify minimum viable work and execute immediately.':tk==='strategic'?'Zoom out to assess what matters most first.':'Adapt quickly to what the situation demands.'}\n• Stress management: "${sa}"\n• Burnout alert: ${burnout?.risk_level==='high'?'⚠️ HIGH burnout — performance under pressure may be reduced.':'✅ Manageable risk — you can handle this effectively.'}`;
+      return `◈ Persona Simulation: Deadline Response\n\nAs a ${tk} thinker, your deadline response:\n\n• Cognitive: ${tk==='analytical'?'Break task into prioritised components.':tk==='practical'?'Identify minimum viable work and execute immediately.':tk==='strategic'?'Zoom out to assess what matters most first.':'Adapt quickly to what the situation demands.'}\n• Stress management: "${sa}"\n• Burnout alert: ${burnout?.risk_level==='high'?'HIGH burnout — performance under pressure may be reduced.':'Manageable risk — you can handle this effectively.'}`;
     if((ql.includes('skip')||ql.includes('miss'))&&ql.includes('study'))
-      return `◈ Persona Simulation: Skip Studying Today\n\n${streak>0?`Your ${streak}-day streak is at immediate risk.`:''}\n\n• Academic: ~${Math.round(2.5+(twin?100-twin.consistency_score:20)*0.08)}% score drop projected within 3 days.\n• Pattern: ${fa.includes('Push')?'You recover well with an intense comeback session.':fa.includes('analyse')?'Your analytical nature will trigger a catch-up review tomorrow.':'You will feel compelled to over-compensate the next day.'}\n\n✅ Even 20 minutes prevents regression. Use Quick Quiz.`;
+      return `◈ Persona Simulation: Skip Studying Today\n\n${streak>0?`Your ${streak}-day streak is at immediate risk.`:''}\n\n• Academic: ~${Math.round(2.5+(twin?100-twin.consistency_score:20)*0.08)}% score drop projected within 3 days.\n• Pattern: ${fa.includes('Push')?'You recover well with an intense comeback session.':fa.includes('analyse')?'Your analytical nature will trigger a catch-up review tomorrow.':'You will feel compelled to over-compensate the next day.'}\n\nEven 20 minutes prevents regression. Use Quick Quiz.`;
     if(ql.includes('motivat')||ql.includes('keep going'))
       return `◈ Persona Simulation: Motivation Core\n\nYour primary motivation: "${ia.motivation??'your goals'}"\n\nWhen you want to give up, you re-engage when:\n${ia.motivation?.includes('Academic')?'• You see measurable progress — even a small score improvement reignites your drive.':ia.motivation?.includes('Career')?'• You reconnect with your career vision and the gap you need to close.':'• You find meaning in how your effort connects to a larger purpose.'}\n\n${ia.life_goal?`North star: "${ia.life_goal?.slice(0,60)}"`:'Complete the interview for personalised motivational guidance.'}`;
     const insight=twin?.ai_insights?.[Math.floor(Math.random()*Math.max(1,twin.ai_insights.length))]??`Twin has analysed ${twin?.data_points??0} data points.`;
@@ -832,16 +832,16 @@ function IntelligenceTab({ profile, twin, subjects, burnout, streakData }:
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.5rem' }}>
-      <SectionHead icon="🔮" title="Prediction Center" desc="AI-generated future outcome predictions with confidence percentages and risk assessments, derived from your behavioral patterns and twin model." color="#ec4899" />
+      <SectionHead icon="" title="Prediction Center" desc="AI-generated future outcome predictions with confidence percentages and risk assessments, derived from your behavioral patterns and twin model." color="#ec4899" />
       <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'0.85rem' }}>
-        <PredCard icon="🔥" label="Maintain streak this week"     prob={streakP}  conf={Math.min(95,50+streak*2)}   color="#f97316"  riskLevel={streakP<40?'high':streakP<65?'medium':'low'}  trend={streak>7?'up':'stable'} />
-        <PredCard icon="🎯" label="Achieve current goals"         prob={goalP}   conf={Math.round(predStr*0.85)}    color="#10b981"  riskLevel={goalP<40?'high':goalP<65?'medium':'low'}    trend={twin?.trend==='improving'?'up':twin?.trend==='declining'?'down':'stable'} />
-        <PredCard icon="🏆" label="Exam readiness"               prob={examP}   conf={Math.round(predStr*0.9)}     color="#6366f1"  riskLevel={examP<40?'high':examP<65?'medium':'low'}    trend={twin?.trend==='improving'?'up':'stable'} />
-        <PredCard icon="⚠️" label="Burnout risk (7 days)"        prob={burnoutP} conf={burnout?85:35}               color={burnoutP>55?'#ef4444':'#f59e0b'} riskLevel={burnoutP>60?'high':burnoutP>35?'medium':'low'} trend={burnout?.risk_level==='high'?'up':'stable'} />
-        <PredCard icon="📝" label="Expected quiz performance"    prob={twin?Math.min(97,Math.round(twin.academic_score*0.88+5)):50} conf={Math.round(predStr*0.8)} color="#8b5cf6" trend="stable" />
-        <PredCard icon="📚" label="Knowledge retention"         prob={twin?Math.round(twin.cognitive_heatmap?.memory_strength??twin.academic_score*0.85):40} conf={Math.round(predStr*0.75)} color="#06b6d4" trend={twin?.trend==='improving'?'up':'stable'} />
-        <PredCard icon="🚀" label="Productivity forecast"       prob={burnout?Math.round(Math.max(0,100-burnout.burnout_score*0.7)):60} conf={burnout?80:40} color="#10b981" riskLevel={burnout?.risk_level} trend="stable" />
-        <PredCard icon="💡" label="Goal completion likelihood"  prob={goalP}   conf={Math.round(predStr*0.8)}    color="#f59e0b"  trend={twin?.trend==='improving'?'up':'stable'} />
+        <PredCard icon="" label="Maintain streak this week"     prob={streakP}  conf={Math.min(95,50+streak*2)}   color="#f97316"  riskLevel={streakP<40?'high':streakP<65?'medium':'low'}  trend={streak>7?'up':'stable'} />
+        <PredCard icon="" label="Achieve current goals"         prob={goalP}   conf={Math.round(predStr*0.85)}    color="#10b981"  riskLevel={goalP<40?'high':goalP<65?'medium':'low'}    trend={twin?.trend==='improving'?'up':twin?.trend==='declining'?'down':'stable'} />
+        <PredCard icon="" label="Exam readiness"               prob={examP}   conf={Math.round(predStr*0.9)}     color="#6366f1"  riskLevel={examP<40?'high':examP<65?'medium':'low'}    trend={twin?.trend==='improving'?'up':'stable'} />
+        <PredCard icon="" label="Burnout risk (7 days)"        prob={burnoutP} conf={burnout?85:35}               color={burnoutP>55?'#ef4444':'#f59e0b'} riskLevel={burnoutP>60?'high':burnoutP>35?'medium':'low'} trend={burnout?.risk_level==='high'?'up':'stable'} />
+        <PredCard icon="" label="Expected quiz performance"    prob={twin?Math.min(97,Math.round(twin.academic_score*0.88+5)):50} conf={Math.round(predStr*0.8)} color="#8b5cf6" trend="stable" />
+        <PredCard icon="" label="Knowledge retention"         prob={twin?Math.round(twin.cognitive_heatmap?.memory_strength??twin.academic_score*0.85):40} conf={Math.round(predStr*0.75)} color="#06b6d4" trend={twin?.trend==='improving'?'up':'stable'} />
+        <PredCard icon="" label="Productivity forecast"       prob={burnout?Math.round(Math.max(0,100-burnout.burnout_score*0.7)):60} conf={burnout?80:40} color="#10b981" riskLevel={burnout?.risk_level} trend="stable" />
+        <PredCard icon="" label="Goal completion likelihood"  prob={goalP}   conf={Math.round(predStr*0.8)}    color="#f59e0b"  trend={twin?.trend==='improving'?'up':'stable'} />
       </div>
 
       {/* Ask My Twin */}
@@ -1219,7 +1219,7 @@ function EvoEvolutionDashboard({ twin }: { twin: TwinState }) {
           <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'0.7rem' }} className="mob-twin-row">
             {twin.ai_insights.map((insight, i) => (
               <div key={i} style={{ display:'flex', gap:'0.6rem', padding:'0.9rem', background:'rgba(129,140,248,0.12)', border:'1px solid rgba(129,140,248,0.28)', borderRadius:12 }}>
-                <span style={{ fontSize:'1rem', flexShrink:0, marginTop:1 }}>{i === 0 ? '🔮' : i === 1 ? '📊' : i === 2 ? '🎯' : '💡'}</span>
+                <span style={{ fontSize:'1rem', flexShrink:0, marginTop:1 }}>{i === 0 ? '' : i === 1 ? '' : i === 2 ? '' : ''}</span>
                 <p style={{ margin:0, fontSize:'0.82rem', color:'#E5E7EB', lineHeight:1.6 }}>{insight}</p>
               </div>
             ))}
@@ -1261,7 +1261,7 @@ function PrivacyTab({ profile, onReset }: { profile:DPTProfile; onReset:()=>void
   const DS=[{name:'Study Sessions',desc:'Session duration, hours, focus data'},{name:'Quiz Performance',desc:'Scores, accuracy, attempts'},{name:'Check-In Data',desc:'Mood, stress, wellness logs'},{name:'Streak Activity',desc:'Daily consistency tracking'},{name:'Achievement Data',desc:'XP, badges, level progress'},{name:'Interview Answers',desc:'Your Build My Twin responses'}];
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
-      <SectionHead icon="🔒" title="Privacy & Data Control" desc="View, manage, export, or delete all data used by your Digital Persona Twin. You remain in full control of your twin at all times." color="#94a3b8" />
+      <SectionHead icon="" title="Privacy & Data Control" desc="View, manage, export, or delete all data used by your Digital Persona Twin. You remain in full control of your twin at all times." color="#94a3b8" />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.25rem' }}>
         <div style={C}>
           <p style={{ margin:'0 0 0.85rem', fontSize:'0.8rem', fontWeight:800, color: '#0f172a' }}>Data Sources</p>
@@ -1285,10 +1285,10 @@ function PrivacyTab({ profile, onReset }: { profile:DPTProfile; onReset:()=>void
             <p style={{ margin:0, fontSize:'0.7rem', color: '#64748b', lineHeight:1.6 }}>Created: {profile.createdAt.slice(0,10)}<br/>Last updated: {profile.updatedAt.slice(0,10)}<br/>Interview: {Object.keys(profile.interview.answers).length}/{INTERVIEW.length} answered<br/>Memories: {profile.memories.length} stored</p>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:'0.6rem' }}>
-            <button onClick={exportProfile} style={{ padding:'0.65rem 1rem', borderRadius:11, background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.22)', color:'#818cf8', fontWeight:700, fontSize:'0.8rem', cursor:'pointer', fontFamily:'inherit', textAlign:'left' as const }}>📥 Export DPT Profile (JSON)</button>
-            <a href="/twin" style={{ padding:'0.65rem 1rem', borderRadius:11, background:'rgba(129,140,248,0.1)', border:'1px solid rgba(129,140,248,0.25)', color:'#a5b4fc', fontWeight:700, fontSize:'0.8rem', textDecoration:'none', display:'block' }}>📊 Evolution Dashboard →</a>
+            <button onClick={exportProfile} style={{ padding:'0.65rem 1rem', borderRadius:11, background:'rgba(99,102,241,0.1)', border:'1px solid rgba(99,102,241,0.22)', color:'#818cf8', fontWeight:700, fontSize:'0.8rem', cursor:'pointer', fontFamily:'inherit', textAlign:'left' as const }}> Export DPT Profile (JSON)</button>
+            <a href="/twin" style={{ padding:'0.65rem 1rem', borderRadius:11, background:'rgba(129,140,248,0.1)', border:'1px solid rgba(129,140,248,0.25)', color:'#a5b4fc', fontWeight:700, fontSize:'0.8rem', textDecoration:'none', display:'block' }}> Evolution Dashboard →</a>
             {!confirm?(
-              <button onClick={()=>setConfirm(true)} style={{ padding:'0.65rem 1rem', borderRadius:11, background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', color:'#f87171', fontWeight:700, fontSize:'0.8rem', cursor:'pointer', fontFamily:'inherit', textAlign:'left' as const }}>🗑️ Reset DPT Profile</button>
+              <button onClick={()=>setConfirm(true)} style={{ padding:'0.65rem 1rem', borderRadius:11, background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', color:'#f87171', fontWeight:700, fontSize:'0.8rem', cursor:'pointer', fontFamily:'inherit', textAlign:'left' as const }}> Reset DPT Profile</button>
             ):(
               <div style={{ padding:'0.85rem', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.28)', borderRadius:12 }}>
                 <p style={{ margin:'0 0 0.6rem', fontSize:'0.78rem', color:'#f87171', fontWeight:700 }}>Are you sure? This cannot be undone.</p>
@@ -1370,7 +1370,7 @@ export default function DigitalPersonaTwin() {
 
             {answered < 6 && (
               <div onClick={()=>setTab('overview')} style={{ cursor:'pointer', marginBottom:'1.25rem', padding:'0.85rem 1.2rem', background:'rgba(99,102,241,0.07)', border:'1px solid rgba(99,102,241,0.22)', borderRadius:14, display:'flex', alignItems:'center', gap:'0.75rem' }}>
-                <span style={{ fontSize:'1.1rem' }}>🏗️</span>
+                <span style={{ fontSize:'1.1rem' }}></span>
                 <div style={{ flex:1 }}>
                   <p style={{ margin:0, fontSize:'0.82rem', fontWeight:700, color:'#818cf8' }}>Your twin is calibrating — complete the Build My Twin interview</p>
                   <p style={{ margin:'0.1rem 0 0', fontSize:'0.7rem', color: '#64748b' }}>{answered}/{INTERVIEW.length} questions answered · {Math.round(answered/INTERVIEW.length*100)}% complete</p>
@@ -1386,11 +1386,11 @@ export default function DigitalPersonaTwin() {
                   <BuildMyTwinPanel profile={profile} onSave={saveAndPersist} />
                   {twin?.ai_insights?.length && (
                     <div style={C}>
-                      <SectionHead icon="💡" title="Latest AI Insights" desc="Real-time insights generated from your twin's analysis of your activity and performance." color="#f59e0b" />
+                      <SectionHead icon="" title="Latest AI Insights" desc="Real-time insights generated from your twin's analysis of your activity and performance." color="#f59e0b" />
                       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.7rem' }}>
                         {twin.ai_insights.slice(0,4).map((ins,i)=>(
                           <div key={i} style={{ padding:'0.8rem 0.95rem', background:'rgba(245,158,11,0.05)', border:'1px solid rgba(245,158,11,0.12)', borderRadius:13, display:'flex', gap:'0.55rem' }}>
-                            <span style={{ flexShrink:0, fontSize:'1rem' }}>{['🔮','📊','🎯','💡'][i]}</span>
+                            <span style={{ flexShrink:0, fontSize:'1rem' }}>{['','','',''][i]}</span>
                             <p style={{ margin:0, fontSize:'0.77rem', color: '#475569', lineHeight:1.6 }}>{ins}</p>
                           </div>
                         ))}

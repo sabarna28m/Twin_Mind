@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
@@ -361,8 +361,8 @@ export default function Mentor() {
 
     // Build display content shown in the chat bubble
     const displayParts: string[] = [];
-    if (hasFile  && attachedFile)  displayParts.push(`📎 ${attachedFile.name}`);
-    if (hasImage && attachedImage) displayParts.push(`🖼 ${attachedImage.name}`);
+    if (hasFile  && attachedFile)  displayParts.push(`[File] ${attachedFile.name}`);
+    if (hasImage && attachedImage) displayParts.push(`[Image] ${attachedImage.name}`);
     if (text.trim()) displayParts.push(text.trim());
 
     const history = messages.map(m => ({ role: m.role, content: m.content }));
@@ -680,9 +680,9 @@ export default function Mentor() {
                       <polyline points="21 15 16 10 5 21"/>
                     </svg>
                     <span style={mc.chipName}>
-                      {attachedImage.name}{attachedImage.fallback ? ' ⚠️' : ' ✓'}
+                      {attachedImage.name}{attachedImage.fallback ? ' ' : ' '}
                     </span>
-                    <button onClick={() => setAttachedImage(null)} style={mc.chipClose}>✕</button>
+                    <button onClick={() => setAttachedImage(null)} style={mc.chipClose}></button>
                   </div>
                 )}
                 {attachedFile && (
@@ -690,8 +690,8 @@ export default function Mentor() {
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                     </svg>
-                    <span style={mc.chipName}>{attachedFile.name} ✓</span>
-                    <button onClick={() => setAttachedFile(null)} style={mc.chipClose}>✕</button>
+                    <span style={mc.chipName}>{attachedFile.name} </span>
+                    <button onClick={() => setAttachedFile(null)} style={mc.chipClose}></button>
                   </div>
                 )}
               </div>
@@ -783,7 +783,7 @@ export default function Mentor() {
                   {' · '}{viewingSession.messages.length} messages · read-only
                 </p>
               </div>
-              <button onClick={() => setViewingSession(null)} style={mc.closeBtn}>✕</button>
+              <button onClick={() => setViewingSession(null)} style={mc.closeBtn}></button>
             </div>
             <div style={{ ...mc.modalBody, display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               {viewingSession.messages.map((m, i) => (
@@ -831,7 +831,7 @@ export default function Mentor() {
                 <p style={mc.modalTitle}>30-Day Study Plan</p>
                 <p style={mc.modalSub}>Personalized for {user?.full_name}</p>
               </div>
-              <button onClick={() => setShowPlan(false)} style={mc.closeBtn}>✕</button>
+              <button onClick={() => setShowPlan(false)} style={mc.closeBtn}></button>
             </div>
 
             <div style={mc.modalBody}>
@@ -869,7 +869,7 @@ export default function Mentor() {
                     cursor: (savingPlan || planSaved) ? 'default' : 'pointer',
                   }}
                 >
-                  {savingPlan ? 'Saving…' : planSaved ? 'Saved ✓' : 'Save Plan'}
+                  {savingPlan ? 'Saving…' : planSaved ? 'Saved ' : 'Save Plan'}
                 </button>
               )}
               <button onClick={() => setShowPlan(false)} style={mc.modalCloseBtn}>Close</button>

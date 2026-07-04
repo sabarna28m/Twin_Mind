@@ -1,4 +1,4 @@
-/* ─────────────────────────────────────────────────────────────────────────────
+﻿/* ─────────────────────────────────────────────────────────────────────────────
    Smart Daily Mission Generator — event-driven edition
    ─────────────────────────────────────────────────────────────────────────────
    • 3 primary + 1 bonus mission per calendar day (stable per day via LCG)
@@ -135,7 +135,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Study ${sub} for ${mins} minutes`,
       description: `Open a focus session and work through ${sub}. The timer tracks your active study time.`,
-      icon: '📚', xp: tier === 'beginner' ? 40 : tier === 'intermediate' ? 55 : 80,
+      icon: '', xp: tier === 'beginner' ? 40 : tier === 'intermediate' ? 55 : 80,
       difficulty: (tier === 'beginner' ? 'easy' : 'medium'),
       tv: mins, unit: 'min', actionLabel: 'Start Session',
       trackingKey: 'subject_minutes', trackingSubKey: sub.toLowerCase().trim(),
@@ -143,7 +143,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Complete 2 study sessions today`,
       description: `Log two separate focus sessions — at least 20 minutes each.`,
-      icon: '⏱', xp: tier === 'beginner' ? 50 : 70,
+      icon: 'TM', xp: tier === 'beginner' ? 50 : 70,
       difficulty: (tier === 'beginner' ? 'medium' : 'hard'),
       tv: 2, unit: 'session', actionLabel: 'Start Session',
       trackingKey: 'sessions_completed',
@@ -151,7 +151,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Reach ${focusMins} minutes of total focus time`,
       description: `Accumulate focus time across all study sessions today.`,
-      icon: '🎯', xp: tier === 'beginner' ? 45 : tier === 'intermediate' ? 65 : 90,
+      icon: '', xp: tier === 'beginner' ? 45 : tier === 'intermediate' ? 65 : 90,
       difficulty: (tier === 'beginner' ? 'easy' : 'medium'),
       tv: focusMins, unit: 'min', actionLabel: 'Start Session',
       trackingKey: 'total_study_minutes',
@@ -159,14 +159,14 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `${mins}-minute deep focus session`,
       description: `Set a ${mins}-minute timer and study without interruptions.`,
-      icon: '🔥', xp: 55, difficulty: 'medium',
+      icon: '', xp: 55, difficulty: 'medium',
       tv: mins, unit: 'min', actionLabel: 'Start Session',
       trackingKey: 'max_session_minutes',
     },
     {
       title: `Write notes during your session`,
       description: `Create at least 1 smart note to capture key ideas from today's study block.`,
-      icon: '📝', xp: 35, difficulty: 'easy',
+      icon: '', xp: 35, difficulty: 'easy',
       tv: 1, unit: 'note', actionLabel: 'Open Notes',
       trackingKey: 'notes_created_today',
     },
@@ -184,56 +184,56 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Complete 1 practice quiz`,
       description: `Take a practice quiz on any subject. Review your wrong answers afterward.`,
-      icon: '🧠', xp: 30, difficulty: 'easy',
+      icon: '', xp: 30, difficulty: 'easy',
       tv: 1, unit: 'quiz', actionLabel: 'Start Quiz',
       trackingKey: 'quizzes_completed',
     },
     {
       title: `Score above ${target}% in a quiz`,
       description: `Attempt a quiz and aim to beat ${target}%. Preparation is key!`,
-      icon: '🎯', xp: 45, difficulty: 'medium',
+      icon: '', xp: 45, difficulty: 'medium',
       tv: target, unit: '%', actionLabel: 'Start Quiz',
       trackingKey: 'quiz_max_pct',
     },
     {
       title: `Score 80% or higher in any quiz`,
       description: `Take a quiz and achieve at least 80% accuracy. Quality over quantity.`,
-      icon: '⭐', xp: 55, difficulty: 'medium',
+      icon: 'QZ', xp: 55, difficulty: 'medium',
       tv: 80, unit: '%', actionLabel: 'Start Quiz',
       trackingKey: 'quiz_max_pct',
     },
     {
       title: `Answer 10 questions correctly`,
       description: `Complete at least one quiz and rack up 10 correct answers total today.`,
-      icon: '✅', xp: 35, difficulty: 'easy',
+      icon: '', xp: 35, difficulty: 'easy',
       tv: 10, unit: 'correct', actionLabel: 'Start Quiz',
       trackingKey: 'quiz_correct_answers',
     },
     {
       title: `Score 75% or higher in a quiz`,
       description: `Take a quiz and hit at least 75%. A great warm-up challenge.`,
-      icon: '👁', xp: 40, difficulty: 'medium',
+      icon: '', xp: 40, difficulty: 'medium',
       tv: 75, unit: '%', actionLabel: 'Start Quiz',
       trackingKey: 'quiz_max_pct',
     },
     {
       title: `Complete 10 quiz questions today`,
       description: `Power through 10 questions across any number of quizzes.`,
-      icon: '🎓', xp: 50, difficulty: 'medium',
+      icon: '', xp: 50, difficulty: 'medium',
       tv: 10, unit: 'question', actionLabel: 'Start Quiz',
       trackingKey: 'quiz_total_questions',
     },
     {
       title: `Complete 2 practice quizzes`,
       description: `Do two separate quiz sessions today to reinforce learning across topics.`,
-      icon: '🏆', xp: 65, difficulty: 'hard',
+      icon: '', xp: 65, difficulty: 'hard',
       tv: 2, unit: 'quiz', actionLabel: 'Start Quiz',
       trackingKey: 'quizzes_completed',
     },
     {
       title: `Answer 5 questions correctly`,
       description: `Score 5 correct answers across any quiz today.`,
-      icon: '⚡', xp: 30, difficulty: 'easy',
+      icon: '', xp: 30, difficulty: 'easy',
       tv: 5, unit: 'correct', actionLabel: 'Start Quiz',
       trackingKey: 'quiz_correct_answers',
     },
@@ -252,7 +252,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Log today's wellness check-in`,
       description: `Record your mood, energy, and stress level. Your AI Twin uses this to adapt your plan.`,
-      icon: '🧘', xp: 20, difficulty: 'easy',
+      icon: '', xp: 20, difficulty: 'easy',
       route: '/checkin', sourceModule: 'progress', category: 'progress',
       tv: 1, unit: 'check-in', actionLabel: 'Check In Now',
       trackingKey: 'checkin_today',
@@ -260,7 +260,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Create 3 smart notes`,
       description: `Use Smart Notes to capture key concepts from today's study session.`,
-      icon: '📝', xp: 30, difficulty: 'easy',
+      icon: '', xp: 30, difficulty: 'easy',
       route: '/notes', sourceModule: 'materials', category: 'content',
       tv: 3, unit: 'note', actionLabel: 'Open Notes',
       trackingKey: 'notes_created_today',
@@ -268,7 +268,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Upload a study material`,
       description: `Upload lecture slides, textbook pages, or any study resource to your library.`,
-      icon: '📤', xp: 25, difficulty: 'easy',
+      icon: '', xp: 25, difficulty: 'easy',
       route: '/materials', sourceModule: 'materials', category: 'content',
       tv: 1, unit: 'material', actionLabel: 'Upload Material',
       trackingKey: 'materials_uploaded_today',
@@ -276,7 +276,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Ask your AI Mentor 3 questions`,
       description: `Chat with your AI Mentor and get personalised answers to 3 study questions.`,
-      icon: '🤖', xp: 30, difficulty: 'easy',
+      icon: '', xp: 30, difficulty: 'easy',
       route: '/mentor', sourceModule: 'mentor', category: 'ai',
       tv: 3, unit: 'message', actionLabel: 'Open Mentor',
       trackingKey: 'mentor_messages_today',
@@ -284,7 +284,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Create 5 smart notes`,
       description: `Capture 5 key concepts in Smart Notes — a proven retention strategy.`,
-      icon: '✍️', xp: 45, difficulty: 'medium',
+      icon: '', xp: 45, difficulty: 'medium',
       route: '/notes', sourceModule: 'materials', category: 'content',
       tv: 5, unit: 'note', actionLabel: 'Open Notes',
       trackingKey: 'notes_created_today',
@@ -292,7 +292,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Upload 2 study materials`,
       description: `Build your material library — upload two files to have reference docs ready.`,
-      icon: '📚', xp: 40, difficulty: 'medium',
+      icon: '', xp: 40, difficulty: 'medium',
       route: '/materials', sourceModule: 'materials', category: 'content',
       tv: 2, unit: 'material', actionLabel: 'Upload Material',
       trackingKey: 'materials_uploaded_today',
@@ -300,7 +300,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Send 5 messages to AI Mentor`,
       description: `Engage deeply with your AI Mentor. Ask about weak subjects, strategies, and tips.`,
-      icon: '💬', xp: 40, difficulty: 'medium',
+      icon: '', xp: 40, difficulty: 'medium',
       route: '/mentor', sourceModule: 'mentor', category: 'ai',
       tv: 5, unit: 'message', actionLabel: 'Open Mentor',
       trackingKey: 'mentor_messages_today',
@@ -313,7 +313,7 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
       ? [{
           title: `Log a mindful wellness check-in`,
           description: `High burnout detected. Take a moment to log your wellness data — recovery starts here.`,
-          icon: '🌿', xp: 15, difficulty: 'easy' as MissionDifficulty,
+          icon: '', xp: 15, difficulty: 'easy' as MissionDifficulty,
           route: '/checkin', sourceModule: 'progress', category: 'progress' as MissionCategory,
           tv: 1, unit: 'check-in', actionLabel: 'Check In Now',
           trackingKey: 'checkin_today' as TrackingKey,
@@ -333,49 +333,49 @@ export function generateDailyMissions(ctx: UserContext): DailyMission[] {
     {
       title: `Quick 5-question warmup quiz`,
       description: `Get your brain going — power through 5 quiz questions before your main study block.`,
-      icon: '⚡', xp: 20, route: '/quiz', sourceModule: 'quiz',
+      icon: '', xp: 20, route: '/quiz', sourceModule: 'quiz',
       tv: 5, unit: 'question', actionLabel: 'Start Quiz',
       trackingKey: 'quiz_total_questions',
     },
     {
       title: `Ask Mentor for weak-subject tips`,
       description: `Open the AI Mentor and ask about ${sub} improvement strategies.`,
-      icon: '💡', xp: 25, route: '/mentor', sourceModule: 'mentor',
+      icon: '', xp: 25, route: '/mentor', sourceModule: 'mentor',
       tv: 1, unit: 'message', actionLabel: 'Open Mentor',
       trackingKey: 'mentor_messages_today',
     },
     {
       title: `Keep your streak alive`,
       description: `Log any study session today to keep your streak alive and earn bonus XP.`,
-      icon: '🔥', xp: 30, route: '/sessions', sourceModule: 'sessions',
+      icon: '', xp: 30, route: '/sessions', sourceModule: 'sessions',
       tv: 1, unit: 'session', actionLabel: 'Start Session',
       trackingKey: 'sessions_completed',
     },
     {
       title: `Create a note after studying`,
       description: `Write at least 1 smart note to solidify what you learned in today's session.`,
-      icon: '📓', xp: 20, route: '/notes', sourceModule: 'materials',
+      icon: '', xp: 20, route: '/notes', sourceModule: 'materials',
       tv: 1, unit: 'note', actionLabel: 'Open Notes',
       trackingKey: 'notes_created_today',
     },
     {
       title: `Score 70%+ in a quiz`,
       description: `Aim for a score of 70% or higher in any practice quiz today.`,
-      icon: '🥇', xp: 20, route: '/quiz', sourceModule: 'quiz',
+      icon: '', xp: 20, route: '/quiz', sourceModule: 'quiz',
       tv: 70, unit: '%', actionLabel: 'Start Quiz',
       trackingKey: 'quiz_max_pct',
     },
     {
       title: `Upload any study material`,
       description: `Add a resource to your library — slides, PDFs, notes — anything counts.`,
-      icon: '📥', xp: 20, route: '/materials', sourceModule: 'materials',
+      icon: '', xp: 20, route: '/materials', sourceModule: 'materials',
       tv: 1, unit: 'material', actionLabel: 'Upload',
       trackingKey: 'materials_uploaded_today',
     },
     {
       title: `Send a message to AI Mentor`,
       description: `Ask your AI Mentor anything. Even a quick question can change your study direction.`,
-      icon: '🤖', xp: 20, route: '/mentor', sourceModule: 'mentor',
+      icon: '', xp: 20, route: '/mentor', sourceModule: 'mentor',
       tv: 1, unit: 'message', actionLabel: 'Open Mentor',
       trackingKey: 'mentor_messages_today',
     },
@@ -493,6 +493,6 @@ export const CATEGORY_META: Record<string, { label: string; color: string }> = {
 
 export const DIFFICULTY_META: Record<string, { label: string; icon: string }> = {
   easy:   { label: 'Easy',   icon: '' },
-  medium: { label: 'Medium', icon: '⚡' },
-  hard:   { label: 'Hard',   icon: '🔥' },
+  medium: { label: 'Medium', icon: '' },
+  hard:   { label: 'Hard',   icon: '' },
 };

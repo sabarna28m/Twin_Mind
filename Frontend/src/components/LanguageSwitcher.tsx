@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Globe } from 'lucide-react';
 import { LANGUAGES, useLanguage } from '../contexts/LanguageContext';
 import type { LangCode } from '../contexts/LanguageContext';
 
@@ -42,7 +43,7 @@ export default function LanguageSwitcher() {
         aria-label="Language selector"
         aria-expanded={open}
       >
-        <span style={{ fontSize: '1rem', lineHeight: 1 }}>{currentLang?.flag ?? '🌐'}</span>
+        <span style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.04em' }}>{currentLang?.flag ?? <Globe size={14} />}</span>
         <span style={s.langCode}>{lang.toUpperCase()}</span>
         <span style={{ ...s.chevron, transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>▾</span>
       </button>
@@ -50,7 +51,7 @@ export default function LanguageSwitcher() {
       {open && (
         <div style={s.dropdown}>
           <div style={s.dropHeader}>
-            <span style={s.dropTitle}>🌐 Language</span>
+            <span style={{ ...s.dropTitle, display:'flex', alignItems:'center', gap:4 }}><Globe size={12} /> Language</span>
           </div>
           <div style={s.dropdownInner}>
             {LANGUAGES.map(l => {
@@ -76,7 +77,7 @@ export default function LanguageSwitcher() {
                       : 'transparent',
                   }}
                 >
-                  <span style={s.flag}>{l.flag}</span>
+                  <span style={{ ...s.flag, fontSize: '0.65rem', fontWeight: 700 }}>{l.flag}</span>
                   <span style={{ ...s.native, color: isActive ? '#a5b4fc' : 'var(--text-h)' }}>{l.native}</span>
                   <span style={s.label}>{l.label}</span>
                   {isActive && <span style={s.check}>✓</span>}

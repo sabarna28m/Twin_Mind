@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BackButton from '../components/BackButton';
 import api from '../services/api';
@@ -128,7 +128,7 @@ function FormatToolbar({ onInsert }: { onInsert: (before: string, after?: string
       {btn('1.', '\n1. ', '', 'item', 'Numbered list')}
       {btn('<>', '`', '`', 'code', 'Inline code')}
       {btn('```', '\n```\n', '\n```', 'code block', 'Code block')}
-      {btn('🔗', '[', '](url)', 'link text', 'Hyperlink')}
+      {btn('', '[', '](url)', 'link text', 'Hyperlink')}
     </div>
   );
 }
@@ -137,18 +137,18 @@ function FormatToolbar({ onInsert }: { onInsert: (before: string, after?: string
 
 function AIResultPanel({ action, result, onClose }: { action: AIAction; result: string; onClose: () => void }) {
   const labels: Record<AIAction, { icon: string; label: string; color: string }> = {
-    summarize:  { icon: '📋', label: 'Summary',     color: CYAN   },
-    keypoints:  { icon: '🎯', label: 'Key Points',  color: GREEN  },
-    quiz:       { icon: '❓', label: 'Quiz',        color: PURPLE },
-    flashcards: { icon: '🃏', label: 'Flashcards',  color: AMBER  },
-    explain:    { icon: '💡', label: 'Explanation', color: INDIGO },
+    summarize:  { icon: '', label: 'Summary',     color: CYAN   },
+    keypoints:  { icon: '', label: 'Key Points',  color: GREEN  },
+    quiz:       { icon: '', label: 'Quiz',        color: PURPLE },
+    flashcards: { icon: '', label: 'Flashcards',  color: AMBER  },
+    explain:    { icon: '', label: 'Explanation', color: INDIGO },
   };
   const { icon, label, color } = labels[action];
   return (
     <div style={{ background: CARD, border: `1px solid ${color}30`, borderRadius: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.65rem', maxHeight: 320, overflow: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ color, fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: 1 }}>{icon} {label}</span>
-        <button onClick={onClose} style={{ background: 'none', border: 'none', color: DIM, cursor: 'pointer', fontSize: '0.9rem' }}>✕</button>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', color: DIM, cursor: 'pointer', fontSize: '0.9rem' }}></button>
       </div>
       <div className="sn-markdown"
         dangerouslySetInnerHTML={{ __html: renderMarkdown(result) }}
@@ -177,8 +177,8 @@ function VersionModal({ noteId, currentVersion, onRestore, onClose }:
       <div style={{ background: 'var(--bg-elevated)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--border)', borderRadius: 18, width: '100%', maxWidth: 780, maxHeight: '85vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Header */}
         <div style={{ padding: '1rem 1.25rem', borderBottom: BORDER, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontWeight: 700, color: TEXT, fontSize: '0.95rem' }}>🕑 Version History</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: MUTED, cursor: 'pointer', fontSize: '1rem' }}>✕</button>
+          <span style={{ fontWeight: 700, color: TEXT, fontSize: '0.95rem' }}> Version History</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: MUTED, cursor: 'pointer', fontSize: '1rem' }}></button>
         </div>
 
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '220px 1fr', overflow: 'hidden' }}>
@@ -245,7 +245,7 @@ function NoteCard({ note, active, onClick, onPin, onDelete }:
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
-            {note.is_pinned && <span style={{ fontSize: '0.65rem', color: AMBER }}>📌</span>}
+            {note.is_pinned && <span style={{ fontSize: '0.65rem', color: AMBER }}></span>}
             <span style={{ fontWeight: 600, color: TEXT, fontSize: '0.84rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{note.title || 'Untitled'}</span>
           </div>
           {note.subject && (
@@ -265,11 +265,11 @@ function NoteCard({ note, active, onClick, onPin, onDelete }:
           <div style={{ display: 'flex', gap: 3 }}>
             <button onClick={e => { e.stopPropagation(); onPin(); }}
               style={{ padding: '2px 5px', background: note.is_pinned ? `${AMBER}20` : 'var(--bg-elevated)', border: `1px solid ${note.is_pinned ? AMBER + '40' : 'var(--border)'}`, borderRadius: 4, color: note.is_pinned ? AMBER : DIM, cursor: 'pointer', fontSize: '0.65rem' }}>
-              📌
+              
             </button>
             <button onClick={e => { e.stopPropagation(); onDelete(); }}
               style={{ padding: '2px 5px', background: 'var(--bg-elevated)', border: BORDER, borderRadius: 4, color: DIM, cursor: 'pointer', fontSize: '0.65rem' }}>
-              🗑
+              
             </button>
           </div>
         </div>
@@ -314,9 +314,9 @@ function KnowledgeHeatmap({ subjectStats }: { subjectStats: Record<string, Subje
       {/* Category bands */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
         {[
-          { label: '✓ Strong Topics',          items: strong, color: GREEN  },
-          { label: '⚡ Developing Topics',      items: medium, color: AMBER  },
-          { label: '⚠ Needs Attention',         items: weak,   color: RED    },
+          { label: ' Strong Topics',          items: strong, color: GREEN  },
+          { label: ' Developing Topics',      items: medium, color: AMBER  },
+          { label: ' Needs Attention',         items: weak,   color: RED    },
         ].map(({ label, items, color }) => (
           <div key={label} style={{ background: CARD, border: `1px solid ${color}25`, borderRadius: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '0.9rem' }}>
             <div style={{ color, fontWeight: 700, fontSize: '0.75rem', marginBottom: '0.6rem' }}>{label}</div>
@@ -339,10 +339,10 @@ function KnowledgeHeatmap({ subjectStats }: { subjectStats: Record<string, Subje
 
 function TimelineView({ events }: { events: Array<{ type: string; title: string; subject: string; date: string | null }> }) {
   const iconMap: Record<string, { icon: string; color: string; label: string }> = {
-    created:  { icon: '✏️', color: GREEN,  label: 'Note Added'   },
-    edited:   { icon: '🔄', color: CYAN,   label: 'Note Edited'  },
-    deleted:  { icon: '🗑️', color: RED,    label: 'Note Deleted' },
-    restored: { icon: '♻️', color: PURPLE, label: 'Note Restored'},
+    created:  { icon: '', color: GREEN,  label: 'Note Added'   },
+    edited:   { icon: '', color: CYAN,   label: 'Note Edited'  },
+    deleted:  { icon: '', color: RED,    label: 'Note Deleted' },
+    restored: { icon: '', color: PURPLE, label: 'Note Restored'},
   };
 
   if (!events.length) return (
@@ -355,7 +355,7 @@ function TimelineView({ events }: { events: Array<{ type: string; title: string;
       <div style={{ position: 'absolute', left: '0.65rem', top: 0, bottom: 0, width: 2, background: 'linear-gradient(to bottom,rgba(99,102,241,0.6),transparent)' }} />
 
       {events.map((ev, i) => {
-        const { icon, color, label } = iconMap[ev.type] ?? { icon: '📝', color: MUTED, label: ev.type };
+        const { icon, color, label } = iconMap[ev.type] ?? { icon: '', color: MUTED, label: ev.type };
         return (
           <div key={i} style={{ display: 'flex', gap: '0.85rem', paddingBottom: '1rem', position: 'relative' }}>
             {/* Dot */}
@@ -574,7 +574,7 @@ export default function SmartNotes() {
       });
       setAiResult(r.data.result);
     } catch (e: any) {
-      setAiResult('❌ AI request failed. Check that the AI service is configured.');
+      setAiResult(' AI request failed. Check that the AI service is configured.');
     } finally {
       setAiLoading(false);
     }
@@ -649,7 +649,7 @@ export default function SmartNotes() {
 
   const saveLabel =
     saveState === 'saving'  ? '⟳ Saving…' :
-    saveState === 'saved'   ? `✓ Saved${lastSaved ? ` at ${lastSaved}` : ''}` :
+    saveState === 'saved'   ? ` Saved${lastSaved ? ` at ${lastSaved}` : ''}` :
     saveState === 'unsaved' ? '● Unsaved' : '';
 
   const saveColor =
@@ -705,7 +705,7 @@ export default function SmartNotes() {
       <div className="sn-header" style={{ borderBottom: `1px solid var(--border)`, padding: '0.85rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--glass-bg)', backdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 50 }}>
         <BackButton />
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '1.25rem' }}>🧠</span>
+          <span style={{ fontSize: '1.25rem' }}></span>
           <span style={{ fontWeight: 800, fontSize: '1.1rem', color: TEXT }}>Smart Notes</span>
           <span className="sn-badge" style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: 99, background: `${CYAN}15`, color: CYAN, border: `1px solid ${CYAN}30`, fontWeight: 700 }}>Knowledge Memory</span>
         </div>
@@ -716,11 +716,11 @@ export default function SmartNotes() {
       {analytics && (
         <div style={{ display: 'flex', gap: '0', borderBottom: BORDER, background: 'var(--bg-surface)', overflowX: 'auto' }}>
           {[
-            { icon: '📝', label: 'Total Notes',    value: analytics.total_notes,   color: CYAN   },
-            { icon: '📌', label: 'Pinned',          value: analytics.pinned_count,  color: AMBER  },
-            { icon: '🗑️', label: 'In History',      value: analytics.total_deleted, color: RED    },
-            { icon: '🔄', label: 'Total Versions',  value: analytics.total_versions, color: PURPLE },
-            { icon: '📚', label: 'Subjects',        value: Object.keys(analytics.subject_stats).length, color: GREEN },
+            { icon: '', label: 'Total Notes',    value: analytics.total_notes,   color: CYAN   },
+            { icon: '', label: 'Pinned',          value: analytics.pinned_count,  color: AMBER  },
+            { icon: '', label: 'In History',      value: analytics.total_deleted, color: RED    },
+            { icon: '', label: 'Total Versions',  value: analytics.total_versions, color: PURPLE },
+            { icon: '', label: 'Subjects',        value: Object.keys(analytics.subject_stats).length, color: GREEN },
           ].map(({ icon, label, value, color }) => (
             <div key={label} style={{ padding: '0.6rem 1.25rem', borderRight: BORDER, flexShrink: 0, textAlign: 'center' }}>
               <div style={{ fontSize: '0.58rem', color: DIM, textTransform: 'uppercase', letterSpacing: 1 }}>{icon} {label}</div>
@@ -733,10 +733,10 @@ export default function SmartNotes() {
       {/* ── View tabs ── */}
       <div className="sn-tabbar" style={{ display: 'flex', borderBottom: BORDER, background: 'var(--glass-bg)', backdropFilter: 'blur(16px)' }}>
         {([
-          { id: 'notes',     icon: '📝', label: 'Notes'     },
-          { id: 'history',   icon: '🗑️', label: 'History'   },
-          { id: 'analytics', icon: '📊', label: 'Analytics' },
-          { id: 'timeline',  icon: '🕑', label: 'Timeline'  },
+          { id: 'notes',     icon: '', label: 'Notes'     },
+          { id: 'history',   icon: '', label: 'History'   },
+          { id: 'analytics', icon: '', label: 'Analytics' },
+          { id: 'timeline',  icon: '', label: 'Timeline'  },
         ] as const).map(tab => (
           <button key={tab.id} onClick={() => setView(tab.id)} className={`view-tab sn-tab ${view === tab.id ? 'sn-tab-active' : 'sn-tab-inactive'}`}
             style={{ padding: '0.7rem 1.25rem', background: 'none', border: 'none', borderBottom: `2px solid ${view === tab.id ? CYAN : 'transparent'}`, color: view === tab.id ? CYAN : MUTED, cursor: 'pointer', fontSize: '0.8rem', fontWeight: view === tab.id ? 700 : 400, display: 'flex', alignItems: 'center', gap: '0.4rem', transition: 'color 0.15s' }}>
@@ -779,7 +779,7 @@ export default function SmartNotes() {
                   <input
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    placeholder="🔍 Search notes…"
+                    placeholder="Search notes…"
                     style={{ flex: 1, background: CARD, border: BORDER, borderRadius: 8, padding: '0.38rem 0.65rem', color: TEXT, fontSize: '0.78rem' }}
                   />
                   <button onClick={createNote}
@@ -796,7 +796,7 @@ export default function SmartNotes() {
                   </select>
                   <button onClick={() => setPinnedOnly(p => !p)}
                     style={{ padding: '0.28rem 0.55rem', background: pinnedOnly ? `${AMBER}20` : 'var(--bg-elevated)', border: `1px solid ${pinnedOnly ? AMBER + '40' : 'var(--border)'}`, borderRadius: 6, color: pinnedOnly ? AMBER : DIM, cursor: 'pointer', fontSize: '0.68rem' }}>
-                    📌
+                    
                   </button>
                 </div>
               </div>
@@ -807,7 +807,7 @@ export default function SmartNotes() {
                   <div style={{ padding: '2rem', textAlign: 'center', color: MUTED, fontSize: '0.85rem' }}>Loading…</div>
                 ) : notes.length === 0 ? (
                   <div style={{ padding: '2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem', filter: 'var(--sn-empty-icon)' }}>📝</div>
+                    <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem', filter: 'var(--sn-empty-icon)' }}></div>
                     <div style={{ color: TEXT, fontWeight: 600, marginBottom: 4 }}>No notes yet</div>
                     <div style={{ color: MUTED, fontSize: '0.8rem', marginBottom: '1rem' }}>Create your first note to begin</div>
                     <button onClick={createNote} style={{ padding: '0.5rem 1.2rem', background: `linear-gradient(135deg,${INDIGO},${PURPLE})`, border: 'none', borderRadius: 8, color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.82rem' }}>+ Create Note</button>
@@ -826,7 +826,7 @@ export default function SmartNotes() {
             <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               {activeId === null ? (
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', color: DIM }}>
-                  <div style={{ fontSize: '3rem', filter: 'var(--sn-empty-icon)' }}>📓</div>
+                  <div style={{ fontSize: '3rem', filter: 'var(--sn-empty-icon)' }}></div>
                   <div style={{ fontWeight: 600, color: MUTED }}>Select a note or create one</div>
                   <button onClick={createNote} style={{ padding: '0.55rem 1.5rem', background: `linear-gradient(135deg,${INDIGO},${PURPLE})`, border: 'none', borderRadius: 10, color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.88rem' }}>+ New Note</button>
                 </div>
@@ -859,11 +859,11 @@ export default function SmartNotes() {
                     <div style={{ display: 'flex', gap: 4, marginLeft: 'auto' }}>
                       <button onClick={() => setPreview(p => !p)}
                         style={{ padding: '0.28rem 0.65rem', background: preview ? `${CYAN}20` : 'var(--bg-elevated)', border: `1px solid ${preview ? CYAN + '40' : 'var(--border)'}`, borderRadius: 7, color: preview ? CYAN : MUTED, cursor: 'pointer', fontSize: '0.72rem' }}>
-                        {preview ? '✎ Edit' : '👁 Preview'}
+                        {preview ? 'Edit' : 'Preview'}
                       </button>
                       <button onClick={() => setShowVersions(true)}
                         style={{ padding: '0.28rem 0.65rem', background: 'var(--bg-elevated)', border: BORDER, borderRadius: 7, color: MUTED, cursor: 'pointer', fontSize: '0.72rem' }} title="Version history">
-                        🕑 v{currentVersion}
+                        v{currentVersion}
                       </button>
                       <button onClick={exportTxt}
                         style={{ padding: '0.28rem 0.65rem', background: 'var(--bg-elevated)', border: BORDER, borderRadius: 7, color: MUTED, cursor: 'pointer', fontSize: '0.72rem' }}>TXT</button>
@@ -907,11 +907,11 @@ export default function SmartNotes() {
                       {/* AI buttons */}
                       <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: aiResult ? '0.65rem' : 0 }}>
                         {([
-                          { action: 'summarize' as AIAction,  icon: '📋', label: 'Summarize',   color: CYAN   },
-                          { action: 'keypoints' as AIAction,  icon: '🎯', label: 'Key Points',  color: GREEN  },
-                          { action: 'quiz'      as AIAction,  icon: '❓', label: 'Quiz',        color: PURPLE },
-                          { action: 'flashcards' as AIAction, icon: '🃏', label: 'Flashcards',  color: AMBER  },
-                          { action: 'explain'   as AIAction,  icon: '💡', label: 'Explain',     color: INDIGO },
+                          { action: 'summarize' as AIAction,  icon: '', label: 'Summarize',   color: CYAN   },
+                          { action: 'keypoints' as AIAction,  icon: '', label: 'Key Points',  color: GREEN  },
+                          { action: 'quiz'      as AIAction,  icon: '', label: 'Quiz',        color: PURPLE },
+                          { action: 'flashcards' as AIAction, icon: '', label: 'Flashcards',  color: AMBER  },
+                          { action: 'explain'   as AIAction,  icon: '', label: 'Explain',     color: INDIGO },
                         ]).map(({ action, icon, label, color }) => (
                           <button key={action} onClick={() => runAI(action)} disabled={aiLoading || !content.trim()} className="ai-btn"
                             style={{ padding: '0.32rem 0.75rem', background: aiAction === action && aiResult ? `${color}20` : CARD, border: `1px solid ${aiAction === action && aiResult ? color + '40' : 'var(--border)'}`, borderRadius: 8, color: aiLoading && aiAction === action ? MUTED : color, cursor: aiLoading || !content.trim() ? 'not-allowed' : 'pointer', fontSize: '0.73rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, opacity: !content.trim() ? 0.5 : 1, transition: 'all 0.15s' }}>
@@ -941,14 +941,14 @@ export default function SmartNotes() {
             <div style={{ maxWidth: 900, margin: '0 auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: '1.1rem', color: TEXT, marginBottom: 2 }}>🗑️ Notes History</div>
+                  <div style={{ fontWeight: 800, fontSize: '1.1rem', color: TEXT, marginBottom: 2 }}> Notes History</div>
                   <div style={{ color: MUTED, fontSize: '0.82rem' }}>Deleted notes are archived here — never lost permanently unless you choose.</div>
                 </div>
               </div>
 
               {history.length === 0 ? (
                 <div style={{ padding: '4rem', textAlign: 'center', background: CARD, border: BORDER, borderRadius: 20 }}>
-                  <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>✨</div>
+                  <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}></div>
                   <div style={{ color: TEXT, fontWeight: 600 }}>History is empty</div>
                   <div style={{ color: MUTED, fontSize: '0.83rem', marginTop: 4 }}>Deleted notes will appear here and can be restored at any time.</div>
                 </div>
@@ -974,11 +974,11 @@ export default function SmartNotes() {
                         <div style={{ display: 'flex', gap: 5 }}>
                           <button onClick={() => restoreHistory(h.id)}
                             style={{ padding: '0.32rem 0.75rem', background: `${GREEN}18`, border: `1px solid ${GREEN}35`, borderRadius: 8, color: GREEN, cursor: 'pointer', fontWeight: 700, fontSize: '0.73rem' }}>
-                            ♻ Restore
+                             Restore
                           </button>
                           <button onClick={() => permanentDelete(h.id)}
                             style={{ padding: '0.32rem 0.75rem', background: `${RED}15`, border: `1px solid ${RED}30`, borderRadius: 8, color: RED, cursor: 'pointer', fontSize: '0.73rem' }}>
-                            ✕ Delete
+                             Delete
                           </button>
                         </div>
                       </div>
@@ -994,7 +994,7 @@ export default function SmartNotes() {
         {view === 'analytics' && (
           <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
             <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ fontWeight: 800, fontSize: '1.1rem', color: TEXT }}>📊 Knowledge Analytics</div>
+              <div style={{ fontWeight: 800, fontSize: '1.1rem', color: TEXT }}> Knowledge Analytics</div>
 
               {!analytics ? (
                 <div style={{ padding: '3rem', textAlign: 'center', color: MUTED }}>Loading analytics…</div>
@@ -1003,11 +1003,11 @@ export default function SmartNotes() {
                   {/* Summary stats */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '0.75rem' }}>
                     {[
-                      { icon: '📝', label: 'Notes',       value: analytics.total_notes,    color: CYAN   },
-                      { icon: '📌', label: 'Pinned',       value: analytics.pinned_count,   color: AMBER  },
-                      { icon: '🗑️', label: 'Archived',     value: analytics.total_deleted,  color: RED    },
-                      { icon: '🔄', label: 'Revisions',    value: analytics.total_versions, color: PURPLE },
-                      { icon: '📚', label: 'Subjects',     value: Object.keys(analytics.subject_stats).length, color: GREEN },
+                      { icon: '', label: 'Notes',       value: analytics.total_notes,    color: CYAN   },
+                      { icon: '', label: 'Pinned',       value: analytics.pinned_count,   color: AMBER  },
+                      { icon: '', label: 'Archived',     value: analytics.total_deleted,  color: RED    },
+                      { icon: '', label: 'Revisions',    value: analytics.total_versions, color: PURPLE },
+                      { icon: '', label: 'Subjects',     value: Object.keys(analytics.subject_stats).length, color: GREEN },
                     ].map(({ icon, label, value, color }) => (
                       <div key={label} style={{ background: CARD2, border: `1px solid ${color}25`, borderRadius: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.04)', padding: '0.9rem', textAlign: 'center' }}>
                         <div style={{ fontSize: '1.2rem', marginBottom: 4 }}>{icon}</div>
@@ -1019,7 +1019,7 @@ export default function SmartNotes() {
 
                   {/* Knowledge heatmap */}
                   <div style={{ background: CARD, border: BORDER, borderRadius: 20, padding: '1.5rem' }}>
-                    <div style={{ fontWeight: 700, color: TEXT, marginBottom: '1rem', fontSize: '0.95rem' }}>🧠 Knowledge Strength Heatmap</div>
+                    <div style={{ fontWeight: 700, color: TEXT, marginBottom: '1rem', fontSize: '0.95rem' }}> Knowledge Strength Heatmap</div>
                     <KnowledgeHeatmap subjectStats={analytics.subject_stats} />
                   </div>
 
@@ -1027,7 +1027,7 @@ export default function SmartNotes() {
                   {analytics.timeline.length > 0 && (
                     <div style={{ background: CARD, border: BORDER, borderRadius: 20, padding: '1.5rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                        <div style={{ fontWeight: 700, color: TEXT, fontSize: '0.95rem' }}>🕑 Recent Activity</div>
+                        <div style={{ fontWeight: 700, color: TEXT, fontSize: '0.95rem' }}> Recent Activity</div>
                         <button onClick={() => setView('timeline')} className="sn-link-cyan" style={{ background: 'none', border: 'none', color: CYAN, cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600 }}>View full timeline →</button>
                       </div>
                       <TimelineView events={analytics.timeline.slice(0, 8)} />
@@ -1043,7 +1043,7 @@ export default function SmartNotes() {
         {view === 'timeline' && (
           <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
             <div style={{ maxWidth: 720, margin: '0 auto' }}>
-              <div style={{ fontWeight: 800, fontSize: '1.1rem', color: TEXT, marginBottom: '0.5rem' }}>🕑 Memory Timeline</div>
+              <div style={{ fontWeight: 800, fontSize: '1.1rem', color: TEXT, marginBottom: '0.5rem' }}> Memory Timeline</div>
               <div style={{ color: MUTED, fontSize: '0.82rem', marginBottom: '1.5rem' }}>Your complete learning journey — every note created, edited, and deleted.</div>
 
               {!analytics ? (

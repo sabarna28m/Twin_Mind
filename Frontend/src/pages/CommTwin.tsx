@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, Legend,
 } from 'recharts';
+import { Star } from 'lucide-react';
 import BackButton from '../components/BackButton';
 import api from '../services/api';
 
@@ -65,13 +66,13 @@ const CARD2  = 'var(--bg-surface)';
 const BORDER = '1px solid var(--border)';
 
 const TABS = [
-  { id:'twin',      label:'Twin',       icon:'🧠' },
-  { id:'image',     label:'Image',      icon:'🖼️'  },
-  { id:'tasks',     label:'Tasks',      icon:'🎙️'  },
-  { id:'grammar',   label:'Grammar',    icon:'✏️'  },
-  { id:'vocab',     label:'Vocab',      icon:'📚'  },
-  { id:'analytics', label:'Analytics',  icon:'📊' },
-  { id:'coach',     label:'AI Coach',   icon:'🏆' },
+  { id:'twin',      label:'Twin',       icon:'' },
+  { id:'image',     label:'Image',      icon:''  },
+  { id:'tasks',     label:'Tasks',      icon:''  },
+  { id:'grammar',   label:'Grammar',    icon:''  },
+  { id:'vocab',     label:'Vocab',      icon:''  },
+  { id:'analytics', label:'Analytics',  icon:'' },
+  { id:'coach',     label:'AI Coach',   icon:'' },
 ];
 
 // ── Voice Recorder Component ──────────────────────────────────────────────
@@ -229,7 +230,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
       {/* Grammar correction */}
       {r.grammar_error_count > 0 && (
         <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem' }}>
-          <div style={{ color:AMBER,fontWeight:700,fontSize:'0.82rem',marginBottom:'0.65rem' }}>✎ Grammar Corrections ({r.grammar_error_count})</div>
+          <div style={{ color:AMBER,fontWeight:700,fontSize:'0.82rem',marginBottom:'0.65rem' }}> Grammar Corrections ({r.grammar_error_count})</div>
           {r.grammar_errors.slice(0,4).map((e,i) => (
             <div key={i} style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:8,padding:'0.5rem',background:'var(--bg-surface)',borderRadius:8 }}>
               <div style={{ background:`${RED}0a`,border:`1px solid ${RED}25`,borderRadius:6,padding:'0.4rem 0.6rem' }}>
@@ -249,7 +250,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
       {/* Filler words */}
       {r.filler_word_count > 0 && (
         <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem' }}>
-          <div style={{ color:PURPLE,fontWeight:700,fontSize:'0.82rem',marginBottom:'0.6rem' }}>💬 Filler Words Detected</div>
+          <div style={{ color:PURPLE,fontWeight:700,fontSize:'0.82rem',marginBottom:'0.6rem' }}> Filler Words Detected</div>
           <div style={{ display:'flex',flexWrap:'wrap',gap:6 }}>
             {r.filler_words.map(f => <Tag key={f.word} text={`"${f.word}" ×${f.count}`} color={PURPLE} />)}
           </div>
@@ -260,7 +261,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
       {/* Advanced vocab */}
       {r.advanced_words_used.length > 0 && (
         <div style={{ background:`${GREEN}0a`,border:`1px solid ${GREEN}25`,borderRadius:12,padding:'0.85rem',display:'flex',gap:'0.75rem',alignItems:'flex-start' }}>
-          <span style={{ fontSize:'1.2rem' }}>⭐</span>
+          <Star size={18} style={{ color: '#10b981', flexShrink: 0 }} />
           <div>
             <div style={{ color:GREEN,fontWeight:700,fontSize:'0.78rem',marginBottom:4 }}>Advanced Vocabulary Detected</div>
             <div style={{ display:'flex',flexWrap:'wrap',gap:5 }}>{r.advanced_words_used.map(w => <Tag key={w} text={w} color={GREEN} />)}</div>
@@ -271,11 +272,11 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
       {/* Strengths / Weaknesses */}
       <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem' }}>
         <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem' }}>
-          <div style={{ color:GREEN,fontWeight:700,fontSize:'0.78rem',marginBottom:'0.55rem' }}>✓ Strengths</div>
+          <div style={{ color:GREEN,fontWeight:700,fontSize:'0.78rem',marginBottom:'0.55rem' }}> Strengths</div>
           {r.strengths.map((s,i) => <div key={i} style={{ color:MUTED,fontSize:'0.8rem',marginBottom:3 }}>• {s}</div>)}
         </div>
         <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem' }}>
-          <div style={{ color:AMBER,fontWeight:700,fontSize:'0.78rem',marginBottom:'0.55rem' }}>⚠ Improve</div>
+          <div style={{ color:AMBER,fontWeight:700,fontSize:'0.78rem',marginBottom:'0.55rem' }}> Improve</div>
           {r.weaknesses.map((w,i) => <div key={i} style={{ color:MUTED,fontSize:'0.8rem',marginBottom:3 }}>• {w}</div>)}
         </div>
       </div>
@@ -283,7 +284,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
       {/* Pronunciation tips */}
       {r.pronunciation_tips.length > 0 && (
         <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem' }}>
-          <div style={{ color:TEAL,fontWeight:700,fontSize:'0.78rem',marginBottom:'0.55rem' }}>🔊 Pronunciation Tips</div>
+          <div style={{ color:TEAL,fontWeight:700,fontSize:'0.78rem',marginBottom:'0.55rem' }}> Pronunciation Tips</div>
           {r.pronunciation_tips.map((t,i) => <div key={i} style={{ color:MUTED,fontSize:'0.8rem',marginBottom:3 }}>→ {t}</div>)}
         </div>
       )}
@@ -291,7 +292,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
       {/* Practice suggestion */}
       {r.practice_suggestion && (
         <div style={{ background:`${INDIGO}0a`,border:`1px solid ${INDIGO}30`,borderRadius:12,padding:'0.85rem',display:'flex',gap:'0.75rem' }}>
-          <span style={{ fontSize:'1.1rem' }}>💡</span>
+          <span style={{ fontSize:'1.1rem' }}></span>
           <div>
             <div style={{ color:INDIGO,fontWeight:700,fontSize:'0.78rem',marginBottom:3 }}>Practice Suggestion</div>
             <div style={{ color:MUTED,fontSize:'0.82rem',lineHeight:1.6 }}>{r.practice_suggestion}</div>
@@ -301,7 +302,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
 
       {r.twin_updated && (
         <div style={{ background:`${GREEN}0a`,border:`1px solid ${GREEN}30`,borderRadius:10,padding:'0.65rem 1rem',display:'flex',gap:'0.65rem',alignItems:'center' }}>
-          <span>🧠</span><span style={{ color:GREEN,fontSize:'0.8rem',fontWeight:600 }}>Communication Twin updated.</span>
+          <span></span><span style={{ color:GREEN,fontSize:'0.8rem',fontWeight:600 }}>Communication Twin updated.</span>
         </div>
       )}
     </div>
@@ -344,11 +345,11 @@ function TwinSection() {
             <div style={{ textAlign:'center' }}><div style={{ fontSize:'0.7rem',color:MUTED }}>Monthly Growth</div><div style={{ fontWeight:800,color:CYAN,fontSize:'1.1rem' }}>+{data.monthly_growth}</div></div>
           </div>
           <div style={{ display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'0.5rem' }}>
-            <ScCard label="Fluency"       value={data.fluency_score}       color={sc(data.fluency_score)}       icon="🌊" />
-            <ScCard label="Pronunciation" value={data.pronunciation_score}  color={sc(data.pronunciation_score)} icon="🔊" />
-            <ScCard label="Vocabulary"    value={data.vocabulary_score}     color={sc(data.vocabulary_score)}    icon="📚" />
-            <ScCard label="Grammar"       value={data.grammar_score}        color={sc(data.grammar_score)}       icon="✏️"  />
-            <ScCard label="Confidence"    value={data.confidence_score}     color={sc(data.confidence_score)}    icon="💪" />
+            <ScCard label="Fluency"       value={data.fluency_score}       color={sc(data.fluency_score)}       icon="" />
+            <ScCard label="Pronunciation" value={data.pronunciation_score}  color={sc(data.pronunciation_score)} icon="" />
+            <ScCard label="Vocabulary"    value={data.vocabulary_score}     color={sc(data.vocabulary_score)}    icon="" />
+            <ScCard label="Grammar"       value={data.grammar_score}        color={sc(data.grammar_score)}       icon=""  />
+            <ScCard label="Confidence"    value={data.confidence_score}     color={sc(data.confidence_score)}    icon="" />
           </div>
         </div>
       </div>
@@ -408,7 +409,7 @@ function TwinSection() {
           <div style={{ color:TEXT,fontWeight:700,marginBottom:'0.85rem' }}>Recent Activity</div>
           {data.recent_activities.slice(0,5).map((a,i) => (
             <div key={i} style={{ display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.5rem 0',borderBottom:i<4?'1px solid var(--border-subtle)':'none' }}>
-              <span style={{ fontSize:'1rem' }}>{String(a.type)==='image_challenge'?'🖼️':String(a.type)==='vocabulary'?'📚':String(a.type)==='grammar_correction'?'✏️':'🎙️'}</span>
+              <span style={{ fontSize:'1rem' }}>{String(a.type)==='image_challenge'?'':String(a.type)==='vocabulary'?'':String(a.type)==='grammar_correction'?'':''}</span>
               <div style={{ flex:1 }}>
                 <div style={{ color:TEXT,fontSize:'0.8rem',fontWeight:600,textTransform:'capitalize' }}>{String(a.type).replace('_',' ')}</div>
                 <div style={{ color:DIM,fontSize:'0.73rem' }}>{String(a.snippet||'')} · {String(a.date||'')}</div>
@@ -421,7 +422,7 @@ function TwinSection() {
 
       {data.sessions_count === 0 && (
         <div style={{ background:`${AMBER}0a`,border:`1px solid ${AMBER}30`,borderRadius:16,padding:'1.25rem',display:'flex',gap:'1rem' }}>
-          <span style={{ fontSize:'1.5rem' }}>💡</span>
+          <span style={{ fontSize:'1.5rem' }}></span>
           <div>
             <div style={{ color:AMBER,fontWeight:700,marginBottom:4 }}>Your Communication Twin is waiting to learn</div>
             <div style={{ color:MUTED,fontSize:'0.83rem',lineHeight:1.6 }}>Complete a speaking task, image challenge, grammar check, or vocabulary drill. Every activity evolves your twin and builds a personalized improvement profile.</div>
@@ -537,18 +538,18 @@ function ImageSection() {
           {/* Elements */}
           <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem' }}>
             <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem' }}>
-              <div style={{ color:GREEN,fontWeight:700,fontSize:'0.8rem',marginBottom:'0.55rem' }}>✓ Elements Described</div>
+              <div style={{ color:GREEN,fontWeight:700,fontSize:'0.8rem',marginBottom:'0.55rem' }}> Elements Described</div>
               <div style={{ display:'flex',flexWrap:'wrap',gap:5 }}>{result.elements_mentioned.map(e=><Tag key={e} text={e} color={GREEN}/>)}</div>
             </div>
             <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem' }}>
-              <div style={{ color:RED,fontWeight:700,fontSize:'0.8rem',marginBottom:'0.55rem' }}>✗ Elements Missed</div>
+              <div style={{ color:RED,fontWeight:700,fontSize:'0.8rem',marginBottom:'0.55rem' }}> Elements Missed</div>
               <div style={{ display:'flex',flexWrap:'wrap',gap:5 }}>{result.elements_missed.map(e=><Tag key={e} text={e} color={RED}/>)}</div>
             </div>
           </div>
 
           {/* AI reconstruction */}
           <div style={{ background:`${PURPLE}0a`,border:`1px solid ${PURPLE}30`,borderRadius:14,padding:'1.1rem' }}>
-            <div style={{ color:PURPLE,fontWeight:700,fontSize:'0.82rem',marginBottom:6 }}>🤖 AI Interpretation of Your Description</div>
+            <div style={{ color:PURPLE,fontWeight:700,fontSize:'0.82rem',marginBottom:6 }}> AI Interpretation of Your Description</div>
             <div style={{ color:MUTED,fontSize:'0.84rem',lineHeight:1.7,fontStyle:'italic' }}>"{result.ai_reconstruction_description}"</div>
           </div>
 
@@ -565,7 +566,7 @@ function ImageSection() {
 // ── Section: Speaking Tasks ───────────────────────────────────────────────
 
 function TasksSection() {
-  const TYPES = [{id:'concept',label:'Explain a Concept',icon:'🧠'},{id:'discussion',label:'Opinion Discussion',icon:'💬'},{id:'intro',label:'Personal Intro',icon:'👤'},{id:'story',label:'Tell a Story',icon:'📖'}];
+  const TYPES = [{id:'concept',label:'Explain a Concept',icon:''},{id:'discussion',label:'Opinion Discussion',icon:''},{id:'intro',label:'Personal Intro',icon:''},{id:'story',label:'Tell a Story',icon:''}];
   const [taskType, setTaskType] = useState('discussion');
   const [task, setTask] = useState<SpeakingTask|null>(null);
   const [result, setResult] = useState<SpeechResult|null>(null);
@@ -673,7 +674,7 @@ function GrammarSection() {
           style={{ width:'100%',background:'var(--bg-elevated)',border:BORDER,borderRadius:12,padding:'0.85rem 1rem',color:'var(--text-h)',fontSize:'0.87rem',resize:'vertical',boxSizing:'border-box',lineHeight:1.65 }} />
         <button onClick={analyze} disabled={loading||!text.trim()}
           style={{ marginTop:'0.75rem',width:'100%',padding:'0.7rem',background:loading||!text.trim()?DIM:`linear-gradient(135deg,${AMBER},${PINK})`,border:'none',borderRadius:10,color:'#fff',fontWeight:700,cursor:'pointer' }}>
-          {loading?'Analyzing…':'✎ Analyze Grammar'}
+          {loading?'Analyzing…':' Analyze Grammar'}
         </button>
       </div>
 
@@ -705,13 +706,13 @@ function GrammarSection() {
           {/* Corrected text */}
           {result.corrected_text !== result.original_text && (
             <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem' }}>
-              <div style={{ color:GREEN,fontWeight:700,fontSize:'0.82rem',marginBottom:8 }}>✓ Corrected Version</div>
+              <div style={{ color:GREEN,fontWeight:700,fontSize:'0.82rem',marginBottom:8 }}> Corrected Version</div>
               <div style={{ background:`${GREEN}08`,border:`1px solid ${GREEN}25`,borderRadius:8,padding:'0.75rem',color:TEXT,fontSize:'0.87rem',lineHeight:1.7 }}>{result.corrected_text}</div>
             </div>
           )}
 
           {result.errors.length===0 ? (
-            <div style={{ background:`${GREEN}0a`,border:`1px solid ${GREEN}30`,borderRadius:12,padding:'1rem',textAlign:'center',color:GREEN,fontWeight:700 }}>✅ Perfect grammar! No errors detected.</div>
+            <div style={{ background:`${GREEN}0a`,border:`1px solid ${GREEN}30`,borderRadius:12,padding:'1rem',textAlign:'center',color:GREEN,fontWeight:700 }}> Perfect grammar! No errors detected.</div>
           ) : (
             <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem' }}>
               <div style={{ color:TEXT,fontWeight:700,marginBottom:'1rem' }}>Error Breakdown</div>
@@ -869,7 +870,7 @@ function AnalyticsSection() {
 
       {noHistory ? (
         <div style={{ background:`${AMBER}0a`,border:`1px solid ${AMBER}30`,borderRadius:14,padding:'2rem',textAlign:'center' }}>
-          <div style={{ fontSize:'2rem',marginBottom:8 }}>📊</div>
+          <div style={{ fontSize:'2rem',marginBottom:8 }}></div>
           <div style={{ color:AMBER,fontWeight:700,marginBottom:6 }}>No history yet</div>
           <div style={{ color:MUTED,fontSize:'0.85rem' }}>Complete speaking activities to generate your communication growth chart.</div>
         </div>
@@ -932,14 +933,14 @@ function CoachSection() {
     <div style={{ display:'flex',flexDirection:'column',gap:'1.5rem' }}>
       {/* Header */}
       <div className="ct-hero" style={{ background:`linear-gradient(135deg,${TEAL}18,${CYAN}10)`,border:`1px solid ${TEAL}35`,borderRadius:20,padding:'1.5rem',display:'flex',gap:'1.25rem',alignItems:'flex-start' }}>
-        <span style={{ fontSize:'2.5rem' }}>🏆</span>
+        <span style={{ fontSize:'2.5rem' }}></span>
         <div>
           <div style={{ color:TEAL,fontWeight:700,fontSize:'0.78rem',textTransform:'uppercase',letterSpacing:1,marginBottom:4 }}>Your Personal AI Coach</div>
           <div style={{ color:TEXT,fontSize:'1rem',fontWeight:700,marginBottom:4 }}>Level: {data.level} · Focus: {data.focus_today}</div>
           <div style={{ color:MUTED,fontSize:'0.87rem',lineHeight:1.6,marginBottom:6 }}>{data.motivational_message}</div>
           <div style={{ display:'flex',gap:8,flexWrap:'wrap' }}>
             <Tag text={`Weekly Goal: ${data.weekly_goal}`} color={GREEN} />
-            <Tag text={`Earn: ${data.badge_to_earn} 🎖️`} color={AMBER} />
+            <Tag text={`Earn: ${data.badge_to_earn}`} color={AMBER} />
           </div>
         </div>
       </div>
@@ -970,7 +971,7 @@ function CoachSection() {
 
       {/* Achievement badge preview */}
       <div style={{ background:`${AMBER}0a`,border:`1px solid ${AMBER}35`,borderRadius:14,padding:'1.1rem',display:'flex',gap:'0.85rem',alignItems:'center' }}>
-        <span style={{ fontSize:'2rem' }}>🎖️</span>
+        <span style={{ fontSize:'2rem' }}></span>
         <div>
           <div style={{ color:AMBER,fontWeight:700,marginBottom:2 }}>{data.badge_to_earn}</div>
           <div style={{ color:MUTED,fontSize:'0.82rem' }}>Complete this week's goal to earn this badge and level up your Communication Twin.</div>
@@ -1021,7 +1022,7 @@ export default function CommTwin() {
         <BackButton />
         <div>
           <div style={{ display:'flex',alignItems:'center',gap:'0.5rem' }}>
-            <span style={{ fontSize:'1.3rem' }}>🗣️</span>
+            <span style={{ fontSize:'1.3rem' }}></span>
             <span style={{ fontWeight:800,fontSize:'1.15rem',color:TEXT }}>Spoken English & Communication Twin</span>
           </div>
           <div style={{ color:MUTED,fontSize:'0.72rem' }}>AI-powered communication intelligence hub</div>

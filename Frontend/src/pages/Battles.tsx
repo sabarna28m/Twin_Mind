@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+﻿import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Flame, Clock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { getLevelColor, getLevelGradient, LEVEL_NAMES } from '../utils/gamification';
@@ -48,9 +49,9 @@ type Duration = '24hr' | '48hr' | '1week';
 
 // ── Config ─────────────────────────────────────────────────────────────────
 const TYPE_INFO: Record<BattleType, { icon: string; label: string; unit: string; desc: string; placeholder: string }> = {
-  study_hours: { icon: '📚', label: 'Study Hours', unit: 'h', desc: 'Most study hours logged wins', placeholder: '10' },
-  quiz:        { icon: '🧠', label: 'Quiz Score',  unit: '%', desc: 'Highest average quiz score wins', placeholder: '80' },
-  streak:      { icon: '🔥', label: 'Streak',      unit: ' days', desc: 'Longest study streak wins', placeholder: '7' },
+  study_hours: { icon: '', label: 'Study Hours', unit: 'h', desc: 'Most study hours logged wins', placeholder: '10' },
+  quiz:        { icon: '', label: 'Quiz Score',  unit: '%', desc: 'Highest average quiz score wins', placeholder: '80' },
+  streak:      { icon: '', label: 'Streak',      unit: ' days', desc: 'Longest study streak wins', placeholder: '7' },
 };
 
 const DUR_INFO: Record<string, { label: string }> = {
@@ -175,14 +176,14 @@ function BattleCard({ battle, onRefresh }: { battle: Battle; onRefresh: () => vo
           color: battle.winner?.is_me ? '#10b981' : battle.winner ? '#ef4444' : '#818cf8',
           fontSize: '0.82rem', fontWeight: 700, textAlign: 'center' as const,
         }}>
-          {battle.winner?.is_me ? '🏆 You Won!' : battle.winner ? `🎯 ${battle.winner.name} Won` : '🤝 It\'s a Tie!'}
+          {battle.winner?.is_me ? 'You Won!' : battle.winner ? `${battle.winner.name} Won` : "It's a Tie!"}
         </div>
       )}
 
       {/* Time remaining */}
       {isActive && battle.expires_at && (
         <p style={{ margin: '0 0 0.75rem', fontSize: '0.76rem', color: '#f97316', fontWeight: 600, textAlign: 'center' as const }}>
-          ⏱ {timeLeft(battle.expires_at)}
+          <Clock size={13} style={{marginRight:'0.3rem',verticalAlign:'middle'}}/>{timeLeft(battle.expires_at)}
         </p>
       )}
 
@@ -205,7 +206,7 @@ function BattleCard({ battle, onRefresh }: { battle: Battle; onRefresh: () => vo
                 onClick={() => handleCopy(battle.invite_code)}
                 style={{ ...btn.sm, background: copied ? '#10b981' : 'linear-gradient(135deg,#f97316,#ef4444)' }}
               >
-                {copied ? '✓ Copied' : 'Copy Code'}
+                {copied ? ' Copied' : 'Copy Code'}
               </button>
             </div>
           </div>
@@ -213,7 +214,7 @@ function BattleCard({ battle, onRefresh }: { battle: Battle; onRefresh: () => vo
             onClick={() => handleCopy(inviteLink)}
             style={{ ...btn.ghost, fontSize: '0.72rem', padding: '0.35rem 0.75rem' }}
           >
-            🔗 Copy Invite Link
+             Copy Invite Link
           </button>
         </div>
       )}
@@ -223,7 +224,7 @@ function BattleCard({ battle, onRefresh }: { battle: Battle; onRefresh: () => vo
 
 // ── LeaderboardRow ─────────────────────────────────────────────────────────
 function LBRow({ entry }: { entry: LBEntry }) {
-  const medals: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
+  const medals: Record<number, string> = { 1: '', 2: '', 3: '' };
   const lvColor = getLevelColor(entry.level);
   const maxXP = 3800;
 
@@ -286,7 +287,7 @@ function LBRow({ entry }: { entry: LBEntry }) {
       {/* Stats */}
       <div style={{ display: 'flex', gap: '0.85rem', flexShrink: 0 }}>
         <div style={{ textAlign: 'center' as const }}>
-          <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 700, color: '#f97316' }}>🔥{entry.streak_days}</p>
+          <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 700, color: '#f97316', display: 'flex', alignItems: 'center', gap: '0.15rem' }}><Flame size={12} />{entry.streak_days}</p>
           <p style={{ margin: 0, fontSize: '0.6rem', color: 'var(--text)' }}>streak</p>
         </div>
         <div style={{ textAlign: 'center' as const }}>
@@ -447,7 +448,7 @@ export default function Battles() {
       {/* Hero */}
       <div style={s.hero}>
         <div style={s.heroOrb} />
-        <span style={s.heroIcon}>⚔️</span>
+        <span style={s.heroIcon}></span>
         <h1 style={s.heroTitle}>Study Battles</h1>
         <p style={s.heroSub}>Challenge peers, track progress, climb the leaderboard</p>
       </div>
@@ -460,7 +461,7 @@ export default function Battles() {
             onClick={() => { setTab(t); setError(''); }}
             style={{ ...s.tabBtn, ...(tab === t ? s.tabBtnActive : {}) }}
           >
-            {t === 'battles' ? '⚔️ My Battles' : '🏆 Leaderboard'}
+            {t === 'battles' ? ' My Battles' : ' Leaderboard'}
           </button>
         ))}
       </div>
@@ -468,7 +469,7 @@ export default function Battles() {
       <main style={s.main}>
         {/* Flash messages */}
         {error && (
-          <div style={s.errorBanner} onClick={() => setError('')}>{error} ✕</div>
+          <div style={s.errorBanner} onClick={() => setError('')}>{error} </div>
         )}
         {successMsg && (
           <div style={s.successBanner}>{successMsg}</div>
@@ -483,27 +484,27 @@ export default function Battles() {
                 onClick={() => { setShowCreate(v => !v); setShowJoin(false); setNewBattle(null); }}
                 style={{ ...btn.primary, ...(showCreate ? { opacity: 0.8 } : {}) }}
               >
-                {showCreate ? '✕ Cancel' : '+ Create Battle'}
+                {showCreate ? ' Cancel' : '+ Create Battle'}
               </button>
               <button
                 onClick={() => { setShowJoin(v => !v); setShowCreate(false); setNewBattle(null); }}
                 style={{ ...btn.secondary, ...(showJoin ? { opacity: 0.8 } : {}) }}
               >
-                {showJoin ? '✕ Cancel' : '🔗 Join by Code'}
+                {showJoin ? ' Cancel' : ' Join by Code'}
               </button>
               <button
                 onClick={handleRandom}
                 disabled={randoming}
                 style={{ ...btn.ghost, opacity: randoming ? 0.6 : 1 }}
               >
-                {randoming ? 'Searching…' : '🎲 Random Match'}
+                {randoming ? 'Searching…' : ' Random Match'}
               </button>
             </div>
 
             {/* Create Battle Panel */}
             {showCreate && (
               <div style={s.panel}>
-                <h3 style={s.panelTitle}>⚔️ Create a Battle</h3>
+                <h3 style={s.panelTitle}> Create a Battle</h3>
 
                 <p style={s.fieldLabel}>Battle Type</p>
                 <div style={s.typeGrid}>
@@ -555,7 +556,7 @@ export default function Battles() {
                   disabled={creating}
                   style={{ ...btn.primary, marginTop: '1rem', opacity: creating ? 0.6 : 1 }}
                 >
-                  {creating ? 'Creating…' : '⚔️ Create Battle'}
+                  {creating ? 'Creating…' : ' Create Battle'}
                 </button>
               </div>
             )}
@@ -564,7 +565,7 @@ export default function Battles() {
             {newBattle && newBattle.status === 'pending' && (
               <div style={{ ...s.panel, border: '1px solid rgba(249,115,22,0.4)', background: 'rgba(249,115,22,0.06)' }}>
                 <p style={{ margin: '0 0 0.5rem', fontWeight: 700, color: '#f97316', fontSize: '0.9rem' }}>
-                  🎉 Battle created! Share this code:
+                   Battle created! Share this code:
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <span style={{ fontFamily: 'monospace', fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-h)', letterSpacing: '0.2em' }}>
@@ -589,7 +590,7 @@ export default function Battles() {
             {/* Join Battle Panel */}
             {showJoin && (
               <div style={s.panel}>
-                <h3 style={s.panelTitle}>🔗 Join a Battle</h3>
+                <h3 style={s.panelTitle}> Join a Battle</h3>
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', flexWrap: 'wrap' as const }}>
                   <label style={s.fieldWrap}>
                     <span style={s.fieldLabel}>Invite Code</span>
@@ -607,7 +608,7 @@ export default function Battles() {
                     disabled={joining || !joinCode.trim()}
                     style={{ ...btn.primary, opacity: joining || !joinCode.trim() ? 0.6 : 1 }}
                   >
-                    {joining ? 'Joining…' : '⚔️ Join Battle'}
+                    {joining ? 'Joining…' : ' Join Battle'}
                   </button>
                 </div>
               </div>
@@ -623,7 +624,7 @@ export default function Battles() {
                 {/* Active */}
                 {active.length > 0 && (
                   <section>
-                    <h2 style={s.sectionHead}>🔴 Active Battles</h2>
+                    <h2 style={s.sectionHead}> Active Battles</h2>
                     <div style={s.cardGrid}>
                       {active.map(b => <BattleCard key={b.id} battle={b} onRefresh={loadBattles} />)}
                     </div>
@@ -633,7 +634,7 @@ export default function Battles() {
                 {/* Pending */}
                 {pending.length > 0 && (
                   <section>
-                    <h2 style={s.sectionHead}>⏳ Waiting for Opponent</h2>
+                    <h2 style={s.sectionHead}>Waiting for Opponent</h2>
                     <div style={s.cardGrid}>
                       {pending.map(b => <BattleCard key={b.id} battle={b} onRefresh={loadBattles} />)}
                     </div>
@@ -643,7 +644,7 @@ export default function Battles() {
                 {/* Completed */}
                 {completed.length > 0 && (
                   <section>
-                    <h2 style={s.sectionHead}>✅ Recent Results</h2>
+                    <h2 style={s.sectionHead}> Recent Results</h2>
                     <div style={s.cardGrid}>
                       {completed.map(b => <BattleCard key={b.id} battle={b} onRefresh={loadBattles} />)}
                     </div>
@@ -652,7 +653,7 @@ export default function Battles() {
 
                 {battles.length === 0 && (
                   <div style={s.emptyState}>
-                    <p style={s.emptyIcon}>⚔️</p>
+                    <p style={s.emptyIcon}></p>
                     <p style={s.emptyTitle}>No battles yet</p>
                     <p style={s.emptySub}>Create a battle or join one using an invite code to get started.</p>
                     <button onClick={() => setShowCreate(true)} style={btn.primary}>
@@ -676,7 +677,7 @@ export default function Battles() {
                   onClick={() => setLbPeriod(p)}
                   style={{ ...s.periodBtn, ...(lbPeriod === p ? s.periodBtnActive : {}) }}
                 >
-                  {p === 'weekly' ? '📅 Weekly' : p === 'monthly' ? '📆 Monthly' : '🏅 All-Time'}
+                  {p === 'weekly' ? ' Weekly' : p === 'monthly' ? ' Monthly' : ' All-Time'}
                 </button>
               ))}
             </div>
@@ -687,7 +688,7 @@ export default function Battles() {
               </div>
             ) : lbEntries.length === 0 ? (
               <div style={s.emptyState}>
-                <p style={s.emptyIcon}>🏆</p>
+                <p style={s.emptyIcon}></p>
                 <p style={s.emptyTitle}>No data yet</p>
                 <p style={s.emptySub}>Start logging study hours and completing quizzes to appear here.</p>
               </div>

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+﻿import { useState, useRef, useEffect, useCallback } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -8,18 +8,18 @@ interface Msg { id: string; role: 'user' | 'assistant'; content: string; streami
 function uid() { return Math.random().toString(36).slice(2); }
 
 const QUICK_CHIPS = [
-  { label: '🧠 Generate Quiz',     text: 'Create a 5-question quiz on my weakest subject.'          },
-  { label: '📋 Study Plan',        text: 'Generate a personalized 7-day study plan for me.'          },
-  { label: '🎯 Explain Concept',   text: 'Explain the most important concept I need to understand.'  },
-  { label: '📉 Analyze Weakness',  text: 'Analyze my weakest subject and give me an action plan.'    },
-  { label: '🔥 Boost Motivation',  text: 'Give me a motivational message and my next best action.'   },
-  { label: '📈 Predict Exam',      text: 'Based on my data, predict how I will perform in exams.'    },
+  { label: 'Generate Quiz',     text: 'Create a 5-question quiz on my weakest subject.'          },
+  { label: 'Study Plan',        text: 'Generate a personalized 7-day study plan for me.'          },
+  { label: 'Explain Concept',   text: 'Explain the most important concept I need to understand.'  },
+  { label: 'Analyze Weakness',  text: 'Analyze my weakest subject and give me an action plan.'    },
+  { label: 'Boost Motivation',  text: 'Give me a motivational message and my next best action.'   },
+  { label: 'Predict Exam',      text: 'Based on my data, predict how I will perform in exams.'    },
 ];
 
 const WELCOME: Msg = {
   id: 'welcome',
   role: 'assistant',
-  content: `Hi! I'm your **TwinMind Copilot** 🤖\n\nI have full access to your academic profile, subject performance, burnout risk, and learning patterns. Ask me anything — I'll give you personalized, data-driven guidance.\n\nTry one of the quick actions below, or just type your question.`,
+  content: `Hi! I'm your **TwinMind Copilot** \n\nI have full access to your academic profile, subject performance, burnout risk, and learning patterns. Ask me anything — I'll give you personalized, data-driven guidance.\n\nTry one of the quick actions below, or just type your question.`,
 };
 
 export default function TwinMindCopilot() {
@@ -143,7 +143,7 @@ export default function TwinMindCopilot() {
         }}
         aria-label="Open TwinMind Copilot"
       >
-        <span style={fab.icon}>{open ? '✕' : '◈'}</span>
+        <span style={fab.icon}>{open ? '' : '◈'}</span>
         <span style={fab.label}>{open ? 'Close' : 'Copilot'}</span>
         {!open && <span style={fab.badge} />}
       </button>

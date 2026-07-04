@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿﻿import { useState, useEffect, useRef } from 'react';
 import type { FormEvent } from 'react';
 import api from '../services/api';
 
@@ -91,9 +91,7 @@ export default function TwoFactorModal({ isOpen, onClose, onEnabled }: Props) {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(99,102,241,0.15)', border: '1.5px solid rgba(99,102,241,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>
-              🔐
-            </div>
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(99,102,241,0.15)', border: '1.5px solid rgba(99,102,241,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}></div>
             <div>
               <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#f1f5f9' }}>
                 {step === 'success' ? 'Two-Factor Authentication Enabled' : 'Set up Two-Factor Authentication'}
@@ -107,7 +105,7 @@ export default function TwoFactorModal({ isOpen, onClose, onEnabled }: Props) {
             </div>
           </div>
           {step !== 'loading' && (
-            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(148,163,184,0.6)', cursor: 'pointer', fontSize: '1.2rem', padding: '4px', lineHeight: 1 }}>✕</button>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(148,163,184,0.6)', cursor: 'pointer', fontSize: '1.2rem', padding: '4px', lineHeight: 1 }}></button>
           )}
         </div>
 
@@ -208,7 +206,7 @@ export default function TwoFactorModal({ isOpen, onClose, onEnabled }: Props) {
         {step === 'success' && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem', padding: '0.65rem 0.9rem', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.35)', borderRadius: '10px' }}>
-              <span style={{ color: '#34d399', fontSize: '1rem' }}>✓</span>
+              <span style={{ color: '#34d399', fontSize: '1rem' }}></span>
               <span style={{ fontSize: '0.82rem', color: '#34d399', fontWeight: 600 }}>2FA is now active on your account</span>
             </div>
 
@@ -229,7 +227,7 @@ export default function TwoFactorModal({ isOpen, onClose, onEnabled }: Props) {
                 onClick={copyAll}
                 style={{ flex: '1 1 auto', padding: '0.58rem 1rem', background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.07)', color: copied ? '#34d399' : '#e2e8f0', border: `1.5px solid ${copied ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.14)'}`, borderRadius: '10px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.18s' }}
               >
-                {copied ? '✓ Copied!' : '⧉ Copy All'}
+                {copied ? 'Copied!' : '⧉ Copy All'}
               </button>
               <button
                 onClick={downloadCodes}

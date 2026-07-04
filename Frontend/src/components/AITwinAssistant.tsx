@@ -5,11 +5,11 @@ import api from '../services/api';
 interface BurnoutEntry { burnout_score: number; risk_level: 'low' | 'medium' | 'high' }
 
 const GENERAL_INSIGHTS = [
-  `📚 Regular spaced-repetition sessions improve long-term retention by up to 40%. Short daily sessions outperform long infrequent ones.`,
-  `🎯 Try a Focus Mode quiz to track your attention score in real time. Consistent scores above 75% signal strong readiness.`,
-  `🧠 Your Digital Twin improves its predictions each time you complete a session, quiz, or check-in. The more you study, the smarter it gets.`,
-  `⚡ Students who review study material within 24 hours of learning it retain 70% more. Schedule a quick revision after every session.`,
-  `📊 Open Subject Analysis under Performance to see your AI-ranked priority list and personalised recovery plans for each subject.`,
+  `Regular spaced-repetition sessions improve long-term retention by up to 40%. Short daily sessions outperform long infrequent ones.`,
+  `Try a Focus Mode quiz to track your attention score in real time. Consistent scores above 75% signal strong readiness.`,
+  `Your Digital Twin improves its predictions each time you complete a session, quiz, or check-in. The more you study, the smarter it gets.`,
+  `Students who review study material within 24 hours of learning it retain 70% more. Schedule a quick revision after every session.`,
+  `Open Subject Analysis under Performance to see your AI-ranked priority list and personalised recovery plans for each subject.`,
 ];
 
 function buildMessages(burnout: BurnoutEntry | null): string[] {
@@ -17,16 +17,16 @@ function buildMessages(burnout: BurnoutEntry | null): string[] {
 
   if (burnout?.risk_level === 'high') {
     msgs.push(
-      `⚠️ High burnout risk detected (score: ${burnout.burnout_score}/100). ` +
+      `High burnout risk detected (score: ${burnout.burnout_score}/100). ` +
       `Consider a lighter 30-min session with breaks today.`
     );
   } else if (burnout?.risk_level === 'medium') {
     msgs.push(
-      `🟡 Medium burnout detected. I recommend a 10-minute break after every study block and a rest day this week.`
+      `Medium burnout detected. I recommend a 10-minute break after every study block and a rest day this week.`
     );
   } else if (burnout?.risk_level === 'low') {
     msgs.push(
-      `✅ Your burnout score is healthy (${burnout.burnout_score}/100). You are in a good zone — maintain your current study rhythm.`
+      `Your burnout score is healthy (${burnout.burnout_score}/100). You are in a good zone — maintain your current study rhythm.`
     );
   }
 
@@ -37,7 +37,7 @@ function buildMessages(burnout: BurnoutEntry | null): string[] {
   }
 
   if (msgs.length === 0) {
-    msgs.push(`🤖 Log your daily check-in to help me understand your patterns and give smarter recommendations.`);
+    msgs.push(`Log your daily check-in to help me understand your patterns and give smarter recommendations.`);
     msgs.push(GENERAL_INSIGHTS[0]);
     msgs.push(GENERAL_INSIGHTS[1]);
   }
@@ -76,7 +76,7 @@ export default function AITwinAssistant() {
         </div>
         <div style={{ flex: 1 }}>
           <p style={ta.name}>TwinMind Twin</p>
-          <p style={ta.status}>🟢 Active · AI Assistant</p>
+          <p style={ta.status}>Active · AI Assistant</p>
         </div>
         <div style={ta.modelTag}>GPT-Powered</div>
       </div>
@@ -109,8 +109,8 @@ export default function AITwinAssistant() {
       {/* Quick actions */}
       <div style={ta.actions}>
         <Link to="/sessions"       style={ta.actionBtn}>▶ Start Session</Link>
-        <Link to="/study-planner"  style={ta.actionBtn}>📋 Generate Study Plan</Link>
-        <Link to="/subjects"       style={ta.actionBtn}>📊 View Weaknesses</Link>
+        <Link to="/study-planner"  style={ta.actionBtn}>Generate Study Plan</Link>
+        <Link to="/subjects"       style={ta.actionBtn}>View Weaknesses</Link>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { GOOGLE_CLIENT_ID } from './lib/config';
 // Only mount GoogleOAuthProvider when a client ID is actually configured.
@@ -26,7 +27,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
       const err = this.state.error as Error;
       return (
         <div style={{ minHeight: '100svh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#060b18', padding: '2rem', gap: '1rem' }}>
-          <span style={{ fontSize: '2rem' }}>⚠️</span>
+          <AlertTriangle size={32} color="#f59e0b" />
           <p style={{ color: '#f1f5f9', fontWeight: 700, margin: 0, fontSize: '1.1rem' }}>Something went wrong</p>
           <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.85rem', maxWidth: '480px', textAlign: 'center' }}>{err.message}</p>
           <button onClick={() => window.location.reload()} style={{ marginTop: '0.5rem', padding: '0.5rem 1.5rem', background: '#00D4FF', color: '#060b18', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem' }}>Reload</button>
@@ -71,6 +72,7 @@ import StudyPlanner from './pages/StudyPlanner';
 import ShieldCenter from './pages/ShieldCenter';
 import About from './pages/About';
 import Home from './pages/Home';
+import NotFound from './pages/NotFound';
 
 /* Auth guard that doubles as the layout route element.
    Renders AppShell (which contains <Outlet />) for all child routes. */
@@ -145,7 +147,7 @@ export default function App() {
             <Route path="/materials"   element={<Navigate to="/quiz"     replace />} />
             <Route path="/focus"       element={<Navigate to="/sessions" replace />} />
             <Route path="/smart-notes" element={<Navigate to="/notes"    replace />} />
-            <Route path="*"            element={<Navigate to="/"         replace />} />
+            <Route path="*"            element={<NotFound />} />
           </Routes>
           <TwinMindCopilot />
         </SidebarProvider>

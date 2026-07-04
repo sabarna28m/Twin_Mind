@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { Brain, TrendingDown as TrendDown, Target, Flame, TrendingUp, Clock, Trophy } from 'lucide-react';
 import api from '../services/api';
 
 interface BurnoutEntry {
@@ -26,7 +27,7 @@ interface Props {
 function MetricCard({
   icon, label, value, sub, color, to,
 }: {
-  icon: string; label: string; value: string; sub: string; color: string; to: string;
+  icon: ReactNode; label: string; value: string; sub: string; color: string; to: string;
 }) {
   return (
     <Link to={to} style={{ textDecoration: 'none' }}>
@@ -102,26 +103,26 @@ export default function AICommandCenter({ brainReadiness, streak, level = 1 }: P
 
   const mainMetrics = [
     {
-      icon: '🧠', label: 'Brain Readiness', to: '/checkin',
+      icon: <Brain size={18} />, label: 'Brain Readiness', to: '/checkin',
       value: brainReadiness > 0 ? `${brainReadiness}%` : '—',
       sub: brainReadiness >= 70 ? 'Thriving' : brainReadiness >= 45 ? 'Growing' : brainReadiness > 0 ? 'Needs Attention' : 'Log check-in',
       color: readinessColor,
     },
     {
-      icon: burnout?.risk_level === 'high' ? '🔴' : burnout?.risk_level === 'medium' ? '🟡' : '🟢',
+      icon: <span style={{ width: 14, height: 14, borderRadius: '50%', display: 'inline-block', background: burnoutColor }} />,
       label: 'Burnout Risk', to: '/burnout',
       value: burnoutLabel,
       sub: burnout ? `Score: ${burnout.burnout_score}/100` : 'No data yet',
       color: burnoutColor,
     },
     {
-      icon: '📉', label: 'Weakest Subject', to: '/subjects',
+      icon: <TrendDown size={18} />, label: 'Weakest Subject', to: '/subjects',
       value: subjects?.weakest?.subject ?? '—',
       sub: subjects?.weakest ? `${subjects.weakest.avg_score != null ? subjects.weakest.avg_score.toFixed(0) : '?'}% avg · needs focus` : 'Add subject data',
       color: '#ef4444',
     },
     {
-      icon: '🎯', label: 'Focus Today', to: '/sessions',
+      icon: <Target size={18} />, label: 'Focus Today', to: '/sessions',
       value: subjects?.focus_today?.subject ?? '—',
       sub: subjects?.focus_today ? `${subjects.focus_today.recommended_daily_minutes} min recommended` : 'Log a session',
       color: '#6366f1',
@@ -139,7 +140,7 @@ export default function AICommandCenter({ brainReadiness, streak, level = 1 }: P
           <span style={cc.pulseDot} className="live-dot" />
           <span style={cc.aiTag}>TWINMIND AI</span>
           <span style={cc.sep}>·</span>
-          <h2 style={cc.title}>🧠 AI Command Center</h2>
+          <h2 style={cc.title}>AI Command Center</h2>
         </div>
         <div style={cc.liveChip}>
           <span style={cc.liveDot} className="live-dot" />
@@ -157,14 +158,14 @@ export default function AICommandCenter({ brainReadiness, streak, level = 1 }: P
       {/* Secondary stats bar */}
       <div style={cc.statsBar} className="mob-cmd-statsbar">
         {[
-          { icon: '🔥', label: 'Study Streak',  value: `${streak} days`,                            color: '#f59e0b', to: '/checkin'      },
-          { icon: '📈', label: 'AI Prediction',  value: predictedBoost ? `+${predictedBoost}% improvement` : 'Log data', color: '#10b981', to: '/predict' },
-          { icon: '⏱',  label: 'Recommended',   value: `${subjects?.focus_today?.recommended_daily_minutes ?? 45} min session`, color: '#00D4FF', to: '/sessions' },
-          { icon: '🏆', label: 'Level',          value: `Level ${level}`,                            color: '#a78bfa', to: '/achievements' },
+          { icon: <Flame size={16} />,      label: 'Study Streak',  value: `${streak} days`,                            color: '#f59e0b', to: '/checkin'      },
+          { icon: <TrendingUp size={16} />, label: 'AI Prediction',  value: predictedBoost ? `+${predictedBoost}% improvement` : 'Log data', color: '#10b981', to: '/predict' },
+          { icon: <Clock size={16} />,      label: 'Recommended',   value: `${subjects?.focus_today?.recommended_daily_minutes ?? 45} min session`, color: '#00D4FF', to: '/sessions' },
+          { icon: <Trophy size={16} />,     label: 'Level',          value: `Level ${level}`,                            color: '#a78bfa', to: '/achievements' },
         ].map((stat, i) => (
           <Link key={i} to={stat.to} style={{ textDecoration: 'none', flex: 1 }}>
             <div style={cc.statItem} className="cmd-stat-item">
-              <span style={{ fontSize: '1rem' }}>{stat.icon}</span>
+              <span style={{ display: 'flex', alignItems: 'center', color: stat.color }}>{stat.icon}</span>
               <div>
                 <p style={cc.statItemLabel}>{stat.label}</p>
                 <p style={{ ...cc.statItemValue, color: stat.color }}>{stat.value}</p>

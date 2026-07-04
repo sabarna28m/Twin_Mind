@@ -310,11 +310,11 @@ def get_analysis(
     notifs: list[str] = []
     for s in with_data:
         if s.trend == "declining" and s.improvement is not None and abs(s.improvement) >= 5:
-            notifs.append(f"📉 {s.subject} score dropped by {abs(s.improvement):.0f}% — review needed.")
+            notifs.append(f" {s.subject} score dropped by {abs(s.improvement):.0f}% — review needed.")
         if s.days_since_activity and s.days_since_activity >= 5:
-            notifs.append(f"⏰ {s.subject} has not been studied for {s.days_since_activity} days.")
+            notifs.append(f" {s.subject} has not been studied for {s.days_since_activity} days.")
         if s.avg_score < 45:
-            notifs.append(f"🔔 AI recommends focusing on {s.subject} today (score: {s.avg_score:.0f}%).")
+            notifs.append(f" AI recommends focusing on {s.subject} today (score: {s.avg_score:.0f}%).")
 
     # Priority ranking (higher score = lower rank number = less urgent, but we rank by urgency)
     def _urgency(s: SubjectSummary) -> float:

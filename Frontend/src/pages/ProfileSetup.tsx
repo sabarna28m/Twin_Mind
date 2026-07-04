@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,11 +15,11 @@ const LEARNING_PREFS = [
 
 const SEMESTER_GROUPS: { label: string; options: string[] }[] = [
   {
-    label: '📚 School Students · Class 1 to 12',
+    label: 'School Students · Class 1 to 12',
     options: Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`),
   },
   {
-    label: '🎓 Undergraduate College · Semester 1–8 or Year 1–4',
+    label: 'Undergraduate College · Semester 1–8 or Year 1–4',
     options: [
       'Semester 1', 'Semester 2', 'Semester 3', 'Semester 4',
       'Semester 5', 'Semester 6', 'Semester 7', 'Semester 8',
@@ -27,38 +27,38 @@ const SEMESTER_GROUPS: { label: string; options: string[] }[] = [
     ],
   },
   {
-    label: '🏛️ Postgraduate · PG Semester or PG Year',
+    label: 'Postgraduate · PG Semester or PG Year',
     options: ['PG Semester 1', 'PG Semester 2', 'PG Semester 3', 'PG Semester 4', 'PG Year 1', 'PG Year 2'],
   },
   {
-    label: '🔬 Doctoral / PhD · PhD Year 1 to 5',
+    label: 'Doctoral / PhD · PhD Year 1 to 5',
     options: Array.from({ length: 5 }, (_, i) => `PhD Year ${i + 1}`),
   },
   {
-    label: '📖 Professional Courses · Module (NPTEL, CA) or Level (AWS, certs)',
+    label: 'Professional Courses · Module (NPTEL, CA) or Level (AWS, certs)',
     options: [
       'Module 1', 'Module 2', 'Module 3', 'Module 4', 'Module 5', 'Module 6',
       'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5',
     ],
   },
   {
-    label: '💻 Online / Self Learning · Beginner to Advanced',
+    label: 'Online / Self Learning · Beginner to Advanced',
     options: ['Beginner Level', 'Intermediate Level', 'Advanced Level', 'Self-paced'],
   },
   {
-    label: '❓ Other',
+    label: 'Other',
     options: ['Not Applicable'],
   },
 ];
 
 const GUIDE_ITEMS = [
-  { emoji: '📚', cat: 'School Students', hint: 'Select Class 1–12' },
-  { emoji: '🎓', cat: 'College Students', hint: 'Select Semester 1–8 or Year 1–4' },
-  { emoji: '🏛️', cat: 'Postgraduate', hint: 'Select PG Semester or PG Year' },
-  { emoji: '🔬', cat: 'PhD / Doctoral', hint: 'Select PhD Year' },
-  { emoji: '📖', cat: 'Professional Courses', hint: 'Module → NPTEL, Coursera, CA  ·  Level → AWS, language, certs' },
-  { emoji: '💻', cat: 'Self Learning', hint: 'Select Beginner, Intermediate, or Advanced' },
-  { emoji: '❓', cat: 'Not sure?', hint: 'Select Not Applicable' },
+  { emoji: '', cat: 'School Students', hint: 'Select Class 1–12' },
+  { emoji: '', cat: 'College Students', hint: 'Select Semester 1–8 or Year 1–4' },
+  { emoji: '', cat: 'Postgraduate', hint: 'Select PG Semester or PG Year' },
+  { emoji: '', cat: 'PhD / Doctoral', hint: 'Select PhD Year' },
+  { emoji: '', cat: 'Professional Courses', hint: 'Module → NPTEL, Coursera, CA  ·  Level → AWS, language, certs' },
+  { emoji: '', cat: 'Self Learning', hint: 'Select Beginner, Intermediate, or Advanced' },
+  { emoji: '', cat: 'Not sure?', hint: 'Select Not Applicable' },
 ];
 
 const COURSE_SUGGESTIONS = [
@@ -354,7 +354,7 @@ export default function ProfileSetup() {
                     onClick={() => togglePref(pref)}
                     style={active ? { ...s.prefChip, ...s.prefChipActive } : s.prefChip}
                   >
-                    {active ? '✓ ' : ''}{pref}
+                    {active ? ' ' : ''}{pref}
                   </button>
                 );
               })}

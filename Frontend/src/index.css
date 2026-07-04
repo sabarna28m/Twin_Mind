@@ -1,6 +1,6 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap');
 @import './tokens.css';
+@import "tailwindcss";
 
 /* ── Tailwind v4: map font-sans utility to Inter ── */
 @theme {
@@ -1559,7 +1559,7 @@ html[data-color-scheme="light"] select.form-select option:checked{ background-co
 
 html { transition: color 0.4s ease; }
 
-/* ── 🌌 Galaxy Nexus ─────────────────────────────────────────────────── */
+/* ──  Galaxy Nexus ─────────────────────────────────────────────────── */
 html[data-theme="galaxy-nexus"],
 html[data-theme="cosmos"] {
   --bg:          transparent;
@@ -1591,7 +1591,7 @@ html[data-theme="cosmos"] .hero-animated {
   background-size:400% 400%!important;
 }
 
-/* ── 🌸 Sakura Dream ─────────────────────────────────────────────────── */
+/* ──  Sakura Dream ─────────────────────────────────────────────────── */
 html[data-theme="sakura-dream"],
 html[data-theme="sakura"] {
   --bg:transparent; --bg-surface:rgba(255,180,200,0.06); --bg-elevated:rgba(255,180,200,0.1);
@@ -1619,7 +1619,7 @@ html[data-theme="sakura-dream"] .hero-animated, html[data-theme="sakura"] .hero-
 html[data-theme="sakura-dream"] ::-webkit-scrollbar-thumb,
 html[data-theme="sakura"] ::-webkit-scrollbar-thumb { background:rgba(255,107,157,0.22)!important; }
 
-/* ── 🔥 Inferno ──────────────────────────────────────────────────────── */
+/* ──  Inferno ──────────────────────────────────────────────────────── */
 html[data-theme="inferno"],
 html[data-theme="ember"] {
   --bg:transparent; --bg-surface:rgba(255,80,0,0.06); --bg-elevated:rgba(255,100,0,0.09);
@@ -1647,7 +1647,7 @@ html[data-theme="inferno"] .hero-animated, html[data-theme="ember"] .hero-animat
 html[data-theme="inferno"] ::-webkit-scrollbar-thumb,
 html[data-theme="ember"] ::-webkit-scrollbar-thumb { background:rgba(255,69,0,0.25)!important; }
 
-/* ── ❄️ Arctic Aurora ────────────────────────────────────────────────── */
+/* ──  Arctic Aurora ────────────────────────────────────────────────── */
 html[data-theme="arctic-aurora"],
 html[data-theme="arctic"] {
   --bg:transparent; --bg-surface:rgba(0,255,200,0.05); --bg-elevated:rgba(0,200,255,0.08);
@@ -1675,7 +1675,7 @@ html[data-theme="arctic-aurora"] .hero-animated, html[data-theme="arctic"] .hero
 html[data-theme="arctic-aurora"] ::-webkit-scrollbar-thumb,
 html[data-theme="arctic"] ::-webkit-scrollbar-thumb { background:rgba(0,255,200,0.22)!important; }
 
-/* ── 🌲 Nature Pulse ─────────────────────────────────────────────────── */
+/* ──  Nature Pulse ─────────────────────────────────────────────────── */
 html[data-theme="nature-pulse"],
 html[data-theme="forest"] {
   --bg:transparent; --bg-surface:rgba(16,185,129,0.06); --bg-elevated:rgba(16,185,129,0.09);
@@ -1703,7 +1703,7 @@ html[data-theme="nature-pulse"] .hero-animated, html[data-theme="forest"] .hero-
 html[data-theme="nature-pulse"] ::-webkit-scrollbar-thumb,
 html[data-theme="forest"] ::-webkit-scrollbar-thumb { background:rgba(16,185,129,0.22)!important; }
 
-/* ── 🤖 Cyberpunk Neo ────────────────────────────────────────────────── */
+/* ──  Cyberpunk Neo ────────────────────────────────────────────────── */
 html[data-theme="cyberpunk-neo"],
 html[data-theme="neon-cyberpunk"] {
   --bg:transparent; --bg-surface:rgba(0,255,65,0.04); --bg-elevated:rgba(0,255,65,0.07);
@@ -1739,7 +1739,7 @@ html[data-theme="neon-cyberpunk"] select.form-select { background-color:#060606!
 html[data-theme="cyberpunk-neo"] select.form-select option,
 html[data-theme="neon-cyberpunk"] select.form-select option { background-color:#050505!important; color:#00ff41!important; }
 
-/* ── 🌊 Ocean Intelligence ────────────────────────────────────────────── */
+/* ──  Ocean Intelligence ────────────────────────────────────────────── */
 html[data-theme="ocean-intelligence"] {
   --bg:transparent; --bg-surface:rgba(0,105,148,0.08); --bg-elevated:rgba(0,150,200,0.1);
   --text:rgba(100,210,220,0.9); --text-m:#67e8f9; --text-h:#e0f9ff;
@@ -1765,7 +1765,7 @@ html[data-theme="ocean-intelligence"] .hero-animated {
 }
 html[data-theme="ocean-intelligence"] ::-webkit-scrollbar-thumb { background:rgba(0,206,209,0.22)!important; }
 
-/* ── 🧠 Neural Brain ─────────────────────────────────────────────────── */
+/* ──  Neural Brain ─────────────────────────────────────────────────── */
 html[data-theme="neural-brain"] {
   --bg:transparent; --bg-surface:rgba(100,0,200,0.06); --bg-elevated:rgba(120,20,220,0.09);
   --text:rgba(180,140,255,0.9); --text-m:#c4b5fd; --text-h:#f5f0ff;
@@ -1888,7 +1888,7 @@ html[data-theme="neural-brain"] select.form-select option:checked { background-c
   --scroll-thumb:      rgba(0,212,255,0.18);
 }
 
-/* ── 🌌 Galaxy Nexus ── */
+/* ──  Galaxy Nexus ── */
 html[data-theme="galaxy-nexus"],html[data-theme="cosmos"] {
   --card-bg:rgba(0,8,30,0.78); --card-border:rgba(0,212,255,0.18); --card-radius:16px;
   --card-shadow:0 8px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(0,212,255,0.09),0 0 30px rgba(0,212,255,0.05);
@@ -1908,7 +1908,7 @@ html[data-theme="galaxy-nexus"],html[data-theme="cosmos"] {
   --scroll-thumb:rgba(0,212,255,0.22);
 }
 
-/* ── 🌸 Sakura Dream ── */
+/* ──  Sakura Dream ── */
 html[data-theme="sakura-dream"],html[data-theme="sakura"] {
   --card-bg:rgba(30,4,18,0.76); --card-border:rgba(255,107,157,0.2); --card-radius:24px;
   --card-shadow:0 8px 40px rgba(0,0,0,0.55),0 0 0 1px rgba(255,107,157,0.08),0 0 50px rgba(255,107,157,0.04);
@@ -1928,7 +1928,7 @@ html[data-theme="sakura-dream"],html[data-theme="sakura"] {
   --scroll-thumb:rgba(255,107,157,0.22);
 }
 
-/* ── 🔥 Inferno ── */
+/* ──  Inferno ── */
 html[data-theme="inferno"],html[data-theme="ember"] {
   --card-bg:rgba(12,2,0,0.86); --card-border:rgba(255,69,0,0.28); --card-radius:10px;
   --card-shadow:0 8px 40px rgba(0,0,0,0.82),0 0 0 1px rgba(255,69,0,0.14),0 0 30px rgba(255,69,0,0.06);
@@ -1948,7 +1948,7 @@ html[data-theme="inferno"],html[data-theme="ember"] {
   --scroll-thumb:rgba(255,69,0,0.28);
 }
 
-/* ── ❄️ Arctic Aurora ── */
+/* ──  Arctic Aurora ── */
 html[data-theme="arctic-aurora"],html[data-theme="arctic"] {
   --card-bg:rgba(0,6,18,0.78); --card-border:rgba(0,255,204,0.2); --card-radius:18px;
   --card-shadow:0 8px 40px rgba(0,0,0,0.65),0 0 0 1px rgba(0,255,204,0.1),0 0 50px rgba(0,255,204,0.04);
@@ -1968,7 +1968,7 @@ html[data-theme="arctic-aurora"],html[data-theme="arctic"] {
   --scroll-thumb:rgba(0,255,204,0.22);
 }
 
-/* ── 🌲 Nature Pulse ── */
+/* ──  Nature Pulse ── */
 html[data-theme="nature-pulse"],html[data-theme="forest"] {
   --card-bg:rgba(1,8,2,0.82); --card-border:rgba(16,185,129,0.2); --card-radius:20px;
   --card-shadow:0 8px 40px rgba(0,0,0,0.65),0 0 0 1px rgba(16,185,129,0.09),0 0 50px rgba(16,185,129,0.04);
@@ -1988,7 +1988,7 @@ html[data-theme="nature-pulse"],html[data-theme="forest"] {
   --scroll-thumb:rgba(16,185,129,0.22);
 }
 
-/* ── 🤖 Cyberpunk Neo ── */
+/* ──  Cyberpunk Neo ── */
 html[data-theme="cyberpunk-neo"],html[data-theme="neon-cyberpunk"] {
   --card-bg:rgba(0,0,0,0.94); --card-border:rgba(0,255,65,0.35); --card-radius:4px;
   --card-shadow:0 0 0 1px rgba(0,255,65,0.18),0 8px 32px rgba(0,0,0,0.96),0 0 40px rgba(0,255,65,0.06);
@@ -2008,7 +2008,7 @@ html[data-theme="cyberpunk-neo"],html[data-theme="neon-cyberpunk"] {
   --scroll-thumb:rgba(0,255,65,0.26);
 }
 
-/* ── 🌊 Ocean Intelligence ── */
+/* ──  Ocean Intelligence ── */
 html[data-theme="ocean-intelligence"] {
   --card-bg:rgba(0,5,18,0.82); --card-border:rgba(0,206,209,0.2); --card-radius:20px;
   --card-shadow:0 8px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(0,206,209,0.1),0 0 50px rgba(0,206,209,0.04);
@@ -2028,7 +2028,7 @@ html[data-theme="ocean-intelligence"] {
   --scroll-thumb:rgba(0,206,209,0.22);
 }
 
-/* ── 🧠 Neural Brain ── */
+/* ──  Neural Brain ── */
 html[data-theme="neural-brain"] {
   --card-bg:rgba(2,2,14,0.86); --card-border:rgba(139,92,246,0.24); --card-radius:16px;
   --card-shadow:0 8px 40px rgba(0,0,0,0.74),0 0 0 1px rgba(139,92,246,0.12),0 0 40px rgba(139,92,246,0.06);
@@ -2321,7 +2321,7 @@ html[data-theme="sakura"] .grad-btn {
   position: relative;
 }
 
-/* ════ 🌌 GALAXY NEXUS — Holographic AI OS ══════════════════════════════ */
+/* ════  GALAXY NEXUS — Holographic AI OS ══════════════════════════════ */
 
 html[data-theme="galaxy-nexus"] .glass-panel,
 html[data-theme="cosmos"] .glass-panel,
@@ -2415,7 +2415,7 @@ html[data-theme="cosmos"] h2 {
   text-shadow: 0 0 30px rgba(0,212,255,0.35), 0 0 60px rgba(124,58,237,0.15);
 }
 
-/* ════ 🌸 SAKURA DREAM — Tranquil Blossom Garden ═══════════════════════ */
+/* ════  SAKURA DREAM — Tranquil Blossom Garden ═══════════════════════ */
 
 html[data-theme="sakura-dream"] .glass-panel,
 html[data-theme="sakura"] .glass-panel,
@@ -2498,7 +2498,7 @@ html[data-theme="sakura"] .action-tile {
   border-radius: 24px !important;
 }
 
-/* ════ 🔥 INFERNO — High-Performance Energy Mode ═══════════════════════ */
+/* ════  INFERNO — High-Performance Energy Mode ═══════════════════════ */
 
 html[data-theme="inferno"] .glass-panel,
 html[data-theme="ember"] .glass-panel,
@@ -2585,7 +2585,7 @@ html[data-theme="ember"] .action-tile {
   border-radius: 8px !important;
 }
 
-/* ════ ❄️ ARCTIC AURORA — Ice Intelligence ══════════════════════════════ */
+/* ════  ARCTIC AURORA — Ice Intelligence ══════════════════════════════ */
 
 html[data-theme="arctic-aurora"] .glass-panel,
 html[data-theme="arctic"] .glass-panel,
@@ -2656,7 +2656,7 @@ html[data-theme="arctic"] h2 {
   text-shadow: 0 0 28px rgba(0,255,204,0.38), 0 0 56px rgba(14,165,233,0.16);
 }
 
-/* ════ 🌲 NATURE PULSE — Living Forest Growth ═══════════════════════════ */
+/* ════  NATURE PULSE — Living Forest Growth ═══════════════════════════ */
 
 html[data-theme="nature-pulse"] .glass-panel,
 html[data-theme="forest"] .glass-panel,
@@ -2745,7 +2745,7 @@ html[data-theme="forest"] .action-tile {
   border-radius: 20px !important;
 }
 
-/* ════ 🤖 CYBERPUNK NEO — Next-Gen AI Terminal ══════════════════════════ */
+/* ════  CYBERPUNK NEO — Next-Gen AI Terminal ══════════════════════════ */
 
 html[data-theme="cyberpunk-neo"] .glass-panel,
 html[data-theme="neon-cyberpunk"] .glass-panel,
@@ -2858,7 +2858,7 @@ html[data-theme="neon-cyberpunk"] .dark-input {
   letter-spacing: 0.04em;
 }
 
-/* ════ 🌊 OCEAN INTELLIGENCE — Deep Ocean Thinking ══════════════════════ */
+/* ════  OCEAN INTELLIGENCE — Deep Ocean Thinking ══════════════════════ */
 
 html[data-theme="ocean-intelligence"] .glass-panel,
 html[data-theme="ocean-intelligence"] .stat-card-premium {
@@ -2927,7 +2927,7 @@ html[data-theme="ocean-intelligence"] h2 {
   text-shadow: 0 0 30px rgba(0,206,209,0.42), 0 0 60px rgba(0,150,180,0.18);
 }
 
-/* ════ 🧠 NEURAL BRAIN — Living Digital Twin OS ═════════════════════════ */
+/* ════  NEURAL BRAIN — Living Digital Twin OS ═════════════════════════ */
 
 html[data-theme="neural-brain"] .glass-panel,
 html[data-theme="neural-brain"] .stat-card-premium {
@@ -3338,7 +3338,7 @@ input, textarea, select {
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
 }
 
-/* ════ 🌌 GALAXY NEXUS — Holographic AI Operating System ════════════════ */
+/* ════  GALAXY NEXUS — Holographic AI Operating System ════════════════ */
 html[data-theme="galaxy-nexus"] {
   --theme-progress: linear-gradient(90deg, #00D4FF, #7C3AED);
   --theme-input-bg: rgba(0,8,32,0.85);
@@ -3401,7 +3401,7 @@ html[data-theme="galaxy-nexus"] #root::before {
   background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,212,255,0.012) 3px, rgba(0,212,255,0.012) 4px);
 }
 
-/* ════ 🌸 SAKURA DREAM — Japanese Cherry Blossom Garden ════════════════ */
+/* ════  SAKURA DREAM — Japanese Cherry Blossom Garden ════════════════ */
 html[data-theme="sakura-dream"] {
   --theme-progress: linear-gradient(90deg, #FF6B9D, #9333ea);
   --theme-input-bg: rgba(30,4,18,0.88);
@@ -3457,7 +3457,7 @@ html[data-theme="sakura-dream"] #root::after {
   background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(20,2,12,0.38) 100%);
 }
 
-/* ════ 🔥 INFERNO — High Performance Energy Mode ════════════════════ */
+/* ════  INFERNO — High Performance Energy Mode ════════════════════ */
 html[data-theme="inferno"] {
   --theme-progress: linear-gradient(90deg, #FF8C00, #FF4500);
   --theme-input-bg: rgba(20,4,0,0.88);
@@ -3516,7 +3516,7 @@ html[data-theme="inferno"] .nav-link:hover { color: #FF4500 !important; text-sha
 html[data-theme="inferno"] ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(255,140,0,0.4), rgba(255,69,0,0.28)) !important; }
 html[data-theme="inferno"] ::-webkit-scrollbar-track { background: rgba(20,4,0,0.6) !important; }
 
-/* ════ ❄️ ARCTIC AURORA — Northern Lights Intelligence ════════════════ */
+/* ════  ARCTIC AURORA — Northern Lights Intelligence ════════════════ */
 html[data-theme="arctic-aurora"] {
   --theme-progress: linear-gradient(90deg, #00FFCC, #0ea5e9);
   --theme-input-bg: rgba(0,6,14,0.88);
@@ -3571,7 +3571,7 @@ html[data-theme="arctic-aurora"] .nav-link:hover { color: #00FFCC !important; te
 html[data-theme="arctic-aurora"] ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(0,255,204,0.35), rgba(14,165,233,0.25)) !important; }
 html[data-theme="arctic-aurora"] ::-webkit-scrollbar-track { background: rgba(0,6,14,0.6) !important; }
 
-/* ════ 🌲 NATURE PULSE — Forest Growth & Organic Life ════════════════ */
+/* ════  NATURE PULSE — Forest Growth & Organic Life ════════════════ */
 html[data-theme="nature-pulse"] {
   --theme-progress: linear-gradient(90deg, #10b981, #22c55e);
   --theme-input-bg: rgba(1,8,2,0.88);
@@ -3630,7 +3630,7 @@ html[data-theme="nature-pulse"] .nav-link:hover { color: #10b981 !important; tex
 html[data-theme="nature-pulse"] ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(16,185,129,0.35), rgba(34,197,94,0.25)) !important; }
 html[data-theme="nature-pulse"] ::-webkit-scrollbar-track { background: rgba(1,8,2,0.6) !important; }
 
-/* ════ 🤖 CYBERPUNK NEO — Next-Gen AI Laboratory ════════════════════ */
+/* ════  CYBERPUNK NEO — Next-Gen AI Laboratory ════════════════════ */
 html[data-theme="cyberpunk-neo"] {
   --theme-progress: linear-gradient(90deg, #00FF41, #00FFFF);
   --theme-input-bg: rgba(0,0,0,0.92);
@@ -3697,7 +3697,7 @@ html[data-theme="cyberpunk-neo"] .nav-link:hover {
 html[data-theme="cyberpunk-neo"] ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(0,255,65,0.4), rgba(0,255,255,0.25)) !important; }
 html[data-theme="cyberpunk-neo"] ::-webkit-scrollbar-track { background: rgba(0,0,0,0.8) !important; }
 
-/* ════ 🌊 OCEAN INTELLIGENCE — Deep Thinking & Reflection ════════════ */
+/* ════  OCEAN INTELLIGENCE — Deep Thinking & Reflection ════════════ */
 html[data-theme="ocean-intelligence"] {
   --theme-progress: linear-gradient(90deg, #00CED1, #006994);
   --theme-input-bg: rgba(0,8,20,0.88);
@@ -3758,7 +3758,7 @@ html[data-theme="ocean-intelligence"] .nav-link:hover { color: #00CED1 !importan
 html[data-theme="ocean-intelligence"] ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(0,206,209,0.35), rgba(0,105,148,0.25)) !important; }
 html[data-theme="ocean-intelligence"] ::-webkit-scrollbar-track { background: rgba(0,8,20,0.6) !important; }
 
-/* ════ 🧠 NEURAL BRAIN — TwinMind Flagship — AI Consciousness ════════ */
+/* ════  NEURAL BRAIN — TwinMind Flagship — AI Consciousness ════════ */
 html[data-theme="neural-brain"] {
   --theme-progress: linear-gradient(90deg, #7C3AED, #00D4FF);
   --theme-input-bg: rgba(2,2,5,0.88);

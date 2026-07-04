@@ -1,3 +1,5 @@
+import { Brain, BookOpen, Eye } from 'lucide-react';
+
 interface Props {
   onSelectMode: (mode: 'practice' | 'focus') => void;
 }
@@ -6,7 +8,7 @@ export default function QuizModeSelector({ onSelectMode }: Props) {
   return (
     <div style={s.shell}>
       <header style={s.nav}>
-        <span style={s.navTitle}>🧠 Quiz Mode</span>
+        <span style={{ ...s.navTitle, display:'flex', alignItems:'center', gap:6 }}><Brain size={16} style={{ flexShrink:0 }} /> Quiz Mode</span>
       </header>
 
       <main style={s.main}>
@@ -21,7 +23,7 @@ export default function QuizModeSelector({ onSelectMode }: Props) {
           <button onClick={() => onSelectMode('practice')} style={s.card}>
             <div style={{ ...s.cardGlow, background: 'radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 65%)' }} />
             <div style={{ ...s.iconWrap, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}>
-              <span style={s.icon}>📚</span>
+              <BookOpen size={28} color="#fff" />
             </div>
             <h2 style={s.cardTitle}>Practice Quiz</h2>
             <p style={s.cardDesc}>
@@ -48,7 +50,7 @@ export default function QuizModeSelector({ onSelectMode }: Props) {
           <button onClick={() => onSelectMode('focus')} style={{ ...s.card, borderColor: 'rgba(0,212,255,0.2)' }}>
             <div style={{ ...s.cardGlow, background: 'radial-gradient(circle, rgba(0,212,255,0.12) 0%, transparent 65%)' }} />
             <div style={{ ...s.iconWrap, background: 'linear-gradient(135deg,#00D4FF,#7C3AED)' }}>
-              <span style={s.icon}>👁</span>
+              <Eye size={28} color="#fff" />
             </div>
             <h2 style={{ ...s.cardTitle, color: '#00D4FF' }}>Focus Mode Quiz</h2>
             <p style={s.cardDesc}>

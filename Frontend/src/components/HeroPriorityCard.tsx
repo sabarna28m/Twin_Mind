@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿﻿import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -17,24 +17,24 @@ function buildRecommendations(
 
   if (subjects?.focus_today) {
     recs.push({
-      icon: '📚',
+      icon: '',
       text: `Study ${subjects.focus_today.subject} for ${subjects.focus_today.recommended_daily_minutes} min`,
       xp: 50, link: '/sessions',
     });
   } else if (subjects?.weakest) {
     recs.push({
-      icon: '📚',
+      icon: '',
       text: `Study ${subjects.weakest.subject} for ${subjects.weakest.recommended_daily_minutes} min`,
       xp: 50, link: '/sessions',
     });
   }
 
-  recs.push({ icon: '🧠', text: 'Complete 1 Practice Quiz', xp: 30, link: '/quiz' });
+  recs.push({ icon: '', text: 'Complete 1 Practice Quiz', xp: 30, link: '/quiz' });
 
   if (burnout && (burnout.risk_level === 'medium' || burnout.risk_level === 'high')) {
-    recs.push({ icon: '🧘', text: 'Log today\'s wellness check-in', xp: 20, link: '/checkin' });
+    recs.push({ icon: '', text: 'Log today\'s wellness check-in', xp: 20, link: '/checkin' });
   } else {
-    recs.push({ icon: '🧠', text: 'Complete a quiz with focus score above 75%', xp: 40, link: '/quiz' });
+    recs.push({ icon: '', text: 'Complete a quiz with focus score above 75%', xp: 40, link: '/quiz' });
   }
 
   return recs.slice(0, 3);
@@ -101,7 +101,7 @@ export default function HeroPriorityCard() {
     burnout?.risk_level === 'medium'             ? 'medium' : 'normal';
 
   const urgencyColor = urgency === 'high' ? '#ef4444' : urgency === 'medium' ? '#f59e0b' : '#00D4FF';
-  const urgencyLabel = urgency === 'high' ? '🔴 HIGH PRIORITY' : urgency === 'medium' ? '🟡 ATTENTION NEEDED' : '🎯 TODAY\'S PRIORITY';
+  const urgencyLabel = urgency === 'high' ? 'HIGH PRIORITY' : urgency === 'medium' ? 'ATTENTION NEEDED' : 'TODAY\'S PRIORITY';
 
   return (
     <div style={h.wrap}>
@@ -138,7 +138,7 @@ export default function HeroPriorityCard() {
               {recs.map((r, i) => (
                 <Link key={i} to={r.link} style={{ textDecoration: 'none' }}>
                   <div style={h.recItem} className="priority-rec-item">
-                    <div style={h.recCheck}>✓</div>
+                    <div style={h.recCheck}></div>
                     <span style={h.recText}>{r.icon} {r.text}</span>
                     <span style={h.recXP}>+{r.xp} XP</span>
                   </div>
@@ -150,7 +150,7 @@ export default function HeroPriorityCard() {
           {/* Expected improvement */}
           <div style={h.improveRow}>
             <div style={h.improveBox}>
-              <span style={h.improveIcon}>📈</span>
+              <span style={h.improveIcon}></span>
               <div>
                 <p style={h.improveLabel}>Expected improvement</p>
                 <p style={h.improveValue}>+{boost}% score boost</p>
@@ -166,16 +166,14 @@ export default function HeroPriorityCard() {
               >
                 ▶ Start Now
               </button>
-              <Link to="/mentor" style={h.secondaryBtn}>📋 View Plan</Link>
+              <Link to="/mentor" style={h.secondaryBtn}>View Plan</Link>
               <button
                 onClick={() => {
                   const event = new CustomEvent('copilot:open');
                   window.dispatchEvent(event);
                 }}
                 style={h.ghostBtn}
-              >
-                🤖 Ask AI
-              </button>
+              >Ask AI</button>
             </div>
           </div>
         </>

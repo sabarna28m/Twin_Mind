@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Camera } from 'lucide-react';
 import * as faceapi from '@vladmandic/face-api';
 
 const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
@@ -156,7 +157,7 @@ export default function IntegrityMonitor({ stream, demoMode, sessionActive, onMe
       <div style={m.camWrap}>
         {!stream && (
           <div style={m.camPH}>
-            <span style={{ fontSize: '1.5rem', opacity: 0.3 }}>📷</span>
+            <Camera size={24} style={{ opacity: 0.3, color: 'var(--text-m)' }} />
             <span style={{ fontSize: '0.7rem', color: 'var(--text)', textAlign: 'center' as const }}>Camera feed</span>
           </div>
         )}

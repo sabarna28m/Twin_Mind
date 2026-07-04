@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 
@@ -14,8 +14,8 @@ interface Analysis {
 }
 
 const ICONS: Record<string, string> = {
-  Mathematics:'∑', Physics:'⚛', Chemistry:'⚗',
-  Biology:'🧬', English:'📖', 'Computer Science':'💻',
+  Mathematics:'∑', Physics:'', Chemistry:'',
+  Biology:'', English:'', 'Computer Science':'',
 };
 
 function sc(s: number) { return s >= 75 ? '#10b981' : s >= 50 ? '#f59e0b' : '#ef4444' }
@@ -30,7 +30,7 @@ function MiniCard({ icon, label, subject, score, detail, cta, color }: {
       <div style={{ position: 'absolute', top: '-15%', right: '-10%', width: '80px', height: '80px', borderRadius: '50%', background: `radial-gradient(circle,${color}18 0%,transparent 70%)`, pointerEvents: 'none' }} />
       <div style={{ ...w.iconBox, background: `${color}20`, color }}>{icon}</div>
       <p style={{ ...w.label, color: `${color}bb` }}>{label}</p>
-      {subject && <p style={{ ...w.subject, color }}>{ICONS[subject] ?? '📚'} {subject}</p>}
+      {subject && <p style={{ ...w.subject, color }}>{ICONS[subject] ?? ''} {subject}</p>}
       {score != null && <p style={{ ...w.score, color }}>{score.toFixed(0)}%</p>}
       <p style={w.detail}>{detail}</p>
       <Link to="/subjects" style={{ ...w.cta, color, borderColor: `${color}40`, background: `${color}10` }}>
@@ -63,7 +63,7 @@ export default function SubjectWidgets() {
 
   if (!data || (!data.weakest && !data.strongest && !data.focus_today)) return (
     <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '18px', padding: '1.5rem', textAlign: 'center' as const }}>
-      <p style={{ margin: '0 0 0.6rem', fontSize: '1.5rem' }}>📚</p>
+      <p style={{ margin: '0 0 0.6rem', fontSize: '1.5rem' }}></p>
       <p style={{ margin: '0 0 0.4rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-h)' }}>No subject data yet</p>
       <p style={{ margin: '0 0 0.85rem', fontSize: '0.75rem', color: 'var(--text)', lineHeight: 1.5 }}>
         Add your subjects in your profile, then log performance records to activate Subject Intelligence.
@@ -82,19 +82,19 @@ export default function SubjectWidgets() {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.85rem' }} className="subj-widget-grid">
       {data.weakest && (
-        <MiniCard icon="🔴" label="Weakest Subject" color="#ef4444"
+        <MiniCard icon="" label="Weakest Subject" color="#ef4444"
           subject={data.weakest.subject} score={data.weakest.avg_score}
           detail={`${data.weakest.recommended_daily_minutes} min/day recommended`}
           cta="Focus Now →" />
       )}
       {data.strongest && (
-        <MiniCard icon="🟢" label="Strongest Subject" color="#10b981"
+        <MiniCard icon="" label="Strongest Subject" color="#10b981"
           subject={data.strongest.subject} score={data.strongest.avg_score}
           detail={data.strongest.improvement != null ? `+${data.strongest.improvement.toFixed(0)}% improvement` : `Trend: ${data.strongest.trend}`}
           cta="Keep Going →" />
       )}
       {data.focus_today && (
-        <MiniCard icon="🎯" label="Focus Today" color="#6366f1"
+        <MiniCard icon="" label="Focus Today" color="#6366f1"
           subject={data.focus_today.subject}
           detail={`${data.focus_today.recommended_daily_minutes} min recommended · ${rl(data.focus_today.avg_score)}`}
           cta="Start Session →" />

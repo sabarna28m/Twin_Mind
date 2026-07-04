@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
+import { Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -299,7 +300,7 @@ export default function FocusModeQuiz({ onBack }: Props) {
         </header>
         <div style={f.center}>
           <div style={f.permCard}>
-            <div style={f.permIcon}>👁</div>
+            <div style={f.permIcon}></div>
             <h2 style={f.permTitle}>Camera & Microphone Required</h2>
             <p style={f.permSub}>
               Focus Mode Quiz uses AI monitoring to verify your focus and integrity during the exam.
@@ -307,10 +308,10 @@ export default function FocusModeQuiz({ onBack }: Props) {
             </p>
             <div style={f.permFeats}>
               {[
-                { icon: '📷', label: 'Webcam monitoring', desc: 'Face detection tracks attention' },
-                { icon: '🎤', label: 'Mic monitoring',    desc: 'Audio environment check' },
-                { icon: '🔀', label: 'Tab detection',     desc: 'Stay on the exam page' },
-                { icon: '⚠️', label: '6-strike system',   desc: 'Auto-terminates at limit' },
+                { icon: '', label: 'Webcam monitoring', desc: 'Face detection tracks attention' },
+                { icon: '', label: 'Mic monitoring',    desc: 'Audio environment check' },
+                { icon: '', label: 'Tab detection',     desc: 'Stay on the exam page' },
+                { icon: '', label: '6-strike system',   desc: 'Auto-terminates at limit' },
               ].map(f => (
                 <div key={f.label} style={fp.feat}>
                   <span style={{ fontSize: '1.2rem' }}>{f.icon}</span>
@@ -323,7 +324,7 @@ export default function FocusModeQuiz({ onBack }: Props) {
             </div>
             {permError && <div style={f.errorBox}>{permError}</div>}
             <button onClick={requestPermissions} disabled={requesting} style={f.primaryBtn}>
-              {requesting ? 'Requesting permissions…' : '🎯 Grant Permissions & Continue'}
+              {requesting ? 'Requesting permissions…' : ' Grant Permissions & Continue'}
             </button>
             <button onClick={enterDemoMode} style={f.demoBtn}>
               Use Demo Mode (no camera needed)
@@ -343,14 +344,14 @@ export default function FocusModeQuiz({ onBack }: Props) {
           <span style={f.navTitle}>Focus Mode Quiz — Setup</span>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             {demoMode   && <span style={f.demoBadge}>Demo Mode</span>}
-            {camGranted && <span style={f.permBadge}>📷 Camera</span>}
-            {micGranted && <span style={f.permBadge}>🎤 Mic</span>}
+            {camGranted && <span style={f.permBadge}>Camera</span>}
+            {micGranted && <span style={f.permBadge}>Mic</span>}
           </div>
         </header>
         <main style={f.main}>
           <div style={f.configCard}>
             <div style={f.cardHead}>
-              <span style={{ fontSize: '2rem' }}>👁</span>
+              <span style={{ fontSize: '2rem' }}></span>
               <div>
                 <h2 style={f.cardTitle}>Focus Mode Quiz</h2>
                 <p style={f.cardSub}>Exam simulation with integrity monitoring</p>
@@ -401,7 +402,7 @@ export default function FocusModeQuiz({ onBack }: Props) {
             </div>
 
             <div style={f.warningNotice}>
-              <span style={{ fontSize: '0.85rem' }}>⚠️</span>
+              <span style={{ fontSize: '0.85rem' }}></span>
               <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-h)', lineHeight: 1.5 }}>
                 This session will be monitored. You have <strong>{MAX_WARNINGS} warnings</strong> before auto-termination.
                 Tab switching, face absence, and distractions all count.
@@ -409,7 +410,7 @@ export default function FocusModeQuiz({ onBack }: Props) {
             </div>
 
             <button onClick={generate} disabled={!subject} style={{ ...f.startBtn, opacity: subject ? 1 : 0.5, cursor: subject ? 'pointer' : 'not-allowed' }}>
-              🎯 Start Focus Mode Exam
+               Start Focus Mode Exam
             </button>
           </div>
         </main>
@@ -479,12 +480,12 @@ export default function FocusModeQuiz({ onBack }: Props) {
       {/* Nav */}
       <header style={f.nav}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <span style={f.focusBadge}>👁 FOCUS MODE</span>
+          <span style={f.focusBadge}> FOCUS MODE</span>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-h)', fontWeight: 600 }}>{subject}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <span style={{ ...f.timerBadge, color: timerColor, borderColor: `${timerColor}44`, background: `${timerColor}11` }}>
-            ⏱ {formatTime(timeLeft)}
+            <Clock size={12} style={{marginRight:'0.25rem'}}/> {formatTime(timeLeft)}
           </span>
           <WarningSystem
             warnings={warnings}
@@ -546,8 +547,8 @@ export default function FocusModeQuiz({ onBack }: Props) {
                     >
                       <span style={f.optionLetter}>{String.fromCharCode(65 + i)}</span>
                       <span style={{ flex: 1 }}>{opt}</span>
-                      {answered && i === q.correct && <span style={{ marginLeft: 'auto' }}>✓</span>}
-                      {answered && i === chosenIdx && i !== q.correct && <span style={{ marginLeft: 'auto' }}>✗</span>}
+                      {answered && i === q.correct && <span style={{ marginLeft: 'auto' }}></span>}
+                      {answered && i === chosenIdx && i !== q.correct && <span style={{ marginLeft: 'auto' }}></span>}
                     </button>
                   );
                 })}
@@ -585,7 +586,7 @@ export default function FocusModeQuiz({ onBack }: Props) {
               <div style={{ height: '100%', borderRadius: '99px', width: `${integrityRef.current.getScore()}%`, background: warnCount === 0 ? '#10b981' : warnCount < 3 ? '#f59e0b' : '#ef4444', transition: 'width 0.5s' }} />
             </div>
             <p style={{ margin: '0.4rem 0 0', fontSize: '0.65rem', color: 'var(--text)' }}>
-              {warnCount === 0 ? '✅ Clean session' : `${warnCount}/${MAX_WARNINGS} warnings — ${MAX_WARNINGS - warnCount} remaining`}
+              {warnCount === 0 ? ' Clean session' : `${warnCount}/${MAX_WARNINGS} warnings — ${MAX_WARNINGS - warnCount} remaining`}
             </p>
           </div>
 

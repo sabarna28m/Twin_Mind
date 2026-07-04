@@ -4,11 +4,12 @@
  * priority-sorted, AI-generated personalised notifications and a daily summary.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bell, BellRing, X, Sparkles, RefreshCw,
   CheckCheck, Trash2, ChevronRight, Brain,
+  AlertTriangle, BookOpen, Target, Flame, Trophy, BarChart2, Calendar, TrendingUp,
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -58,28 +59,31 @@ const PRIORITY_LABEL: Record<string, string> = {
 
 const CATEGORY_TABS = [
   { key: 'all',             label: 'All' },
-  { key: 'weak_subject',    label: '⚠️ Subjects' },
-  { key: 'burnout_alert',   label: '🚨 Burnout' },
-  { key: 'motivation',      label: '🔥 Motivation' },
-  { key: 'focus_alert',     label: '🎯 Focus' },
-  { key: 'study_reminder',  label: '📚 Study' },
-  { key: 'achievement',     label: '🏆 Achievements' },
-  { key: 'prediction',      label: '🔮 Predictions' },
+  { key: 'weak_subject',    label: 'Subjects' },
+  { key: 'burnout_alert',   label: 'Burnout' },
+  { key: 'motivation',      label: 'Motivation' },
+  { key: 'focus_alert',     label: 'Focus' },
+  { key: 'study_reminder',  label: 'Study' },
+  { key: 'achievement',     label: 'Achievements' },
+  { key: 'prediction',      label: 'Predictions' },
 ];
 
-const DEFAULT_EMOJI: Record<string, string> = {
-  study_reminder: '📚',
-  weak_subject:   '⚠️',
-  burnout_alert:  '🚨',
-  focus_alert:    '🎯',
-  motivation:     '🔥',
-  achievement:    '🏆',
-  prediction:     '🔮',
-  badge_earned:   '🏆',
-  streak_milestone: '🔥',
-  low_checkin_reminder: '📅',
-  weekly_summary: '📊',
-};
+function getCategoryIcon(category: string): ReactNode {
+  const map: Record<string, ReactNode> = {
+    study_reminder:        <BookOpen size={16} />,
+    weak_subject:          <AlertTriangle size={16} />,
+    burnout_alert:         <Flame size={16} />,
+    focus_alert:           <Target size={16} />,
+    motivation:            <Flame size={16} />,
+    achievement:           <Trophy size={16} />,
+    prediction:            <TrendingUp size={16} />,
+    badge_earned:          <Trophy size={16} />,
+    streak_milestone:      <Flame size={16} />,
+    low_checkin_reminder:  <Calendar size={16} />,
+    weekly_summary:        <BarChart2 size={16} />,
+  };
+  return map[category] ?? <Bell size={16} />;
+}
 
 const ANALYTICS_KEY = 'twinmind_notif_analytics';
 
@@ -129,7 +133,7 @@ function NotificationCard({
   onAction: (url: string, id: number, category?: string) => void;
 }) {
   const pColor = PRIORITY_COLOR[notif.priority ?? 'informational'] ?? '#6366F1';
-  const emoji  = notif.emoji ?? DEFAULT_EMOJI[notif.category ?? notif.notification_type] ?? '🔔';
+  const categoryIcon = getCategoryIcon(notif.category ?? notif.notification_type);
   const title  = notif.title ?? notif.notification_type.replace(/_/g, ' ');
 
   return (
@@ -160,7 +164,7 @@ function NotificationCard({
 
       {/* Content */}
       <div style={nc.body}>
-        <span style={nc.emoji}>{emoji}</span>
+        <span style={{ ...nc.emoji, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{categoryIcon}</span>
         <div style={nc.content}>
           <p style={{ ...nc.title, fontWeight: notif.is_read ? 600 : 700, color: notif.is_read ? 'var(--text)' : 'var(--text-h)' }}>
             {title}
@@ -297,7 +301,7 @@ function DailySummaryCard({
         ) : summary ? (
           <div style={ds.body}>
             <p style={ds.headline}>
-              <span style={ds.moodEmoji}>{summary.mood_emoji}</span>
+              <Brain size={16} style={{ flexShrink: 0, color: 'var(--accent)' }} />
               {summary.headline}
             </p>
             <div style={ds.statsRow}>

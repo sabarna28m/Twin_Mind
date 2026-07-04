@@ -129,7 +129,7 @@ const TOPIC_BANK: Record<string, string[]> = {
 const BLOCK_META: Record<BlockType, { color: string; bg: string; icon: string; label: string }> = {
   study:      { color: 'var(--primary)',  bg: 'rgba(var(--primary-rgb),0.09)', icon: '📚', label: 'Study'      },
   catchup:    { color: '#ef4444',         bg: 'rgba(239,68,68,0.09)',          icon: '⚡', label: 'Catch-up'   },
-  break:      { color: '#64748b',         bg: 'rgba(100,116,139,0.06)',        icon: '☕', label: 'Break'      },
+  break:      { color: 'var(--ui-text-muted)',         bg: 'rgba(100,116,139,0.06)',        icon: '☕', label: 'Break'      },
   quiz:       { color: '#f59e0b',         bg: 'rgba(245,158,11,0.09)',         icon: '📝', label: 'Quiz'       },
   revision:   { color: '#8b5cf6',         bg: 'rgba(139,92,246,0.09)',         icon: '🔁', label: 'Revision'   },
   ai_session: { color: '#10b981',         bg: 'rgba(16,185,129,0.09)',         icon: '◈',  label: 'AI Session' },
@@ -492,17 +492,17 @@ export default function StudyPlanner() {
   return (
     <div style={{ minHeight: '100svh', background: 'var(--bg)', display: 'flex', flexDirection: 'column', fontFamily: "'Inter',sans-serif", position: 'relative' }}>
       <canvas ref={canvasRef} style={{ position: 'fixed', inset: 0, zIndex: 999, pointerEvents: 'none' }} />
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(2,4,15,0.5)', zIndex: 0, pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', inset: 0, background: 'var(--ui-bg)', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1 }}>
 
 
         {/* ── KPI strip ── */}
-        <div style={{ background: 'rgba(4,8,22,0.82)', borderBottom: '1.5px solid rgba(var(--primary-rgb),0.12)', backdropFilter: 'blur(20px)', padding: '1rem 1.5rem', flexShrink: 0 }}>
+        <div style={{ background: 'var(--ui-surface)', borderBottom: '1.5px solid rgba(var(--primary-rgb),0.12)', backdropFilter: 'blur(20px)', padding: '1rem 1.5rem', flexShrink: 0 }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div>
-                <p style={{ margin: 0, fontSize: '0.62rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{getMonthName()}</p>
-                <p style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#f1f5f9' }}>AI-Powered Academic Planner</p>
+                <p style={{ margin: 0, fontSize: '0.62rem', fontWeight: 800, color: 'var(--ui-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{getMonthName()}</p>
+                <p style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: 'var(--ui-text-h)' }}>AI-Powered Academic Planner</p>
               </div>
               <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
                 {[
@@ -514,7 +514,7 @@ export default function StudyPlanner() {
                 ].map(s => (
                   <div key={s.label} style={{ textAlign: 'center' }}>
                     <p style={{ margin: 0, fontSize: '1.05rem', fontWeight: 900, color: s.color, textShadow: `0 0 12px ${s.color}66` }}>{s.value}</p>
-                    <p style={{ margin: 0, fontSize: '0.58rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
+                    <p style={{ margin: 0, fontSize: '0.58rem', color: 'var(--ui-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -526,10 +526,10 @@ export default function StudyPlanner() {
               ].map(bar => (
                 <div key={bar.label}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.28rem' }}>
-                    <span style={{ fontSize: '0.7rem', color: '#cbd5e1', fontWeight: 600 }}>{bar.label}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--ui-text)', fontWeight: 600 }}>{bar.label}</span>
                     <span style={{ fontSize: '0.7rem', fontWeight: 900, color: bar.color }}>{bar.pct}%</span>
                   </div>
-                  <div style={{ height: '7px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)' }}>
+                  <div style={{ height: '7px', background: 'var(--ui-border)', borderRadius: '99px', overflow: 'hidden', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)' }}>
                     <div style={{ height: '100%', width: `${bar.pct}%`, background: bar.color, borderRadius: '99px', transition: 'width 0.8s ease', boxShadow: `0 0 8px ${bar.color}55` }} />
                   </div>
                 </div>
@@ -539,13 +539,13 @@ export default function StudyPlanner() {
         </div>
 
         {/* ── Tab bar ── */}
-        <div style={{ background: 'rgba(4,8,22,0.65)', borderBottom: '1px solid rgba(var(--primary-rgb),0.1)', backdropFilter: 'blur(16px)' }}>
+        <div style={{ background: 'var(--ui-surface)', borderBottom: '1px solid rgba(var(--primary-rgb),0.1)', backdropFilter: 'blur(16px)' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem', display: 'flex', gap: '0.1rem' }}>
             {TABS.map(tab => {
               const active = activeTab === tab.id;
               return (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.7rem 1.05rem', background: 'none', border: 'none', borderBottom: active ? '2px solid var(--primary)' : '2px solid transparent', color: active ? 'var(--primary)' : '#94a3b8', fontFamily: 'inherit', fontSize: '0.82rem', fontWeight: active ? 700 : 500, cursor: 'pointer', transition: 'all 0.15s', marginBottom: '-1px' }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.7rem 1.05rem', background: 'none', border: 'none', borderBottom: active ? '2px solid var(--primary)' : '2px solid transparent', color: active ? 'var(--primary)' : 'var(--ui-text-muted)', fontFamily: 'inherit', fontSize: '0.82rem', fontWeight: active ? 700 : 500, cursor: 'pointer', transition: 'all 0.15s', marginBottom: '-1px' }}>
                   {tab.icon} {tab.label}
                 </button>
               );
@@ -558,7 +558,7 @@ export default function StudyPlanner() {
         {/* ── Content ── */}
         <main style={{ flex: 1, maxWidth: '1200px', width: '100%', margin: '0 auto', padding: '1.75rem 1.5rem', boxSizing: 'border-box' }}>
           {loading ? (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '260px', gap: '0.75rem', color: '#94a3b8' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '260px', gap: '0.75rem', color: 'var(--ui-text-muted)' }}>
               <div style={{ width: '20px', height: '20px', border: '2px solid rgba(var(--primary-rgb),0.3)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
               Analysing your academic profile…
             </div>
@@ -641,18 +641,18 @@ export default function StudyPlanner() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
 
                   {/* ── MONTHLY MISSION CARD ── */}
-                  <div style={{ background: 'rgba(4,8,22,0.93)', border: '1.5px solid rgba(var(--primary-rgb),0.3)', borderRadius: '20px', padding: '1.75rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.3)', borderRadius: '20px', padding: '1.75rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 0% 0%, rgba(var(--primary-rgb),0.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
                       <div>
-                        <p style={{ margin: '0 0 0.2rem', fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Monthly Mission — {getMonthName()}</p>
-                        <h2 style={{ margin: '0 0 0.1rem', fontSize: '1.4rem', fontWeight: 900, color: '#f1f5f9' }}>Reach {targetScore}% This Month</h2>
-                        <p style={{ margin: 0, fontSize: '0.82rem', color: '#94a3b8' }}>4-week structured roadmap to your target score</p>
+                        <p style={{ margin: '0 0 0.2rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--ui-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Monthly Mission — {getMonthName()}</p>
+                        <h2 style={{ margin: '0 0 0.1rem', fontSize: '1.4rem', fontWeight: 900, color: 'var(--ui-text-h)' }}>Reach {targetScore}% This Month</h2>
+                        <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--ui-text-muted)' }}>4-week structured roadmap to your target score</p>
                       </div>
                       <div style={{ display: 'flex', gap: '1.25rem', flexShrink: 0, flexWrap: 'wrap' }}>
                         <div style={{ textAlign: 'center' }}>
-                          <p style={{ margin: '0 0 0.08rem', fontSize: '1.5rem', fontWeight: 900, color: '#94a3b8' }}>{curScore}%</p>
-                          <p style={{ margin: 0, fontSize: '0.6rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Current</p>
+                          <p style={{ margin: '0 0 0.08rem', fontSize: '1.5rem', fontWeight: 900, color: 'var(--ui-text-muted)' }}>{curScore}%</p>
+                          <p style={{ margin: 0, fontSize: '0.6rem', color: 'var(--ui-text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Current</p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', color: '#4b5563', fontSize: '1.2rem', paddingTop: '0.2rem' }}>→</div>
                         <div style={{ textAlign: 'center' }}>
@@ -672,8 +672,8 @@ export default function StudyPlanner() {
                         <span style={{ fontSize: '0.85rem' }}>◈</span>
                         <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>AI Summary</span>
                       </div>
-                      <p style={{ margin: 0, fontSize: '0.88rem', color: '#cbd5e1', lineHeight: 1.7 }}>
-                        Based on your current performance, study habits, focus scores, quiz accuracy, and Digital Twin simulation, completing this 4-week roadmap can increase your predicted score from <strong style={{ color: '#94a3b8' }}>{curScore}%</strong> to approximately <strong style={{ color: '#10b981' }}>{targetScore}%</strong>.{smartPlan?.forecast ? ` ${smartPlan.forecast}` : ''}
+                      <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--ui-text)', lineHeight: 1.7 }}>
+                        Based on your current performance, study habits, focus scores, quiz accuracy, and Digital Twin simulation, completing this 4-week roadmap can increase your predicted score from <strong style={{ color: 'var(--ui-text-muted)' }}>{curScore}%</strong> to approximately <strong style={{ color: '#10b981' }}>{targetScore}%</strong>.{smartPlan?.forecast ? ` ${smartPlan.forecast}` : ''}
                       </p>
                     </div>
 
@@ -684,10 +684,10 @@ export default function StudyPlanner() {
                         const dotColor = st === 'done' ? '#10b981' : st === 'current' ? 'var(--primary)' : '#374151';
                         return (
                           <div key={w} style={{ display: 'flex', alignItems: 'center', flex: wi < 3 ? 1 : 'none' }}>
-                            <div style={{ flexShrink: 0, width: '32px', height: '32px', borderRadius: '50%', background: st === 'done' ? 'rgba(16,185,129,0.15)' : st === 'current' ? 'rgba(var(--primary-rgb),0.15)' : 'rgba(255,255,255,0.04)', border: `2px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s' }}>
+                            <div style={{ flexShrink: 0, width: '32px', height: '32px', borderRadius: '50%', background: st === 'done' ? 'rgba(16,185,129,0.15)' : st === 'current' ? 'rgba(var(--primary-rgb),0.15)' : 'var(--ui-border)', border: `2px solid ${dotColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s' }}>
                               {st === 'done' ? <span style={{ fontSize: '0.85rem' }}>✅</span> : <span style={{ fontSize: '0.7rem', fontWeight: 900, color: dotColor }}>W{w}</span>}
                             </div>
-                            {wi < 3 && <div style={{ flex: 1, height: '2px', background: st === 'done' ? '#10b981' : 'rgba(255,255,255,0.08)', transition: 'background 0.3s' }} />}
+                            {wi < 3 && <div style={{ flex: 1, height: '2px', background: st === 'done' ? '#10b981' : 'var(--ui-border)', transition: 'background 0.3s' }} />}
                           </div>
                         );
                       })}
@@ -696,10 +696,10 @@ export default function StudyPlanner() {
                     {/* Overall progress bar */}
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.32rem' }}>
-                        <span style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: 600 }}>Overall Monthly Progress</span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--ui-text)', fontWeight: 600 }}>Overall Monthly Progress</span>
                         <span style={{ fontSize: '0.72rem', fontWeight: 900, color: monthPct >= 70 ? '#10b981' : 'var(--primary)' }}>{monthPct}%</span>
                       </div>
-                      <div style={{ height: '10px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden', boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.45)' }}>
+                      <div style={{ height: '10px', background: 'var(--ui-border)', borderRadius: '99px', overflow: 'hidden', boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.45)' }}>
                         <div style={{ height: '100%', width: `${monthPct}%`, background: monthPct >= 70 ? '#10b981' : 'linear-gradient(90deg,var(--primary),rgba(var(--primary-rgb),0.7))', borderRadius: '99px', transition: 'width 0.9s ease', boxShadow: '0 0 12px rgba(var(--primary-rgb),0.5)' }} />
                       </div>
                     </div>
@@ -713,7 +713,7 @@ export default function StudyPlanner() {
 
                   {/* ── 4 WEEK ROADMAP ── */}
                   <div>
-                    <h2 style={{ margin: '0 0 1rem', fontSize: '1.05rem', fontWeight: 800, color: '#f1f5f9' }}>4-Week Roadmap</h2>
+                    <h2 style={{ margin: '0 0 1rem', fontSize: '1.05rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>4-Week Roadmap</h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                       {WEEK_CARDS.map((wk, wi) => {
                         const st = weekStatus(wk.num);
@@ -722,7 +722,7 @@ export default function StudyPlanner() {
                         const isNow = st === 'current';
                         const isDone = st === 'done';
                         return (
-                          <div key={wk.num} style={{ background: isDone ? 'rgba(16,185,129,0.05)' : 'rgba(4,8,22,0.90)', border: `1.5px solid ${isDone ? 'rgba(16,185,129,0.25)' : isNow ? `${wk.color}35` : 'rgba(255,255,255,0.08)'}`, borderLeft: `4px solid ${isDone ? '#10b981' : wk.color}`, borderRadius: '18px', padding: '1.5rem', backdropFilter: 'blur(28px)', boxShadow: isNow ? `0 12px 40px rgba(0,0,0,0.6), 0 0 20px ${wk.color}10` : '0 8px 28px rgba(0,0,0,0.5)' }}>
+                          <div key={wk.num} style={{ background: isDone ? 'rgba(16,185,129,0.05)' : 'var(--ui-surface)', border: `1.5px solid ${isDone ? 'rgba(16,185,129,0.25)' : isNow ? `${wk.color}35` : 'var(--ui-border)'}`, borderLeft: `4px solid ${isDone ? '#10b981' : wk.color}`, borderRadius: '18px', padding: '1.5rem', backdropFilter: 'blur(28px)', boxShadow: isNow ? `0 12px 40px rgba(0,0,0,0.6), 0 0 20px ${wk.color}10` : '0 8px 28px rgba(0,0,0,0.5)' }}>
                             {/* Week header */}
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.9rem' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -734,30 +734,30 @@ export default function StudyPlanner() {
                                     <span style={{ fontSize: '0.65rem', fontWeight: 800, color: isDone ? '#10b981' : wk.color, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Week {wk.num}</span>
                                     {isNow && <span style={{ fontSize: '0.6rem', padding: '0.08rem 0.45rem', background: `${wk.color}20`, color: wk.color, borderRadius: '99px', fontWeight: 700, border: `1px solid ${wk.color}35` }}>In Progress</span>}
                                     {isDone && <span style={{ fontSize: '0.6rem', padding: '0.08rem 0.45rem', background: 'rgba(16,185,129,0.15)', color: '#34d399', borderRadius: '99px', fontWeight: 700 }}>Complete</span>}
-                                    {!isNow && !isDone && wk.num > weekOfMonth() && <span style={{ fontSize: '0.6rem', padding: '0.08rem 0.45rem', background: 'rgba(255,255,255,0.06)', color: '#64748b', borderRadius: '99px', fontWeight: 700 }}>Upcoming</span>}
+                                    {!isNow && !isDone && wk.num > weekOfMonth() && <span style={{ fontSize: '0.6rem', padding: '0.08rem 0.45rem', background: 'var(--ui-border)', color: 'var(--ui-text-muted)', borderRadius: '99px', fontWeight: 700 }}>Upcoming</span>}
                                   </div>
-                                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: isDone ? '#a7f3d0' : '#f1f5f9' }}>{wk.label}</h3>
+                                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: isDone ? '#a7f3d0' : 'var(--ui-text-h)' }}>{wk.label}</h3>
                                 </div>
                               </div>
                               <div style={{ textAlign: 'right', flexShrink: 0 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#94a3b8' }}>{fromScore}%</span>
+                                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--ui-text-muted)' }}>{fromScore}%</span>
                                   <span style={{ color: '#4b5563' }}>→</span>
                                   <span style={{ fontSize: '1.05rem', fontWeight: 900, color: isDone ? '#34d399' : wk.color, textShadow: `0 0 14px ${isDone ? '#10b981' : wk.color}66` }}>{toScore}%</span>
                                 </div>
-                                <p style={{ margin: '0.1rem 0 0', fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>Expected Improvement</p>
+                                <p style={{ margin: '0.1rem 0 0', fontSize: '0.6rem', color: 'var(--ui-text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Expected Improvement</p>
                               </div>
                             </div>
 
                             {/* Goal */}
-                            <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.6, borderLeft: `2px solid ${wk.color}30`, paddingLeft: '0.75rem' }}><em>{wk.goal}</em></p>
+                            <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: 'var(--ui-text-muted)', lineHeight: 1.6, borderLeft: `2px solid ${wk.color}30`, paddingLeft: '0.75rem' }}><em>{wk.goal}</em></p>
 
                             {/* Must Complete checklist */}
                             <div style={{ marginBottom: '1rem' }}>
-                              <p style={{ margin: '0 0 0.55rem', fontSize: '0.72rem', fontWeight: 800, color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Must Complete</p>
+                              <p style={{ margin: '0 0 0.55rem', fontSize: '0.72rem', fontWeight: 800, color: 'var(--ui-text)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Must Complete</p>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.38rem' }}>
                                 {wk.mustComplete.map((item, ii) => (
-                                  <div key={ii} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.55rem', padding: '0.42rem 0.65rem', background: isDone ? 'rgba(16,185,129,0.06)' : 'rgba(255,255,255,0.03)', borderRadius: '8px', border: `1px solid ${isDone ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.06)'}` }}>
+                                  <div key={ii} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.55rem', padding: '0.42rem 0.65rem', background: isDone ? 'rgba(16,185,129,0.06)' : 'var(--ui-border)', borderRadius: '8px', border: `1px solid ${isDone ? 'rgba(16,185,129,0.15)' : 'var(--ui-border)'}` }}>
                                     <span style={{ fontSize: '0.78rem', flexShrink: 0, color: isDone ? '#34d399' : wk.color, marginTop: '1px' }}>{isDone ? '✓' : '○'}</span>
                                     <span style={{ fontSize: '0.82rem', color: isDone ? '#a7f3d0' : '#e2e8f0', lineHeight: 1.45 }}>{item}</span>
                                   </div>
@@ -769,7 +769,7 @@ export default function StudyPlanner() {
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <span style={{ fontSize: '0.68rem', padding: '0.22rem 0.65rem', background: `${wk.color}12`, color: wk.color, borderRadius: '8px', fontWeight: 700, border: `1px solid ${wk.color}25` }}>📝 {wk.quizNote}</span>
-                                <span style={{ fontSize: '0.68rem', padding: '0.22rem 0.65rem', background: 'rgba(255,255,255,0.05)', color: '#94a3b8', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>{wk.mustComplete.length} tasks</span>
+                                <span style={{ fontSize: '0.68rem', padding: '0.22rem 0.65rem', background: 'var(--ui-border)', color: 'var(--ui-text-muted)', borderRadius: '8px', border: '1px solid var(--ui-border)' }}>{wk.mustComplete.length} tasks</span>
                               </div>
                               <button onClick={() => { setSelectedWeek(wk.num); setActiveTab('weekly'); }}
                                 style={{ fontSize: '0.75rem', fontWeight: 700, color: wk.color, background: `${wk.color}12`, border: `1px solid ${wk.color}28`, borderRadius: '8px', padding: '0.28rem 0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -785,30 +785,30 @@ export default function StudyPlanner() {
                   {/* ── SUBJECT TARGETS ── */}
                   {subjects.length > 0 && (
                     <div>
-                      <h2 style={{ margin: '0 0 1rem', fontSize: '1.05rem', fontWeight: 800, color: '#f1f5f9' }}>Subject Targets</h2>
+                      <h2 style={{ margin: '0 0 1rem', fontSize: '1.05rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>Subject Targets</h2>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '0.85rem' }}>
                         {subjects.map((goal, gi) => {
                           const color = MONTH_COLORS[gi % MONTH_COLORS.length];
                           const topics = getTopicsFor(goal.subject).slice(0, 3);
                           return (
-                            <div key={goal.id} style={{ background: 'rgba(4,8,22,0.90)', border: `1.5px solid ${color}28`, borderRadius: '16px', padding: '1.15rem', backdropFilter: 'blur(24px)', boxShadow: '0 8px 28px rgba(0,0,0,0.5)' }}>
+                            <div key={goal.id} style={{ background: 'var(--ui-surface)', border: `1.5px solid ${color}28`, borderRadius: '16px', padding: '1.15rem', backdropFilter: 'blur(24px)', boxShadow: '0 8px 28px rgba(0,0,0,0.5)' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                                <h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#f1f5f9' }}>{goal.subject}</h3>
+                                <h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>{goal.subject}</h3>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.42rem' }}>
-                                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 700 }}>{goal.fromScore}%</span>
+                                  <span style={{ fontSize: '0.8rem', color: 'var(--ui-text-muted)', fontWeight: 700 }}>{goal.fromScore}%</span>
                                   <span style={{ color: '#4b5563', fontSize: '0.9rem' }}>→</span>
                                   <span style={{ fontSize: '0.95rem', fontWeight: 900, color, textShadow: `0 0 12px ${color}66` }}>{goal.toScore}%</span>
                                 </div>
                               </div>
-                              <div style={{ height: '5px', background: 'rgba(255,255,255,0.07)', borderRadius: '99px', overflow: 'hidden', marginBottom: '0.85rem' }}>
+                              <div style={{ height: '5px', background: 'var(--ui-border)', borderRadius: '99px', overflow: 'hidden', marginBottom: '0.85rem' }}>
                                 <div style={{ height: '100%', width: `${Math.round(goal.fromScore)}%`, background: color, borderRadius: '99px' }} />
                               </div>
-                              <p style={{ margin: '0 0 0.45rem', fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Topics to Master</p>
+                              <p style={{ margin: '0 0 0.45rem', fontSize: '0.65rem', fontWeight: 800, color: 'var(--ui-text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Topics to Master</p>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.28rem' }}>
                                 {topics.map((t, ti) => (
                                   <div key={ti} style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                                     <span style={{ fontSize: '0.65rem', color: color, flexShrink: 0 }}>•</span>
-                                    <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>{t}</span>
+                                    <span style={{ fontSize: '0.78rem', color: 'var(--ui-text)' }}>{t}</span>
                                   </div>
                                 ))}
                               </div>
@@ -820,12 +820,12 @@ export default function StudyPlanner() {
                   )}
 
                   {/* ── AI INSIGHT PANEL ── */}
-                  <div style={{ background: 'rgba(4,8,22,0.90)', border: '1.5px solid rgba(var(--primary-rgb),0.22)', borderRadius: '18px', padding: '1.35rem 1.5rem', backdropFilter: 'blur(28px)', boxShadow: '0 12px 40px rgba(0,0,0,0.6)' }}>
+                  <div style={{ background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.22)', borderRadius: '18px', padding: '1.35rem 1.5rem', backdropFilter: 'blur(28px)', boxShadow: '0 12px 40px rgba(0,0,0,0.6)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.85rem' }}>
                       <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(var(--primary-rgb),0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>◈</div>
-                      <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#f1f5f9' }}>AI Insight</span>
+                      <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>AI Insight</span>
                     </div>
-                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#cbd5e1', lineHeight: 1.75, padding: '1rem 1.1rem', background: 'rgba(var(--primary-rgb),0.06)', borderRadius: '12px', border: '1px solid rgba(var(--primary-rgb),0.12)' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--ui-text)', lineHeight: 1.75, padding: '1rem 1.1rem', background: 'rgba(var(--primary-rgb),0.06)', borderRadius: '12px', border: '1px solid rgba(var(--primary-rgb),0.12)' }}>
                       {biggestGap.length >= 2
                         ? `Your biggest improvement opportunity is ${biggestGap[0].subject} and ${biggestGap[1].subject}. Focusing on these two subjects alone can contribute approximately ${Math.round((((biggestGap[0].toScore - biggestGap[0].fromScore) + (biggestGap[1].toScore - biggestGap[1].fromScore)) / (gain || 1)) * 100)}% of your expected monthly improvement. Prioritise these in Week 1 and Week 3 for maximum impact.`
                         : `Your biggest opportunity this month is ${biggestGap[0]?.subject ?? 'core subjects'}. Completing the Week 1 foundation and Week 3 revision blocks for this subject will directly drive your score toward ${targetScore}%.`
@@ -852,7 +852,7 @@ export default function StudyPlanner() {
               <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                 {([1,2,3,4] as WeekNum[]).map(w => (
                   <button key={w} onClick={() => { setSelectedWeek(w); setSelectedDay(0); }}
-                    style={{ padding: '0.38rem 0.85rem', borderRadius: '8px', border: `1.5px solid ${selectedWeek === w ? 'rgba(var(--primary-rgb),0.55)' : 'rgba(255,255,255,0.1)'}`, background: selectedWeek === w ? 'rgba(var(--primary-rgb),0.16)' : 'rgba(255,255,255,0.04)', color: selectedWeek === w ? 'var(--primary)' : '#94a3b8', fontFamily: 'inherit', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+                    style={{ padding: '0.38rem 0.85rem', borderRadius: '8px', border: `1.5px solid ${selectedWeek === w ? 'rgba(var(--primary-rgb),0.55)' : 'var(--ui-border)'}`, background: selectedWeek === w ? 'rgba(var(--primary-rgb),0.16)' : 'var(--ui-border)', color: selectedWeek === w ? 'var(--primary)' : 'var(--ui-text-muted)', fontFamily: 'inherit', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
                     Week {w}{w === weekOfMonth() ? ' · Now' : ''}
                   </button>
                 ))}
@@ -869,10 +869,10 @@ export default function StudyPlanner() {
                     const dayDone = dayNonBreak.length > 0 && dayNonBreak.every(b => completedIds[b.id]);
                     return (
                       <button key={day.dayKey} onClick={() => setSelectedDay(di)}
-                        style={{ flexShrink: 0, padding: '0.6rem 0.85rem', borderRadius: '12px', border: `1.5px solid ${active ? 'rgba(var(--primary-rgb),0.55)' : today ? 'rgba(var(--primary-rgb),0.25)' : 'rgba(255,255,255,0.08)'}`, background: active ? 'rgba(var(--primary-rgb),0.14)' : today ? 'rgba(var(--primary-rgb),0.05)' : 'rgba(255,255,255,0.03)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center', minWidth: '78px', transition: 'all 0.15s' }}>
-                        <p style={{ margin: '0 0 0.05rem', fontSize: '0.6rem', fontWeight: 700, color: active || today ? 'var(--primary)' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{day.dayName.slice(0, 3)}{today ? ' ·' : ''}</p>
-                        <p style={{ margin: '0 0 0.22rem', fontSize: '0.62rem', color: '#64748b' }}>{new Date(day.dayKey + 'T12:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>
-                        <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, color: dayDone ? '#34d399' : past && !dayDone ? '#f87171' : '#f1f5f9' }}>{dayDone ? '✅' : past && !dayDone ? '⚠' : `+${day.expectedXP}XP`}</p>
+                        style={{ flexShrink: 0, padding: '0.6rem 0.85rem', borderRadius: '12px', border: `1.5px solid ${active ? 'rgba(var(--primary-rgb),0.55)' : today ? 'rgba(var(--primary-rgb),0.25)' : 'var(--ui-border)'}`, background: active ? 'rgba(var(--primary-rgb),0.14)' : today ? 'rgba(var(--primary-rgb),0.05)' : 'var(--ui-border)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center', minWidth: '78px', transition: 'all 0.15s' }}>
+                        <p style={{ margin: '0 0 0.05rem', fontSize: '0.6rem', fontWeight: 700, color: active || today ? 'var(--primary)' : 'var(--ui-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{day.dayName.slice(0, 3)}{today ? ' ·' : ''}</p>
+                        <p style={{ margin: '0 0 0.22rem', fontSize: '0.62rem', color: 'var(--ui-text-muted)' }}>{new Date(day.dayKey + 'T12:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>
+                        <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700, color: dayDone ? '#34d399' : past && !dayDone ? '#f87171' : 'var(--ui-text-h)' }}>{dayDone ? '✅' : past && !dayDone ? '⚠' : `+${day.expectedXP}XP`}</p>
                       </button>
                     );
                   })}
@@ -881,20 +881,20 @@ export default function StudyPlanner() {
 
               {/* No schedule state */}
               {!currentDay && (
-                <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(4,8,22,0.88)', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '18px', backdropFilter: 'blur(28px)' }}>
+                <div style={{ padding: '3rem', textAlign: 'center', background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '18px', backdropFilter: 'blur(28px)' }}>
                   <p style={{ fontSize: '2.5rem', margin: '0 0 0.6rem' }}>🧠</p>
-                  <p style={{ margin: '0 0 0.4rem', fontWeight: 800, color: '#f1f5f9' }}>No AI schedule yet</p>
-                  <p style={{ margin: '0 0 1.25rem', fontSize: '0.83rem', color: '#94a3b8' }}>Generate your personalised plan to see an hour-by-hour daily schedule with exact topics.</p>
+                  <p style={{ margin: '0 0 0.4rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>No AI schedule yet</p>
+                  <p style={{ margin: '0 0 1.25rem', fontSize: '0.83rem', color: 'var(--ui-text-muted)' }}>Generate your personalised plan to see an hour-by-hour daily schedule with exact topics.</p>
                   <button onClick={generateAIPlan} disabled={generating} style={{ padding: '0.62rem 1.5rem', background: 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{generating ? 'Generating…' : '✦ Generate AI Study Plan'}</button>
                 </div>
               )}
 
               {/* Day stats */}
               {currentDay && (
-                <div style={{ background: 'rgba(4,8,22,0.90)', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '16px', padding: '1rem 1.3rem', backdropFilter: 'blur(28px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.9rem' }}>
+                <div style={{ background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '16px', padding: '1rem 1.3rem', backdropFilter: 'blur(28px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.9rem' }}>
                   <div>
-                    <p style={{ margin: '0 0 0.08rem', fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>{currentDay.dayName}</p>
-                    <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8' }}>{currentDay.dayLabel} · {currentDay.blocks.length} blocks scheduled</p>
+                    <p style={{ margin: '0 0 0.08rem', fontSize: '1rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>{currentDay.dayName}</p>
+                    <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--ui-text-muted)' }}>{currentDay.dayLabel} · {currentDay.blocks.length} blocks scheduled</p>
                   </div>
                   <div style={{ display: 'flex', gap: '1.1rem', flexWrap: 'wrap' }}>
                     {[
@@ -905,7 +905,7 @@ export default function StudyPlanner() {
                     ].map(s => (
                       <div key={s.l} style={{ textAlign: 'center' }}>
                         <p style={{ margin: '0 0 0.05rem', fontSize: '1rem', fontWeight: 900, color: s.c, textShadow: `0 0 12px ${s.c}55` }}>{s.v}</p>
-                        <p style={{ margin: 0, fontSize: '0.58rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.l}</p>
+                        <p style={{ margin: 0, fontSize: '0.58rem', color: 'var(--ui-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.l}</p>
                       </div>
                     ))}
                   </div>
@@ -923,11 +923,11 @@ export default function StudyPlanner() {
                       <div key={block.id} style={{ display: 'flex', gap: '0.8rem', alignItems: 'stretch', opacity: done ? 0.68 : 1, transition: 'opacity 0.3s' }}>
                         {/* Time column */}
                         <div style={{ flexShrink: 0, width: '48px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', paddingTop: '0.4rem', gap: '1px' }}>
-                          <span style={{ fontSize: '0.66rem', fontWeight: 700, color: done ? '#34d399' : '#64748b', fontVariantNumeric: 'tabular-nums' }}>{block.startTime}</span>
+                          <span style={{ fontSize: '0.66rem', fontWeight: 700, color: done ? '#34d399' : 'var(--ui-text-muted)', fontVariantNumeric: 'tabular-nums' }}>{block.startTime}</span>
                           <span style={{ fontSize: '0.58rem', color: '#374151' }}>{block.endTime}</span>
                         </div>
                         {/* Block */}
-                        <div style={{ flex: 1, background: done ? 'rgba(16,185,129,0.07)' : isBreak ? 'rgba(255,255,255,0.02)' : meta.bg, border: `1.5px solid ${done ? 'rgba(16,185,129,0.28)' : isBreak ? 'rgba(255,255,255,0.05)' : `${meta.color}28`}`, borderLeft: `3px solid ${done ? '#10b981' : meta.color}`, borderRadius: '12px', padding: isBreak ? '0.5rem 0.85rem' : '0.82rem 1.05rem', transition: 'all 0.18s' }}>
+                        <div style={{ flex: 1, background: done ? 'rgba(16,185,129,0.07)' : isBreak ? 'rgba(255,255,255,0.02)' : meta.bg, border: `1.5px solid ${done ? 'rgba(16,185,129,0.28)' : isBreak ? 'var(--ui-border)' : `${meta.color}28`}`, borderLeft: `3px solid ${done ? '#10b981' : meta.color}`, borderRadius: '12px', padding: isBreak ? '0.5rem 0.85rem' : '0.82rem 1.05rem', transition: 'all 0.18s' }}>
                           {isBreak ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.48rem' }}>
                               <span style={{ fontSize: '0.8rem' }}>{meta.icon}</span>
@@ -942,7 +942,7 @@ export default function StudyPlanner() {
                                     <span style={{ fontSize: '0.7rem', fontWeight: 800, color: meta.color, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{block.subject}</span>
                                     {done && <span style={{ fontSize: '0.72rem' }}>✅</span>}
                                   </div>
-                                  <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 700, color: done ? '#a7f3d0' : '#f1f5f9', lineHeight: 1.35 }}>{block.topic}</p>
+                                  <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 700, color: done ? '#a7f3d0' : 'var(--ui-text-h)', lineHeight: 1.35 }}>{block.topic}</p>
                                 </div>
                                 {block.xp > 0 && (
                                   <div style={{ flexShrink: 0, textAlign: 'right' }}>
@@ -951,7 +951,7 @@ export default function StudyPlanner() {
                                 )}
                               </div>
                               <div style={{ display: 'flex', gap: '0.38rem', flexWrap: 'wrap' }}>
-                                <span style={{ fontSize: '0.63rem', padding: '0.1rem 0.44rem', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.07)' }}>⏱ {block.durationMins}m</span>
+                                <span style={{ fontSize: '0.63rem', padding: '0.1rem 0.44rem', borderRadius: '6px', background: 'var(--ui-border)', color: 'var(--ui-text-muted)', border: '1px solid var(--ui-border)' }}>⏱ {block.durationMins}m</span>
                                 <span style={{ fontSize: '0.63rem', padding: '0.1rem 0.44rem', borderRadius: '6px', background: `${meta.color}12`, color: meta.color, border: `1px solid ${meta.color}22`, fontWeight: 600 }}>{meta.label}</span>
                                 {block.focusDemand >= 80 && <span style={{ fontSize: '0.63rem', padding: '0.1rem 0.44rem', borderRadius: '6px', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)', fontWeight: 700 }}>High Focus</span>}
                                 {block.type === 'catchup' && <span style={{ fontSize: '0.63rem', padding: '0.1rem 0.44rem', borderRadius: '6px', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.22)', fontWeight: 700 }}>Adaptive Carry-forward</span>}
@@ -964,8 +964,8 @@ export default function StudyPlanner() {
                   })}
                   <div style={{ padding: '0.7rem 0.9rem', background: 'rgba(var(--primary-rgb),0.05)', border: '1px solid rgba(var(--primary-rgb),0.12)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
                     <span style={{ fontSize: '0.82rem' }}>🤖</span>
-                    <p style={{ margin: 0, fontSize: '0.73rem', color: '#94a3b8', lineHeight: 1.5 }}>
-                      <strong style={{ color: '#cbd5e1' }}>Auto-tracked:</strong> Blocks complete automatically as you study, quiz, and check in. No manual input required.
+                    <p style={{ margin: 0, fontSize: '0.73rem', color: 'var(--ui-text-muted)', lineHeight: 1.5 }}>
+                      <strong style={{ color: 'var(--ui-text)' }}>Auto-tracked:</strong> Blocks complete automatically as you study, quiz, and check in. No manual input required.
                     </p>
                   </div>
                 </div>
@@ -977,30 +977,30 @@ export default function StudyPlanner() {
             /* ══════ TWIN SIMULATION TAB ══════ */
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {!planner?.twinSim ? (
-                <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(4,8,22,0.88)', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '18px', backdropFilter: 'blur(28px)' }}>
+                <div style={{ padding: '3rem', textAlign: 'center', background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '18px', backdropFilter: 'blur(28px)' }}>
                   <p style={{ fontSize: '2.5rem', margin: '0 0 0.6rem' }}>🧠</p>
-                  <p style={{ margin: '0 0 0.4rem', fontWeight: 800, color: '#f1f5f9' }}>No Twin Simulation yet</p>
-                  <p style={{ margin: '0 0 1.25rem', fontSize: '0.83rem', color: '#94a3b8' }}>Generate your AI plan to run a Digital Twin simulation and see predicted outcomes before you start studying.</p>
+                  <p style={{ margin: '0 0 0.4rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>No Twin Simulation yet</p>
+                  <p style={{ margin: '0 0 1.25rem', fontSize: '0.83rem', color: 'var(--ui-text-muted)' }}>Generate your AI plan to run a Digital Twin simulation and see predicted outcomes before you start studying.</p>
                   <button onClick={generateAIPlan} disabled={generating} style={{ padding: '0.62rem 1.5rem', background: 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{generating ? 'Simulating…' : '✦ Run Twin Simulation'}</button>
                 </div>
               ) : simRunning ? (
-                <div style={{ padding: '2.5rem 1.5rem', background: 'rgba(4,8,22,0.95)', border: '1.5px solid rgba(var(--primary-rgb),0.3)', borderRadius: '18px', backdropFilter: 'blur(40px)', textAlign: 'center' }}>
+                <div style={{ padding: '2.5rem 1.5rem', background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.3)', borderRadius: '18px', backdropFilter: 'blur(40px)', textAlign: 'center' }}>
                   <div style={{ width: '44px', height: '44px', border: '3px solid rgba(var(--primary-rgb),0.2)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 0.75s linear infinite', margin: '0 auto 1.1rem' }} />
                   <p style={{ margin: '0 0 0.35rem', fontWeight: 800, color: 'var(--primary)', fontSize: '1rem' }}>◈ Running Digital Twin Simulation…</p>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#94a3b8' }}>Analysing habits · Projecting performance · Simulating outcomes</p>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--ui-text-muted)' }}>Analysing habits · Projecting performance · Simulating outcomes</p>
                 </div>
               ) : (
                 <>
                   {/* Completion probability hero */}
-                  <div style={{ background: 'rgba(4,8,22,0.93)', border: '1.5px solid rgba(var(--primary-rgb),0.28)', borderRadius: '20px', padding: '2rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.28)', borderRadius: '20px', padding: '2rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(var(--primary-rgb),0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
-                    <p style={{ margin: '0 0 0.3rem', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Digital Twin Simulation Result</p>
+                    <p style={{ margin: '0 0 0.3rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--ui-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Digital Twin Simulation Result</p>
                     <p style={{ margin: '0 0 0.1rem', fontSize: '4.2rem', fontWeight: 900, color: 'var(--primary)', lineHeight: 1, textShadow: '0 0 40px rgba(var(--primary-rgb),0.55)' }}>{planner.twinSim.completionProbability}%</p>
-                    <p style={{ margin: '0 0 1.5rem', fontSize: '0.88rem', color: '#cbd5e1', fontWeight: 600 }}>Plan Completion Probability</p>
+                    <p style={{ margin: '0 0 1.5rem', fontSize: '0.88rem', color: 'var(--ui-text)', fontWeight: 600 }}>Plan Completion Probability</p>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.7rem', padding: '0.7rem 1.5rem', background: 'rgba(var(--primary-rgb),0.1)', border: '1px solid rgba(var(--primary-rgb),0.2)', borderRadius: '12px' }}>
                       <div style={{ textAlign: 'center' }}>
-                        <p style={{ margin: 0, fontSize: '0.68rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current</p>
-                        <p style={{ margin: 0, fontSize: '1.3rem', fontWeight: 900, color: '#94a3b8' }}>{planner.twinSim.currentScore}%</p>
+                        <p style={{ margin: 0, fontSize: '0.68rem', color: 'var(--ui-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current</p>
+                        <p style={{ margin: 0, fontSize: '1.3rem', fontWeight: 900, color: 'var(--ui-text-muted)' }}>{planner.twinSim.currentScore}%</p>
                       </div>
                       <span style={{ color: '#4b5563', fontSize: '1.5rem' }}>→</span>
                       <div style={{ textAlign: 'center' }}>
@@ -1020,45 +1020,45 @@ export default function StudyPlanner() {
                       { label: 'Most Likely Strength', value: planner.twinSim.predictedStrength,         color: '#34d399', icon: '💪' },
                       { label: 'Most Likely Weakness', value: planner.twinSim.predictedWeakness,         color: '#f87171', icon: '⚠️' },
                     ].map(s => (
-                      <div key={s.label} style={{ background: 'rgba(4,8,22,0.90)', border: `1.5px solid ${s.color}25`, borderRadius: '16px', padding: '1.05rem', backdropFilter: 'blur(24px)', boxShadow: `0 8px 28px rgba(0,0,0,0.5), 0 0 14px ${s.color}0b` }}>
+                      <div key={s.label} style={{ background: 'var(--ui-surface)', border: `1.5px solid ${s.color}25`, borderRadius: '16px', padding: '1.05rem', backdropFilter: 'blur(24px)', boxShadow: `0 8px 28px rgba(0,0,0,0.5), 0 0 14px ${s.color}0b` }}>
                         <p style={{ margin: '0 0 0.25rem', fontSize: '1rem' }}>{s.icon}</p>
                         <p style={{ margin: '0 0 0.15rem', fontSize: '1.05rem', fontWeight: 900, color: s.color, textShadow: `0 0 12px ${s.color}55`, lineHeight: 1.25, wordBreak: 'break-word' }}>{s.value}</p>
-                        <p style={{ margin: 0, fontSize: '0.58rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
+                        <p style={{ margin: 0, fontSize: '0.58rem', color: 'var(--ui-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
                       </div>
                     ))}
                   </div>
 
                   {/* AI Recommendation */}
-                  <div style={{ background: 'rgba(4,8,22,0.90)', border: '1.5px solid rgba(var(--primary-rgb),0.22)', borderRadius: '18px', padding: '1.3rem 1.5rem', backdropFilter: 'blur(28px)' }}>
+                  <div style={{ background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.22)', borderRadius: '18px', padding: '1.3rem 1.5rem', backdropFilter: 'blur(28px)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.8rem' }}>
                       <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(var(--primary-rgb),0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>◈</div>
-                      <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#f1f5f9' }}>AI Recommendation</span>
+                      <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>AI Recommendation</span>
                     </div>
-                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#cbd5e1', lineHeight: 1.7, padding: '0.85rem 1rem', background: 'rgba(var(--primary-rgb),0.06)', borderRadius: '10px', border: '1px solid rgba(var(--primary-rgb),0.12)' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--ui-text)', lineHeight: 1.7, padding: '0.85rem 1rem', background: 'rgba(var(--primary-rgb),0.06)', borderRadius: '10px', border: '1px solid rgba(var(--primary-rgb),0.12)' }}>
                       "{planner.twinSim.aiRecommendation}"
                     </p>
                   </div>
 
                   {/* What-If Scenarios */}
                   <div>
-                    <h3 style={{ margin: '0 0 0.9rem', fontSize: '0.95rem', fontWeight: 800, color: '#f1f5f9' }}>What-If Scenarios</h3>
+                    <h3 style={{ margin: '0 0 0.9rem', fontSize: '0.95rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>What-If Scenarios</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '0.8rem' }}>
                       {planner.twinSim.whatIf.map(s => {
                         const isBase    = s.id === 'current';
-                        const bColor    = isBase ? 'rgba(var(--primary-rgb),0.3)' : s.impact === 'positive' ? 'rgba(16,185,129,0.28)' : s.impact === 'negative' ? 'rgba(239,68,68,0.28)' : 'rgba(255,255,255,0.1)';
+                        const bColor    = isBase ? 'rgba(var(--primary-rgb),0.3)' : s.impact === 'positive' ? 'rgba(16,185,129,0.28)' : s.impact === 'negative' ? 'rgba(239,68,68,0.28)' : 'var(--ui-border)';
                         const scoreColor = isBase ? 'var(--primary)' : s.impact === 'positive' ? '#34d399' : '#f87171';
                         const delta      = s.score - (planner.twinSim?.predictedScore ?? 0);
                         return (
-                          <div key={s.id} style={{ background: isBase ? 'rgba(var(--primary-rgb),0.07)' : 'rgba(4,8,22,0.88)', border: `1.5px solid ${bColor}`, borderRadius: '16px', padding: '1.05rem', backdropFilter: 'blur(24px)', transition: 'all 0.18s' }}>
+                          <div key={s.id} style={{ background: isBase ? 'rgba(var(--primary-rgb),0.07)' : 'var(--ui-surface)', border: `1.5px solid ${bColor}`, borderRadius: '16px', padding: '1.05rem', backdropFilter: 'blur(24px)', transition: 'all 0.18s' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.48rem', marginBottom: '0.55rem' }}>
                               <span style={{ fontSize: '1.05rem' }}>{s.icon}</span>
-                              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#f1f5f9' }}>{s.label}</span>
+                              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>{s.label}</span>
                               {isBase && <span style={{ fontSize: '0.6rem', padding: '0.07rem 0.36rem', background: 'rgba(var(--primary-rgb),0.2)', color: 'var(--primary)', borderRadius: '99px', fontWeight: 700 }}>Current</span>}
                             </div>
-                            <p style={{ margin: '0 0 0.65rem', fontSize: '0.73rem', color: '#94a3b8', lineHeight: 1.4 }}>{s.change}</p>
+                            <p style={{ margin: '0 0 0.65rem', fontSize: '0.73rem', color: 'var(--ui-text-muted)', lineHeight: 1.4 }}>{s.change}</p>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.38rem' }}>
                               <span style={{ fontSize: '1.75rem', fontWeight: 900, color: scoreColor, textShadow: `0 0 14px ${scoreColor}55` }}>{s.score}%</span>
-                              <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>predicted</span>
+                              <span style={{ fontSize: '0.7rem', color: 'var(--ui-text-muted)' }}>predicted</span>
                               {!isBase && delta !== 0 && (
                                 <span style={{ fontSize: '0.72rem', fontWeight: 700, color: scoreColor, marginLeft: 'auto' }}>
                                   {delta > 0 ? '+' : ''}{delta}%
@@ -1086,10 +1086,10 @@ export default function StudyPlanner() {
       {/* Celebration popup */}
       {celebration && (
         <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }} onClick={() => setCelebration(null)}>
-          <div style={{ background: 'rgba(4,8,22,0.97)', border: '2px solid rgba(var(--primary-rgb),0.4)', borderRadius: '24px', padding: '2.5rem 2rem', textAlign: 'center', maxWidth: '360px', width: '90%', boxShadow: '0 30px 80px rgba(0,0,0,0.85)', backdropFilter: 'blur(40px)', animation: 'popIn 0.3s ease' }} onClick={e => e.stopPropagation()}>
+          <div style={{ background: 'var(--ui-surface)', border: '2px solid rgba(var(--primary-rgb),0.4)', borderRadius: '24px', padding: '2.5rem 2rem', textAlign: 'center', maxWidth: '360px', width: '90%', boxShadow: '0 30px 80px rgba(0,0,0,0.85)', backdropFilter: 'blur(40px)', animation: 'popIn 0.3s ease' }} onClick={e => e.stopPropagation()}>
             <p style={{ fontSize: '3rem', margin: '0 0 0.5rem' }}>🎉</p>
-            <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.3rem', fontWeight: 900, color: '#f1f5f9' }}>{celebration.title}</h3>
-            <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.6 }}>{celebration.msg}</p>
+            <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.3rem', fontWeight: 900, color: 'var(--ui-text-h)' }}>{celebration.title}</h3>
+            <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: 'var(--ui-text-muted)', lineHeight: 1.6 }}>{celebration.msg}</p>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.2rem', background: 'linear-gradient(135deg,#ffd700,#f59e0b)', borderRadius: '99px', marginBottom: '1.25rem' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: 900, color: '#0f172a' }}>⭐ +{celebration.xp} XP</span>
             </div>

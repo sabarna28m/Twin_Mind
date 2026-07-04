@@ -1,11 +1,12 @@
-/**
+﻿/**
  * VoiceInterview — Premium AI mock-interview panel.
  * Supports both Text mode and Voice mode.
  * Uses Web Speech API (SpeechRecognition + SpeechSynthesis).
  * No extra dependencies — inline styles only, consistent with the rest of the app.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Keyboard, Mic, MicOff, Play, Pause, Square, RotateCcw, CornerDownLeft } from 'lucide-react';
 import api from '../services/api';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -270,7 +271,7 @@ function Bubble({ msg, isNew }: { msg: InterviewMsg; isNew?: boolean }) {
       animation: isNew ? 'fade-up 0.3s ease both' : 'none',
     }}>
       {!isUser && (
-        <div style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg,#6366f1,#00D4FF)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', flexShrink:0 }}>🤖</div>
+        <div style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg,#6366f1,#00D4FF)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', flexShrink:0 }}></div>
       )}
       <div style={{
         maxWidth:'75%',
@@ -290,7 +291,7 @@ function Bubble({ msg, isNew }: { msg: InterviewMsg; isNew?: boolean }) {
         {msg.content}
       </div>
       {isUser && (
-        <div style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg,#8b5cf6,#6366f1)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', flexShrink:0 }}>👤</div>
+        <div style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg,#8b5cf6,#6366f1)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', flexShrink:0 }}></div>
       )}
     </div>
   );
@@ -317,7 +318,7 @@ function ProgressHeader({ role, userCount, qTotal, timer, complete, onRestart, m
         {(['text','voice'] as const).map(m => (
           <button key={m} onClick={onModeToggle} disabled={mode===m}
             style={{ padding:'4px 10px', borderRadius:6, border:'none', background:mode===m?INDIGO:'transparent', color:mode===m?'#fff':MUTED, cursor:mode===m?'default':'pointer', fontSize:'0.72rem', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.5px' }}>
-            {m==='text'?'⌨ Text':'🎤 Voice'}
+            {m==='text'?<><Keyboard size={12} style={{marginRight:'0.25rem'}}/>Text</>:<><Mic size={12} style={{marginRight:'0.25rem'}}/>Voice</>}
           </button>
         ))}
       </div>
@@ -361,13 +362,13 @@ function ScoreResults({ scores, feedback, strengths, improvements }:
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
           {strengths.length > 0 && (
             <div style={{ background:CARD, border:BORDER, borderRadius:12, padding:'0.9rem' }}>
-              <div style={{ color:GREEN, fontWeight:700, fontSize:'0.75rem', marginBottom:5 }}>✓ Strengths</div>
+              <div style={{ color:GREEN, fontWeight:700, fontSize:'0.75rem', marginBottom:5 }}> Strengths</div>
               {strengths.map((s,i)=><div key={i} style={{ color:MUTED, fontSize:'0.79rem', marginBottom:3 }}>• {s}</div>)}
             </div>
           )}
           {improvements.length > 0 && (
             <div style={{ background:CARD, border:BORDER, borderRadius:12, padding:'0.9rem' }}>
-              <div style={{ color:AMBER, fontWeight:700, fontSize:'0.75rem', marginBottom:5 }}>⚠ Improve</div>
+              <div style={{ color:AMBER, fontWeight:700, fontSize:'0.75rem', marginBottom:5 }}> Improve</div>
               {improvements.map((imp,i)=><div key={i} style={{ color:MUTED, fontSize:'0.79rem', marginBottom:3 }}>• {imp}</div>)}
             </div>
           )}
@@ -390,7 +391,7 @@ function ControlsBar({ muted, paused, speed, voices, selectedVoice, onMute, onPa
   const [showVoices, setShowVoices] = useState(false);
 
   const CtrlBtn = ({ icon, label, active, color, onClick, disabled }:
-    { icon:string; label:string; active?:boolean; color?:string; onClick:()=>void; disabled?:boolean }) => (
+    { icon:React.ReactNode; label:string; active?:boolean; color?:string; onClick:()=>void; disabled?:boolean }) => (
     <button onClick={onClick} disabled={disabled}
       style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:2, padding:'6px 10px', borderRadius:9, border:`1px solid ${active?(color||CYAN)+'55':'rgba(255,255,255,0.08)'}`, background:active?`${color||CYAN}15`:'rgba(255,255,255,0.03)', color:disabled?DIM:active?(color||CYAN):MUTED, cursor:disabled?'not-allowed':'pointer', fontSize:'0.58rem', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.5px', transition:'all 0.15s', minWidth:44, opacity:disabled?0.5:1 }}>
       <span style={{ fontSize:'1rem' }}>{icon}</span>{label}
@@ -401,11 +402,11 @@ function ControlsBar({ muted, paused, speed, voices, selectedVoice, onMute, onPa
     <div style={{ display:'flex', flexDirection:'column', gap:'0.65rem' }}>
       {/* Control buttons */}
       <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
-        <CtrlBtn icon={muted?'🔇':'🔊'} label={muted?'Muted':'Mute'} active={muted} color={RED} onClick={onMute} />
-        <CtrlBtn icon={paused?'▶':'⏸'} label={paused?'Resume':'Pause'} active={paused} color={AMBER} onClick={onPause} />
-        <CtrlBtn icon="↩" label="Replay" onClick={onReplay} disabled={!canReplay} />
-        <CtrlBtn icon="↺" label="Restart" onClick={onRestart} />
-        <CtrlBtn icon="⏹" label="End" color={RED} onClick={onEnd} />
+        <CtrlBtn icon={muted?<MicOff size={16}/>:<Mic size={16}/>} label={muted?'Muted':'Mute'} active={muted} color={RED} onClick={onMute} />
+        <CtrlBtn icon={paused?<Play size={16}/>:<Pause size={16}/>} label={paused?'Resume':'Pause'} active={paused} color={AMBER} onClick={onPause} />
+        <CtrlBtn icon={<CornerDownLeft size={16}/>} label="Replay" onClick={onReplay} disabled={!canReplay} />
+        <CtrlBtn icon={<RotateCcw size={16}/>} label="Restart" onClick={onRestart} />
+        <CtrlBtn icon={<Square size={16}/>} label="End" color={RED} onClick={onEnd} />
       </div>
 
       {/* Speed slider */}
@@ -829,7 +830,7 @@ export default function VoiceInterview() {
               {(['voice','text'] as const).map(m => (
                 <button key={m} onClick={() => setMode(m)}
                   style={{ flex:1, padding:'0.55rem', borderRadius:9, border:'none', background:mode===m?`linear-gradient(135deg,${INDIGO},${PURPLE})`:'transparent', color:mode===m?'#fff':MUTED, cursor:'pointer', fontWeight:mode===m?700:400, fontSize:'0.85rem', transition:'all 0.2s' }}>
-                  {m === 'voice' ? '🎤 Voice Mode' : '⌨️ Text Mode'}
+                  {m === 'voice' ? <><Mic size={14} style={{marginRight:'0.3rem'}}/>Voice Mode</> : <><Keyboard size={14} style={{marginRight:'0.3rem'}}/>Text Mode</>}
                 </button>
               ))}
             </div>
@@ -848,7 +849,7 @@ export default function VoiceInterview() {
 
             <button onClick={startInterview}
               style={{ width:'100%', padding:'0.85rem', background:`linear-gradient(135deg,${INDIGO},${PURPLE})`, border:'none', borderRadius:12, color:'#fff', fontWeight:700, cursor:'pointer', fontSize:'1rem', boxShadow:`0 8px 24px rgba(99,102,241,0.4)`, letterSpacing:'0.3px' }}>
-              {mode === 'voice' ? '🎤 Start Voice Interview' : '⌨️ Start Text Interview'}
+              {mode === 'voice' ? <><Mic size={16} style={{marginRight:'0.4rem'}}/>Start Voice Interview</> : <><Keyboard size={16} style={{marginRight:'0.4rem'}}/>Start Text Interview</>}
             </button>
           </div>
         </div>
@@ -898,7 +899,7 @@ export default function VoiceInterview() {
               {/* Thinking indicator */}
               {loading && (
                 <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                  <div style={{ width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,#6366f1,#00D4FF)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.75rem' }}>🤖</div>
+                  <div style={{ width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,#6366f1,#00D4FF)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.75rem' }}></div>
                   <div style={{ display:'flex', gap:5, padding:'10px 14px', background:'rgba(255,255,255,0.06)', borderRadius:'4px 18px 18px 18px', border:BORDER }}>
                     {[0,1,2].map(i=>(
                       <div key={i} style={{ width:7,height:7,borderRadius:'50%',background:INDIGO,animation:`thinking-dot 1.4s ease-in-out ${i*0.2}s infinite` }} />
@@ -914,7 +915,7 @@ export default function VoiceInterview() {
                     <div style={{ color:INDIGO, fontSize:'0.62rem', fontWeight:700, textTransform:'uppercase', letterSpacing:1, marginBottom:3 }}>● Live</div>
                     {liveText}<span style={{ color:`${MUTED}88` }}>{interimText}</span>
                   </div>
-                  <div style={{ width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,#8b5cf6,#6366f1)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.75rem',flexShrink:0 }}>👤</div>
+                  <div style={{ width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,#8b5cf6,#6366f1)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.75rem',flexShrink:0 }}></div>
                 </div>
               )}
 

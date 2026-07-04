@@ -1,3 +1,4 @@
+import { BookOpen, Search } from 'lucide-react';
 import SessionCard from './SessionCard';
 import type { Session } from '../../types/sessions';
 
@@ -23,7 +24,7 @@ export default function SessionHistory({ sessions, loading, onToggle, onDelete, 
   if (totalCount === 0) {
     return (
       <div style={s.empty}>
-        <p style={s.emptyIcon}>📖</p>
+        <BookOpen size={40} style={{ color: 'var(--text-m)', marginBottom: '0.5rem' }} />
         <p style={s.emptyTitle}>No sessions yet</p>
         <p style={s.emptyHint}>Start your first focus session with the timer above.</p>
       </div>
@@ -33,7 +34,7 @@ export default function SessionHistory({ sessions, loading, onToggle, onDelete, 
   if (sessions.length === 0) {
     return (
       <div style={s.empty}>
-        <p style={s.emptyIcon}>🔍</p>
+        <Search size={40} style={{ color: 'var(--text-m)', marginBottom: '0.5rem' }} />
         <p style={s.emptyTitle}>No sessions match your filters</p>
         <p style={s.emptyHint}>Try adjusting the search or filter options.</p>
       </div>

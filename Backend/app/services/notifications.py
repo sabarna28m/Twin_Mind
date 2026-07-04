@@ -110,7 +110,7 @@ def notify_shield_earned(db: DBSession, user_id: int, shield_count: int) -> None
         reference_key=f"shield_earned_{today.isoformat()}_{shield_count}",
         priority="important",
         category="achievement",
-        emoji="🛡️",
+        emoji="",
         title="Streak Shield Earned",
         action_url="/checkin",
     )
@@ -125,7 +125,7 @@ def notify_shield_used(db: DBSession, user_id: int, streak: int, shields_remaini
         reference_key=f"shield_used_{today.isoformat()}",
         priority="important",
         category="streak_milestone",
-        emoji="🛡️",
+        emoji="",
         title="Streak Protected",
         action_url="/checkin",
     )
@@ -139,7 +139,7 @@ def notify_recovery_available(db: DBSession, user_id: int, missed_date) -> None:
         reference_key=f"recovery_{missed_date.isoformat()}",
         priority="critical",
         category="streak_milestone",
-        emoji="⚡",
+        emoji="",
         title="Streak Recovery Available",
         action_url="/checkin",
     )
@@ -154,7 +154,7 @@ def notify_no_shields_warning(db: DBSession, user_id: int) -> None:
         reference_key=f"no_shields_{today.isoformat()}",
         priority="important",
         category="streak_milestone",
-        emoji="⚠️",
+        emoji="",
         title="No Shields Remaining",
         action_url="/shop",
     )

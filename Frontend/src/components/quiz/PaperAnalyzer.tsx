@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
+import { BarChart2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
@@ -58,12 +59,12 @@ type Difficulty = 'same' | 'easier' | 'harder' | 'mixed';
 
 /* ── Helpers ────────────────────────────────────────────────────────────────── */
 function fileIcon(mime: string) {
-  if (mime === 'application/pdf') return '📄';
-  if (mime.startsWith('image/')) return '🖼';
-  if (mime.startsWith('text/')) return '📝';
-  if (mime.includes('word')) return '📘';
-  if (mime.includes('presentation')) return '📊';
-  return '📎';
+  if (mime === 'application/pdf') return '';
+  if (mime.startsWith('image/')) return '';
+  if (mime.startsWith('text/')) return '';
+  if (mime.includes('word')) return '';
+  if (mime.includes('presentation')) return '';
+  return '';
 }
 function fmtSize(b: number) {
   if (b < 1048576) return `${(b / 1024).toFixed(1)} KB`;
@@ -195,7 +196,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
       {/* ── Header ── */}
       <div style={s.header}>
         <div>
-          <p style={s.pageTitle}>📄 Question Paper Analyzer</p>
+          <p style={s.pageTitle}> Question Paper Analyzer</p>
           <p style={s.pageSub}>Upload an exam paper → AI analyzes the pattern → Generate a new paper</p>
         </div>
       </div>
@@ -214,7 +215,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
                 background: done ? '#10b981' : active ? 'rgba(0,212,255,0.2)' : 'var(--border)',
                 border: `1.5px solid ${done ? '#10b981' : active ? 'rgba(0,212,255,0.5)' : 'var(--border)'}`,
                 color: done ? '#fff' : active ? '#00D4FF' : 'var(--text)',
-              }}>{done ? '✓' : i + 1}</div>
+              }}>{done ? '' : i + 1}</div>
               <span style={{ fontSize: '0.72rem', fontWeight: active ? 700 : 500,
                 color: active ? '#00D4FF' : done ? '#34d399' : 'var(--text)' }}>
                 {labels[i]}
@@ -245,7 +246,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
               </>
             ) : (
               <>
-                <span style={{ fontSize: '1.6rem' }}>📤</span>
+                <span style={{ fontSize: '1.6rem' }}></span>
                 <p style={s.dropLabel}>{dragOver ? 'Drop your paper here' : 'Upload Question Paper'}</p>
                 <p style={s.dropHint}>PDF, DOCX, or image · max 20 MB</p>
               </>
@@ -290,7 +291,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
           </div>
 
           <button onClick={analyzeSelected} disabled={analyzing} style={{ ...s.primaryBtn, opacity: analyzing ? 0.6 : 1 }}>
-            {analyzing ? '⏳ Analyzing paper pattern…' : '🤖 Analyze Paper Pattern'}
+            {analyzing ? 'Analyzing paper pattern…' : 'Analyze Paper Pattern'}
           </button>
 
           {analyzing && (
@@ -311,7 +312,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
         <>
           {/* Analysis results */}
           <div style={s.card}>
-            <p style={s.cardTitle}>📊 Paper Analysis: {analysis.material_name}</p>
+            <p style={{ ...s.cardTitle, display: 'flex', alignItems: 'center', gap: '0.4rem' }}><BarChart2 size={16} /> Paper Analysis: {analysis.material_name}</p>
 
             {/* Stats row */}
             <div style={s.statsRow}>
@@ -331,7 +332,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
             {/* Exam pattern */}
             {analysis.exam_pattern && (
               <div style={s.infoBlock}>
-                <p style={s.infoHead}>📋 Exam Pattern</p>
+                <p style={s.infoHead}> Exam Pattern</p>
                 <p style={s.infoBody}>{analysis.exam_pattern}</p>
               </div>
             )}
@@ -339,7 +340,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
             {/* Section structure */}
             {(analysis.section_structure ?? []).length > 0 && (
               <div style={s.infoBlock}>
-                <p style={s.infoHead}>📑 Section Structure</p>
+                <p style={s.infoHead}> Section Structure</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   {analysis.section_structure!.map((sec, i) => (
                     <div key={i} style={s.secRow}>
@@ -359,7 +360,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
             {/* Marks distribution */}
             {(analysis.marks_distribution ?? []).length > 0 && (
               <div style={s.infoBlock}>
-                <p style={s.infoHead}>📊 Marks Distribution</p>
+                <p style={s.infoHead}> Marks Distribution</p>
                 <table style={s.table}>
                   <thead>
                     <tr>{['Section', 'Questions', 'Marks/Q', 'Total'].map(h => (
@@ -383,7 +384,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
             {/* Topic weightage */}
             {(analysis.topic_weightage ?? []).length > 0 && (
               <div style={s.infoBlock}>
-                <p style={s.infoHead}>⚖️ Topic Weightage</p>
+                <p style={s.infoHead}> Topic Weightage</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
                   {analysis.topic_weightage!.map((tw, i) => (
                     <div key={i}>
@@ -403,7 +404,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
             {/* Frequently repeated topics */}
             {(analysis.frequently_repeated_topics ?? []).length > 0 && (
               <div style={s.infoBlock}>
-                <p style={s.infoHead}>🔁 Frequently Repeated Topics</p>
+                <p style={s.infoHead}> Frequently Repeated Topics</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
                   {analysis.frequently_repeated_topics!.map((t, i) => (
                     <span key={i} style={s.repeatChip}>{t}</span>
@@ -415,7 +416,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
             {/* Assessment style */}
             {analysis.assessment_style && (
               <div style={s.infoBlock}>
-                <p style={s.infoHead}>🎯 Assessment Style</p>
+                <p style={s.infoHead}> Assessment Style</p>
                 <p style={s.infoBody}>{analysis.assessment_style}</p>
               </div>
             )}
@@ -423,7 +424,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
 
           {/* Generate panel */}
           <div style={s.card}>
-            <p style={s.cardTitle}>🤖 Generate Similar Paper</p>
+            <p style={s.cardTitle}>Generate Similar Paper</p>
             <p style={s.cardSub}>Choose difficulty and generate a brand-new question paper following the same structure.</p>
 
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
@@ -446,7 +447,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
 
             <button onClick={generatePaper} disabled={generating}
               style={{ ...s.primaryBtn, opacity: generating ? 0.6 : 1 }}>
-              {generating ? '⏳ Generating paper…' : '✨ Generate New Question Paper'}
+              {generating ? 'Generating paper…' : 'Generate New Question Paper'}
             </button>
 
             {generating && (
@@ -469,7 +470,7 @@ ${(q.options ?? []).map(o => `<div class="opt">${o}</div>`).join('')}
                     Time: {generated.total_time} · Marks: {generated.total_marks} · Difficulty: {generated.difficulty}
                   </p>
                 </div>
-                <button onClick={printPaper} style={s.printBtn}>🖨 Print / Download</button>
+                <button onClick={printPaper} style={s.printBtn}> Print / Download</button>
               </div>
 
               {generated.instructions && (

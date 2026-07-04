@@ -1,9 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, AreaChart, Area, Legend,
 } from 'recharts';
+import {
+  Bot, Target, FileText, Briefcase, Mic, Lightbulb, BarChart2, Star, Search,
+  Map, TrendingUp, BookOpen, Code2, GraduationCap, Building2, GitBranch, Zap,
+  Lock, User, Trophy, CheckCircle, Square,
+} from 'lucide-react';
 import BackButton from '../components/BackButton';
 import InterviewEngine from '../components/InterviewEngine';
 import api from '../services/api';
@@ -110,19 +115,19 @@ const TEXT   = 'var(--text-h)';
 const MUTED  = 'var(--text)';
 const DIM    = 'var(--text-m)';
 
-const TABS = [
-  { id: 'twin',            label: 'Career Twin',    icon: '🤖' },
-  { id: 'overview',        label: 'Readiness',      icon: '🎯' },
-  { id: 'resume',          label: 'Resume',         icon: '📄' },
-  { id: 'linkedin',        label: 'LinkedIn',       icon: '💼' },
-  { id: 'interview',       label: 'Interview AI',   icon: '🎤' },
-  { id: 'coding',          label: 'Practice',       icon: '💡' },
-  { id: 'skillgap',        label: 'Skill Gap',      icon: '📊' },
-  { id: 'recommendations', label: 'Careers',        icon: '🌟' },
-  { id: 'jobmatch',        label: 'Job Match',      icon: '🔍' },
-  { id: 'roadmap',         label: 'Roadmap',        icon: '🗺️' },
-  { id: 'analytics',       label: 'Analytics',      icon: '📈' },
-  { id: 'resources',       label: 'Resources',      icon: '📚' },
+const TABS: { id: string; label: string; icon: ReactNode }[] = [
+  { id: 'twin',            label: 'Career Twin',    icon: <Bot size={14} /> },
+  { id: 'overview',        label: 'Readiness',      icon: <Target size={14} /> },
+  { id: 'resume',          label: 'Resume',         icon: <FileText size={14} /> },
+  { id: 'linkedin',        label: 'LinkedIn',       icon: <Briefcase size={14} /> },
+  { id: 'interview',       label: 'Interview AI',   icon: <Mic size={14} /> },
+  { id: 'coding',          label: 'Practice',       icon: <Code2 size={14} /> },
+  { id: 'skillgap',        label: 'Skill Gap',      icon: <BarChart2 size={14} /> },
+  { id: 'recommendations', label: 'Careers',        icon: <Star size={14} /> },
+  { id: 'jobmatch',        label: 'Job Match',      icon: <Search size={14} /> },
+  { id: 'roadmap',         label: 'Roadmap',        icon: <Map size={14} /> },
+  { id: 'analytics',       label: 'Analytics',      icon: <TrendingUp size={14} /> },
+  { id: 'resources',       label: 'Resources',      icon: <BookOpen size={14} /> },
 ];
 
 const CAREER_OPTIONS = [
@@ -162,19 +167,19 @@ const CAREER_OPTIONS = [
   'Freelancer / Independent Consultant', 'Social Entrepreneur', 'NGO Program Manager',
 ];
 
-const RESOURCES = [
-  { name:'LinkedIn',       url:'https://linkedin.com',                   icon:'💼', color:'#0077b5', desc:'Professional networking, job search, and career building across every field.',   tip:'Update your profile weekly. Connect with 5 professionals in your domain daily.' },
-  { name:'Coursera',       url:'https://coursera.org',                   icon:'🎓', color:'#0056d2', desc:'University courses & certificates from top global institutions in any discipline.', tip:'Complete specializations for structured, globally recognized learning paths.' },
-  { name:'edX',            url:'https://edx.org',                        icon:'📖', color:'#5c3e94', desc:'Professional certificates from MIT, Harvard & world-class universities.',           tip:'Enroll in MicroMasters programs for deep expertise recognized by top employers.' },
-  { name:'NPTEL',          url:'https://nptel.ac.in',                    icon:'🏛️', color:'#f59e0b', desc:'Free courses from IITs and IIMs across technical and professional domains.',       tip:'Earn NPTEL-certified scores — valuable for government and PSU job applications.' },
-  { name:'Khan Academy',   url:'https://khanacademy.org',                icon:'📚', color:'#14bf96', desc:'Free, world-class education across maths, science, humanities, and economics.',    tip:'Use to strengthen fundamentals in any subject — from algebra to legal reasoning.' },
-  { name:'Google Scholar', url:'https://scholar.google.com',             icon:'🔍', color:'#4285f4', desc:'Search millions of scholarly articles, theses, patents, and research papers.',     tip:'Set keyword alerts for new research in your field. Essential for PhD learners.' },
-  { name:'PubMed',         url:'https://pubmed.ncbi.nlm.nih.gov',        icon:'🔬', color:'#336699', desc:'35M+ medical, nursing, and biomedical research articles and clinical trials.',      tip:'Essential for healthcare learners exploring evidence-based clinical practice.' },
-  { name:'Internshala',    url:'https://internshala.com',                icon:'💡', color:'#00b4d8', desc:'Internships, training programs, and fresher jobs across all disciplines in India.', tip:'Apply early — competitive positions fill within hours of being posted.' },
-  { name:'Udemy',          url:'https://udemy.com',                      icon:'🎯', color:'#a435f0', desc:'Practical, hands-on skill courses across every profession and domain.',             tip:'Buy on sale for ~$15. Prioritize project-based courses with real deliverables.' },
-  { name:'GitHub',         url:'https://github.com',                     icon:'🐙', color:'#e2e8f0', desc:'Host technical projects, collaborate, and build a visible public portfolio.',       tip:'Maintain a consistent contribution graph. Pin your 6 best projects.' },
-  { name:'LeetCode',       url:'https://leetcode.com',                   icon:'⚡', color:'#f89f1b', desc:'3000+ coding interview problems for tech and software engineering roles.',          tip:'Solve 1 problem daily. Focus on problem patterns, not memorization.' },
-  { name:'Kaggle',         url:'https://kaggle.com',                     icon:'📊', color:'#20beff', desc:'ML competitions, real-world datasets, and data science community notebooks.',       tip:'Compete in active challenges to build a strong data science and AI portfolio.' },
+const RESOURCES: { name: string; url: string; icon: ReactNode; color: string; desc: string; tip: string }[] = [
+  { name:'LinkedIn',       url:'https://linkedin.com',                   icon:<Briefcase size={22} />,     color:'#0077b5', desc:'Professional networking, job search, and career building across every field.',   tip:'Update your profile weekly. Connect with 5 professionals in your domain daily.' },
+  { name:'Coursera',       url:'https://coursera.org',                   icon:<GraduationCap size={22} />, color:'#0056d2', desc:'University courses & certificates from top global institutions in any discipline.', tip:'Complete specializations for structured, globally recognized learning paths.' },
+  { name:'edX',            url:'https://edx.org',                        icon:<BookOpen size={22} />,      color:'#5c3e94', desc:'Professional certificates from MIT, Harvard & world-class universities.',           tip:'Enroll in MicroMasters programs for deep expertise recognized by top employers.' },
+  { name:'NPTEL',          url:'https://nptel.ac.in',                    icon:<Building2 size={22} />,     color:'#f59e0b', desc:'Free courses from IITs and IIMs across technical and professional domains.',       tip:'Earn NPTEL-certified scores — valuable for government and PSU job applications.' },
+  { name:'Khan Academy',   url:'https://khanacademy.org',                icon:<BookOpen size={22} />,      color:'#14bf96', desc:'Free, world-class education across maths, science, humanities, and economics.',    tip:'Use to strengthen fundamentals in any subject — from algebra to legal reasoning.' },
+  { name:'Google Scholar', url:'https://scholar.google.com',             icon:<Search size={22} />,        color:'#4285f4', desc:'Search millions of scholarly articles, theses, patents, and research papers.',     tip:'Set keyword alerts for new research in your field. Essential for PhD learners.' },
+  { name:'PubMed',         url:'https://pubmed.ncbi.nlm.nih.gov',        icon:<Search size={22} />,        color:'#336699', desc:'35M+ medical, nursing, and biomedical research articles and clinical trials.',      tip:'Essential for healthcare learners exploring evidence-based clinical practice.' },
+  { name:'Internshala',    url:'https://internshala.com',                icon:<Lightbulb size={22} />,     color:'#00b4d8', desc:'Internships, training programs, and fresher jobs across all disciplines in India.', tip:'Apply early — competitive positions fill within hours of being posted.' },
+  { name:'Udemy',          url:'https://udemy.com',                      icon:<Target size={22} />,        color:'#a435f0', desc:'Practical, hands-on skill courses across every profession and domain.',             tip:'Buy on sale for ~$15. Prioritize project-based courses with real deliverables.' },
+  { name:'GitHub',         url:'https://github.com',                     icon:<GitBranch size={22} />,        color:'#e2e8f0', desc:'Host technical projects, collaborate, and build a visible public portfolio.',       tip:'Maintain a consistent contribution graph. Pin your 6 best projects.' },
+  { name:'LeetCode',       url:'https://leetcode.com',                   icon:<Zap size={22} />,           color:'#f89f1b', desc:'3000+ coding interview problems for tech and software engineering roles.',          tip:'Solve 1 problem daily. Focus on problem patterns, not memorization.' },
+  { name:'Kaggle',         url:'https://kaggle.com',                     icon:<BarChart2 size={22} />,     color:'#20beff', desc:'ML competitions, real-world datasets, and data science community notebooks.',       tip:'Compete in active challenges to build a strong data science and AI portfolio.' },
 ];
 
 // ── Shared primitives ────────────────────────────────────────────────────────
@@ -214,10 +219,10 @@ function Tag({ text, color }: { text:string; color:string }) {
   return <span style={{ display:'inline-block', padding:'2px 9px', borderRadius:99, fontSize:'0.72rem', fontWeight:600, background:`${color}22`, color, border:`1px solid ${color}44` }}>{text}</span>;
 }
 
-function ScoreCard({ label, value, color, icon }: { label:string; value:number; color:string; icon:string }) {
+function ScoreCard({ label, value, color, icon }: { label:string; value:number; color:string; icon:ReactNode }) {
   return (
     <div style={{ background:CARD2, border:`1px solid ${color}30`, borderRadius:16, padding:'1.1rem', textAlign:'center' }}>
-      <div style={{ fontSize:'1.4rem', marginBottom:4 }}>{icon}</div>
+      <div style={{ display:'flex', justifyContent:'center', marginBottom:4, color }}>{icon}</div>
       <div style={{ fontSize:'0.7rem', color:MUTED, textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>{label}</div>
       <div style={{ fontSize:'1.8rem', fontWeight:800, color, lineHeight:1 }}>{value}</div>
       <Bar value={value} color={color} height={3} />
@@ -266,10 +271,10 @@ function CareerTwinSection() {
           </div>
           <div style={{ color:MUTED, fontSize:'0.88rem', lineHeight:1.6, marginBottom:'1rem' }}>{data.twin_insight}</div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'0.5rem' }}>
-            <ScoreCard label="Resume"    value={data.resume_score}   color={CYAN}   icon="📄" />
-            <ScoreCard label="LinkedIn"  value={data.linkedin_score} color="#0077b5" icon="💼" />
-            <ScoreCard label="Interview" value={data.interview_score}color={PURPLE}  icon="🎤" />
-            <ScoreCard label="Coding"    value={data.coding_score}   color={AMBER}   icon="💻" />
+            <ScoreCard label="Resume"    value={data.resume_score}   color={CYAN}   icon={<FileText size={22} />} />
+            <ScoreCard label="LinkedIn"  value={data.linkedin_score} color="#0077b5" icon={<Briefcase size={22} />} />
+            <ScoreCard label="Interview" value={data.interview_score}color={PURPLE}  icon={<Mic size={22} />} />
+            <ScoreCard label="Coding"    value={data.coding_score}   color={AMBER}   icon={<Code2 size={22} />} />
           </div>
         </div>
       </div>
@@ -361,7 +366,7 @@ function CareerTwinSection() {
 
       {data.score_history.length === 0 && (
         <div style={{ background:`${AMBER}0a`, border:`1px solid ${AMBER}30`, borderRadius:16, padding:'1.25rem', display:'flex', gap:'1rem', alignItems:'flex-start' }}>
-          <span style={{ fontSize:'1.5rem' }}>💡</span>
+          <Lightbulb size={22} style={{ color: '#f59e0b', flexShrink: 0 }} />
           <div>
             <div style={{ color:AMBER, fontWeight:700, marginBottom:4 }}>Career Twin needs data to evolve</div>
             <div style={{ color:MUTED, fontSize:'0.85rem', lineHeight:1.6 }}>Upload your resume, complete a mock interview, or submit a coding solution. Every action updates your Career Twin and unlocks predictive insights.</div>
@@ -408,7 +413,7 @@ function OverviewSection() {
             <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>{data.strengths.map(s => <Tag key={s} text={s} color={GREEN} />)}</div>
           </div>
           <div>
-            <div style={{ color:AMBER, fontSize:'0.75rem', fontWeight:700, textTransform:'uppercase', letterSpacing:1, marginBottom:8 }}>⚠ Improve</div>
+            <div style={{ color:AMBER, fontSize:'0.75rem', fontWeight:700, textTransform:'uppercase', letterSpacing:1, marginBottom:8 }}>Improve</div>
             <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>{data.areas_to_improve.map(s => <Tag key={s} text={s} color={AMBER} />)}</div>
           </div>
         </div>
@@ -431,7 +436,7 @@ function OverviewSection() {
         </div>
       </div>
       <div style={{ background:`linear-gradient(135deg,${INDIGO}18,${CYAN}10)`, border:`1px solid ${INDIGO}40`, borderRadius:20, padding:'1.5rem', display:'flex', gap:'1rem' }}>
-        <span style={{ fontSize:'1.8rem', flexShrink:0 }}>🤖</span>
+        <Bot size={26} style={{ color: '#00D4FF', flexShrink: 0 }} />
         <div>
           <div style={{ color:CYAN, fontWeight:700, fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>Digital Twin Prediction</div>
           <div style={{ color:TEXT, fontSize:'0.95rem', lineHeight:1.65 }}>{data.twin_prediction}</div>
@@ -497,7 +502,7 @@ function ResumeUploadSection() {
         {(['upload','paste'] as const).map(m => (
           <button key={m} onClick={() => setMode(m)}
             style={{ padding:'0.45rem 1.1rem', borderRadius:8, border:`1px solid ${mode===m?CYAN:'rgba(255,255,255,0.1)'}`, background:mode===m?`${CYAN}18`:'transparent', color:mode===m?CYAN:MUTED, cursor:'pointer', fontWeight:600, fontSize:'0.82rem', textTransform:'capitalize' }}>
-            {m==='upload' ? '📁 Upload File' : '📋 Paste Text'}
+            {m==='upload' ? 'Upload File' : 'Paste Text'}
           </button>
         ))}
       </div>
@@ -514,7 +519,7 @@ function ResumeUploadSection() {
             onClick={()=>fileRef.current?.click()}
             style={{ border:`2px dashed ${dragOver?CYAN:'rgba(255,255,255,0.15)'}`, borderRadius:14, padding:'3rem 2rem', textAlign:'center', cursor:'pointer', background:dragOver?`${CYAN}08`:'transparent', transition:'all 0.2s' }}>
             <input ref={fileRef} type="file" accept=".pdf,.docx,.txt" style={{ display:'none' }} onChange={e=>{ const f=e.target.files?.[0]; if(f) handleFile(f); }} />
-            <div style={{ fontSize:'2.5rem', marginBottom:'0.75rem' }}>📁</div>
+            <FileText size={40} style={{ marginBottom:'0.75rem', color: 'rgba(255,255,255,0.3)' }} />
             {file ? (
               <div>
                 <div style={{ color:GREEN, fontWeight:700, marginBottom:4 }}>✓ {file.name}</div>
@@ -544,7 +549,7 @@ function ResumeUploadSection() {
 
         <button onClick={analyze} disabled={loading || (mode==='upload'?!file:!pasteText.trim())}
           style={{ marginTop:'1rem', width:'100%', padding:'0.75rem', background:loading?DIM:`linear-gradient(135deg,${INDIGO},${CYAN})`, border:'none', borderRadius:10, color:'#fff', fontWeight:700, cursor:loading?'not-allowed':'pointer', fontSize:'0.95rem' }}>
-          {loading ? 'Analyzing…' : '🔍 Analyze Resume'}
+          {loading ? 'Analyzing…' : 'Analyze Resume'}
         </button>
         {err && <div style={{ color:RED, fontSize:'0.83rem', marginTop:8 }}>{err}</div>}
       </div>
@@ -573,7 +578,7 @@ function ResumeUploadSection() {
           {/* Industry relevance */}
           {result.industry_relevance && (
             <div style={{ background:`${CYAN}0a`, border:`1px solid ${CYAN}25`, borderRadius:14, padding:'1rem', display:'flex', gap:'0.75rem' }}>
-              <span style={{ fontSize:'1.2rem' }}>🏭</span>
+              <Building2 size={18} style={{ color: CYAN, flexShrink: 0 }} />
               <div><span style={{ color:CYAN, fontWeight:600, fontSize:'0.82rem' }}>Industry Relevance: </span><span style={{ color:MUTED, fontSize:'0.83rem' }}>{result.industry_relevance}</span></div>
             </div>
           )}
@@ -672,7 +677,7 @@ function ResumeUploadSection() {
           {/* Missing keywords */}
           {result.missing_keywords.length > 0 && (
             <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-              <div style={{ color:AMBER, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>⚠ Missing Keywords</div>
+              <div style={{ color:AMBER, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>Missing Keywords</div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
                 {result.missing_keywords.map(k => <Tag key={k} text={k} color={AMBER} />)}
               </div>
@@ -681,13 +686,13 @@ function ResumeUploadSection() {
 
           {/* Suggestions */}
           <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-            <div style={{ color:CYAN, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>💡 Suggestions</div>
+            <div style={{ color:CYAN, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem', display:'flex', alignItems:'center', gap:4 }}><Lightbulb size={14} style={{ flexShrink:0 }} /> Suggestions</div>
             {result.suggestions.map((s,i) => <div key={i} style={{ color:MUTED, fontSize:'0.82rem', marginBottom:4 }}>→ {s}</div>)}
           </div>
 
           {result.twin_updated && (
             <div style={{ background:`${GREEN}0a`, border:`1px solid ${GREEN}30`, borderRadius:12, padding:'0.75rem 1rem', display:'flex', gap:'0.75rem', alignItems:'center' }}>
-              <span>🤖</span><span style={{ color:GREEN, fontSize:'0.83rem', fontWeight:600 }}>Career Twin updated with your resume score.</span>
+              <Bot size={16} style={{ color: GREEN, flexShrink: 0 }} /><span style={{ color:GREEN, fontSize:'0.83rem', fontWeight:600 }}>Career Twin updated with your resume score.</span>
             </div>
           )}
         </div>
@@ -717,12 +722,12 @@ interface LITwin {
   twin_insight:string; twin_updated:boolean;
 }
 
-const LI_SUB_TABS = [
-  { id:'input',     label:'Input',     icon:'📥' },
-  { id:'profile',   label:'Twin',      icon:'👤' },
-  { id:'achieve',   label:'Achieve',   icon:'🏆' },
-  { id:'optimize',  label:'Optimize',  icon:'⚙️' },
-  { id:'predict',   label:'Predict',   icon:'🔮' },
+const LI_SUB_TABS: { id: string; label: string; icon: ReactNode }[] = [
+  { id:'input',     label:'Input',     icon:<Briefcase size={13} /> },
+  { id:'profile',   label:'Twin',      icon:<Bot size={13} /> },
+  { id:'achieve',   label:'Achieve',   icon:<Star size={13} /> },
+  { id:'optimize',  label:'Optimize',  icon:<Target size={13} /> },
+  { id:'predict',   label:'Predict',   icon:<TrendingUp size={13} /> },
 ];
 
 function LinkedInSection() {
@@ -775,9 +780,9 @@ function LinkedInSection() {
     }
 
     const INPUT_MODES = [
-      { id:'paste', label:'Paste Text',  icon:'📋' },
-      { id:'file',  label:'Upload File', icon:'📁' },
-      { id:'url',   label:'Profile URL', icon:'🔗' },
+      { id:'paste', label:'Paste Text',  },
+      { id:'file',  label:'Upload File', },
+      { id:'url',   label:'Profile URL', },
     ] as const;
 
     return (
@@ -787,7 +792,7 @@ function LinkedInSection() {
           {INPUT_MODES.map(m => (
             <button key={m.id} onClick={() => setInputMode(m.id)}
               style={{ padding:'0.45rem 1rem', borderRadius:8, border:`1px solid ${inputMode===m.id?'#0077b5':'rgba(255,255,255,0.1)'}`, background:inputMode===m.id?'#0077b522':'transparent', color:inputMode===m.id?'#5cb8ff':MUTED, cursor:'pointer', fontWeight:600, fontSize:'0.82rem' }}>
-              {m.icon} {m.label}
+              {m.label}
             </button>
           ))}
         </div>
@@ -807,7 +812,7 @@ function LinkedInSection() {
                 style={{ border:`2px dashed ${file?GREEN:'rgba(255,255,255,0.15)'}`, borderRadius:14, padding:'2.5rem', textAlign:'center', cursor:'pointer', background:file?`${GREEN}06`:'transparent' }}>
                 <input ref={fileRef} type="file" accept=".pdf,.docx,.txt" style={{ display:'none' }}
                   onChange={e => setFile(e.target.files?.[0] || null)} />
-                <div style={{ fontSize:'2rem', marginBottom:8 }}>📁</div>
+                <FileText size={32} style={{ marginBottom:8, color: 'rgba(255,255,255,0.3)' }} />
                 {file ? (
                   <div><div style={{ color:GREEN, fontWeight:700 }}>✓ {file.name}</div><div style={{ color:MUTED, fontSize:'0.78rem' }}>Click to change</div></div>
                 ) : (
@@ -843,7 +848,7 @@ function LinkedInSection() {
 
           <button onClick={analyze} disabled={loading || (!profileText.trim() && !file && !profileUrl.trim())}
             style={{ padding:'0.75rem', background:loading?DIM:`linear-gradient(135deg,#0077b5,${CYAN})`, border:'none', borderRadius:10, color:'#fff', fontWeight:700, cursor:'pointer', fontSize:'0.95rem' }}>
-            {loading ? 'Analyzing with AI…' : '🔍 Analyze LinkedIn Profile'}
+            {loading ? 'Analyzing with AI…' : 'Analyze LinkedIn Profile'}
           </button>
           {err && <div style={{ color:RED, fontSize:'0.82rem' }}>{err}</div>}
         </div>
@@ -851,7 +856,7 @@ function LinkedInSection() {
         {twinLoading && <Loader text="Loading LinkedIn Twin…" />}
         {!twinLoading && twinData && !twinData.last_analyzed && (
           <div style={{ background:`${INDIGO}0a`, border:`1px solid ${INDIGO}30`, borderRadius:14, padding:'1.25rem', display:'flex', gap:'1rem', alignItems:'flex-start' }}>
-            <span style={{ fontSize:'1.6rem' }}>💡</span>
+            <Lightbulb size={22} style={{ color: '#6366f1', flexShrink: 0 }} />
             <div>
               <div style={{ color:INDIGO, fontWeight:700, marginBottom:4 }}>How to get the most from LinkedIn Digital Twin</div>
               <div style={{ color:MUTED, fontSize:'0.83rem', lineHeight:1.7 }}>
@@ -871,7 +876,7 @@ function LinkedInSection() {
   function ProfileTab() {
     if (!twinData || !twinData.last_analyzed) return (
       <div style={{ padding:'3rem', textAlign:'center', color:MUTED }}>
-        <div style={{ fontSize:'2.5rem', marginBottom:'0.75rem' }}>👤</div>
+        <User size={40} style={{ marginBottom:'0.75rem', color: MUTED }} />
         <div style={{ fontWeight:700, color:TEXT, marginBottom:6 }}>No profile analyzed yet</div>
         <div style={{ fontSize:'0.85rem', marginBottom:'1rem' }}>Go to the Input tab to upload or paste your LinkedIn profile.</div>
         <button onClick={() => setLiTab('input')} style={{ padding:'0.55rem 1.5rem', background:INDIGO, border:'none', borderRadius:10, color:'#fff', fontWeight:600, cursor:'pointer' }}>Go to Input</button>
@@ -937,13 +942,13 @@ function LinkedInSection() {
         {/* Generated content */}
         {d.suggested_headline && (
           <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-            <div style={{ color:CYAN, fontWeight:700, fontSize:'0.83rem', marginBottom:8 }}>✨ Suggested Headline</div>
+            <div style={{ color:CYAN, fontWeight:700, fontSize:'0.83rem', marginBottom:8 }}>Suggested Headline</div>
             <div style={{ background:`${CYAN}08`, border:`1px solid ${CYAN}25`, borderRadius:8, padding:'0.75rem', color:TEXT, fontSize:'0.9rem', lineHeight:1.6 }}>{d.suggested_headline}</div>
           </div>
         )}
         {d.suggested_about && (
           <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-            <div style={{ color:CYAN, fontWeight:700, fontSize:'0.83rem', marginBottom:8 }}>✨ Suggested About Section</div>
+            <div style={{ color:CYAN, fontWeight:700, fontSize:'0.83rem', marginBottom:8 }}>Suggested About Section</div>
             <div style={{ background:`${CYAN}06`, border:`1px solid ${CYAN}20`, borderRadius:8, padding:'0.85rem', color:MUTED, fontSize:'0.86rem', lineHeight:1.75 }}>{d.suggested_about}</div>
           </div>
         )}
@@ -1058,7 +1063,7 @@ function LinkedInSection() {
                 {achFile ? (
                   <div><div style={{ color:GREEN, fontWeight:700 }}>✓ {achFile.name}</div><div style={{ color:MUTED, fontSize:'0.75rem' }}>Click to change</div></div>
                 ) : (
-                  <div><div style={{ fontSize:'1.5rem', marginBottom:5 }}>📜</div><div style={{ color:TEXT, fontWeight:600, fontSize:'0.88rem' }}>Upload Certificate / Document</div><div style={{ color:MUTED, fontSize:'0.75rem' }}>PDF, DOCX, TXT, JPG, PNG</div></div>
+                  <div><FileText size={22} style={{ marginBottom:5, color: MUTED }} /><div style={{ color:TEXT, fontWeight:600, fontSize:'0.88rem' }}>Upload Certificate / Document</div><div style={{ color:MUTED, fontSize:'0.75rem' }}>PDF, DOCX, TXT, JPG, PNG</div></div>
                 )}
               </div>
               <button onClick={uploadCert} disabled={loading || !achFile}
@@ -1084,7 +1089,7 @@ function LinkedInSection() {
         {/* Achievement cards */}
         {achievements.length === 0 ? (
           <div style={{ padding:'2rem', textAlign:'center', color:MUTED }}>
-            <div style={{ fontSize:'2rem', marginBottom:8 }}>🏆</div>
+            <Trophy size={32} style={{ marginBottom:8, color: MUTED }} />
             No achievements added yet. Upload certificates, internship letters, or add manually.
           </div>
         ) : (
@@ -1096,8 +1101,8 @@ function LinkedInSection() {
               return (
                 <div key={a.id} style={{ background:CARD, border:BORDER, borderRadius:16, overflow:'hidden' }}>
                   <div onClick={() => setExpandedId(open ? null : a.id)} style={{ padding:'1rem 1.25rem', cursor:'pointer', display:'flex', alignItems:'center', gap:'0.85rem' }}>
-                    <div style={{ width:42, height:42, borderRadius:10, background:`${PURPLE}22`, border:`1px solid ${PURPLE}44`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.2rem', flexShrink:0 }}>
-                      {a.achievement_type==='certificate'?'🎓':a.achievement_type==='internship'?'💼':a.achievement_type==='project'?'🛠':a.achievement_type==='hackathon'?'⚡':a.achievement_type==='award'?'🏆':'📜'}
+                    <div style={{ width:42, height:42, borderRadius:10, background:`${PURPLE}22`, border:`1px solid ${PURPLE}44`, display:'flex', alignItems:'center', justifyContent:'center', color:PURPLE, flexShrink:0 }}>
+                      {a.achievement_type==='certificate'?<GraduationCap size={20}/>:a.achievement_type==='internship'?<Briefcase size={20}/>:a.achievement_type==='project'?<Code2 size={20}/>:a.achievement_type==='hackathon'?<Zap size={20}/>:a.achievement_type==='award'?<Trophy size={20}/>:<FileText size={20}/>}
                     </div>
                     <div style={{ flex:1 }}>
                       <div style={{ color:TEXT, fontWeight:700, fontSize:'0.88rem' }}>{a.title}</div>
@@ -1198,7 +1203,7 @@ function LinkedInSection() {
           <div style={{ display:'flex', flexDirection:'column', gap:'0.6rem', marginTop:'1rem' }}>
             {checklist.map(item => (
               <div key={item.key} style={{ display:'flex', alignItems:'flex-start', gap:'0.75rem', padding:'0.65rem 0.85rem', background:item.completed?`${GREEN}08`:'rgba(255,255,255,0.02)', border:`1px solid ${item.completed?GREEN+'30':'rgba(255,255,255,0.06)'}`, borderRadius:10 }}>
-                <span style={{ fontSize:'1rem', flexShrink:0, marginTop:1 }}>{item.completed ? '✅' : '⬜'}</span>
+                <span style={{ flexShrink:0, marginTop:1, display:'flex' }}>{item.completed ? <CheckCircle size={16} style={{ color:GREEN }} /> : <Square size={16} style={{ color:DIM }} />}</span>
                 <div style={{ flex:1 }}>
                   <div style={{ color:item.completed?GREEN:TEXT, fontWeight:item.completed?600:400, fontSize:'0.85rem' }}>{item.label}</div>
                   {!item.completed && <div style={{ color:DIM, fontSize:'0.75rem', marginTop:2 }}>{item.recommendation}</div>}
@@ -1264,7 +1269,7 @@ function LinkedInSection() {
     return (
       <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
         <div style={{ background:`linear-gradient(135deg,${PURPLE}15,${INDIGO}10)`, border:`1px solid ${PURPLE}35`, borderRadius:18, padding:'1.25rem', display:'flex', gap:'0.85rem' }}>
-          <span style={{ fontSize:'1.8rem' }}>🔮</span>
+          <Bot size={28} style={{ color: PURPLE, flexShrink: 0 }} />
           <div>
             <div style={{ color:PURPLE, fontWeight:700, fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>Digital Twin Career Forecast</div>
             <div style={{ color:TEXT, fontSize:'0.9rem', lineHeight:1.6 }}>{twinData.twin_insight}</div>
@@ -1334,7 +1339,7 @@ function LinkedInSection() {
             <button key={t.id} onClick={() => !locked && setLiTab(t.id as typeof liTab)}
               style={{ flex:1, padding:'0.55rem 0.5rem', borderRadius:9, border:'none', background:active?'rgba(255,255,255,0.09)':'transparent', color:locked?DIM:active?TEXT:MUTED, cursor:locked?'not-allowed':'pointer', fontSize:'0.78rem', fontWeight:active?700:400, display:'flex', alignItems:'center', justifyContent:'center', gap:'0.3rem', transition:'all 0.15s' }}>
               <span>{t.icon}</span><span>{t.label}</span>
-              {locked && <span style={{ fontSize:'0.6rem' }}>🔒</span>}
+              {locked && <Lock size={10} />}
             </button>
           );
         })}
@@ -1396,7 +1401,7 @@ function InterviewSection() {
 
   if (!started) return (
     <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'2.5rem', maxWidth:500, margin:'0 auto', textAlign:'center' }}>
-      <div style={{ fontSize:'3rem', marginBottom:'1rem' }}>🎤</div>
+      <Mic size={48} style={{ marginBottom:'1rem', color: MUTED }} />
       <div style={{ color:TEXT, fontWeight:700, fontSize:'1.2rem', marginBottom:'0.5rem' }}>AI Mock Interview</div>
       <div style={{ color:MUTED, fontSize:'0.85rem', lineHeight:1.6, marginBottom:'1.5rem' }}>
         8 questions mixing Domain Knowledge, Behavioral, HR, and Situational rounds.<br/>
@@ -1471,7 +1476,7 @@ function InterviewSection() {
                 {strengths.map((s,i) => <div key={i} style={{ color:MUTED, fontSize:'0.8rem' }}>• {s}</div>)}
               </div>
               <div style={{ background:CARD, border:BORDER, borderRadius:12, padding:'1rem' }}>
-                <div style={{ color:AMBER, fontWeight:700, fontSize:'0.8rem', marginBottom:6 }}>⚠ Improve</div>
+                <div style={{ color:AMBER, fontWeight:700, fontSize:'0.8rem', marginBottom:6 }}>Improve</div>
                 {improvements.map((imp,i) => <div key={i} style={{ color:MUTED, fontSize:'0.8rem' }}>• {imp}</div>)}
               </div>
             </div>
@@ -1594,7 +1599,7 @@ function CodingSection() {
             )}
             <button onClick={()=>setShowHints(!showHints)}
               style={{ padding:'0.45rem 1rem', background:`${AMBER}12`, border:`1px solid ${AMBER}35`, borderRadius:8, color:AMBER, cursor:'pointer', fontSize:'0.8rem', width:'fit-content' }}>
-              {showHints?'Hide Hints':'Show Hints 💡'}
+              {showHints?'Hide Hints':'Show Hints'}
             </button>
             {showHints && challenge.hints.map((h,i)=>(
               <div key={i} style={{ background:`${AMBER}08`, border:`1px solid ${AMBER}25`, borderRadius:8, padding:'0.6rem 0.75rem', color:AMBER, fontSize:'0.8rem' }}>Hint {i+1}: {h}</div>
@@ -1632,8 +1637,8 @@ function CodingSection() {
                 </div>
                 <div style={{ color:MUTED, fontSize:'0.83rem', lineHeight:1.6, marginBottom:'0.85rem' }}>{evalResult.feedback}</div>
                 <div style={{ display:'flex', gap:'0.65rem', flexWrap:'wrap', marginBottom:'0.75rem' }}>
-                  <Tag text={`⏱ ${evalResult.time_complexity}`}  color={CYAN}   />
-                  <Tag text={`💾 ${evalResult.space_complexity}`} color={INDIGO} />
+                  <Tag text={`Time: ${evalResult.time_complexity}`}  color={CYAN}   />
+                  <Tag text={`Space: ${evalResult.space_complexity}`} color={INDIGO} />
                   <Tag text={evalResult.approach_quality}         color={PURPLE} />
                 </div>
                 {evalResult.improvements.length > 0 && (
@@ -1643,7 +1648,7 @@ function CodingSection() {
                   </>
                 )}
                 {evalResult.twin_updated && (
-                  <div style={{ marginTop:8, color:GREEN, fontSize:'0.78rem', fontWeight:600 }}>🤖 Career Twin updated</div>
+                  <div style={{ marginTop:8, color:GREEN, fontSize:'0.78rem', fontWeight:600, display:'flex', alignItems:'center', gap:4 }}><Bot size={12} style={{ flexShrink:0 }} /> Career Twin updated</div>
                 )}
               </div>
             )}
@@ -1706,15 +1711,15 @@ function SkillGapSection() {
               <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.current_skills.map(s=><Tag key={s} text={s} color={GREEN}/>)}</div>
             </div>
             <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-              <div style={{ color:RED, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>⚠ Missing Skills</div>
+              <div style={{ color:RED, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>Missing Skills</div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.missing_skills.map(s=><Tag key={s} text={s} color={RED}/>)}</div>
             </div>
             <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-              <div style={{ color:AMBER, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>🎓 Missing Certifications</div>
+              <div style={{ color:AMBER, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem', display:'flex', alignItems:'center', gap:4 }}><GraduationCap size={14} style={{ flexShrink:0 }} /> Missing Certifications</div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.missing_certifications.map(c=><Tag key={c} text={c} color={AMBER}/>)}</div>
             </div>
             <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
-              <div style={{ color:PURPLE, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>🛠 Missing Projects</div>
+              <div style={{ color:PURPLE, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem', display:'flex', alignItems:'center', gap:4 }}><Code2 size={14} style={{ flexShrink:0 }} /> Missing Projects</div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.missing_projects.map(p=><Tag key={p} text={p} color={PURPLE}/>)}</div>
             </div>
           </div>
@@ -1755,7 +1760,7 @@ function RecommendationsSection() {
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.5rem' }}>
       <div style={{ background:`linear-gradient(135deg,${INDIGO}18,${PURPLE}15)`, border:`1px solid ${INDIGO}40`, borderRadius:16, padding:'1.25rem', display:'flex', gap:'1rem' }}>
-        <span style={{ fontSize:'1.8rem' }}>🤖</span>
+        <Bot size={28} style={{ color: CYAN, flexShrink: 0 }} />
         <div>
           <div style={{ color:CYAN, fontWeight:700, fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>Twin Insight</div>
           <div style={{ color:TEXT, fontSize:'0.95rem', lineHeight:1.6 }}>{data.twin_insight}</div>
@@ -1803,7 +1808,7 @@ function JobMatchSection() {
         return (
           <div key={m.role} style={{ background:CARD, border:i===0?`1px solid ${c}40`:BORDER, borderRadius:16, overflow:'hidden' }}>
             <div onClick={()=>setExpanded(open?null:m.role)} style={{ padding:'1.1rem 1.25rem', cursor:'pointer', display:'flex', alignItems:'center', gap:'1rem' }}>
-              {i===0 && <span style={{ fontSize:'1.1rem' }}>🏆</span>}
+              {i===0 && <Trophy size={18} style={{ color:CYAN, flexShrink:0 }} />}
               <div style={{ flex:1 }}>
                 <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
                   <span style={{ color:TEXT, fontWeight:700, fontSize:'0.92rem' }}>{m.role}</span>
@@ -1954,7 +1959,7 @@ function RoadmapSection() {
                     <div key={i} style={{ background:'rgba(255,255,255,0.03)', border:`1px solid ${colors[i%4]}30`, borderRadius:12, padding:'0.85rem' }}>
                       <div style={{ color:colors[i%4], fontWeight:700, fontSize:'0.78rem', marginBottom:4 }}>Month {m.month}</div>
                       <div style={{ color:TEXT, fontSize:'0.8rem', fontWeight:600, marginBottom:3 }}>{m.goal}</div>
-                      <div style={{ color:MUTED, fontSize:'0.75rem' }}>📌 {m.deliverable}</div>
+                      <div style={{ color:MUTED, fontSize:'0.75rem' }}>{m.deliverable}</div>
                     </div>
                   );
                 })}
@@ -1963,7 +1968,7 @@ function RoadmapSection() {
           )}
 
           <div style={{ background:`linear-gradient(135deg,${GREEN}10,${CYAN}06)`, border:`1px solid ${GREEN}35`, borderRadius:14, padding:'1.1rem', display:'flex', gap:'0.85rem', alignItems:'center' }}>
-            <span style={{ fontSize:'1.8rem' }}>🤖</span>
+            <Bot size={28} style={{ color: GREEN, flexShrink: 0 }} />
             <div>
               <div style={{ color:GREEN, fontWeight:700, fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:1, marginBottom:3 }}>Twin Success Probability</div>
               <div style={{ color:TEXT, fontSize:'0.9rem' }}>Your Digital Twin estimates a <strong style={{ color:GREEN }}>{Math.round(data.twin_success_probability*100)}%</strong> probability of successfully transitioning to <strong style={{ color:CYAN }}>{data.target_career}</strong>.</div>
@@ -2006,7 +2011,7 @@ function AnalyticsSection() {
 
       {noHistory ? (
         <div style={{ background:`${AMBER}0a`, border:`1px solid ${AMBER}30`, borderRadius:16, padding:'2rem', textAlign:'center' }}>
-          <div style={{ fontSize:'2rem', marginBottom:'0.75rem' }}>📊</div>
+          <BarChart2 size={32} style={{ marginBottom:'0.75rem', color:AMBER }} />
           <div style={{ color:AMBER, fontWeight:700, marginBottom:6 }}>No history yet</div>
           <div style={{ color:MUTED, fontSize:'0.85rem' }}>Upload a resume, complete an interview, or submit coding solutions to generate analytics charts.</div>
         </div>
@@ -2083,11 +2088,11 @@ function ResourceHub() {
             onMouseEnter={e=>{(e.currentTarget as HTMLDivElement).style.transform='translateY(-3px)';(e.currentTarget as HTMLDivElement).style.borderColor='rgba(255,255,255,0.18)';}}
             onMouseLeave={e=>{(e.currentTarget as HTMLDivElement).style.transform='none';(e.currentTarget as HTMLDivElement).style.borderColor='rgba(255,255,255,0.08)';}}>
             <div style={{ display:'flex', alignItems:'center', gap:'0.65rem', marginBottom:'0.65rem' }}>
-              <span style={{ fontSize:'1.5rem' }}>{res.icon}</span>
+              <span style={{ display:'flex', alignItems:'center', color: res.color }}>{res.icon}</span>
               <span style={{ color:TEXT, fontWeight:700, fontSize:'0.92rem' }}>{res.name}</span>
             </div>
             <div style={{ color:MUTED, fontSize:'0.8rem', lineHeight:1.6, marginBottom:'0.5rem' }}>{res.desc}</div>
-            <div style={{ color:DIM, fontSize:'0.73rem', fontStyle:'italic' }}>💡 {res.tip}</div>
+            <div style={{ color:DIM, fontSize:'0.73rem', fontStyle:'italic' }}>{res.tip}</div>
           </div>
         </a>
       ))}
@@ -2138,7 +2143,7 @@ export default function CareerDevelopment() {
         <BackButton />
         <div>
           <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
-            <span style={{ fontSize:'1.3rem' }}>🚀</span>
+            <Zap size={20} style={{ color: CYAN, flexShrink: 0 }} />
             <span style={{ fontWeight:800, fontSize:'1.15rem', color:TEXT }}>Career Intelligence Hub</span>
           </div>
           <div style={{ color:MUTED, fontSize:'0.72rem' }}>AI-powered career guidance for every learner & professional</div>

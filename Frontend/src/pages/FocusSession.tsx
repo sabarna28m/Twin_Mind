@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿﻿import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Timer, Play, Pause, Square, RotateCcw,
@@ -32,14 +32,14 @@ const PRESETS = [
 
 /* ─── AI Coach messages keyed by milestone ─── */
 const COACH_MSGS = {
-  ready:     ['Set your timer and enter the Focus Zone. I\'ll coach you in real-time. 🎯',
+  ready:     ['Set your timer and enter the Focus Zone. I\'ll coach you in real-time.',
               'Deep work begins with a single session. Ready when you are.',
               'Your brain performs best in focused bursts. Let\'s build that habit.'],
   start:     ['Great start! Your brain is warming up — stay with it.',
               'Focus session initiated. I\'m tracking your progress.'],
   min5:      ['You\'re entering the flow state. This is where real learning happens!',
               'First 5 minutes done. Deep focus kicks in now — keep going.'],
-  min15:     ['Outstanding! 15 minutes of deep focus. You\'re in the zone. 🔥',
+  min15:     ['Outstanding! 15 minutes of deep focus. You\'re in the zone.',
               'Flow state achieved. Excellent concentration — don\'t stop!'],
   min25:     ['25 minutes! Pomodoro complete. You may take a 5-minute break.',
               'Excellent deep work session. Your brain is absorbing information well.'],
@@ -49,8 +49,8 @@ const COACH_MSGS = {
               'World-class focus for 60 minutes. Take care of your brain — rest first.'],
   paused:    ['Session paused. Breathe. Resume whenever you\'re ready — I\'ll be here.',
               'Take a moment, then come back stronger. You\'re doing great.'],
-  completed: ['🎉 Session complete! You crushed it. Rest well — you earned it.',
-              '✅ Excellent work! Your focus score is looking strong today.'],
+  completed: ['Session complete! You crushed it. Rest well — you earned it.',
+              'Excellent work! Your focus score is looking strong today.'],
 };
 
 const HISTORY_KEY = 'twinmind_focus_history';
@@ -290,7 +290,7 @@ export default function FocusSession() {
         <div style={s.notif} className="animate-slide-up">
           <CheckCircle size={18} color="#10B981" />
           <span style={s.notifText}>Focus session complete — great work!</span>
-          <button onClick={() => setShowNotif(false)} style={s.notifClose}>✕</button>
+          <button onClick={() => setShowNotif(false)} style={s.notifClose}></button>
         </div>
       )}
 
@@ -505,28 +505,28 @@ export default function FocusSession() {
             <div style={coach.analyticsRow}>
               {[
                 {
-                  icon: '⏱', label: 'Elapsed',
+                  icon: '', label: 'Elapsed',
                   value: isActive || status === 'completed'
                     ? fmtDuration(totalSec - remainingSec)
                     : '—',
                   color: 'var(--accent)',
                 },
                 {
-                  icon: '🎯', label: 'Focus Score',
+                  icon: '', label: 'Focus Score',
                   value: status === 'running'
                     ? `${Math.min(99, 60 + Math.round((totalSec - remainingSec) / 60 * 0.65))}%`
-                    : status === 'completed' ? '✅ Done' : '—',
+                    : status === 'completed' ? 'Done' : '—',
                   color: '#10b981',
                 },
                 {
-                  icon: '📊', label: 'Productivity',
+                  icon: '', label: 'Productivity',
                   value: status === 'running' && totalSec > 0
                     ? `${Math.round(progress * 100)}%`
                     : status === 'completed' ? '100%' : '—',
                   color: '#f59e0b',
                 },
                 {
-                  icon: '🔥', label: 'Sessions Done',
+                  icon: '', label: 'Sessions Done',
                   value: String(history.length),
                   color: '#ef4444',
                 },
@@ -554,7 +554,7 @@ export default function FocusSession() {
 
             {history.length === 0 ? (
               <div style={s.historyEmpty}>
-                <p style={s.historyEmptyIcon}>⏱</p>
+                <p style={s.historyEmptyIcon}></p>
                 <p style={s.historyEmptyText}>No completed sessions yet.</p>
                 <p style={s.historyEmptyHint}>Start your first focus session to see history here.</p>
               </div>

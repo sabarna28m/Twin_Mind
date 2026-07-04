@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Globe } from 'lucide-react';
 import { LANGUAGES, useLanguage } from '../contexts/LanguageContext';
 import type { LangCode } from '../contexts/LanguageContext';
 
@@ -26,7 +27,7 @@ export default function LanguageModal({ onClose }: Props) {
 
         <div style={s.header}>
           <div>
-            <p style={s.title}>🌐 {t('language_title')}</p>
+            <p style={{ ...s.title, display:'flex', alignItems:'center', gap:6 }}><Globe size={16} style={{ flexShrink:0 }} />{t('language_title')}</p>
             <p style={s.sub}>{t('language_select')}</p>
           </div>
           <button onClick={onClose} style={s.closeBtn}>✕</button>
@@ -42,7 +43,7 @@ export default function LanguageModal({ onClose }: Props) {
                 ...(lang === l.code ? s.langBtnActive : {}),
               }}
             >
-              <span style={s.flag}>{l.flag}</span>
+              <span style={{ ...s.flag, fontSize: '0.65rem', fontWeight: 700 }}>{l.flag}</span>
               <div style={s.langText}>
                 <span style={{ ...s.native, color: lang === l.code ? '#818cf8' : 'var(--text-h)' }}>
                   {l.native}

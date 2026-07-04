@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
+import { Brain, Zap, RefreshCw } from 'lucide-react';
 import TwinRobotAvatar from './TwinRobotAvatar';
 
 interface Props {
@@ -85,9 +86,9 @@ export default function TwinHeroBanner({ fidelityScore = 88, userName }: Props) 
 
         {/* Mini stats row */}
         <div style={statsRow}>
-          <StatChip icon="🧠" label="AI Active" color="#00D4FF" />
-          <StatChip icon="⚡" label="Learning" color="#A855F7" />
-          <StatChip icon="🔄" label="Syncing" color="#22C55E" />
+          <StatChip icon={<Brain size={10} />} label="AI Active" color="#00D4FF" />
+          <StatChip icon={<Zap size={10} />} label="Learning" color="#A855F7" />
+          <StatChip icon={<RefreshCw size={10} />} label="Syncing" color="#22C55E" />
         </div>
       </div>
 
@@ -178,7 +179,7 @@ export default function TwinHeroBanner({ fidelityScore = 88, userName }: Props) 
   );
 }
 
-function StatChip({ icon, label, color }: { icon: string; label: string; color: string }) {
+function StatChip({ icon, label, color }: { icon: ReactNode; label: string; color: string }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: '0.3rem',
@@ -186,7 +187,7 @@ function StatChip({ icon, label, color }: { icon: string; label: string; color: 
       background: `${color}14`,
       border: `1px solid ${color}30`,
     }}>
-      <span style={{ fontSize: '0.72rem' }}>{icon}</span>
+      <span style={{ display: 'flex', color }}>{icon}</span>
       <span style={{ fontSize: '0.7rem', fontWeight: 600, color, letterSpacing: '0.03em' }}>{label}</span>
     </div>
   );

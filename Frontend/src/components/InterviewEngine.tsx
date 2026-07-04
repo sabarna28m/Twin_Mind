@@ -1,4 +1,4 @@
-/**
+﻿/**
  * InterviewEngine — Digital Twin Interview Intelligence System.
  *
  * Fully domain-aware: Medical → clinical questions, Law → legal rounds,
@@ -8,6 +8,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { Keyboard, Mic, Square, Pause } from 'lucide-react';
 import api from '../services/api';
 
 // ── Palette ───────────────────────────────────────────────────────────────
@@ -49,200 +50,200 @@ const DOMAIN_CONFIGS: Record<string, {
   metrics: string[];
 }> = {
   medical: {
-    label: 'Medical & Healthcare', icon: '🏥',
+    label: 'Medical & Healthcare', icon: '',
     tabs: [
-      { id: 'HR', label: 'HR Round', icon: '👔' },
-      { id: 'Clinical Cases', label: 'Clinical Cases', icon: '🩺' },
-      { id: 'Medical Theory', label: 'Medical Theory', icon: '📚' },
-      { id: 'Emergency Response', label: 'Emergency Response', icon: '🚨' },
-      { id: 'Patient Communication', label: 'Patient Comms', icon: '💬' },
+      { id: 'HR', label: 'HR Round', icon: '' },
+      { id: 'Clinical Cases', label: 'Clinical Cases', icon: '' },
+      { id: 'Medical Theory', label: 'Medical Theory', icon: '' },
+      { id: 'Emergency Response', label: 'Emergency Response', icon: '' },
+      { id: 'Patient Communication', label: 'Patient Comms', icon: '' },
     ],
     scenarios: [
-      { id: 'Emergency Room', label: 'Emergency Room', icon: '🚨', desc: 'Handle a critical multi-system patient under time pressure' },
-      { id: 'Patient Consultation', label: 'Patient Consultation', icon: '🩺', desc: 'Take a comprehensive history and propose a management plan' },
-      { id: 'Ward Round Presentation', label: 'Ward Round', icon: '📋', desc: 'Present a complex case to senior consultants' },
+      { id: 'Emergency Room', label: 'Emergency Room', icon: '', desc: 'Handle a critical multi-system patient under time pressure' },
+      { id: 'Patient Consultation', label: 'Patient Consultation', icon: '', desc: 'Take a comprehensive history and propose a management plan' },
+      { id: 'Ward Round Presentation', label: 'Ward Round', icon: '', desc: 'Present a complex case to senior consultants' },
     ],
     modes: [
-      { id: 'friendly', label: 'Junior Consultant', icon: '😊', desc: 'Supportive, case-based discussion' },
-      { id: 'technical', label: 'Senior Specialist', icon: '🎓', desc: 'Deep clinical knowledge, evidence-based' },
-      { id: 'panel', label: 'Hospital Panel', icon: '🏥', desc: 'Multi-assessor formal interview' },
-      { id: 'stress', label: 'Stress Panel', icon: '⚡', desc: 'Time-pressured emergency scenarios' },
+      { id: 'friendly', label: 'Junior Consultant', icon: '', desc: 'Supportive, case-based discussion' },
+      { id: 'technical', label: 'Senior Specialist', icon: '', desc: 'Deep clinical knowledge, evidence-based' },
+      { id: 'panel', label: 'Hospital Panel', icon: '', desc: 'Multi-assessor formal interview' },
+      { id: 'stress', label: 'Stress Panel', icon: '', desc: 'Time-pressured emergency scenarios' },
     ],
     metrics: ['Clinical Knowledge', 'Communication', 'Confidence', 'Decision Making', 'Patient Empathy'],
   },
   nursing: {
-    label: 'Nursing & Patient Care', icon: '💉',
+    label: 'Nursing & Patient Care', icon: '',
     tabs: [
-      { id: 'HR', label: 'HR Round', icon: '👔' },
-      { id: 'Clinical Practice', label: 'Clinical Practice', icon: '💊' },
-      { id: 'Patient Care', label: 'Patient Care', icon: '❤️' },
-      { id: 'Emergency Protocols', label: 'Emergency Protocols', icon: '🚨' },
-      { id: 'Professional Standards', label: 'Professional Standards', icon: '📜' },
+      { id: 'HR', label: 'HR Round', icon: '' },
+      { id: 'Clinical Practice', label: 'Clinical Practice', icon: '' },
+      { id: 'Patient Care', label: 'Patient Care', icon: '' },
+      { id: 'Emergency Protocols', label: 'Emergency Protocols', icon: '' },
+      { id: 'Professional Standards', label: 'Professional Standards', icon: '' },
     ],
     scenarios: [
-      { id: 'Code Blue Response', label: 'Code Blue', icon: '🚨', desc: 'Respond to a cardiac arrest as the first nurse on scene' },
-      { id: 'Patient Handover', label: 'Patient Handover', icon: '📋', desc: 'Conduct a structured SBAR handover to the incoming shift' },
-      { id: 'Difficult Patient', label: 'Difficult Patient', icon: '🩹', desc: 'Manage an agitated, non-compliant patient with empathy' },
+      { id: 'Code Blue Response', label: 'Code Blue', icon: '', desc: 'Respond to a cardiac arrest as the first nurse on scene' },
+      { id: 'Patient Handover', label: 'Patient Handover', icon: '', desc: 'Conduct a structured SBAR handover to the incoming shift' },
+      { id: 'Difficult Patient', label: 'Difficult Patient', icon: '', desc: 'Manage an agitated, non-compliant patient with empathy' },
     ],
     modes: [
-      { id: 'friendly', label: 'Nursing Supervisor', icon: '😊', desc: 'Supportive new-graduate interview' },
-      { id: 'technical', label: 'Clinical Director', icon: '🎓', desc: 'Detailed clinical competency testing' },
-      { id: 'panel', label: 'Hospital Panel', icon: '🏥', desc: 'Multi-assessor formal evaluation' },
-      { id: 'stress', label: 'Emergency Panel', icon: '⚡', desc: 'High-pressure scenario under time constraint' },
+      { id: 'friendly', label: 'Nursing Supervisor', icon: '', desc: 'Supportive new-graduate interview' },
+      { id: 'technical', label: 'Clinical Director', icon: '', desc: 'Detailed clinical competency testing' },
+      { id: 'panel', label: 'Hospital Panel', icon: '', desc: 'Multi-assessor formal evaluation' },
+      { id: 'stress', label: 'Emergency Panel', icon: '', desc: 'High-pressure scenario under time constraint' },
     ],
     metrics: ['Clinical Skills', 'Patient Care', 'Communication', 'Confidence', 'Professional Ethics'],
   },
   pharmacy: {
-    label: 'Pharmacy & Drug Sciences', icon: '💊',
+    label: 'Pharmacy & Drug Sciences', icon: '',
     tabs: [
-      { id: 'HR', label: 'HR Round', icon: '👔' },
-      { id: 'Drug Knowledge', label: 'Drug Knowledge', icon: '💊' },
-      { id: 'Clinical Pharmacy', label: 'Clinical Pharmacy', icon: '🔬' },
-      { id: 'Regulatory Affairs', label: 'Regulatory', icon: '📜' },
-      { id: 'Patient Counseling', label: 'Patient Counseling', icon: '💬' },
+      { id: 'HR', label: 'HR Round', icon: '' },
+      { id: 'Drug Knowledge', label: 'Drug Knowledge', icon: '' },
+      { id: 'Clinical Pharmacy', label: 'Clinical Pharmacy', icon: '' },
+      { id: 'Regulatory Affairs', label: 'Regulatory', icon: '' },
+      { id: 'Patient Counseling', label: 'Patient Counseling', icon: '' },
     ],
     scenarios: [
-      { id: 'Drug Interaction Alert', label: 'Drug Interaction', icon: '⚠️', desc: 'Identify and resolve a critical drug interaction for a patient' },
-      { id: 'Pharmacovigilance Report', label: 'Adverse Event', icon: '📋', desc: 'Handle a serious adverse drug reaction report' },
-      { id: 'Patient Counseling Session', label: 'Counseling Session', icon: '💬', desc: 'Counsel a patient on a new chronic medication regimen' },
+      { id: 'Drug Interaction Alert', label: 'Drug Interaction', icon: '', desc: 'Identify and resolve a critical drug interaction for a patient' },
+      { id: 'Pharmacovigilance Report', label: 'Adverse Event', icon: '', desc: 'Handle a serious adverse drug reaction report' },
+      { id: 'Patient Counseling Session', label: 'Counseling Session', icon: '', desc: 'Counsel a patient on a new chronic medication regimen' },
     ],
     modes: [
-      { id: 'friendly', label: 'Senior Pharmacist', icon: '😊', desc: 'Mentorship-oriented practical discussion' },
-      { id: 'technical', label: 'Clinical Pharmacologist', icon: '🎓', desc: 'Deep pharmacology and drug therapy focus' },
-      { id: 'panel', label: 'Hospital Committee', icon: '🏥', desc: 'Formal multi-panel assessment' },
-      { id: 'stress', label: 'Regulatory Audit', icon: '⚡', desc: 'Compliance under pressure' },
+      { id: 'friendly', label: 'Senior Pharmacist', icon: '', desc: 'Mentorship-oriented practical discussion' },
+      { id: 'technical', label: 'Clinical Pharmacologist', icon: '', desc: 'Deep pharmacology and drug therapy focus' },
+      { id: 'panel', label: 'Hospital Committee', icon: '', desc: 'Formal multi-panel assessment' },
+      { id: 'stress', label: 'Regulatory Audit', icon: '', desc: 'Compliance under pressure' },
     ],
     metrics: ['Drug Knowledge', 'Clinical Reasoning', 'Communication', 'Confidence', 'Regulatory Awareness'],
   },
   law: {
-    label: 'Law & Legal Practice', icon: '⚖️',
+    label: 'Law & Legal Practice', icon: '',
     tabs: [
-      { id: 'HR', label: 'HR Round', icon: '👔' },
-      { id: 'Legal Reasoning', label: 'Legal Reasoning', icon: '⚖️' },
-      { id: 'Case Studies', label: 'Case Studies', icon: '📂' },
-      { id: 'Constitutional Law', label: 'Constitutional Law', icon: '📜' },
-      { id: 'Courtroom Skills', label: 'Courtroom Skills', icon: '🏛️' },
+      { id: 'HR', label: 'HR Round', icon: '' },
+      { id: 'Legal Reasoning', label: 'Legal Reasoning', icon: '' },
+      { id: 'Case Studies', label: 'Case Studies', icon: '' },
+      { id: 'Constitutional Law', label: 'Constitutional Law', icon: '' },
+      { id: 'Courtroom Skills', label: 'Courtroom Skills', icon: '' },
     ],
     scenarios: [
-      { id: 'Moot Court', label: 'Moot Court', icon: '🏛️', desc: 'Argue a constitutional matter before a bench of judges' },
-      { id: 'Client Consultation', label: 'Client Consultation', icon: '💼', desc: 'Advise a new client on their legal options and risks' },
-      { id: 'Cross-Examination', label: 'Cross-Examination', icon: '🎤', desc: 'Cross-examine a hostile witness in a criminal trial' },
+      { id: 'Moot Court', label: 'Moot Court', icon: '', desc: 'Argue a constitutional matter before a bench of judges' },
+      { id: 'Client Consultation', label: 'Client Consultation', icon: '', desc: 'Advise a new client on their legal options and risks' },
+      { id: 'Cross-Examination', label: 'Cross-Examination', icon: '', desc: 'Cross-examine a hostile witness in a criminal trial' },
     ],
     modes: [
-      { id: 'friendly', label: 'Junior Advocate', icon: '😊', desc: 'Collegial experience-sharing discussion' },
-      { id: 'technical', label: 'Senior Counsel', icon: '🎓', desc: 'Rigorous legal knowledge and case examination' },
-      { id: 'panel', label: 'Law Firm Panel', icon: '🏛️', desc: 'Formal multi-assessor evaluation' },
-      { id: 'stress', label: 'Courtroom Cross-Examination', icon: '⚡', desc: 'Adversarial, high-pressure challenge' },
+      { id: 'friendly', label: 'Junior Advocate', icon: '', desc: 'Collegial experience-sharing discussion' },
+      { id: 'technical', label: 'Senior Counsel', icon: '', desc: 'Rigorous legal knowledge and case examination' },
+      { id: 'panel', label: 'Law Firm Panel', icon: '', desc: 'Formal multi-assessor evaluation' },
+      { id: 'stress', label: 'Courtroom Cross-Examination', icon: '', desc: 'Adversarial, high-pressure challenge' },
     ],
     metrics: ['Legal Knowledge', 'Analytical Thinking', 'Communication', 'Confidence', 'Professional Ethics'],
   },
   finance: {
-    label: 'Finance & Commerce', icon: '📊',
+    label: 'Finance & Commerce', icon: '',
     tabs: [
-      { id: 'HR', label: 'HR Round', icon: '👔' },
-      { id: 'Financial Analysis', label: 'Financial Analysis', icon: '📊' },
-      { id: 'Accounting & Taxation', label: 'Accounting & Tax', icon: '🧮' },
-      { id: 'Investment & Markets', label: 'Investment & Markets', icon: '📈' },
-      { id: 'Case Studies', label: 'Case Studies', icon: '💼' },
+      { id: 'HR', label: 'HR Round', icon: '' },
+      { id: 'Financial Analysis', label: 'Financial Analysis', icon: '' },
+      { id: 'Accounting & Taxation', label: 'Accounting & Tax', icon: '' },
+      { id: 'Investment & Markets', label: 'Investment & Markets', icon: '' },
+      { id: 'Case Studies', label: 'Case Studies', icon: '' },
     ],
     scenarios: [
-      { id: 'Financial Modelling Challenge', label: 'Financial Model', icon: '📊', desc: 'Build a quick DCF model and defend your assumptions' },
-      { id: 'Investment Pitch', label: 'Investment Pitch', icon: '📈', desc: 'Pitch a stock or investment idea to a fund manager' },
-      { id: 'M&A Case Study', label: 'M&A Case', icon: '🤝', desc: 'Analyse a merger scenario for strategic and financial fit' },
+      { id: 'Financial Modelling Challenge', label: 'Financial Model', icon: '', desc: 'Build a quick DCF model and defend your assumptions' },
+      { id: 'Investment Pitch', label: 'Investment Pitch', icon: '', desc: 'Pitch a stock or investment idea to a fund manager' },
+      { id: 'M&A Case Study', label: 'M&A Case', icon: '', desc: 'Analyse a merger scenario for strategic and financial fit' },
     ],
     modes: [
-      { id: 'friendly', label: 'Finance Manager', icon: '😊', desc: 'Supportive career-guiding conversation' },
-      { id: 'technical', label: 'CFO / Director', icon: '🎓', desc: 'Deep financial modelling and analysis focus' },
-      { id: 'panel', label: 'Investment Bank Panel', icon: '🏦', desc: 'Formal multi-round assessment' },
-      { id: 'stress', label: 'Stress Test', icon: '⚡', desc: 'Time-pressured case analysis' },
+      { id: 'friendly', label: 'Finance Manager', icon: '', desc: 'Supportive career-guiding conversation' },
+      { id: 'technical', label: 'CFO / Director', icon: '', desc: 'Deep financial modelling and analysis focus' },
+      { id: 'panel', label: 'Investment Bank Panel', icon: '', desc: 'Formal multi-round assessment' },
+      { id: 'stress', label: 'Stress Test', icon: '', desc: 'Time-pressured case analysis' },
     ],
     metrics: ['Financial Knowledge', 'Analytical Skills', 'Communication', 'Confidence', 'Problem Solving'],
   },
   management: {
-    label: 'Management & Business', icon: '💼',
+    label: 'Management & Business', icon: '',
     tabs: [
-      { id: 'HR', label: 'HR Round', icon: '👔' },
-      { id: 'Business Strategy', label: 'Business Strategy', icon: '🎯' },
-      { id: 'Leadership & OB', label: 'Leadership & OB', icon: '👥' },
-      { id: 'Marketing & Sales', label: 'Marketing & Sales', icon: '📣' },
-      { id: 'Case Studies', label: 'Case Studies', icon: '📋' },
+      { id: 'HR', label: 'HR Round', icon: '' },
+      { id: 'Business Strategy', label: 'Business Strategy', icon: '' },
+      { id: 'Leadership & OB', label: 'Leadership & OB', icon: '' },
+      { id: 'Marketing & Sales', label: 'Marketing & Sales', icon: '' },
+      { id: 'Case Studies', label: 'Case Studies', icon: '' },
     ],
     scenarios: [
-      { id: 'Business Crisis Simulation', label: 'Business Crisis', icon: '🔥', desc: 'Manage a company through a sudden PR crisis or market downturn' },
-      { id: 'Leadership Challenge', label: 'Leadership Challenge', icon: '👥', desc: 'Lead a difficult team through organisational change' },
-      { id: 'Investor Pitch', label: 'Investor Pitch', icon: '🚀', desc: 'Pitch your business plan to a panel of angel investors' },
+      { id: 'Business Crisis Simulation', label: 'Business Crisis', icon: '', desc: 'Manage a company through a sudden PR crisis or market downturn' },
+      { id: 'Leadership Challenge', label: 'Leadership Challenge', icon: '', desc: 'Lead a difficult team through organisational change' },
+      { id: 'Investor Pitch', label: 'Investor Pitch', icon: '', desc: 'Pitch your business plan to a panel of angel investors' },
     ],
     modes: [
-      { id: 'friendly', label: 'HR Manager', icon: '😊', desc: 'Culture-fit and motivation assessment' },
-      { id: 'technical', label: 'Business Director', icon: '🎓', desc: 'Strategic case and framework testing' },
-      { id: 'panel', label: 'Consulting Panel', icon: '🏢', desc: 'Formal case + fit interview' },
-      { id: 'stress', label: 'Board Presentation', icon: '⚡', desc: 'High-stakes business defence' },
+      { id: 'friendly', label: 'HR Manager', icon: '', desc: 'Culture-fit and motivation assessment' },
+      { id: 'technical', label: 'Business Director', icon: '', desc: 'Strategic case and framework testing' },
+      { id: 'panel', label: 'Consulting Panel', icon: '', desc: 'Formal case + fit interview' },
+      { id: 'stress', label: 'Board Presentation', icon: '', desc: 'High-stakes business defence' },
     ],
     metrics: ['Business Acumen', 'Leadership', 'Communication', 'Confidence', 'Strategic Thinking'],
   },
   engineering: {
-    label: 'Engineering & Technology', icon: '⚙️',
+    label: 'Engineering & Technology', icon: '',
     tabs: [
-      { id: 'HR', label: 'HR Round', icon: '👔' },
-      { id: 'Technical Concepts', label: 'Technical Concepts', icon: '💻' },
-      { id: 'System Design', label: 'System Design', icon: '🏗️' },
-      { id: 'Coding / Problem Solving', label: 'Coding & Problems', icon: '🧩' },
-      { id: 'Behavioral', label: 'Behavioral', icon: '🧠' },
+      { id: 'HR', label: 'HR Round', icon: '' },
+      { id: 'Technical Concepts', label: 'Technical Concepts', icon: '' },
+      { id: 'System Design', label: 'System Design', icon: '' },
+      { id: 'Coding / Problem Solving', label: 'Coding & Problems', icon: '' },
+      { id: 'Behavioral', label: 'Behavioral', icon: '' },
     ],
     scenarios: [
-      { id: 'System Design Challenge', label: 'System Design', icon: '🏗️', desc: 'Design a scalable distributed system under constraints' },
-      { id: 'Debugging Challenge', label: 'Debugging', icon: '🐛', desc: 'Identify and fix bugs in a complex codebase under time pressure' },
-      { id: 'Architecture Review', label: 'Architecture Review', icon: '📐', desc: 'Review and critique a system architecture proposal' },
+      { id: 'System Design Challenge', label: 'System Design', icon: '', desc: 'Design a scalable distributed system under constraints' },
+      { id: 'Debugging Challenge', label: 'Debugging', icon: '', desc: 'Identify and fix bugs in a complex codebase under time pressure' },
+      { id: 'Architecture Review', label: 'Architecture Review', icon: '', desc: 'Review and critique a system architecture proposal' },
     ],
     modes: [
-      { id: 'friendly', label: 'Engineering Manager', icon: '😊', desc: 'Team culture and technical breadth' },
-      { id: 'technical', label: 'Senior Engineer', icon: '🎓', desc: 'Deep technical probing, whiteboard coding' },
-      { id: 'panel', label: 'Tech Loop', icon: '💻', desc: 'Multi-stage technical + behavioral' },
-      { id: 'stress', label: 'Timed Algorithm', icon: '⚡', desc: 'Competitive programming under pressure' },
+      { id: 'friendly', label: 'Engineering Manager', icon: '', desc: 'Team culture and technical breadth' },
+      { id: 'technical', label: 'Senior Engineer', icon: '', desc: 'Deep technical probing, whiteboard coding' },
+      { id: 'panel', label: 'Tech Loop', icon: '', desc: 'Multi-stage technical + behavioral' },
+      { id: 'stress', label: 'Timed Algorithm', icon: '', desc: 'Competitive programming under pressure' },
     ],
     metrics: ['Technical Knowledge', 'Problem Solving', 'Communication', 'Confidence', 'System Thinking'],
   },
   education: {
-    label: 'Education & Teaching', icon: '🎓',
+    label: 'Education & Teaching', icon: '',
     tabs: [
-      { id: 'HR', label: 'HR Round', icon: '👔' },
-      { id: 'Classroom Management', label: 'Classroom Mgmt', icon: '🏫' },
-      { id: 'Subject Knowledge', label: 'Subject Knowledge', icon: '📚' },
-      { id: 'Student Psychology', label: 'Student Psychology', icon: '🧠' },
-      { id: 'Teaching Demonstration', label: 'Teaching Demo', icon: '🎯' },
+      { id: 'HR', label: 'HR Round', icon: '' },
+      { id: 'Classroom Management', label: 'Classroom Mgmt', icon: '' },
+      { id: 'Subject Knowledge', label: 'Subject Knowledge', icon: '' },
+      { id: 'Student Psychology', label: 'Student Psychology', icon: '' },
+      { id: 'Teaching Demonstration', label: 'Teaching Demo', icon: '' },
     ],
     scenarios: [
-      { id: 'Classroom Management Simulation', label: 'Classroom Situation', icon: '🏫', desc: 'Handle a disruptive classroom incident professionally' },
-      { id: 'Parent-Teacher Meeting', label: 'Parent Meeting', icon: '👨‍👩‍👧', desc: 'Discuss a struggling student with concerned parents' },
-      { id: 'Lesson Delivery', label: 'Live Lesson', icon: '🎯', desc: 'Deliver a 5-minute lesson on a topic of your choice' },
+      { id: 'Classroom Management Simulation', label: 'Classroom Situation', icon: '', desc: 'Handle a disruptive classroom incident professionally' },
+      { id: 'Parent-Teacher Meeting', label: 'Parent Meeting', icon: '‍‍', desc: 'Discuss a struggling student with concerned parents' },
+      { id: 'Lesson Delivery', label: 'Live Lesson', icon: '', desc: 'Deliver a 5-minute lesson on a topic of your choice' },
     ],
     modes: [
-      { id: 'friendly', label: 'School Principal', icon: '😊', desc: 'Values-centered collaborative assessment' },
-      { id: 'technical', label: 'Academic Director', icon: '🎓', desc: 'Curriculum expertise and pedagogy focus' },
-      { id: 'panel', label: 'School Board Panel', icon: '🏫', desc: 'Formal multi-assessor interview' },
-      { id: 'stress', label: 'Observed Teaching', icon: '⚡', desc: 'Live classroom simulation with feedback' },
+      { id: 'friendly', label: 'School Principal', icon: '', desc: 'Values-centered collaborative assessment' },
+      { id: 'technical', label: 'Academic Director', icon: '', desc: 'Curriculum expertise and pedagogy focus' },
+      { id: 'panel', label: 'School Board Panel', icon: '', desc: 'Formal multi-assessor interview' },
+      { id: 'stress', label: 'Observed Teaching', icon: '', desc: 'Live classroom simulation with feedback' },
     ],
     metrics: ['Subject Mastery', 'Pedagogical Skills', 'Communication', 'Confidence', 'Student Empathy'],
   },
   general: {
-    label: 'Professional Career', icon: '💼',
+    label: 'Professional Career', icon: '',
     tabs: [
-      { id: 'HR', label: 'HR Round', icon: '👔' },
-      { id: 'Domain Knowledge', label: 'Domain Knowledge', icon: '📚' },
-      { id: 'Problem Solving', label: 'Problem Solving', icon: '🧩' },
-      { id: 'Communication', label: 'Communication', icon: '💬' },
-      { id: 'Behavioral', label: 'Behavioral', icon: '🧠' },
+      { id: 'HR', label: 'HR Round', icon: '' },
+      { id: 'Domain Knowledge', label: 'Domain Knowledge', icon: '' },
+      { id: 'Problem Solving', label: 'Problem Solving', icon: '' },
+      { id: 'Communication', label: 'Communication', icon: '' },
+      { id: 'Behavioral', label: 'Behavioral', icon: '' },
     ],
     scenarios: [
-      { id: 'Stakeholder Conflict', label: 'Stakeholder Conflict', icon: '🤝', desc: 'Navigate a conflict between two key stakeholders in a project' },
-      { id: 'Crisis Management', label: 'Crisis Management', icon: '🔥', desc: 'Lead the response to an unexpected business crisis' },
-      { id: 'Presentation Challenge', label: 'Presentation', icon: '🎤', desc: 'Deliver a persuasive 3-minute pitch on a professional topic' },
+      { id: 'Stakeholder Conflict', label: 'Stakeholder Conflict', icon: '', desc: 'Navigate a conflict between two key stakeholders in a project' },
+      { id: 'Crisis Management', label: 'Crisis Management', icon: '', desc: 'Lead the response to an unexpected business crisis' },
+      { id: 'Presentation Challenge', label: 'Presentation', icon: '', desc: 'Deliver a persuasive 3-minute pitch on a professional topic' },
     ],
     modes: [
-      { id: 'friendly', label: 'HR Generalist', icon: '😊', desc: 'Culture-fit and motivation assessment' },
-      { id: 'technical', label: 'Department Head', icon: '🎓', desc: 'Domain expertise and problem-solving focus' },
-      { id: 'panel', label: 'Panel Interview', icon: '🏢', desc: 'Multi-perspective comprehensive evaluation' },
-      { id: 'stress', label: 'Pressure Interview', icon: '⚡', desc: 'Challenging follow-ups, rapid-fire questions' },
+      { id: 'friendly', label: 'HR Generalist', icon: '', desc: 'Culture-fit and motivation assessment' },
+      { id: 'technical', label: 'Department Head', icon: '', desc: 'Domain expertise and problem-solving focus' },
+      { id: 'panel', label: 'Panel Interview', icon: '', desc: 'Multi-perspective comprehensive evaluation' },
+      { id: 'stress', label: 'Pressure Interview', icon: '', desc: 'Challenging follow-ups, rapid-fire questions' },
     ],
     metrics: ['Domain Knowledge', 'Problem Solving', 'Communication', 'Confidence', 'Leadership'],
   },
@@ -453,12 +454,12 @@ function HubView({ career, domain, sessions, onStartMock, onChangeView }: {
       {/* Quick action cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.85rem' }}>
         {[
-          { icon: '🎤', label: 'Mock Interview', desc: `Domain-specific ${cfg.tabs.length}-round system`, action: onStartMock, color: INDIGO },
-          { icon: '📖', label: 'Vocabulary Bank', desc: `${getVocab(domain).length} domain-critical terms`, action: () => onChangeView('vocab'), color: CYAN },
-          { icon: '🎭', label: 'Scenario Lab', desc: `${cfg.scenarios.length} realistic simulations`, action: () => onChangeView('scenarios'), color: PURPLE },
-          { icon: '📊', label: 'Analytics', desc: 'Score trends & growth', action: () => onChangeView('analytics'), color: GREEN },
-          { icon: '🗓️', label: 'Session History', desc: `${sessions.length} past interviews`, action: () => onChangeView('history'), color: AMBER },
-          { icon: '🔍', label: 'Weakness Tracker', desc: 'Identify recurring gaps', action: () => onChangeView('analytics'), color: RED },
+          { icon: '', label: 'Mock Interview', desc: `Domain-specific ${cfg.tabs.length}-round system`, action: onStartMock, color: INDIGO },
+          { icon: '', label: 'Vocabulary Bank', desc: `${getVocab(domain).length} domain-critical terms`, action: () => onChangeView('vocab'), color: CYAN },
+          { icon: '', label: 'Scenario Lab', desc: `${cfg.scenarios.length} realistic simulations`, action: () => onChangeView('scenarios'), color: PURPLE },
+          { icon: '', label: 'Analytics', desc: 'Score trends & growth', action: () => onChangeView('analytics'), color: GREEN },
+          { icon: '', label: 'Session History', desc: `${sessions.length} past interviews`, action: () => onChangeView('history'), color: AMBER },
+          { icon: '', label: 'Weakness Tracker', desc: 'Identify recurring gaps', action: () => onChangeView('analytics'), color: RED },
         ].map((c, i) => (
           <button key={i} onClick={c.action} style={{
             background: CARD, border: BORDER, borderRadius: 16, padding: '1.1rem',
@@ -691,7 +692,7 @@ function MockInterviewView({ career, domain, onComplete }: {
             color: inputMode === m ? CYAN : MUTED, fontWeight: inputMode === m ? 700 : 400, fontSize: '0.85rem',
             transition: 'all 0.15s',
           }}>
-            {m === 'text' ? '⌨️ Text Mode' : '🎤 Voice Mode'}
+            {m === 'text' ? <><Keyboard size={14} style={{marginRight:'0.3rem'}}/>Text Mode</> : <><Mic size={14} style={{marginRight:'0.3rem'}}/>Voice Mode</>}
           </button>
         ))}
       </div>
@@ -738,11 +739,11 @@ function MockInterviewView({ career, domain, onComplete }: {
       {(strengths.length > 0 || improvements.length > 0) && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
           <div style={{ background: CARD, border: `1px solid ${GREEN}30`, borderRadius: 14, padding: '1rem' }}>
-            <div style={{ color: GREEN, fontWeight: 700, fontSize: '0.8rem', marginBottom: 8 }}>✓ Strengths</div>
+            <div style={{ color: GREEN, fontWeight: 700, fontSize: '0.8rem', marginBottom: 8 }}>Strengths</div>
             {strengths.map((s, i) => <div key={i} style={{ color: MUTED, fontSize: '0.8rem', marginBottom: 4 }}>• {s}</div>)}
           </div>
           <div style={{ background: CARD, border: `1px solid ${AMBER}30`, borderRadius: 14, padding: '1rem' }}>
-            <div style={{ color: AMBER, fontWeight: 700, fontSize: '0.8rem', marginBottom: 8 }}>⚠ Improve</div>
+            <div style={{ color: AMBER, fontWeight: 700, fontSize: '0.8rem', marginBottom: 8 }}>Improve</div>
             {improvements.map((s, i) => <div key={i} style={{ color: MUTED, fontSize: '0.8rem', marginBottom: 4 }}>• {s}</div>)}
           </div>
         </div>
@@ -753,13 +754,13 @@ function MockInterviewView({ career, domain, onComplete }: {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
           {weakAreas.length > 0 && (
             <div style={{ background: CARD, border: `1px solid ${RED}25`, borderRadius: 14, padding: '1rem' }}>
-              <div style={{ color: RED, fontWeight: 700, fontSize: '0.8rem', marginBottom: 8 }}>🔍 Weak Areas</div>
+              <div style={{ color: RED, fontWeight: 700, fontSize: '0.8rem', marginBottom: 8 }}>Weak Areas</div>
               {weakAreas.map((s, i) => <div key={i} style={{ color: MUTED, fontSize: '0.8rem', marginBottom: 4 }}>• {s}</div>)}
             </div>
           )}
           {plan.length > 0 && (
             <div style={{ background: CARD, border: `1px solid ${CYAN}25`, borderRadius: 14, padding: '1rem' }}>
-              <div style={{ color: CYAN, fontWeight: 700, fontSize: '0.8rem', marginBottom: 8 }}>📋 Improvement Plan</div>
+              <div style={{ color: CYAN, fontWeight: 700, fontSize: '0.8rem', marginBottom: 8 }}>Improvement Plan</div>
               {plan.map((s, i) => <div key={i} style={{ color: MUTED, fontSize: '0.8rem', marginBottom: 4 }}>{i + 1}. {s}</div>)}
             </div>
           )}
@@ -798,7 +799,7 @@ function MockInterviewView({ career, domain, onComplete }: {
         <div style={{ display: 'flex', gap: '1rem', padding: '0.6rem 1rem', background: CARD2, borderRadius: 10, border: BORDER, flexShrink: 0 }}>
           <span style={{ color: MUTED, fontSize: '0.72rem' }}>WPM <strong style={{ color: CYAN }}>{wpm}</strong></span>
           <span style={{ color: MUTED, fontSize: '0.72rem' }}>Fillers <strong style={{ color: fillers > 3 ? RED : GREEN }}>{fillers}</strong></span>
-          <span style={{ color: listening ? GREEN : MUTED, fontSize: '0.72rem' }}>{listening ? '🔴 Listening…' : '⏸ Paused'}</span>
+          <span style={{ color: listening ? GREEN : MUTED, fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>{listening ? 'Listening…' : <><Pause size={12}/>Paused</>}</span>
         </div>
       )}
 
@@ -859,7 +860,7 @@ function MockInterviewView({ career, domain, onComplete }: {
               color: '#fff', transition: 'all 0.2s',
               boxShadow: listening ? `0 0 20px ${RED}50` : `0 0 20px ${GREEN}40`,
             }}>
-            {listening ? '⏹ Stop & Submit' : '🎤 Start Speaking'}
+            {listening ? <><Square size={14} style={{marginRight:'0.3rem'}}/>Stop &amp; Submit</> : <><Mic size={14} style={{marginRight:'0.3rem'}}/>Start Speaking</>}
           </button>
           {liveText && !listening && (
             <button onClick={() => { setLiveText(''); liveRef.current = ''; }}
@@ -914,7 +915,7 @@ function VocabularyView({ domain }: { domain: string }) {
                   <div style={{ color: TEXT, fontSize: '0.82rem', fontStyle: 'italic' }}>"{v.example}"</div>
                 </div>
                 <div style={{ background: `${AMBER}10`, border: `1px solid ${AMBER}30`, borderRadius: 10, padding: '0.75rem' }}>
-                  <div style={{ color: AMBER, fontSize: '0.68rem', fontWeight: 700, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>💡 Interview Tip</div>
+                  <div style={{ color: AMBER, fontSize: '0.68rem', fontWeight: 700, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Interview Tip</div>
                   <div style={{ color: TEXT, fontSize: '0.8rem' }}>{v.tip}</div>
                 </div>
               </div>
@@ -1009,12 +1010,12 @@ function ScenariosView({ career, domain }: { career: string; domain: string }) {
         {simHist.map((m, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
             <div style={{ maxWidth: '85%', padding: '0.75rem 1rem', borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px', background: m.role === 'user' ? `linear-gradient(135deg,${PURPLE},${INDIGO})` : CARD2, border: m.role === 'user' ? 'none' : BORDER, color: TEXT, fontSize: '0.86rem', lineHeight: 1.65 }}>
-              {m.role === 'assistant' && <div style={{ color: PURPLE, fontSize: '0.65rem', fontWeight: 700, marginBottom: 5, textTransform: 'uppercase' }}>🎭 Scenario</div>}
+              {m.role === 'assistant' && <div style={{ color: PURPLE, fontSize: '0.65rem', fontWeight: 700, marginBottom: 5, textTransform: 'uppercase' }}>Scenario</div>}
               {m.content}
             </div>
           </div>
         ))}
-        {simLoading && <div style={{ color: MUTED, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: PURPLE, animation: 'pulse 1s infinite' }} /> Responding…</div>}
+        {simLoading && <div style={{ color: MUTED, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: PURPLE, animation: 'pulse 1s infinite' }} />Responding…</div>}
         <div ref={bottomRef} />
       </div>
 
@@ -1024,7 +1025,7 @@ function ScenariosView({ career, domain }: { career: string; domain: string }) {
             <div style={{ fontSize: '1.5rem', fontWeight: 900, color: simScore >= 70 ? GREEN : AMBER }}>{simScore}</div>
             <div style={{ color: TEXT, fontWeight: 700, fontSize: '0.88rem' }}>Scenario Complete</div>
           </div>
-          {simTips.map((t, i) => <div key={i} style={{ color: MUTED, fontSize: '0.78rem', marginBottom: 3 }}>💡 {t}</div>)}
+          {simTips.map((t, i) => <div key={i} style={{ color: MUTED, fontSize: '0.78rem', marginBottom: 3 }}> {t}</div>)}
           <button onClick={() => setActive(null)} style={{ marginTop: '0.75rem', padding: '0.5rem 1rem', background: CARD, border: BORDER, borderRadius: 8, color: MUTED, cursor: 'pointer', fontSize: '0.78rem' }}>
             Try Another Scenario
           </button>
@@ -1047,7 +1048,7 @@ function ScenariosView({ career, domain }: { career: string; domain: string }) {
 function HistoryView({ sessions }: { sessions: SessionRecord[] }) {
   if (!sessions.length) return (
     <div style={{ textAlign: 'center', padding: '4rem 2rem', color: MUTED }}>
-      <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📅</div>
+      <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}></div>
       <div style={{ fontWeight: 700, color: TEXT, marginBottom: 4 }}>No sessions yet</div>
       <div style={{ fontSize: '0.82rem' }}>Complete a mock interview to see your history here.</div>
     </div>
@@ -1085,7 +1086,7 @@ function HistoryView({ sessions }: { sessions: SessionRecord[] }) {
 function AnalyticsView({ sessions }: { sessions: SessionRecord[] }) {
   if (sessions.length < 2) return (
     <div style={{ textAlign: 'center', padding: '4rem 2rem', color: MUTED }}>
-      <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📈</div>
+      <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}></div>
       <div style={{ fontWeight: 700, color: TEXT, marginBottom: 4 }}>Need more sessions</div>
       <div style={{ fontSize: '0.82rem' }}>Complete at least 2 interviews to see your growth analytics.</div>
     </div>
@@ -1165,7 +1166,7 @@ function AnalyticsView({ sessions }: { sessions: SessionRecord[] }) {
           })}
           {dimAvgs.filter(d => d.avg < 60).length > 0 && (
             <div style={{ marginTop: '1rem', background: `${RED}10`, border: `1px solid ${RED}25`, borderRadius: 10, padding: '0.85rem' }}>
-              <div style={{ color: RED, fontWeight: 700, fontSize: '0.78rem', marginBottom: 6 }}>🔍 Focus Areas</div>
+              <div style={{ color: RED, fontWeight: 700, fontSize: '0.78rem', marginBottom: 6 }}>Focus Areas</div>
               {dimAvgs.filter(d => d.avg < 60).map(d => (
                 <div key={d.name} style={{ color: MUTED, fontSize: '0.76rem', marginBottom: 3 }}>• {d.name} ({d.avg}/100) — needs consistent practice</div>
               ))}
@@ -1199,12 +1200,12 @@ export default function InterviewEngine() {
   const cfg = getDomainConfig(domain);
 
   const navItems: { id: View; label: string; icon: string }[] = [
-    { id: 'hub',       label: 'Hub',       icon: '🏠' },
-    { id: 'mock',      label: 'Interview', icon: '🎤' },
-    { id: 'vocab',     label: 'Vocabulary', icon: '📖' },
-    { id: 'scenarios', label: 'Scenarios', icon: '🎭' },
-    { id: 'history',   label: 'History',   icon: '🗓️' },
-    { id: 'analytics', label: 'Analytics', icon: '📊' },
+    { id: 'hub',       label: 'Hub',       icon: '' },
+    { id: 'mock',      label: 'Interview', icon: '' },
+    { id: 'vocab',     label: 'Vocabulary', icon: '' },
+    { id: 'scenarios', label: 'Scenarios', icon: '' },
+    { id: 'history',   label: 'History',   icon: '' },
+    { id: 'analytics', label: 'Analytics', icon: '' },
   ];
 
   if (loadingCareer) return (
@@ -1229,7 +1230,7 @@ export default function InterviewEngine() {
         </div>
         {career && (
           <div style={{ color: TEXT, fontSize: '0.82rem', fontWeight: 600 }}>
-            🎯 <span style={{ color: MUTED }}>Role:</span> {career}
+             <span style={{ color: MUTED }}>Role:</span> {career}
           </div>
         )}
       </div>

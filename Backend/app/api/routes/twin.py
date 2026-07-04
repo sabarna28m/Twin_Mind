@@ -126,22 +126,22 @@ def _build_evolution_timeline(history: list[TwinHistoryPoint]) -> list[Evolution
     for i, pt in enumerate(history):
         delta = pt.score_delta
         if i == 0:
-            events.append(EvolutionEvent(date=pt.date, icon="🌱", description="Twin was born — learning journey started."))
+            events.append(EvolutionEvent(date=pt.date, icon="", description="Twin was born — learning journey started."))
             continue
         if delta is None:
             continue
         if delta >= 10:
-            events.append(EvolutionEvent(date=pt.date, icon="🚀", description=f"Major growth — twin intelligence surged by {delta:.0f} points. {pt.ai_explanation}"))
+            events.append(EvolutionEvent(date=pt.date, icon="", description=f"Major growth — twin intelligence surged by {delta:.0f} points. {pt.ai_explanation}"))
         elif delta >= 5:
-            events.append(EvolutionEvent(date=pt.date, icon="📈", description=f"Significant improvement of {delta:.0f} points. {pt.ai_explanation}"))
+            events.append(EvolutionEvent(date=pt.date, icon="", description=f"Significant improvement of {delta:.0f} points. {pt.ai_explanation}"))
         elif delta <= -10:
-            events.append(EvolutionEvent(date=pt.date, icon="⚡", description=f"Sharp decline of {abs(delta):.0f} points. {pt.ai_explanation}"))
+            events.append(EvolutionEvent(date=pt.date, icon="", description=f"Sharp decline of {abs(delta):.0f} points. {pt.ai_explanation}"))
         elif delta <= -5:
-            events.append(EvolutionEvent(date=pt.date, icon="📉", description=f"Score dropped {abs(delta):.0f} points. {pt.ai_explanation}"))
+            events.append(EvolutionEvent(date=pt.date, icon="", description=f"Score dropped {abs(delta):.0f} points. {pt.ai_explanation}"))
         elif pt.quiz_accuracy is not None and pt.quiz_accuracy >= 85:
-            events.append(EvolutionEvent(date=pt.date, icon="🧠", description=f"Excellent quiz performance at {pt.quiz_accuracy:.0f}% — memory strength improved."))
+            events.append(EvolutionEvent(date=pt.date, icon="", description=f"Excellent quiz performance at {pt.quiz_accuracy:.0f}% — memory strength improved."))
         elif pt.study_hours >= 5:
-            events.append(EvolutionEvent(date=pt.date, icon="📚", description=f"High learning activity — {pt.study_hours:.1f}h of study powered twin growth."))
+            events.append(EvolutionEvent(date=pt.date, icon="", description=f"High learning activity — {pt.study_hours:.1f}h of study powered twin growth."))
     # newest first, max 8
     return list(reversed(events))[:8]
 
@@ -620,7 +620,7 @@ def _insufficient(n: int) -> TwinComparisonResponse:
         ai_insights=["Log at least 2 check-ins to activate Human vs Twin comparison."],
         prediction_history=[], accuracy_trend=[],
         learning_status="insufficient_data",
-        learning_status_label="🔴 Insufficient Data",
+        learning_status_label=" Insufficient Data",
         learning_status_detail="Log more check-ins so the Twin can start learning your patterns.",
         exceeded_predictions=[], missed_predictions=[],
         twin_incorrect_assumptions=[], newly_learned_patterns=[],
@@ -830,19 +830,19 @@ def get_twin_comparison(
     if n < 3 or twin_accuracy < 40:
         ls, ls_lbl, ls_detail = (
             "insufficient_data",
-            "🔴 Insufficient Data",
+            " Insufficient Data",
             "The Twin needs more check-ins to build a reliable behavioral model.",
         )
     elif twin_accuracy >= 75 and n >= 10:
         ls, ls_lbl, ls_detail = (
             "learning_fast",
-            "🟢 Learning Fast",
+            " Learning Fast",
             f"Twin has analyzed {n} behavioral data points and is accurately predicting your study patterns.",
         )
     else:
         ls, ls_lbl, ls_detail = (
             "learning_patterns",
-            "🟡 Learning User Patterns",
+            " Learning User Patterns",
             f"Twin has {n} data points and is actively refining its model. Accuracy improves with each check-in.",
         )
 
@@ -888,15 +888,15 @@ def get_twin_comparison(
     # ── Confidence factors ─────────────────────────────────
     conf_factors: list[str] = []
     if n > 0:
-        conf_factors.append(f"✓ {n} check-in{'s' if n != 1 else ''} analyzed")
+        conf_factors.append(f" {n} check-in{'s' if n != 1 else ''} analyzed")
     if all_quizzes:
-        conf_factors.append(f"✓ {len(all_quizzes)} quiz session{'s' if len(all_quizzes) != 1 else ''} analyzed")
+        conf_factors.append(f" {len(all_quizzes)} quiz session{'s' if len(all_quizzes) != 1 else ''} analyzed")
     if all_sessions:
-        conf_factors.append(f"✓ {len(all_sessions)} focus session{'s' if len(all_sessions) != 1 else ''} analyzed")
+        conf_factors.append(f" {len(all_sessions)} focus session{'s' if len(all_sessions) != 1 else ''} analyzed")
     if all_subject_recs:
-        conf_factors.append(f"✓ {len(all_subject_recs)} subject record{'s' if len(all_subject_recs) != 1 else ''} analyzed")
+        conf_factors.append(f" {len(all_subject_recs)} subject record{'s' if len(all_subject_recs) != 1 else ''} analyzed")
     if all_notes:
-        conf_factors.append(f"✓ {len(all_notes)} note{'s' if len(all_notes) != 1 else ''} catalogued")
+        conf_factors.append(f" {len(all_notes)} note{'s' if len(all_notes) != 1 else ''} catalogued")
 
     n_sources = len(conf_factors)
     pred_confidence = round(min(100.0, (n / 20.0) * 60.0 + n_sources * 8.0), 1)

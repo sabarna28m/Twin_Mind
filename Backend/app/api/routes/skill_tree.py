@@ -17,352 +17,352 @@ router = APIRouter(prefix="/skill-tree", tags=["skill-tree"])
 
 CAREER_TREES: dict[str, dict[str, Any]] = {
     "software_engineering": {
-        "root": {"id": "se_root", "name": "Software Engineering", "icon": "💻"},
+        "root": {"id": "se_root", "name": "Software Engineering", "icon": ""},
         "branches": [
-            {"id": "se_prog", "name": "Programming", "icon": "🐍", "children": [
-                {"id": "se_py", "name": "Python", "icon": "🐍", "desc": "Python fundamentals & advanced patterns"},
-                {"id": "se_java", "name": "Java", "icon": "☕", "desc": "Object-oriented Java programming"},
-                {"id": "se_cpp", "name": "C / C++", "icon": "⚡", "desc": "Systems & performance programming"},
+            {"id": "se_prog", "name": "Programming", "icon": "", "children": [
+                {"id": "se_py", "name": "Python", "icon": "", "desc": "Python fundamentals & advanced patterns"},
+                {"id": "se_java", "name": "Java", "icon": "", "desc": "Object-oriented Java programming"},
+                {"id": "se_cpp", "name": "C / C++", "icon": "", "desc": "Systems & performance programming"},
             ]},
-            {"id": "se_dsa", "name": "Data Structures", "icon": "🌳", "children": [
-                {"id": "se_arrays", "name": "Arrays", "icon": "📊", "desc": "Arrays, strings & sliding window"},
-                {"id": "se_trees_n", "name": "Trees", "icon": "🌲", "desc": "Binary trees, BST & traversal"},
-                {"id": "se_graphs", "name": "Graphs", "icon": "🕸️", "desc": "BFS, DFS, shortest paths"},
-                {"id": "se_dp", "name": "Dynamic Prog.", "icon": "🧩", "desc": "Memoization & tabulation"},
+            {"id": "se_dsa", "name": "Data Structures", "icon": "", "children": [
+                {"id": "se_arrays", "name": "Arrays", "icon": "", "desc": "Arrays, strings & sliding window"},
+                {"id": "se_trees_n", "name": "Trees", "icon": "", "desc": "Binary trees, BST & traversal"},
+                {"id": "se_graphs", "name": "Graphs", "icon": "", "desc": "BFS, DFS, shortest paths"},
+                {"id": "se_dp", "name": "Dynamic Prog.", "icon": "", "desc": "Memoization & tabulation"},
             ]},
-            {"id": "se_web", "name": "Web Dev", "icon": "🌐", "children": [
-                {"id": "se_html", "name": "HTML / CSS", "icon": "🎨", "desc": "Web structure & styling"},
-                {"id": "se_js", "name": "JavaScript", "icon": "🟡", "desc": "DOM, async, ES6+"},
-                {"id": "se_react", "name": "React", "icon": "⚛️", "desc": "Component-based UI & state"},
-                {"id": "se_backend", "name": "Backend APIs", "icon": "🔧", "desc": "REST APIs & databases"},
+            {"id": "se_web", "name": "Web Dev", "icon": "", "children": [
+                {"id": "se_html", "name": "HTML / CSS", "icon": "", "desc": "Web structure & styling"},
+                {"id": "se_js", "name": "JavaScript", "icon": "", "desc": "DOM, async, ES6+"},
+                {"id": "se_react", "name": "React", "icon": "", "desc": "Component-based UI & state"},
+                {"id": "se_backend", "name": "Backend APIs", "icon": "", "desc": "REST APIs & databases"},
             ]},
-            {"id": "se_ai", "name": "AI Engineering", "icon": "🤖", "children": [
-                {"id": "se_ml", "name": "Machine Learning", "icon": "📈", "desc": "ML algorithms & feature engineering"},
-                {"id": "se_nn", "name": "Neural Networks", "icon": "🧠", "desc": "Deep learning & backpropagation"},
-                {"id": "se_cv_ai", "name": "Computer Vision", "icon": "👁️", "desc": "Image recognition & processing"},
+            {"id": "se_ai", "name": "AI Engineering", "icon": "", "children": [
+                {"id": "se_ml", "name": "Machine Learning", "icon": "", "desc": "ML algorithms & feature engineering"},
+                {"id": "se_nn", "name": "Neural Networks", "icon": "", "desc": "Deep learning & backpropagation"},
+                {"id": "se_cv_ai", "name": "Computer Vision", "icon": "", "desc": "Image recognition & processing"},
             ]},
-            {"id": "se_sys", "name": "System Design", "icon": "🏗️", "children": [
-                {"id": "se_arch", "name": "Architecture", "icon": "📐", "desc": "Design patterns & microservices"},
-                {"id": "se_db", "name": "Databases", "icon": "💾", "desc": "SQL, NoSQL & data modeling"},
-                {"id": "se_cloud", "name": "Cloud & DevOps", "icon": "☁️", "desc": "AWS, Docker, CI/CD pipelines"},
+            {"id": "se_sys", "name": "System Design", "icon": "", "children": [
+                {"id": "se_arch", "name": "Architecture", "icon": "", "desc": "Design patterns & microservices"},
+                {"id": "se_db", "name": "Databases", "icon": "", "desc": "SQL, NoSQL & data modeling"},
+                {"id": "se_cloud", "name": "Cloud & DevOps", "icon": "", "desc": "AWS, Docker, CI/CD pipelines"},
             ]},
         ],
         "achievements": [
-            {"id": "se_first_commit", "name": "First Commit", "icon": "🌱", "color": "#52FFB8", "xp_bonus": 50, "desc": "Unlock your first skill node", "type": "first"},
-            {"id": "se_code_warrior", "name": "Code Warrior", "icon": "⚔️", "color": "#39c98a", "xp_bonus": 200, "desc": "Master all Programming nodes", "type": "branch", "branch": "se_prog"},
-            {"id": "se_algorithm_king", "name": "Algorithm King", "icon": "♛", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Data Structure nodes", "type": "branch", "branch": "se_dsa"},
-            {"id": "se_fullstack", "name": "Full-Stack Dev", "icon": "🚀", "color": "#52FFB8", "xp_bonus": 250, "desc": "Master all Web Dev nodes", "type": "branch", "branch": "se_web"},
-            {"id": "se_ai_pioneer", "name": "AI Pioneer", "icon": "🤖", "color": "#6bffc7", "xp_bonus": 400, "desc": "Master all AI Engineering nodes", "type": "branch", "branch": "se_ai"},
-            {"id": "se_master", "name": "SE Master", "icon": "🌟", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 10+ skill nodes", "type": "count", "count": 10},
+            {"id": "se_first_commit", "name": "First Commit", "icon": "", "color": "#52FFB8", "xp_bonus": 50, "desc": "Unlock your first skill node", "type": "first"},
+            {"id": "se_code_warrior", "name": "Code Warrior", "icon": "", "color": "#39c98a", "xp_bonus": 200, "desc": "Master all Programming nodes", "type": "branch", "branch": "se_prog"},
+            {"id": "se_algorithm_king", "name": "Algorithm King", "icon": "", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Data Structure nodes", "type": "branch", "branch": "se_dsa"},
+            {"id": "se_fullstack", "name": "Full-Stack Dev", "icon": "", "color": "#52FFB8", "xp_bonus": 250, "desc": "Master all Web Dev nodes", "type": "branch", "branch": "se_web"},
+            {"id": "se_ai_pioneer", "name": "AI Pioneer", "icon": "", "color": "#6bffc7", "xp_bonus": 400, "desc": "Master all AI Engineering nodes", "type": "branch", "branch": "se_ai"},
+            {"id": "se_master", "name": "SE Master", "icon": "", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 10+ skill nodes", "type": "count", "count": 10},
         ],
         "pillars": ["Programming", "Data Structures", "Web Dev", "AI Engineering", "System Design"],
         "readiness_weights": {"se_prog": 0.2, "se_dsa": 0.2, "se_web": 0.2, "se_ai": 0.2, "se_sys": 0.2},
     },
 
     "mbbs": {
-        "root": {"id": "mbbs_root", "name": "MBBS", "icon": "🏥"},
+        "root": {"id": "mbbs_root", "name": "MBBS", "icon": ""},
         "branches": [
-            {"id": "mbbs_anat", "name": "Anatomy", "icon": "🦴", "children": [
-                {"id": "mbbs_neuro", "name": "Nervous System", "icon": "🧠", "desc": "CNS, PNS & autonomic nervous system"},
-                {"id": "mbbs_musc", "name": "Muscular System", "icon": "💪", "desc": "Muscle types, groups & function"},
-                {"id": "mbbs_cardio_a", "name": "Cardiovascular", "icon": "❤️", "desc": "Heart chambers & blood vessel anatomy"},
+            {"id": "mbbs_anat", "name": "Anatomy", "icon": "", "children": [
+                {"id": "mbbs_neuro", "name": "Nervous System", "icon": "", "desc": "CNS, PNS & autonomic nervous system"},
+                {"id": "mbbs_musc", "name": "Muscular System", "icon": "", "desc": "Muscle types, groups & function"},
+                {"id": "mbbs_cardio_a", "name": "Cardiovascular", "icon": "", "desc": "Heart chambers & blood vessel anatomy"},
             ]},
-            {"id": "mbbs_phys", "name": "Physiology", "icon": "🔬", "children": [
-                {"id": "mbbs_dig", "name": "Digestion", "icon": "🍎", "desc": "GI tract function & digestive enzymes"},
-                {"id": "mbbs_resp", "name": "Respiration", "icon": "🫁", "desc": "Respiratory mechanics & gas exchange"},
-                {"id": "mbbs_circ", "name": "Circulation", "icon": "🩸", "desc": "Cardiac cycle & hemodynamics"},
+            {"id": "mbbs_phys", "name": "Physiology", "icon": "", "children": [
+                {"id": "mbbs_dig", "name": "Digestion", "icon": "", "desc": "GI tract function & digestive enzymes"},
+                {"id": "mbbs_resp", "name": "Respiration", "icon": "", "desc": "Respiratory mechanics & gas exchange"},
+                {"id": "mbbs_circ", "name": "Circulation", "icon": "", "desc": "Cardiac cycle & hemodynamics"},
             ]},
-            {"id": "mbbs_pharma", "name": "Pharmacology", "icon": "💊", "children": [
-                {"id": "mbbs_drug", "name": "Drug Classes", "icon": "📋", "desc": "Drug classification & mechanisms of action"},
-                {"id": "mbbs_abx", "name": "Antibiotics", "icon": "🦠", "desc": "Antibiotic spectrum & resistance"},
-                {"id": "mbbs_side", "name": "Side Effects", "icon": "⚠️", "desc": "Adverse drug reactions & monitoring"},
+            {"id": "mbbs_pharma", "name": "Pharmacology", "icon": "", "children": [
+                {"id": "mbbs_drug", "name": "Drug Classes", "icon": "", "desc": "Drug classification & mechanisms of action"},
+                {"id": "mbbs_abx", "name": "Antibiotics", "icon": "", "desc": "Antibiotic spectrum & resistance"},
+                {"id": "mbbs_side", "name": "Side Effects", "icon": "", "desc": "Adverse drug reactions & monitoring"},
             ]},
-            {"id": "mbbs_path", "name": "Pathology", "icon": "🔭", "children": [
-                {"id": "mbbs_histo", "name": "Histology", "icon": "🔬", "desc": "Tissue types & cellular pathology"},
-                {"id": "mbbs_micro", "name": "Microbiology", "icon": "🦠", "desc": "Bacteria, viruses, fungi & parasites"},
-                {"id": "mbbs_lab", "name": "Lab Diagnostics", "icon": "🧪", "desc": "CBC, LFT, RFT & ECG interpretation"},
+            {"id": "mbbs_path", "name": "Pathology", "icon": "", "children": [
+                {"id": "mbbs_histo", "name": "Histology", "icon": "", "desc": "Tissue types & cellular pathology"},
+                {"id": "mbbs_micro", "name": "Microbiology", "icon": "", "desc": "Bacteria, viruses, fungi & parasites"},
+                {"id": "mbbs_lab", "name": "Lab Diagnostics", "icon": "", "desc": "CBC, LFT, RFT & ECG interpretation"},
             ]},
-            {"id": "mbbs_clinical", "name": "Clinical Skills", "icon": "🩺", "children": [
-                {"id": "mbbs_diag", "name": "Diagnosis", "icon": "🔍", "desc": "Clinical diagnosis & differential diagnosis"},
-                {"id": "mbbs_surg", "name": "Surgery Basics", "icon": "🔪", "desc": "Surgical principles & procedures"},
-                {"id": "mbbs_cases", "name": "Case Studies", "icon": "📚", "desc": "Clinical case analysis & management"},
+            {"id": "mbbs_clinical", "name": "Clinical Skills", "icon": "", "children": [
+                {"id": "mbbs_diag", "name": "Diagnosis", "icon": "", "desc": "Clinical diagnosis & differential diagnosis"},
+                {"id": "mbbs_surg", "name": "Surgery Basics", "icon": "", "desc": "Surgical principles & procedures"},
+                {"id": "mbbs_cases", "name": "Case Studies", "icon": "", "desc": "Clinical case analysis & management"},
             ]},
         ],
         "achievements": [
-            {"id": "mbbs_first_patient", "name": "First Patient", "icon": "🌱", "color": "#52FFB8", "xp_bonus": 50, "desc": "Begin your medical journey", "type": "first"},
-            {"id": "mbbs_anatomist", "name": "The Anatomist", "icon": "🦴", "color": "#a3ffdc", "xp_bonus": 250, "desc": "Master all Anatomy nodes", "type": "branch", "branch": "mbbs_anat"},
-            {"id": "mbbs_pharmacist", "name": "Drug Expert", "icon": "💊", "color": "#39c98a", "xp_bonus": 300, "desc": "Master all Pharmacology nodes", "type": "branch", "branch": "mbbs_pharma"},
-            {"id": "mbbs_clinician", "name": "Clinician", "icon": "🩺", "color": "#6bffc7", "xp_bonus": 400, "desc": "Master all Clinical Skills", "type": "branch", "branch": "mbbs_clinical"},
-            {"id": "mbbs_doctor", "name": "Future Doctor", "icon": "🏥", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ skill nodes", "type": "count", "count": 12},
+            {"id": "mbbs_first_patient", "name": "First Patient", "icon": "", "color": "#52FFB8", "xp_bonus": 50, "desc": "Begin your medical journey", "type": "first"},
+            {"id": "mbbs_anatomist", "name": "The Anatomist", "icon": "", "color": "#a3ffdc", "xp_bonus": 250, "desc": "Master all Anatomy nodes", "type": "branch", "branch": "mbbs_anat"},
+            {"id": "mbbs_pharmacist", "name": "Drug Expert", "icon": "", "color": "#39c98a", "xp_bonus": 300, "desc": "Master all Pharmacology nodes", "type": "branch", "branch": "mbbs_pharma"},
+            {"id": "mbbs_clinician", "name": "Clinician", "icon": "", "color": "#6bffc7", "xp_bonus": 400, "desc": "Master all Clinical Skills", "type": "branch", "branch": "mbbs_clinical"},
+            {"id": "mbbs_doctor", "name": "Future Doctor", "icon": "", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ skill nodes", "type": "count", "count": 12},
         ],
         "pillars": ["Anatomy", "Physiology", "Pharmacology", "Pathology", "Clinical Skills"],
         "readiness_weights": {"mbbs_anat": 0.2, "mbbs_phys": 0.2, "mbbs_pharma": 0.2, "mbbs_path": 0.2, "mbbs_clinical": 0.2},
     },
 
     "law": {
-        "root": {"id": "law_root", "name": "Law", "icon": "⚖️"},
+        "root": {"id": "law_root", "name": "Law", "icon": ""},
         "branches": [
-            {"id": "law_const", "name": "Constitutional", "icon": "📜", "children": [
-                {"id": "law_fr", "name": "Fundamental Rights", "icon": "🏛️", "desc": "Rights, freedoms & constitutional limits"},
-                {"id": "law_dp", "name": "Directive Principles", "icon": "📋", "desc": "State policy directives & governance"},
-                {"id": "law_jud", "name": "Judiciary", "icon": "⚖️", "desc": "Court hierarchy, writ jurisdiction"},
+            {"id": "law_const", "name": "Constitutional", "icon": "", "children": [
+                {"id": "law_fr", "name": "Fundamental Rights", "icon": "", "desc": "Rights, freedoms & constitutional limits"},
+                {"id": "law_dp", "name": "Directive Principles", "icon": "", "desc": "State policy directives & governance"},
+                {"id": "law_jud", "name": "Judiciary", "icon": "", "desc": "Court hierarchy, writ jurisdiction"},
             ]},
-            {"id": "law_crim", "name": "Criminal Law", "icon": "🔐", "children": [
-                {"id": "law_ipc", "name": "Penal Code", "icon": "📖", "desc": "Criminal offenses, punishment & defences"},
-                {"id": "law_crpc", "name": "Criminal Procedure", "icon": "📝", "desc": "FIR, trial & investigation process"},
-                {"id": "law_evid", "name": "Evidence", "icon": "🔍", "desc": "Admissibility & burden of proof"},
+            {"id": "law_crim", "name": "Criminal Law", "icon": "", "children": [
+                {"id": "law_ipc", "name": "Penal Code", "icon": "", "desc": "Criminal offenses, punishment & defences"},
+                {"id": "law_crpc", "name": "Criminal Procedure", "icon": "", "desc": "FIR, trial & investigation process"},
+                {"id": "law_evid", "name": "Evidence", "icon": "", "desc": "Admissibility & burden of proof"},
             ]},
-            {"id": "law_civil", "name": "Civil Law", "icon": "📄", "children": [
-                {"id": "law_contract", "name": "Contract Law", "icon": "🤝", "desc": "Formation, breach & remedies"},
-                {"id": "law_tort", "name": "Law of Torts", "icon": "⚠️", "desc": "Negligence, nuisance & strict liability"},
-                {"id": "law_prop", "name": "Property Law", "icon": "🏠", "desc": "Ownership, transfer & tenancy"},
+            {"id": "law_civil", "name": "Civil Law", "icon": "", "children": [
+                {"id": "law_contract", "name": "Contract Law", "icon": "", "desc": "Formation, breach & remedies"},
+                {"id": "law_tort", "name": "Law of Torts", "icon": "", "desc": "Negligence, nuisance & strict liability"},
+                {"id": "law_prop", "name": "Property Law", "icon": "", "desc": "Ownership, transfer & tenancy"},
             ]},
-            {"id": "law_corp", "name": "Corporate Law", "icon": "🏢", "children": [
-                {"id": "law_comp", "name": "Company Law", "icon": "📈", "desc": "Corporate structure & governance"},
-                {"id": "law_ip", "name": "IP Law", "icon": "💡", "desc": "Patents, trademarks & copyright"},
-                {"id": "law_tax", "name": "Tax Law", "icon": "💰", "desc": "Direct & indirect taxation"},
+            {"id": "law_corp", "name": "Corporate Law", "icon": "", "children": [
+                {"id": "law_comp", "name": "Company Law", "icon": "", "desc": "Corporate structure & governance"},
+                {"id": "law_ip", "name": "IP Law", "icon": "", "desc": "Patents, trademarks & copyright"},
+                {"id": "law_tax", "name": "Tax Law", "icon": "", "desc": "Direct & indirect taxation"},
             ]},
-            {"id": "law_skills", "name": "Legal Practice", "icon": "🎯", "children": [
-                {"id": "law_draft", "name": "Legal Drafting", "icon": "✍️", "desc": "Contracts, plaints & petitions"},
-                {"id": "law_arg", "name": "Argumentation", "icon": "🗣️", "desc": "Oral arguments & mooting techniques"},
-                {"id": "law_research", "name": "Legal Research", "icon": "📚", "desc": "Case law & statute analysis"},
+            {"id": "law_skills", "name": "Legal Practice", "icon": "", "children": [
+                {"id": "law_draft", "name": "Legal Drafting", "icon": "", "desc": "Contracts, plaints & petitions"},
+                {"id": "law_arg", "name": "Argumentation", "icon": "", "desc": "Oral arguments & mooting techniques"},
+                {"id": "law_research", "name": "Legal Research", "icon": "", "desc": "Case law & statute analysis"},
             ]},
         ],
         "achievements": [
-            {"id": "law_first_brief", "name": "First Brief", "icon": "📄", "color": "#52FFB8", "xp_bonus": 50, "desc": "Begin your legal education", "type": "first"},
-            {"id": "law_constitutionalist", "name": "Constitutionalist", "icon": "📜", "color": "#a3ffdc", "xp_bonus": 250, "desc": "Master Constitutional Law", "type": "branch", "branch": "law_const"},
-            {"id": "law_prosecutor", "name": "Prosecutor", "icon": "🔐", "color": "#39c98a", "xp_bonus": 300, "desc": "Master Criminal Law", "type": "branch", "branch": "law_crim"},
-            {"id": "law_counselor", "name": "Senior Counsel", "icon": "⚖️", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ legal skills", "type": "count", "count": 12},
+            {"id": "law_first_brief", "name": "First Brief", "icon": "", "color": "#52FFB8", "xp_bonus": 50, "desc": "Begin your legal education", "type": "first"},
+            {"id": "law_constitutionalist", "name": "Constitutionalist", "icon": "", "color": "#a3ffdc", "xp_bonus": 250, "desc": "Master Constitutional Law", "type": "branch", "branch": "law_const"},
+            {"id": "law_prosecutor", "name": "Prosecutor", "icon": "", "color": "#39c98a", "xp_bonus": 300, "desc": "Master Criminal Law", "type": "branch", "branch": "law_crim"},
+            {"id": "law_counselor", "name": "Senior Counsel", "icon": "", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ legal skills", "type": "count", "count": 12},
         ],
         "pillars": ["Constitutional", "Criminal", "Civil", "Corporate", "Legal Practice"],
         "readiness_weights": {"law_const": 0.2, "law_crim": 0.2, "law_civil": 0.2, "law_corp": 0.2, "law_skills": 0.2},
     },
 
     "mba": {
-        "root": {"id": "mba_root", "name": "MBA", "icon": "📊"},
+        "root": {"id": "mba_root", "name": "MBA", "icon": ""},
         "branches": [
-            {"id": "mba_fin", "name": "Finance", "icon": "💰", "children": [
-                {"id": "mba_acc", "name": "Accounting", "icon": "📒", "desc": "Financial statements & analysis"},
-                {"id": "mba_corp_fin", "name": "Corporate Finance", "icon": "🏦", "desc": "Capital budgeting & valuation"},
-                {"id": "mba_invest", "name": "Investment", "icon": "📈", "desc": "Portfolio management & markets"},
+            {"id": "mba_fin", "name": "Finance", "icon": "", "children": [
+                {"id": "mba_acc", "name": "Accounting", "icon": "", "desc": "Financial statements & analysis"},
+                {"id": "mba_corp_fin", "name": "Corporate Finance", "icon": "", "desc": "Capital budgeting & valuation"},
+                {"id": "mba_invest", "name": "Investment", "icon": "", "desc": "Portfolio management & markets"},
             ]},
-            {"id": "mba_mkt", "name": "Marketing", "icon": "📣", "children": [
-                {"id": "mba_brand", "name": "Branding", "icon": "🎯", "desc": "Brand strategy & positioning"},
-                {"id": "mba_digital", "name": "Digital Marketing", "icon": "💻", "desc": "SEO, social media & content strategy"},
-                {"id": "mba_consumer", "name": "Consumer Behavior", "icon": "🧠", "desc": "Buyer psychology & decision models"},
+            {"id": "mba_mkt", "name": "Marketing", "icon": "", "children": [
+                {"id": "mba_brand", "name": "Branding", "icon": "", "desc": "Brand strategy & positioning"},
+                {"id": "mba_digital", "name": "Digital Marketing", "icon": "", "desc": "SEO, social media & content strategy"},
+                {"id": "mba_consumer", "name": "Consumer Behavior", "icon": "", "desc": "Buyer psychology & decision models"},
             ]},
-            {"id": "mba_ops", "name": "Operations", "icon": "⚙️", "children": [
-                {"id": "mba_supply", "name": "Supply Chain", "icon": "🔗", "desc": "Logistics, procurement & inventory"},
-                {"id": "mba_quality", "name": "Quality Mgmt", "icon": "✅", "desc": "Six Sigma, TQM & ISO standards"},
-                {"id": "mba_proj", "name": "Project Mgmt", "icon": "📅", "desc": "Agile, PMP & execution"},
+            {"id": "mba_ops", "name": "Operations", "icon": "", "children": [
+                {"id": "mba_supply", "name": "Supply Chain", "icon": "", "desc": "Logistics, procurement & inventory"},
+                {"id": "mba_quality", "name": "Quality Mgmt", "icon": "", "desc": "Six Sigma, TQM & ISO standards"},
+                {"id": "mba_proj", "name": "Project Mgmt", "icon": "", "desc": "Agile, PMP & execution"},
             ]},
-            {"id": "mba_strategy", "name": "Strategy", "icon": "♟️", "children": [
-                {"id": "mba_biz", "name": "Business Strategy", "icon": "🗺️", "desc": "Porter's Five Forces & Blue Ocean"},
-                {"id": "mba_innov", "name": "Innovation", "icon": "💡", "desc": "Design thinking & disruption"},
-                {"id": "mba_global", "name": "Global Business", "icon": "🌍", "desc": "International trade & expansion"},
+            {"id": "mba_strategy", "name": "Strategy", "icon": "", "children": [
+                {"id": "mba_biz", "name": "Business Strategy", "icon": "", "desc": "Porter's Five Forces & Blue Ocean"},
+                {"id": "mba_innov", "name": "Innovation", "icon": "", "desc": "Design thinking & disruption"},
+                {"id": "mba_global", "name": "Global Business", "icon": "", "desc": "International trade & expansion"},
             ]},
-            {"id": "mba_lead", "name": "Leadership", "icon": "👑", "children": [
-                {"id": "mba_neg", "name": "Negotiation", "icon": "🤝", "desc": "Win-win negotiation tactics"},
-                {"id": "mba_team", "name": "Team Dynamics", "icon": "👥", "desc": "Organizational behavior & culture"},
-                {"id": "mba_ethics", "name": "Business Ethics", "icon": "⚖️", "desc": "Corporate governance & CSR"},
+            {"id": "mba_lead", "name": "Leadership", "icon": "", "children": [
+                {"id": "mba_neg", "name": "Negotiation", "icon": "", "desc": "Win-win negotiation tactics"},
+                {"id": "mba_team", "name": "Team Dynamics", "icon": "", "desc": "Organizational behavior & culture"},
+                {"id": "mba_ethics", "name": "Business Ethics", "icon": "", "desc": "Corporate governance & CSR"},
             ]},
         ],
         "achievements": [
-            {"id": "mba_first_deal", "name": "First Deal", "icon": "🤝", "color": "#52FFB8", "xp_bonus": 50, "desc": "Start your MBA journey", "type": "first"},
-            {"id": "mba_cfo_track", "name": "CFO Track", "icon": "💰", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Finance nodes", "type": "branch", "branch": "mba_fin"},
-            {"id": "mba_cmo_track", "name": "CMO Track", "icon": "📣", "color": "#39c98a", "xp_bonus": 300, "desc": "Master all Marketing nodes", "type": "branch", "branch": "mba_mkt"},
-            {"id": "mba_ceo", "name": "CEO Material", "icon": "👑", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ business skills", "type": "count", "count": 12},
+            {"id": "mba_first_deal", "name": "First Deal", "icon": "", "color": "#52FFB8", "xp_bonus": 50, "desc": "Start your MBA journey", "type": "first"},
+            {"id": "mba_cfo_track", "name": "CFO Track", "icon": "", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Finance nodes", "type": "branch", "branch": "mba_fin"},
+            {"id": "mba_cmo_track", "name": "CMO Track", "icon": "", "color": "#39c98a", "xp_bonus": 300, "desc": "Master all Marketing nodes", "type": "branch", "branch": "mba_mkt"},
+            {"id": "mba_ceo", "name": "CEO Material", "icon": "", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ business skills", "type": "count", "count": 12},
         ],
         "pillars": ["Finance", "Marketing", "Operations", "Strategy", "Leadership"],
         "readiness_weights": {"mba_fin": 0.2, "mba_mkt": 0.2, "mba_ops": 0.15, "mba_strategy": 0.25, "mba_lead": 0.2},
     },
 
     "data_science": {
-        "root": {"id": "ds_root", "name": "Data Science", "icon": "📊"},
+        "root": {"id": "ds_root", "name": "Data Science", "icon": ""},
         "branches": [
-            {"id": "ds_math", "name": "Mathematics", "icon": "📐", "children": [
-                {"id": "ds_lin", "name": "Linear Algebra", "icon": "🔢", "desc": "Vectors, matrices & eigenvalues"},
-                {"id": "ds_stat", "name": "Statistics", "icon": "📊", "desc": "Probability, distributions & inference"},
+            {"id": "ds_math", "name": "Mathematics", "icon": "", "children": [
+                {"id": "ds_lin", "name": "Linear Algebra", "icon": "", "desc": "Vectors, matrices & eigenvalues"},
+                {"id": "ds_stat", "name": "Statistics", "icon": "", "desc": "Probability, distributions & inference"},
                 {"id": "ds_calc", "name": "Calculus", "icon": "∫", "desc": "Gradients, optimization & chain rule"},
             ]},
-            {"id": "ds_prog", "name": "Programming", "icon": "🐍", "children": [
-                {"id": "ds_py", "name": "Python", "icon": "🐍", "desc": "NumPy, Pandas, Scikit-learn"},
-                {"id": "ds_sql", "name": "SQL", "icon": "🗄️", "desc": "Queries, joins & window functions"},
-                {"id": "ds_spark", "name": "Big Data", "icon": "💥", "desc": "Spark, Hadoop & distributed systems"},
+            {"id": "ds_prog", "name": "Programming", "icon": "", "children": [
+                {"id": "ds_py", "name": "Python", "icon": "", "desc": "NumPy, Pandas, Scikit-learn"},
+                {"id": "ds_sql", "name": "SQL", "icon": "", "desc": "Queries, joins & window functions"},
+                {"id": "ds_spark", "name": "Big Data", "icon": "", "desc": "Spark, Hadoop & distributed systems"},
             ]},
-            {"id": "ds_ml", "name": "Machine Learning", "icon": "🤖", "children": [
-                {"id": "ds_sup", "name": "Supervised", "icon": "📈", "desc": "Regression, SVM & tree models"},
-                {"id": "ds_unsup", "name": "Unsupervised", "icon": "🔍", "desc": "Clustering & dimensionality reduction"},
-                {"id": "ds_dl", "name": "Deep Learning", "icon": "🧠", "desc": "CNNs, RNNs & transformers"},
+            {"id": "ds_ml", "name": "Machine Learning", "icon": "", "children": [
+                {"id": "ds_sup", "name": "Supervised", "icon": "", "desc": "Regression, SVM & tree models"},
+                {"id": "ds_unsup", "name": "Unsupervised", "icon": "", "desc": "Clustering & dimensionality reduction"},
+                {"id": "ds_dl", "name": "Deep Learning", "icon": "", "desc": "CNNs, RNNs & transformers"},
             ]},
-            {"id": "ds_viz", "name": "Visualization", "icon": "📈", "children": [
-                {"id": "ds_plot", "name": "Plotting", "icon": "📊", "desc": "Matplotlib, Seaborn & Plotly"},
-                {"id": "ds_dash", "name": "Dashboards", "icon": "🖥️", "desc": "Tableau, Power BI & Streamlit"},
-                {"id": "ds_story", "name": "Data Storytelling", "icon": "📖", "desc": "Insight communication & narrative"},
+            {"id": "ds_viz", "name": "Visualization", "icon": "", "children": [
+                {"id": "ds_plot", "name": "Plotting", "icon": "", "desc": "Matplotlib, Seaborn & Plotly"},
+                {"id": "ds_dash", "name": "Dashboards", "icon": "", "desc": "Tableau, Power BI & Streamlit"},
+                {"id": "ds_story", "name": "Data Storytelling", "icon": "", "desc": "Insight communication & narrative"},
             ]},
-            {"id": "ds_mlops", "name": "MLOps", "icon": "🚀", "children": [
-                {"id": "ds_deploy", "name": "Deployment", "icon": "🌐", "desc": "FastAPI, Docker & model serving"},
-                {"id": "ds_monitor", "name": "Monitoring", "icon": "📡", "desc": "Model drift & performance tracking"},
-                {"id": "ds_pipeline", "name": "Data Pipelines", "icon": "🔧", "desc": "ETL, Airflow & workflow automation"},
+            {"id": "ds_mlops", "name": "MLOps", "icon": "", "children": [
+                {"id": "ds_deploy", "name": "Deployment", "icon": "", "desc": "FastAPI, Docker & model serving"},
+                {"id": "ds_monitor", "name": "Monitoring", "icon": "", "desc": "Model drift & performance tracking"},
+                {"id": "ds_pipeline", "name": "Data Pipelines", "icon": "", "desc": "ETL, Airflow & workflow automation"},
             ]},
         ],
         "achievements": [
-            {"id": "ds_first_model", "name": "First Model", "icon": "🌱", "color": "#52FFB8", "xp_bonus": 50, "desc": "Train your first ML model", "type": "first"},
-            {"id": "ds_math_wizard", "name": "Math Wizard", "icon": "📐", "color": "#a3ffdc", "xp_bonus": 250, "desc": "Master all Mathematics nodes", "type": "branch", "branch": "ds_math"},
-            {"id": "ds_ml_master", "name": "ML Master", "icon": "🤖", "color": "#39c98a", "xp_bonus": 400, "desc": "Master all ML nodes", "type": "branch", "branch": "ds_ml"},
-            {"id": "ds_data_guru", "name": "Data Guru", "icon": "🔮", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ data science skills", "type": "count", "count": 12},
+            {"id": "ds_first_model", "name": "First Model", "icon": "", "color": "#52FFB8", "xp_bonus": 50, "desc": "Train your first ML model", "type": "first"},
+            {"id": "ds_math_wizard", "name": "Math Wizard", "icon": "", "color": "#a3ffdc", "xp_bonus": 250, "desc": "Master all Mathematics nodes", "type": "branch", "branch": "ds_math"},
+            {"id": "ds_ml_master", "name": "ML Master", "icon": "", "color": "#39c98a", "xp_bonus": 400, "desc": "Master all ML nodes", "type": "branch", "branch": "ds_ml"},
+            {"id": "ds_data_guru", "name": "Data Guru", "icon": "", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ data science skills", "type": "count", "count": 12},
         ],
         "pillars": ["Mathematics", "Programming", "Machine Learning", "Visualization", "MLOps"],
         "readiness_weights": {"ds_math": 0.2, "ds_prog": 0.2, "ds_ml": 0.25, "ds_viz": 0.15, "ds_mlops": 0.2},
     },
 
     "mechanical_engineering": {
-        "root": {"id": "me_root", "name": "Mechanical Eng.", "icon": "⚙️"},
+        "root": {"id": "me_root", "name": "Mechanical Eng.", "icon": ""},
         "branches": [
-            {"id": "me_math", "name": "Engineering Math", "icon": "📐", "children": [
+            {"id": "me_math", "name": "Engineering Math", "icon": "", "children": [
                 {"id": "me_calc", "name": "Calculus", "icon": "∫", "desc": "Differential & integral calculus"},
-                {"id": "me_diffeq", "name": "Diff. Equations", "icon": "📊", "desc": "ODEs & PDEs for engineering"},
-                {"id": "me_numerical", "name": "Numerical Methods", "icon": "🔢", "desc": "Root finding & numerical integration"},
+                {"id": "me_diffeq", "name": "Diff. Equations", "icon": "", "desc": "ODEs & PDEs for engineering"},
+                {"id": "me_numerical", "name": "Numerical Methods", "icon": "", "desc": "Root finding & numerical integration"},
             ]},
-            {"id": "me_thermo", "name": "Thermodynamics", "icon": "🌡️", "children": [
-                {"id": "me_heat", "name": "Heat Transfer", "icon": "🔥", "desc": "Conduction, convection & radiation"},
-                {"id": "me_fluid", "name": "Fluid Mechanics", "icon": "💧", "desc": "Flow analysis & Bernoulli principle"},
-                {"id": "me_cycles", "name": "Power Cycles", "icon": "⚡", "desc": "Carnot, Rankine & Brayton cycles"},
+            {"id": "me_thermo", "name": "Thermodynamics", "icon": "", "children": [
+                {"id": "me_heat", "name": "Heat Transfer", "icon": "", "desc": "Conduction, convection & radiation"},
+                {"id": "me_fluid", "name": "Fluid Mechanics", "icon": "", "desc": "Flow analysis & Bernoulli principle"},
+                {"id": "me_cycles", "name": "Power Cycles", "icon": "", "desc": "Carnot, Rankine & Brayton cycles"},
             ]},
-            {"id": "me_mech", "name": "Mechanics", "icon": "🔩", "children": [
-                {"id": "me_statics", "name": "Statics", "icon": "⚖️", "desc": "Force equilibrium & moments"},
-                {"id": "me_dyn", "name": "Dynamics", "icon": "🏃", "desc": "Kinematics & kinetics of motion"},
-                {"id": "me_strength", "name": "Strength of Mat.", "icon": "🏗️", "desc": "Stress, strain & beam analysis"},
+            {"id": "me_mech", "name": "Mechanics", "icon": "", "children": [
+                {"id": "me_statics", "name": "Statics", "icon": "", "desc": "Force equilibrium & moments"},
+                {"id": "me_dyn", "name": "Dynamics", "icon": "", "desc": "Kinematics & kinetics of motion"},
+                {"id": "me_strength", "name": "Strength of Mat.", "icon": "", "desc": "Stress, strain & beam analysis"},
             ]},
-            {"id": "me_design", "name": "Design & CAD", "icon": "📐", "children": [
-                {"id": "me_cad", "name": "CAD", "icon": "💻", "desc": "AutoCAD, SolidWorks & Fusion360"},
-                {"id": "me_fea", "name": "FEA / FEM", "icon": "🧩", "desc": "Finite element analysis & ANSYS"},
-                {"id": "me_mfg", "name": "Manufacturing", "icon": "🏭", "desc": "Machining, casting & CNC processes"},
+            {"id": "me_design", "name": "Design & CAD", "icon": "", "children": [
+                {"id": "me_cad", "name": "CAD", "icon": "", "desc": "AutoCAD, SolidWorks & Fusion360"},
+                {"id": "me_fea", "name": "FEA / FEM", "icon": "", "desc": "Finite element analysis & ANSYS"},
+                {"id": "me_mfg", "name": "Manufacturing", "icon": "", "desc": "Machining, casting & CNC processes"},
             ]},
-            {"id": "me_auto", "name": "Automation", "icon": "🤖", "children": [
-                {"id": "me_ctrl", "name": "Control Systems", "icon": "🎛️", "desc": "PID, state-space & feedback control"},
-                {"id": "me_robot", "name": "Robotics", "icon": "🦾", "desc": "Robotic kinematics & programming"},
-                {"id": "me_plc", "name": "PLC / SCADA", "icon": "🖥️", "desc": "Industrial automation & ladder logic"},
+            {"id": "me_auto", "name": "Automation", "icon": "", "children": [
+                {"id": "me_ctrl", "name": "Control Systems", "icon": "", "desc": "PID, state-space & feedback control"},
+                {"id": "me_robot", "name": "Robotics", "icon": "", "desc": "Robotic kinematics & programming"},
+                {"id": "me_plc", "name": "PLC / SCADA", "icon": "", "desc": "Industrial automation & ladder logic"},
             ]},
         ],
         "achievements": [
-            {"id": "me_first_gear", "name": "First Gear", "icon": "⚙️", "color": "#52FFB8", "xp_bonus": 50, "desc": "Start your engineering journey", "type": "first"},
-            {"id": "me_thermodynamist", "name": "Thermodynamist", "icon": "🌡️", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Thermodynamics nodes", "type": "branch", "branch": "me_thermo"},
-            {"id": "me_engineer", "name": "Master Engineer", "icon": "🏆", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ engineering skills", "type": "count", "count": 12},
+            {"id": "me_first_gear", "name": "First Gear", "icon": "", "color": "#52FFB8", "xp_bonus": 50, "desc": "Start your engineering journey", "type": "first"},
+            {"id": "me_thermodynamist", "name": "Thermodynamist", "icon": "", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Thermodynamics nodes", "type": "branch", "branch": "me_thermo"},
+            {"id": "me_engineer", "name": "Master Engineer", "icon": "", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ engineering skills", "type": "count", "count": 12},
         ],
         "pillars": ["Math", "Thermodynamics", "Mechanics", "Design", "Automation"],
         "readiness_weights": {"me_math": 0.15, "me_thermo": 0.2, "me_mech": 0.25, "me_design": 0.25, "me_auto": 0.15},
     },
 
     "commerce": {
-        "root": {"id": "com_root", "name": "Commerce", "icon": "💼"},
+        "root": {"id": "com_root", "name": "Commerce", "icon": ""},
         "branches": [
-            {"id": "com_acc", "name": "Accounting", "icon": "📒", "children": [
-                {"id": "com_book", "name": "Bookkeeping", "icon": "📖", "desc": "Journal entries, ledgers & trial balance"},
-                {"id": "com_fin_acc", "name": "Financial Accounting", "icon": "📊", "desc": "P&L, balance sheet & cash flow statements"},
-                {"id": "com_cost", "name": "Cost Accounting", "icon": "💹", "desc": "Cost analysis, variance & marginal costing"},
+            {"id": "com_acc", "name": "Accounting", "icon": "", "children": [
+                {"id": "com_book", "name": "Bookkeeping", "icon": "", "desc": "Journal entries, ledgers & trial balance"},
+                {"id": "com_fin_acc", "name": "Financial Accounting", "icon": "", "desc": "P&L, balance sheet & cash flow statements"},
+                {"id": "com_cost", "name": "Cost Accounting", "icon": "", "desc": "Cost analysis, variance & marginal costing"},
             ]},
-            {"id": "com_eco", "name": "Economics", "icon": "📈", "children": [
-                {"id": "com_micro", "name": "Microeconomics", "icon": "🔍", "desc": "Supply, demand & market structures"},
-                {"id": "com_macro", "name": "Macroeconomics", "icon": "🌍", "desc": "GDP, inflation, monetary & fiscal policy"},
-                {"id": "com_biz_eco", "name": "Business Economics", "icon": "💡", "desc": "Applied economics for business decisions"},
+            {"id": "com_eco", "name": "Economics", "icon": "", "children": [
+                {"id": "com_micro", "name": "Microeconomics", "icon": "", "desc": "Supply, demand & market structures"},
+                {"id": "com_macro", "name": "Macroeconomics", "icon": "", "desc": "GDP, inflation, monetary & fiscal policy"},
+                {"id": "com_biz_eco", "name": "Business Economics", "icon": "", "desc": "Applied economics for business decisions"},
             ]},
-            {"id": "com_tax", "name": "Taxation", "icon": "💰", "children": [
-                {"id": "com_gst", "name": "GST", "icon": "🧾", "desc": "Goods & Services Tax framework & filing"},
-                {"id": "com_income", "name": "Income Tax", "icon": "📋", "desc": "Tax computation, deductions & filing"},
-                {"id": "com_corp_tax", "name": "Corporate Tax", "icon": "🏢", "desc": "Corporate tax planning & compliance"},
+            {"id": "com_tax", "name": "Taxation", "icon": "", "children": [
+                {"id": "com_gst", "name": "GST", "icon": "", "desc": "Goods & Services Tax framework & filing"},
+                {"id": "com_income", "name": "Income Tax", "icon": "", "desc": "Tax computation, deductions & filing"},
+                {"id": "com_corp_tax", "name": "Corporate Tax", "icon": "", "desc": "Corporate tax planning & compliance"},
             ]},
-            {"id": "com_fin_mgmt", "name": "Financial Mgmt", "icon": "🏦", "children": [
-                {"id": "com_cap", "name": "Capital Structure", "icon": "🔧", "desc": "Debt vs equity financing decisions"},
-                {"id": "com_working", "name": "Working Capital", "icon": "⚡", "desc": "Cash, inventory & receivables management"},
-                {"id": "com_invest", "name": "Investment Analysis", "icon": "📈", "desc": "NPV, IRR & capital project evaluation"},
+            {"id": "com_fin_mgmt", "name": "Financial Mgmt", "icon": "", "children": [
+                {"id": "com_cap", "name": "Capital Structure", "icon": "", "desc": "Debt vs equity financing decisions"},
+                {"id": "com_working", "name": "Working Capital", "icon": "", "desc": "Cash, inventory & receivables management"},
+                {"id": "com_invest", "name": "Investment Analysis", "icon": "", "desc": "NPV, IRR & capital project evaluation"},
             ]},
-            {"id": "com_audit", "name": "Auditing", "icon": "🔎", "children": [
-                {"id": "com_int_audit", "name": "Internal Audit", "icon": "🔍", "desc": "Internal controls & risk assessment"},
-                {"id": "com_stat_audit", "name": "Statutory Audit", "icon": "📋", "desc": "External audit & financial reporting"},
-                {"id": "com_forensic", "name": "Forensic Accounting", "icon": "🕵️", "desc": "Fraud detection & investigation"},
+            {"id": "com_audit", "name": "Auditing", "icon": "", "children": [
+                {"id": "com_int_audit", "name": "Internal Audit", "icon": "", "desc": "Internal controls & risk assessment"},
+                {"id": "com_stat_audit", "name": "Statutory Audit", "icon": "", "desc": "External audit & financial reporting"},
+                {"id": "com_forensic", "name": "Forensic Accounting", "icon": "", "desc": "Fraud detection & investigation"},
             ]},
         ],
         "achievements": [
-            {"id": "com_first_entry", "name": "First Entry", "icon": "📒", "color": "#52FFB8", "xp_bonus": 50, "desc": "Begin your commerce journey", "type": "first"},
-            {"id": "com_tax_expert", "name": "Tax Expert", "icon": "💰", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Taxation nodes", "type": "branch", "branch": "com_tax"},
-            {"id": "com_ca_track", "name": "CA Track", "icon": "🏆", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ commerce skills", "type": "count", "count": 12},
+            {"id": "com_first_entry", "name": "First Entry", "icon": "", "color": "#52FFB8", "xp_bonus": 50, "desc": "Begin your commerce journey", "type": "first"},
+            {"id": "com_tax_expert", "name": "Tax Expert", "icon": "", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Taxation nodes", "type": "branch", "branch": "com_tax"},
+            {"id": "com_ca_track", "name": "CA Track", "icon": "", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ commerce skills", "type": "count", "count": 12},
         ],
         "pillars": ["Accounting", "Economics", "Taxation", "Finance", "Auditing"],
         "readiness_weights": {"com_acc": 0.25, "com_eco": 0.15, "com_tax": 0.2, "com_fin_mgmt": 0.25, "com_audit": 0.15},
     },
 
     "psychology": {
-        "root": {"id": "psy_root", "name": "Psychology", "icon": "🧠"},
+        "root": {"id": "psy_root", "name": "Psychology", "icon": ""},
         "branches": [
-            {"id": "psy_bio", "name": "Biological Psych", "icon": "🔬", "children": [
-                {"id": "psy_neuro", "name": "Neuroscience", "icon": "🧠", "desc": "Brain structure & neural pathways"},
-                {"id": "psy_genetics", "name": "Behavioral Genetics", "icon": "🧬", "desc": "Nature vs nurture debate"},
-                {"id": "psy_physio", "name": "Physiological Psych", "icon": "💉", "desc": "Hormones, drugs & behavior"},
+            {"id": "psy_bio", "name": "Biological Psych", "icon": "", "children": [
+                {"id": "psy_neuro", "name": "Neuroscience", "icon": "", "desc": "Brain structure & neural pathways"},
+                {"id": "psy_genetics", "name": "Behavioral Genetics", "icon": "", "desc": "Nature vs nurture debate"},
+                {"id": "psy_physio", "name": "Physiological Psych", "icon": "", "desc": "Hormones, drugs & behavior"},
             ]},
-            {"id": "psy_cog", "name": "Cognitive Psych", "icon": "💡", "children": [
-                {"id": "psy_memory", "name": "Memory", "icon": "🗄️", "desc": "Memory types, encoding & retrieval"},
-                {"id": "psy_attention", "name": "Attention", "icon": "👁️", "desc": "Selective attention & divided focus"},
-                {"id": "psy_decision", "name": "Decision Making", "icon": "⚖️", "desc": "Heuristics & cognitive biases"},
+            {"id": "psy_cog", "name": "Cognitive Psych", "icon": "", "children": [
+                {"id": "psy_memory", "name": "Memory", "icon": "", "desc": "Memory types, encoding & retrieval"},
+                {"id": "psy_attention", "name": "Attention", "icon": "", "desc": "Selective attention & divided focus"},
+                {"id": "psy_decision", "name": "Decision Making", "icon": "", "desc": "Heuristics & cognitive biases"},
             ]},
-            {"id": "psy_develop", "name": "Developmental", "icon": "👶", "children": [
-                {"id": "psy_child", "name": "Child Psychology", "icon": "🧸", "desc": "Piaget & childhood cognitive development"},
-                {"id": "psy_adol", "name": "Adolescence", "icon": "🎒", "desc": "Identity formation & peer influence"},
-                {"id": "psy_adult", "name": "Adult Development", "icon": "👤", "desc": "Erikson's stages & lifespan psychology"},
+            {"id": "psy_develop", "name": "Developmental", "icon": "", "children": [
+                {"id": "psy_child", "name": "Child Psychology", "icon": "", "desc": "Piaget & childhood cognitive development"},
+                {"id": "psy_adol", "name": "Adolescence", "icon": "", "desc": "Identity formation & peer influence"},
+                {"id": "psy_adult", "name": "Adult Development", "icon": "", "desc": "Erikson's stages & lifespan psychology"},
             ]},
-            {"id": "psy_social", "name": "Social Psych", "icon": "👥", "children": [
-                {"id": "psy_conform", "name": "Conformity", "icon": "🔄", "desc": "Social influence, obedience & authority"},
-                {"id": "psy_attitude", "name": "Attitudes", "icon": "💬", "desc": "Attitude formation & persuasion"},
-                {"id": "psy_group", "name": "Group Dynamics", "icon": "🫂", "desc": "In-group bias, groupthink & leadership"},
+            {"id": "psy_social", "name": "Social Psych", "icon": "", "children": [
+                {"id": "psy_conform", "name": "Conformity", "icon": "", "desc": "Social influence, obedience & authority"},
+                {"id": "psy_attitude", "name": "Attitudes", "icon": "", "desc": "Attitude formation & persuasion"},
+                {"id": "psy_group", "name": "Group Dynamics", "icon": "", "desc": "In-group bias, groupthink & leadership"},
             ]},
-            {"id": "psy_clinical", "name": "Clinical Psych", "icon": "🩺", "children": [
-                {"id": "psy_abnorm", "name": "Abnormal Psych", "icon": "🌪️", "desc": "Mental disorders & DSM-5 criteria"},
-                {"id": "psy_therapy", "name": "Psychotherapy", "icon": "💬", "desc": "CBT, psychoanalysis & humanistic therapy"},
-                {"id": "psy_assess", "name": "Psychological Tests", "icon": "📋", "desc": "IQ tests, personality inventories"},
+            {"id": "psy_clinical", "name": "Clinical Psych", "icon": "", "children": [
+                {"id": "psy_abnorm", "name": "Abnormal Psych", "icon": "", "desc": "Mental disorders & DSM-5 criteria"},
+                {"id": "psy_therapy", "name": "Psychotherapy", "icon": "", "desc": "CBT, psychoanalysis & humanistic therapy"},
+                {"id": "psy_assess", "name": "Psychological Tests", "icon": "", "desc": "IQ tests, personality inventories"},
             ]},
         ],
         "achievements": [
-            {"id": "psy_first_session", "name": "First Session", "icon": "🌱", "color": "#52FFB8", "xp_bonus": 50, "desc": "Begin your psychology journey", "type": "first"},
-            {"id": "psy_cognitive_master", "name": "Mind Reader", "icon": "💡", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Cognitive Psych nodes", "type": "branch", "branch": "psy_cog"},
-            {"id": "psy_therapist", "name": "The Therapist", "icon": "🩺", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ psychology skills", "type": "count", "count": 12},
+            {"id": "psy_first_session", "name": "First Session", "icon": "", "color": "#52FFB8", "xp_bonus": 50, "desc": "Begin your psychology journey", "type": "first"},
+            {"id": "psy_cognitive_master", "name": "Mind Reader", "icon": "", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Cognitive Psych nodes", "type": "branch", "branch": "psy_cog"},
+            {"id": "psy_therapist", "name": "The Therapist", "icon": "", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ psychology skills", "type": "count", "count": 12},
         ],
         "pillars": ["Biological", "Cognitive", "Developmental", "Social", "Clinical"],
         "readiness_weights": {"psy_bio": 0.15, "psy_cog": 0.25, "psy_develop": 0.2, "psy_social": 0.2, "psy_clinical": 0.2},
     },
 
     "architecture": {
-        "root": {"id": "arch_root", "name": "Architecture", "icon": "🏛️"},
+        "root": {"id": "arch_root", "name": "Architecture", "icon": ""},
         "branches": [
-            {"id": "arch_design", "name": "Design Theory", "icon": "✏️", "children": [
-                {"id": "arch_form", "name": "Form & Space", "icon": "📐", "desc": "Spatial relationships & composition principles"},
-                {"id": "arch_hist", "name": "Arch. History", "icon": "🏺", "desc": "Greek to contemporary architectural styles"},
-                {"id": "arch_urban", "name": "Urban Design", "icon": "🏙️", "desc": "City planning, zoning & public spaces"},
+            {"id": "arch_design", "name": "Design Theory", "icon": "", "children": [
+                {"id": "arch_form", "name": "Form & Space", "icon": "", "desc": "Spatial relationships & composition principles"},
+                {"id": "arch_hist", "name": "Arch. History", "icon": "", "desc": "Greek to contemporary architectural styles"},
+                {"id": "arch_urban", "name": "Urban Design", "icon": "", "desc": "City planning, zoning & public spaces"},
             ]},
-            {"id": "arch_tech", "name": "Building Technology", "icon": "🏗️", "children": [
-                {"id": "arch_struct", "name": "Structure", "icon": "🔩", "desc": "Load analysis & structural systems"},
-                {"id": "arch_env", "name": "Environmental", "icon": "🌿", "desc": "Thermal comfort, acoustics & daylighting"},
-                {"id": "arch_material", "name": "Materials", "icon": "🧱", "desc": "Concrete, steel, glass & timber"},
+            {"id": "arch_tech", "name": "Building Technology", "icon": "", "children": [
+                {"id": "arch_struct", "name": "Structure", "icon": "", "desc": "Load analysis & structural systems"},
+                {"id": "arch_env", "name": "Environmental", "icon": "", "desc": "Thermal comfort, acoustics & daylighting"},
+                {"id": "arch_material", "name": "Materials", "icon": "", "desc": "Concrete, steel, glass & timber"},
             ]},
-            {"id": "arch_digital", "name": "Digital Tools", "icon": "💻", "children": [
-                {"id": "arch_cad", "name": "AutoCAD", "icon": "📏", "desc": "Technical drawing & documentation"},
-                {"id": "arch_revit", "name": "Revit / BIM", "icon": "🏢", "desc": "Building information modeling & coordination"},
-                {"id": "arch_3d", "name": "3D Visualization", "icon": "🎨", "desc": "Rhino, SketchUp & rendering"},
+            {"id": "arch_digital", "name": "Digital Tools", "icon": "", "children": [
+                {"id": "arch_cad", "name": "AutoCAD", "icon": "", "desc": "Technical drawing & documentation"},
+                {"id": "arch_revit", "name": "Revit / BIM", "icon": "", "desc": "Building information modeling & coordination"},
+                {"id": "arch_3d", "name": "3D Visualization", "icon": "", "desc": "Rhino, SketchUp & rendering"},
             ]},
-            {"id": "arch_sus", "name": "Sustainability", "icon": "🌱", "children": [
-                {"id": "arch_green", "name": "Green Building", "icon": "♻️", "desc": "LEED, GRIHA & sustainable design standards"},
-                {"id": "arch_passive", "name": "Passive Design", "icon": "☀️", "desc": "Natural ventilation & solar strategies"},
-                {"id": "arch_energy", "name": "Energy Analysis", "icon": "⚡", "desc": "Energy modeling & building efficiency"},
+            {"id": "arch_sus", "name": "Sustainability", "icon": "", "children": [
+                {"id": "arch_green", "name": "Green Building", "icon": "", "desc": "LEED, GRIHA & sustainable design standards"},
+                {"id": "arch_passive", "name": "Passive Design", "icon": "", "desc": "Natural ventilation & solar strategies"},
+                {"id": "arch_energy", "name": "Energy Analysis", "icon": "", "desc": "Energy modeling & building efficiency"},
             ]},
-            {"id": "arch_prof", "name": "Professional Practice", "icon": "💼", "children": [
-                {"id": "arch_contract", "name": "Contracts", "icon": "📋", "desc": "Architectural contracts & professional law"},
-                {"id": "arch_pm", "name": "Project Mgmt", "icon": "📅", "desc": "Site supervision & project scheduling"},
-                {"id": "arch_spec", "name": "Specifications", "icon": "📝", "desc": "Technical specs, BOQ & detailing"},
+            {"id": "arch_prof", "name": "Professional Practice", "icon": "", "children": [
+                {"id": "arch_contract", "name": "Contracts", "icon": "", "desc": "Architectural contracts & professional law"},
+                {"id": "arch_pm", "name": "Project Mgmt", "icon": "", "desc": "Site supervision & project scheduling"},
+                {"id": "arch_spec", "name": "Specifications", "icon": "", "desc": "Technical specs, BOQ & detailing"},
             ]},
         ],
         "achievements": [
-            {"id": "arch_first_sketch", "name": "First Sketch", "icon": "✏️", "color": "#52FFB8", "xp_bonus": 50, "desc": "Begin your architecture journey", "type": "first"},
-            {"id": "arch_sustainable", "name": "Green Architect", "icon": "🌱", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Sustainability nodes", "type": "branch", "branch": "arch_sus"},
-            {"id": "arch_master", "name": "Master Architect", "icon": "🏛️", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ architecture skills", "type": "count", "count": 12},
+            {"id": "arch_first_sketch", "name": "First Sketch", "icon": "", "color": "#52FFB8", "xp_bonus": 50, "desc": "Begin your architecture journey", "type": "first"},
+            {"id": "arch_sustainable", "name": "Green Architect", "icon": "", "color": "#a3ffdc", "xp_bonus": 300, "desc": "Master all Sustainability nodes", "type": "branch", "branch": "arch_sus"},
+            {"id": "arch_master", "name": "Master Architect", "icon": "", "color": "#FFFFFF", "xp_bonus": 1000, "desc": "Master 12+ architecture skills", "type": "count", "count": 12},
         ],
         "pillars": ["Design", "Technology", "Digital", "Sustainability", "Professional"],
         "readiness_weights": {"arch_design": 0.2, "arch_tech": 0.2, "arch_digital": 0.2, "arch_sus": 0.2, "arch_prof": 0.2},

@@ -4,20 +4,20 @@ import type { ReactNode } from 'react';
 export type LangCode = 'en' | 'hi' | 'bn' | 'ta' | 'te' | 'mr' | 'es' | 'fr' | 'de' | 'ja' | 'zh' | 'ar' | 'pt' | 'ko';
 
 export const LANGUAGES: { code: LangCode; label: string; native: string; flag: string }[] = [
-  { code: 'en', label: 'English',            native: 'English',    flag: '🇬🇧' },
-  { code: 'hi', label: 'Hindi',              native: 'हिन्दी',      flag: '🇮🇳' },
-  { code: 'bn', label: 'Bengali',            native: 'বাংলা',       flag: '🇧🇩' },
-  { code: 'ta', label: 'Tamil',              native: 'தமிழ்',       flag: '🇮🇳' },
-  { code: 'te', label: 'Telugu',             native: 'తెలుగు',      flag: '🇮🇳' },
-  { code: 'mr', label: 'Marathi',            native: 'मराठी',       flag: '🇮🇳' },
-  { code: 'es', label: 'Spanish',            native: 'Español',     flag: '🇪🇸' },
-  { code: 'fr', label: 'French',             native: 'Français',    flag: '🇫🇷' },
-  { code: 'de', label: 'German',             native: 'Deutsch',     flag: '🇩🇪' },
-  { code: 'ja', label: 'Japanese',           native: '日本語',        flag: '🇯🇵' },
-  { code: 'zh', label: 'Chinese (Simplified)', native: '中文',       flag: '🇨🇳' },
-  { code: 'ar', label: 'Arabic',             native: 'العربية',     flag: '🇸🇦' },
-  { code: 'pt', label: 'Portuguese',         native: 'Português',   flag: '🇧🇷' },
-  { code: 'ko', label: 'Korean',             native: '한국어',        flag: '🇰🇷' },
+  { code: 'en', label: 'English',              native: 'English',    flag: 'EN' },
+  { code: 'hi', label: 'Hindi',                native: 'हिन्दी',      flag: 'HI' },
+  { code: 'bn', label: 'Bengali',              native: 'বাংলা',       flag: 'BN' },
+  { code: 'ta', label: 'Tamil',                native: 'தமிழ்',       flag: 'TA' },
+  { code: 'te', label: 'Telugu',               native: 'తెలుగు',      flag: 'TE' },
+  { code: 'mr', label: 'Marathi',              native: 'मराठी',       flag: 'MR' },
+  { code: 'es', label: 'Spanish',              native: 'Español',     flag: 'ES' },
+  { code: 'fr', label: 'French',               native: 'Français',    flag: 'FR' },
+  { code: 'de', label: 'German',               native: 'Deutsch',     flag: 'DE' },
+  { code: 'ja', label: 'Japanese',             native: '日本語',        flag: 'JA' },
+  { code: 'zh', label: 'Chinese (Simplified)', native: '中文',         flag: 'ZH' },
+  { code: 'ar', label: 'Arabic',               native: 'العربية',     flag: 'AR' },
+  { code: 'pt', label: 'Portuguese',           native: 'Português',   flag: 'PT' },
+  { code: 'ko', label: 'Korean',               native: '한국어',        flag: 'KO' },
 ];
 
 type Translations = Record<string, string>;

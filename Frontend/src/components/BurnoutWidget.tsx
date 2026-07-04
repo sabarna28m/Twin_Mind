@@ -4,7 +4,7 @@ import {
   ResponsiveContainer, ReferenceLine,
 } from 'recharts';
 import { Link } from 'react-router-dom';
-import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
+import { TrendingDown, TrendingUp, Minus, Wind } from 'lucide-react';
 import api from '../services/api';
 
 interface BurnoutLatest {
@@ -107,7 +107,7 @@ export default function BurnoutWidget() {
   if (!entry) {
     return (
       <div style={{ textAlign: 'center', padding: '20px 8px' }}>
-        <p style={{ fontSize: '1.75rem', margin: '0 0 8px' }}>🧘</p>
+        <Wind size={28} style={{ margin: '0 0 8px', color: 'var(--text-m)' }} />
         <p style={{ margin: '0 0 4px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-h)' }}>No Check-ins Yet</p>
         <p style={{ margin: '0 0 14px', fontSize: '0.75rem', color: 'var(--text-m)', lineHeight: 1.5 }}>
           Complete a burnout check-in to generate your mental health score and start tracking trends.

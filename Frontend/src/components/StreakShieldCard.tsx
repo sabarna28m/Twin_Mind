@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Shield, Flame, Calendar, RefreshCw } from 'lucide-react';
 import api from '../services/api';
 import type { StreakShieldStatus } from '../utils/gamification';
 import { MAX_SHIELDS, RECOVERY_COST, STREAK_MILESTONES } from '../utils/gamification';
@@ -52,14 +53,14 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
       {/* Header */}
       <div style={s.header}>
         <span style={s.title}>Streak Protection</span>
-        <Link to="/shield" style={s.shopLink}>🛒 XP Shop</Link>
+        <Link to="/shield" style={s.shopLink}> XP Shop</Link>
       </div>
 
       {/* Main stats row */}
       <div style={s.statsRow}>
         {/* Streak */}
         <div style={s.stat}>
-          <span style={s.statIcon}>🔥</span>
+          <span style={s.statIcon}><Flame size={20} style={{ color: '#f97316' }} /></span>
           <div>
             <p style={s.statLabel}>Current Streak</p>
             <p style={{ ...s.statValue, color: streakColor }}>{status.streak_days} days</p>
@@ -68,7 +69,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
 
         {/* Shields */}
         <div style={s.stat}>
-          <span style={s.statIcon}>🛡️</span>
+          <span style={s.statIcon}><Shield size={20} style={{ color: '#7c3aed' }} /></span>
           <div>
             <p style={s.statLabel}>Shields</p>
             <p style={{ ...s.statValue, color: '#7c3aed' }}>
@@ -79,7 +80,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
 
         {/* Last check-in */}
         <div style={s.stat}>
-          <span style={s.statIcon}>📅</span>
+          <span style={s.statIcon}><Calendar size={20} style={{ color: '#64748b' }} /></span>
           <div>
             <p style={s.statLabel}>Last Check-in</p>
             <p style={{ ...s.statValue, color: '#64748b', fontSize: '0.85rem' }}>
@@ -92,7 +93,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
 
         {/* Recovery */}
         <div style={s.stat}>
-          <span style={s.statIcon}>⚡</span>
+          <span style={s.statIcon}><RefreshCw size={20} style={{ color: '#059669' }} /></span>
           <div>
             <p style={s.statLabel}>Recovery</p>
             <p style={{ ...s.statValue, color: status.can_recover ? '#059669' : '#64748b', fontSize: '0.85rem' }}>
@@ -116,7 +117,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
       {/* Next milestone */}
       {nextMilestone && (
         <div style={s.milestone}>
-          <span style={s.milestoneIcon}>🎯</span>
+          <span style={s.milestoneIcon}></span>
           <span style={s.milestoneText}>
             <strong style={{color: '#0f172a'}}>{daysToMilestone} day{daysToMilestone !== 1 ? 's' : ''}</strong> to {nextMilestone}-day streak
             {nextMilestone === 7 && ' → +1 Shield'}
@@ -130,7 +131,7 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
       {status.can_recover && (
         <div style={s.recoveryBox}>
           <div style={s.recoveryInfo}>
-            <p style={s.recoveryTitle}>⚡ Streak Recovery Available</p>
+            <p style={s.recoveryTitle}> Streak Recovery Available</p>
             <p style={s.recoverySub}>
               Recover your streak for {RECOVERY_COST} XP
               {recoveryMins !== null && ` · ${recoveryMins}m remaining`}
@@ -150,8 +151,8 @@ export default function StreakShieldCard({ onRecoverySuccess }: Props) {
 
       {/* Footer links */}
       <div style={s.footer}>
-        <Link to="/shield" style={s.footerLink}>🛡️ Buy Shield ({100} XP)</Link>
-        <Link to="/checkin" style={s.footerLink}>📋 Log Check-in</Link>
+        <Link to="/shield" style={{ ...s.footerLink, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><Shield size={12} /> Buy Shield ({100} XP)</Link>
+        <Link to="/checkin" style={s.footerLink}>Log Check-in</Link>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { BookOpen, Lightbulb, Clock } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -228,11 +229,11 @@ export default function PracticeQuiz({ onBack }: Props) {
     return (
       <div className={themeClass} style={p.shell}>
         <header style={p.nav}>
-          <div style={p.navLeft}><span style={p.modeBadge}>📚 Practice</span></div>
+          <div style={p.navLeft}><span style={{ ...p.modeBadge, display:'flex', alignItems:'center', gap:4 }}><BookOpen size={12} style={{ flexShrink:0 }} /> Practice</span></div>
           <span style={p.navTitle}>{subject}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span style={{ ...p.timerBadge, color: timerColor, borderColor: `${timerColor}44`, background: `${timerColor}11` }}>
-              ⏱ {formatTime(timeLeft)}
+              <Clock size={12} style={{ display:'inline', marginRight:2, verticalAlign:'middle' }} />{formatTime(timeLeft)}
             </span>
           </div>
         </header>
@@ -346,7 +347,7 @@ export default function PracticeQuiz({ onBack }: Props) {
                     </div>
                     {!isCorrect && q.explanation && (
                       <div style={p.explanationBox}>
-                        <span style={p.explanationIcon}>💡</span>
+                        <Lightbulb size={16} style={{ color:'#f59e0b', flexShrink:0 }} />
                         <p style={p.explanationText}>{q.explanation}</p>
                       </div>
                     )}
@@ -372,7 +373,7 @@ export default function PracticeQuiz({ onBack }: Props) {
         <div style={p.setupGrid}>
           <div style={p.configCard}>
             <div style={p.cardHead}>
-              <span style={p.cardIcon}>📚</span>
+              <BookOpen size={22} style={{ color:'var(--accent)', flexShrink:0 }} />
               <div>
                 <h2 style={p.cardTitle}>Configure Practice Quiz</h2>
                 <p style={p.cardSub}>{t('quiz_powered')}</p>

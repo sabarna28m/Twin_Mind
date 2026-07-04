@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 
 const API = 'http://localhost:8000/api/v1/skill-tree';
@@ -35,11 +35,11 @@ const STATUS_GLOW: Record<string, string> = {
 };
 
 const STATUS_LABEL: Record<string, string> = {
-  locked:      '🔒 Locked',
-  available:   '🟢 Available',
-  in_progress: '⚡ In Progress',
-  mastered:    '⭐ Mastered',
-  weak:        '🔴 Weak',
+  locked:      ' Locked',
+  available:   ' Available',
+  in_progress: ' In Progress',
+  mastered:    'Mastered',
+  weak:        ' Weak',
 };
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -291,10 +291,10 @@ function NodeDetail({
 }) {
   const sc = STATUS_COLOR[node.status];
   const acts = [
-    { type: 'lesson',    label: 'Study Lesson',  icon: '📖', xp: 20  },
-    { type: 'quiz',      label: 'Take Quiz',     icon: '📝', xp: 50  },
-    { type: 'task',      label: 'Practice Task', icon: '⚙️', xp: 30  },
-    { type: 'challenge', label: 'Challenge',     icon: '🏆', xp: 100 },
+    { type: 'lesson',    label: 'Study Lesson',  icon: '', xp: 20  },
+    { type: 'quiz',      label: 'Take Quiz',     icon: '', xp: 50  },
+    { type: 'task',      label: 'Practice Task', icon: '', xp: 30  },
+    { type: 'challenge', label: 'Challenge',     icon: '', xp: 100 },
   ];
 
   return (
@@ -383,7 +383,7 @@ function NodeDetail({
           border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center',
           color: C.subtext, fontSize: 13,
         }}>
-          🔒 Complete parent skills to unlock this node
+           Complete parent skills to unlock this node
         </div>
       )}
     </div>
@@ -416,7 +416,7 @@ function Sidebar({
       {insight && (
         <div style={{ padding: 16, borderRadius: 16, background: C.card, border: `1px solid ${C.border}` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <span style={{ fontSize: 18 }}>🧠</span>
+            <span style={{ fontSize: 18 }}></span>
             <span style={{ fontSize: 12, color: C.accent, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               TwinMind Mentor
             </span>
@@ -427,7 +427,7 @@ function Sidebar({
             background: 'rgba(82,255,184,0.06)', border: `1px solid rgba(82,255,184,0.1)`,
             fontSize: 12, color: C.subtext, fontStyle: 'italic',
           }}>
-            📈 {insight.prediction}
+            {insight.prediction}
           </div>
           <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
             {insight.recommendations.map((r, i) => (
@@ -496,13 +496,13 @@ function AnalyticsTab({ data, readiness }: { data: TreeData; readiness: Readines
     <div style={{ padding: 24, overflowY: 'auto', height: '100%' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14, marginBottom: 24 }}>
         {[
-          { label: 'Total XP',       val: data.xp.total_xp,  color: C.accent,   icon: '⚡' },
-          { label: 'Level',          val: `${data.xp.level} — ${data.xp.level_name}`, color: C.mastered, icon: '🏅' },
-          { label: 'Weekly XP',      val: data.weekly_xp,    color: C.dim,      icon: '📅' },
-          { label: 'Nodes Mastered', val: mastered,          color: C.mastered, icon: '⭐' },
-          { label: 'In Progress',    val: inProg,            color: C.dim,      icon: '⚡' },
-          { label: 'Weak Skills',    val: weak,              color: C.weak,     icon: '🔴' },
-          { label: 'Unlocked',       val: `${unlocked} / ${nodes.length}`, color: C.accent, icon: '🔓' },
+          { label: 'Total XP',       val: data.xp.total_xp,  color: C.accent,   icon: 'XP' },
+          { label: 'Level',          val: `${data.xp.level} — ${data.xp.level_name}`, color: C.mastered, icon: 'LV' },
+          { label: 'Weekly XP',      val: data.weekly_xp,    color: C.dim,      icon: 'WK' },
+          { label: 'Nodes Mastered', val: mastered,          color: C.mastered, icon: 'OK' },
+          { label: 'In Progress',    val: inProg,            color: C.dim,      icon: 'IP' },
+          { label: 'Weak Skills',    val: weak,              color: C.weak,     icon: '!!' },
+          { label: 'Unlocked',       val: `${unlocked} / ${nodes.length}`, color: C.accent, icon: 'UN' },
         ].map(s => (
           <div key={s.label} style={{
             padding: '16px 18px', borderRadius: 14, background: C.card,
@@ -709,9 +709,9 @@ export default function SkillTree() {
   }
 
   const TABS = [
-    { id: 'tree'          as const, label: 'Skill Tree',   icon: '🌳' },
-    { id: 'analytics'     as const, label: 'Analytics',    icon: '📊' },
-    { id: 'achievements'  as const, label: 'Achievements', icon: '🏆' },
+    { id: 'tree'          as const, label: 'Skill Tree',   icon: '' },
+    { id: 'analytics'     as const, label: 'Analytics',    icon: '' },
+    { id: 'achievements'  as const, label: 'Achievements', icon: '' },
   ];
 
   if (fetching) return (
@@ -729,7 +729,7 @@ export default function SkillTree() {
 
   if (error) return (
     <div style={{ minHeight: '100vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: C.weak, fontSize: 15, textAlign: 'center' }}>⚠️ {error}</div>
+      <div style={{ color: C.weak, fontSize: 15, textAlign: 'center' }}> {error}</div>
     </div>
   );
 
@@ -873,7 +873,7 @@ export default function SkillTree() {
                   alignItems: 'center', justifyContent: 'center', gap: 12,
                   color: C.subtext, textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: 40 }}>🌳</div>
+                  <div style={{ fontSize: 40 }}></div>
                   <div style={{ fontSize: 13 }}>Click any node to explore skills and complete activities</div>
                   <div style={{
                     marginTop: 6, padding: '10px 14px', borderRadius: 12,

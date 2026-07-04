@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿﻿import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
@@ -38,12 +38,12 @@ type QType = 'MCQ' | 'true_false' | 'fill_blank' | 'short_answer' | 'long_answer
 
 /* ── Helpers ────────────────────────────────────────────────────────────────── */
 function fileIcon(mime: string) {
-  if (mime === 'application/pdf') return '📄';
-  if (mime.startsWith('image/')) return '🖼';
-  if (mime.startsWith('text/')) return '📝';
-  if (mime.includes('word')) return '📘';
-  if (mime.includes('presentation')) return '📊';
-  return '📎';
+  if (mime === 'application/pdf') return '';
+  if (mime.startsWith('image/')) return '';
+  if (mime.startsWith('text/')) return '';
+  if (mime.includes('word')) return '';
+  if (mime.includes('presentation')) return '';
+  return '';
 }
 
 const DIFF_COLORS: Record<string, string> = { easy: '#34d399', medium: '#fbbf24', hard: '#f87171', mixed: '#a78bfa' };
@@ -167,7 +167,7 @@ function ReviewCard({ q, userAnswer }: { q: QuizQuestion; userAnswer: string | u
         <span style={{ ...qc.diffChip, color: DIFF_COLORS[q.difficulty], borderColor: `${DIFF_COLORS[q.difficulty]}40`, background: `${DIFF_COLORS[q.difficulty]}12` }}>{q.difficulty}</span>
         {isObjective && (
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: isCorrect ? '#34d399' : '#f87171' }}>
-            {isCorrect ? '✓ Correct' : '✗ Incorrect'}
+            {isCorrect ? 'Correct' : 'Incorrect'}
           </span>
         )}
         {!isObjective && <span style={{ fontSize: '0.7rem', color: '#a78bfa', fontWeight: 600 }}>Self-review</span>}
@@ -278,7 +278,7 @@ export default function AIAssessments() {
   if (view === 'config') return (
     <div style={s.wrap}>
       <div style={s.pageHead}>
-        <p style={s.pageTitle}>🤖 AI Quiz Generator</p>
+        <p style={s.pageTitle}>AI Quiz Generator</p>
         <p style={s.pageSub}>Generate a custom quiz from any uploaded study material</p>
       </div>
 
@@ -303,7 +303,7 @@ export default function AIAssessments() {
               >
                 <span style={{ fontSize: '1.2rem' }}>{fileIcon(m.mime_type)}</span>
                 <p style={s.matName}>{m.original_name}</p>
-                {selected?.id === m.id && <span style={s.selectedMark}>✓</span>}
+                {selected?.id === m.id && <span style={s.selectedMark}></span>}
               </div>
             ))}
           </div>
@@ -375,7 +375,7 @@ export default function AIAssessments() {
         disabled={!selected || generating}
         style={{ ...s.primaryBtn, opacity: (!selected || generating) ? 0.5 : 1, cursor: (!selected || generating) ? 'not-allowed' : 'pointer' }}
       >
-        {generating ? '⏳ Generating quiz…' : '✨ Generate Quiz from Material'}
+        {generating ? 'Generating quiz…' : 'Generate Quiz from Material'}
       </button>
 
       {generating && (
@@ -402,7 +402,7 @@ export default function AIAssessments() {
             <p style={s.quizTitle}>{quiz.material_name}</p>
             <p style={s.quizMeta}>{questions.length} questions · {quiz.difficulty} · {quiz.question_types.join(', ')}</p>
           </div>
-          <button onClick={newQuiz} style={s.outlineBtn}>✕ Exit</button>
+          <button onClick={newQuiz} style={s.outlineBtn}>Exit</button>
         </div>
 
         {/* Progress */}
@@ -453,9 +453,7 @@ export default function AIAssessments() {
               Next →
             </button>
           ) : (
-            <button onClick={submitQuiz} style={{ ...s.primaryBtn, background: 'linear-gradient(135deg, #10b981, #34d399)' }}>
-              Submit Quiz ✓
-            </button>
+            <button onClick={submitQuiz} style={{ ...s.primaryBtn, background: 'linear-gradient(135deg, #10b981, #34d399)' }}>Submit Quiz</button>
           )}
         </div>
       </div>
@@ -474,22 +472,20 @@ export default function AIAssessments() {
             {pct}%
           </p>
           <p style={{ margin: '0 0 0.35rem', fontWeight: 700, fontSize: '1rem', color: 'var(--text-h)' }}>
-            {pct >= 80 ? '🏆 Excellent!' : pct >= 65 ? '👍 Good Job!' : pct >= 50 ? '📖 Keep Practicing' : '💪 Need More Study'}
+            {pct >= 80 ? 'Excellent!' : pct >= 65 ? 'Good Job!' : pct >= 50 ? 'Keep Practicing' : 'Need More Study'}
           </p>
           <p style={{ margin: '0 0 1.25rem', fontSize: '0.8rem', color: 'var(--text)' }}>
             {correctCount} / {objective.length} correct · {earnedMarks} / {totalMarks} marks
             {questions.length > objective.length && ` · ${questions.length - objective.length} subjective (self-review)`}
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' as const }}>
-            <button onClick={retakeQuiz} style={s.outlineBtn}>🔄 Retake Quiz</button>
-            <button onClick={newQuiz} style={s.primaryBtn}>✨ New Quiz</button>
+            <button onClick={retakeQuiz} style={s.outlineBtn}>Retake Quiz</button>
+            <button onClick={newQuiz} style={s.primaryBtn}>New Quiz</button>
           </div>
         </div>
 
         {/* Review */}
-        <p style={{ margin: '0.25rem 0', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-m)' }}>
-          📋 Question Review
-        </p>
+        <p style={{ margin: '0.25rem 0', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-m)' }}>Question Review</p>
         {questions.map(q => (
           <ReviewCard key={q.id} q={q} userAnswer={answers[q.id]} />
         ))}

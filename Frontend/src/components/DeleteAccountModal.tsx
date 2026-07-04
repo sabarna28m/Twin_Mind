@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { FormEvent } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import api from '../services/api';
 
 interface Props {
@@ -70,8 +71,8 @@ export default function DeleteAccountModal({ isOpen, onClose, onDeleted }: Props
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(239,68,68,0.12)', border: '1.5px solid rgba(239,68,68,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>
-              ⚠
+            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(239,68,68,0.12)', border: '1.5px solid rgba(239,68,68,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <AlertTriangle size={18} style={{ color: '#ef4444' }} />
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '0.97rem', fontWeight: 700, color: '#f1f5f9' }}>Delete Account</h3>

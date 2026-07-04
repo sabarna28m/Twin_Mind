@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿﻿﻿import { useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
@@ -19,13 +19,13 @@ interface Material {
 const ACCEPT = '.pdf,.png,.jpg,.jpeg,.gif,.webp,.txt,.docx,.pptx,.xlsx,.doc';
 
 function fileIcon(mime: string) {
-  if (mime === 'application/pdf') return '📄';
-  if (mime.startsWith('image/')) return '🖼';
-  if (mime.startsWith('text/')) return '📝';
-  if (mime.includes('word')) return '📘';
-  if (mime.includes('presentation')) return '📊';
-  if (mime.includes('sheet')) return '📗';
-  return '📎';
+  if (mime === 'application/pdf') return '';
+  if (mime.startsWith('image/')) return '';
+  if (mime.startsWith('text/')) return '';
+  if (mime.includes('word')) return '';
+  if (mime.includes('presentation')) return '';
+  if (mime.includes('sheet')) return '';
+  return '';
 }
 
 function formatSize(bytes: number) {
@@ -154,7 +154,7 @@ export default function Materials() {
             </div>
           ) : (
             <>
-              <p style={s.dropIcon}>☁</p>
+              <p style={s.dropIcon}></p>
               <p style={s.dropLabel}>{dragOver ? t('materials_drop') : t('materials_upload')}</p>
               <p style={s.dropHint}>{t('materials_browse')} · {t('materials_supported')}</p>
             </>
@@ -168,7 +168,7 @@ export default function Materials() {
           <p style={s.emptyText}>{t('loading')}</p>
         ) : materials.length === 0 ? (
           <div style={s.empty}>
-            <p style={s.emptyIcon}>📂</p>
+            <p style={s.emptyIcon}></p>
             <p style={s.emptyTitle}>{t('materials_empty')}</p>
             <p style={s.emptyHint}>Upload your first file above.</p>
           </div>
@@ -183,7 +183,7 @@ export default function Materials() {
                 </div>
                 <div style={s.actions}>
                   <button onClick={() => downloadMaterial(m.id, m.original_name)} style={s.actionBtn} title="Download">↓</button>
-                  <button onClick={() => deleteMaterial(m.id)} style={s.deleteBtn} title="Delete">✕</button>
+                  <button onClick={() => deleteMaterial(m.id)} style={s.deleteBtn} title="Delete"></button>
                 </div>
               </div>
             ))}

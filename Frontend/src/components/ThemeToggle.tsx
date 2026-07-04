@@ -5,6 +5,7 @@
  * with a clean, minimal toggle that switches between light and dark modes.
  */
 
+import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 export default function ThemeToggle() {
@@ -34,7 +35,7 @@ export default function ThemeToggle() {
         padding: 0,
       }}
     >
-      {isDark ? '☀️' : '🌙'}
+      {isDark ? <Sun size={16} /> : <Moon size={16} />}
     </button>
   );
 }

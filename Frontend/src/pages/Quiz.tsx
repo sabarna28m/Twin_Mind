@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Brain, BookOpen, FileText, Eye, GraduationCap } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import PracticeQuiz   from '../components/quiz/PracticeQuiz';
@@ -21,10 +22,10 @@ export default function Quiz() {
   if (view === 'practice') return <PracticeQuiz  onBack={() => setView('hub')} />;
   if (view === 'focus')    return <FocusModeQuiz onBack={() => setView('hub')} />;
 
-  const TABS: { key: Tab; icon: string; label: string; desc: string }[] = [
-    { key: 'modes',     icon: '🧠', label: t('quiz_tab_modes'),     desc: t('quiz_tab_modes_sub') },
-    { key: 'resources', icon: '📚', label: t('quiz_tab_resources'), desc: t('quiz_tab_resources_sub') },
-    { key: 'papers',    icon: '📄', label: t('quiz_tab_papers'),    desc: t('quiz_tab_papers_sub') },
+  const TABS: { key: Tab; icon: ReactNode; label: string; desc: string }[] = [
+    { key: 'modes',     icon: <Brain size={16} />,    label: t('quiz_tab_modes'),     desc: t('quiz_tab_modes_sub') },
+    { key: 'resources', icon: <BookOpen size={16} />, label: t('quiz_tab_resources'), desc: t('quiz_tab_resources_sub') },
+    { key: 'papers',    icon: <FileText size={16} />, label: t('quiz_tab_papers'),    desc: t('quiz_tab_papers_sub') },
   ];
 
   const currentTabLabel = TABS.find(tb => tb.key === tab)?.label ?? t('quiz_tab_modes');
@@ -49,7 +50,7 @@ export default function Quiz() {
           </div>
           {/* Brand row */}
           <div style={s.brandRow}>
-            <span style={s.brandIcon}>🎓</span>
+            <GraduationCap size={22} style={{ color: '#00D4FF', flexShrink: 0 }} />
             <div>
               <p style={s.brandName}>{t('quiz_hub_title')}</p>
               <p style={s.brandSub}>{t('quiz_hub_sub')}</p>
@@ -74,7 +75,7 @@ export default function Quiz() {
                   color:       active ? 'var(--accent)'         : 'var(--text-m)',
                 }}
               >
-                <span style={{ fontSize: '1rem' }}>{tb.icon}</span>
+                <span style={{ display: 'flex', alignItems: 'center' }}>{tb.icon}</span>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                   <span style={{ fontWeight: active ? 800 : 600, fontSize: '0.8rem', lineHeight: 1.1 }}>
                     {tb.label}
@@ -97,7 +98,7 @@ export default function Quiz() {
               {/* Practice Quiz */}
               <button onClick={() => setView('practice')} style={s.modeCard}>
                 <div style={s.modeCardGlow} />
-                <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}>📚</div>
+                <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}><BookOpen size={22} color="#fff" /></div>
                 <p style={s.modeTitle}>{t('quiz_practice_title')}</p>
                 <p style={s.modeDesc}>{t('quiz_practice_desc')}</p>
                 <div style={s.modeFeats}>
@@ -116,7 +117,7 @@ export default function Quiz() {
               {/* Focus Mode */}
               <button onClick={() => setView('focus')} style={{ ...s.modeCard, borderColor: 'var(--border)' }}>
                 <div style={{ ...s.modeCardGlow, background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 65%)' }} />
-                <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#00D4FF,#7c3aed)' }}>👁</div>
+                <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#00D4FF,#7c3aed)' }}><Eye size={22} color="#fff" /></div>
                 <p style={{ ...s.modeTitle, color: 'var(--accent)' }}>{t('quiz_focus_title')}</p>
                 <p style={s.modeDesc}>{t('quiz_focus_desc')}</p>
                 <div style={s.modeFeats}>
@@ -137,13 +138,13 @@ export default function Quiz() {
             <p style={{ ...s.sectionLabel, marginTop: '1.5rem' }}>{t('quiz_ai_tools_label')}</p>
             <div style={s.quickRow}>
               {[
-                { icon: '📚', label: 'Upload, analyze & generate quizzes from study materials', tab: 'resources' as Tab, color: '#10b981' },
-                { icon: '📄', label: 'Analyze exam paper patterns & generate new papers',       tab: 'papers'    as Tab, color: '#f59e0b' },
+                { icon: <BookOpen size={22} />, label: 'Upload, analyze & generate quizzes from study materials', tab: 'resources' as Tab, color: '#10b981' },
+                { icon: <FileText size={22} />, label: 'Analyze exam paper patterns & generate new papers',       tab: 'papers'    as Tab, color: '#f59e0b' },
               ].map(item => (
                 <button key={item.tab} onClick={() => setTab(item.tab)} style={{
                   ...s.quickCard, borderColor: `${item.color}30`,
                 }}>
-                  <span style={{ fontSize: '1.4rem' }}>{item.icon}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', color: item.color }}>{item.icon}</span>
                   <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 600,
                     color: 'var(--text-m)', lineHeight: 1.4 }}>
                     {item.label}

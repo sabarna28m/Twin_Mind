@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -726,7 +726,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
             {twin.ai_insights.map((insight, i) => (
               <div key={i} style={{ display: 'flex', gap: '0.6rem', padding: '0.85rem', background: 'rgba(129,140,248,0.06)', border: '1px solid rgba(129,140,248,0.15)', borderRadius: '12px' }}>
                 <span style={{ fontSize: '1rem', flexShrink: 0, marginTop: '1px' }}>
-                  {i === 0 ? '🔮' : i === 1 ? '📊' : i === 2 ? '🎯' : '💡'}
+                  {i === 0 ? '' : i === 1 ? '' : i === 2 ? '' : ''}
                 </span>
                 <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', lineHeight: 1.6 }}>{insight}</p>
               </div>
@@ -875,11 +875,11 @@ function ExtendedModelsSection({
   const [tab, setTab] = useState<ModelTab>('knowledge');
 
   const tabs: { key: ModelTab; label: string; icon: string; color: string }[] = [
-    { key: 'knowledge',   label: 'Knowledge',   icon: '🧠', color: '#0052cc' },
-    { key: 'behavior',    label: 'Behavior',    icon: '📊', color: '#06b6d4' },
-    { key: 'style',       label: 'Learning Style', icon: '🎯', color: '#0052cc' },
-    { key: 'personality', label: 'Personality', icon: '⚡', color: '#f59e0b' },
-    { key: 'productivity',label: 'Productivity',icon: '🚀', color: '#10b981' },
+    { key: 'knowledge',   label: 'Knowledge',   icon: '', color: '#0052cc' },
+    { key: 'behavior',    label: 'Behavior',    icon: '', color: '#06b6d4' },
+    { key: 'style',       label: 'Learning Style', icon: '', color: '#0052cc' },
+    { key: 'personality', label: 'Personality', icon: '', color: '#f59e0b' },
+    { key: 'productivity',label: 'Productivity',icon: '', color: '#10b981' },
   ];
 
   /* ── derived metrics ── */
@@ -956,7 +956,7 @@ function ExtendedModelsSection({
   return (
     <div style={{ ...x.card, ...x.fullWidth }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-        <span style={{ fontSize: '1rem' }}>🤖</span>
+        <span style={{ fontSize: '1rem' }}></span>
         <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Twin Model Analytics</h3>
         <span style={{ marginLeft: 'auto', fontSize: '0.62rem', color: '#64748b' }}>8 adaptive models</span>
       </div>
@@ -997,7 +997,7 @@ function ExtendedModelsSection({
             {!subjects && <p style={{ color: '#64748b', fontSize: '0.82rem' }}>Log subject sessions to build your knowledge model.</p>}
             <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.15)', borderRadius: '12px' }}>
               <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 600, color: '#0052cc' }}>
-                🧠 Knowledge Velocity: <strong>{twin.trend === 'improving' ? 'Accelerating' : twin.trend === 'stable' ? 'Steady' : 'Decelerating'}</strong>
+                 Knowledge Velocity: <strong>{twin.trend === 'improving' ? 'Accelerating' : twin.trend === 'stable' ? 'Steady' : 'Decelerating'}</strong>
               </p>
               <p style={{ margin: '0.3rem 0 0', fontSize: '0.68rem', color: '#64748b' }}>
                 Based on {twin.data_points} data points over {twin.twin_age} days
@@ -1012,7 +1012,7 @@ function ExtendedModelsSection({
             <MBar label="Prediction Confidence" value={twin.cognitive_heatmap?.prediction_confidence ?? Math.round(twin.confidence_level)}   color="#10b981" />
             {subjects?.weakest && (
               <div style={{ marginTop: '1rem', padding: '0.65rem 0.85rem', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.18)', borderRadius: '10px' }}>
-                <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: '#f87171' }}>⚠ Forgetting Risk: {subjects.weakest.subject}</p>
+                <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: '#f87171' }}> Forgetting Risk: {subjects.weakest.subject}</p>
                 <p style={{ margin: '0.2rem 0 0', fontSize: '0.67rem', color: '#64748b' }}>
                   Not studied recently — review every {subjects.weakest.recommended_daily_minutes} min/day to prevent decay.
                 </p>
@@ -1046,10 +1046,10 @@ function ExtendedModelsSection({
           <div>
             <p style={{ ...x.sectionLabel, color: activeColor }}>Behavioral Insights</p>
             {[
-              { icon: '⏰', title: 'Peak Productivity', text: avgStudyHours >= 2.5 ? 'Long focused sessions — deep work oriented.' : 'Short distributed sessions — sprint learner.' },
-              { icon: '📈', title: 'Habit Trend', text: twin.trend === 'improving' ? 'Positive habit formation detected. Keep going.' : twin.trend === 'stable' ? 'Stable patterns — consider adding variety.' : 'Habit disruption detected. Re-anchor your routine.' },
-              { icon: '🔁', title: 'Consistency Forecast', text: `${Math.round(twin.consistency_score)}% consistency score. ${twin.consistency_score >= 70 ? 'Excellent — sustain this rhythm.' : 'Needs improvement — aim for daily check-ins.'}` },
-              { icon: '🎯', title: 'Preferred Method', text: `Your twin detects ${styleLabels[dominantStyle]} tendencies based on session data.` },
+              { icon: 'PK', title: 'Peak Productivity', text: avgStudyHours >= 2.5 ? 'Long focused sessions — deep work oriented.' : 'Short distributed sessions — sprint learner.' },
+              { icon: 'HT', title: 'Habit Trend', text: twin.trend === 'improving' ? 'Positive habit formation detected. Keep going.' : twin.trend === 'stable' ? 'Stable patterns — consider adding variety.' : 'Habit disruption detected. Re-anchor your routine.' },
+              { icon: 'CF', title: 'Consistency Forecast', text: `${Math.round(twin.consistency_score)}% consistency score. ${twin.consistency_score >= 70 ? 'Excellent — sustain this rhythm.' : 'Needs improvement — aim for daily check-ins.'}` },
+              { icon: 'PM', title: 'Preferred Method', text: `Your twin detects ${styleLabels[dominantStyle]} tendencies based on session data.` },
             ].map(ins => (
               <div key={ins.title} style={{ display: 'flex', gap: '0.6rem', padding: '0.7rem 0.85rem', background: `${activeColor}08`, border: `1px solid ${activeColor}18`, borderRadius: '12px', marginBottom: '0.5rem' }}>
                 <span style={{ fontSize: '1rem', flexShrink: 0 }}>{ins.icon}</span>
@@ -1079,13 +1079,13 @@ function ExtendedModelsSection({
           <div>
             <p style={{ ...x.sectionLabel, color: activeColor }}>Style-Based Recommendations</p>
             {[
-              dominantStyle === 'quiz'     && { icon: '🧩', text: 'Your twin recommends short daily quizzes of 5–10 questions. Spaced repetition is your superpower.' },
-              dominantStyle === 'reading'  && { icon: '📖', text: 'Your twin recommends structured note-taking and summary writing. Review notes within 24h.' },
-              dominantStyle === 'practice' && { icon: '💪', text: 'Your twin recommends long focus sessions with deliberate practice. Use the Focus Timer daily.' },
-              dominantStyle === 'video'    && { icon: '🎥', text: 'Your twin recommends curated video playlists. Pair with notes for maximum retention.' },
-              { icon: '🔄', text: 'Your twin adapts its study plan recommendations based on your evolving learning style profile.' },
-              { icon: '📊', text: `You have completed ${totalSessions} sessions analyzed. Your style accuracy improves with more data.` },
-              { icon: '🎯', text: `${dominantStyle === 'mixed' ? 'Mixed learners benefit from variety.' : `${styleLabels[dominantStyle]}s retain best through ${dominantStyle === 'quiz' ? 'active recall' : dominantStyle === 'practice' ? 'deliberate practice' : 'structured review'}.`}` },
+              dominantStyle === 'quiz'     && { icon: '', text: 'Your twin recommends short daily quizzes of 5–10 questions. Spaced repetition is your superpower.' },
+              dominantStyle === 'reading'  && { icon: '', text: 'Your twin recommends structured note-taking and summary writing. Review notes within 24h.' },
+              dominantStyle === 'practice' && { icon: '', text: 'Your twin recommends long focus sessions with deliberate practice. Use the Focus Timer daily.' },
+              dominantStyle === 'video'    && { icon: '', text: 'Your twin recommends curated video playlists. Pair with notes for maximum retention.' },
+              { icon: '', text: 'Your twin adapts its study plan recommendations based on your evolving learning style profile.' },
+              { icon: '', text: `You have completed ${totalSessions} sessions analyzed. Your style accuracy improves with more data.` },
+              { icon: '', text: `${dominantStyle === 'mixed' ? 'Mixed learners benefit from variety.' : `${styleLabels[dominantStyle]}s retain best through ${dominantStyle === 'quiz' ? 'active recall' : dominantStyle === 'practice' ? 'deliberate practice' : 'structured review'}.`}` },
             ].filter(Boolean).slice(0, 4).map((ins: unknown, i) => {
               const item = ins as { icon: string; text: string };
               return (
@@ -1111,10 +1111,10 @@ function ExtendedModelsSection({
           <div>
             <p style={{ ...x.sectionLabel, color: activeColor }}>Trait Insights</p>
             {[
-              { trait: 'Discipline', icon: '🔒', note: personality.Discipline >= 70 ? 'Strong. Your twin sees structured study habits.' : 'Developing. Build daily routines to strengthen this.' },
-              { trait: 'Persistence', icon: '🔥', note: streakDays >= 7 ? `${streakDays}-day streak proves your persistence.` : 'Build a 7-day streak to unlock persistence recognition.' },
-              { trait: 'Focus', icon: '🎯', note: burnout?.risk_level === 'low' ? 'Excellent focus health detected.' : 'Focus is under pressure — manage burnout risk.' },
-              { trait: 'Curiosity', icon: '💡', note: noteSessions > 5 ? 'High note-taking activity signals strong curiosity.' : 'Take more notes to signal curiosity to your twin.' },
+              { trait: 'Discipline', icon: '', note: personality.Discipline >= 70 ? 'Strong. Your twin sees structured study habits.' : 'Developing. Build daily routines to strengthen this.' },
+              { trait: 'Persistence', icon: '', note: streakDays >= 7 ? `${streakDays}-day streak proves your persistence.` : 'Build a 7-day streak to unlock persistence recognition.' },
+              { trait: 'Focus', icon: '', note: burnout?.risk_level === 'low' ? 'Excellent focus health detected.' : 'Focus is under pressure — manage burnout risk.' },
+              { trait: 'Curiosity', icon: '', note: noteSessions > 5 ? 'High note-taking activity signals strong curiosity.' : 'Take more notes to signal curiosity to your twin.' },
             ].map(({ trait, icon, note }) => (
               <div key={trait} style={{ display: 'flex', gap: '0.6rem', padding: '0.65rem 0.85rem', background: `${PERS_COLORS[trait] ?? activeColor}08`, border: `1px solid ${PERS_COLORS[trait] ?? activeColor}20`, borderRadius: '12px', marginBottom: '0.5rem' }}>
                 <span>{icon}</span>
@@ -1126,7 +1126,7 @@ function ExtendedModelsSection({
             ))}
             <div style={{ marginTop: '0.5rem', padding: '0.7rem', background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '12px' }}>
               <p style={{ margin: 0, fontSize: '0.72rem', color: '#fbbf24' }}>
-                ⚡ Scores update automatically based on your actions, goal completions, and study behavior.
+                 Scores update automatically based on your actions, goal completions, and study behavior.
               </p>
             </div>
           </div>
@@ -1167,9 +1167,9 @@ function ExtendedModelsSection({
               <MBar label="Burnout Pressure" value={burnout?.burnout_score ?? 0} color={burnout?.risk_level === 'high' ? '#ef4444' : burnout?.risk_level === 'medium' ? '#f59e0b' : '#10b981'} />
             </div>
             {[
-              { icon: '⚡', title: 'Burnout Probability (7d)', value: `${Math.min(95, Math.round((burnout?.burnout_score ?? 30) * 0.8 + 5))}%` },
-              { icon: '📉', title: 'Productivity Decline Risk', value: twin.trend === 'declining' ? 'HIGH' : twin.trend === 'stable' ? 'MEDIUM' : 'LOW' },
-              { icon: '🎯', title: 'Missed Study Probability', value: `${Math.max(5, Math.round(100 - twin.consistency_score * 0.9))}%` },
+              { icon: '', title: 'Burnout Probability (7d)', value: `${Math.min(95, Math.round((burnout?.burnout_score ?? 30) * 0.8 + 5))}%` },
+              { icon: '', title: 'Productivity Decline Risk', value: twin.trend === 'declining' ? 'HIGH' : twin.trend === 'stable' ? 'MEDIUM' : 'LOW' },
+              { icon: '', title: 'Missed Study Probability', value: `${Math.max(5, Math.round(100 - twin.consistency_score * 0.9))}%` },
             ].map(p => (
               <div key={p.title} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.55rem 0.75rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '10px', marginBottom: '0.5rem' }}>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -1209,20 +1209,20 @@ function PredictionCenterSection({
   const focusProb = Math.round(Math.max(10, 100 - (burnout?.burnout_score ?? 25) * 0.7));
 
   const predictions = [
-    { icon: '🔥', label: 'Maintain streak this week', prob: streakProb,      conf: Math.min(95, 55 + streakDays), color: '#f97316' },
-    { icon: '📚', label: 'Complete syllabus on time',  prob: syllabusProb,   conf: Math.round(twin.confidence_level * 0.9), color: '#0052cc' },
-    { icon: '🧠', label: `Forgetting risk: ${forgettingSubject}`, prob: forgettingRisk, conf: subjects ? 82 : 30, color: '#ef4444' },
-    { icon: '🎯', label: 'Goal failure probability',   prob: goalFailRisk,   conf: Math.round(twin.prediction_reliability * 0.85), color: '#f59e0b' },
-    { icon: '📝', label: 'Expected quiz score (next week)', prob: quizScoreNext, conf: Math.round(twin.confidence_level), color: '#10b981' },
-    { icon: '🏆', label: 'Exam readiness',             prob: examReadiness,  conf: Math.round(twin.confidence_level * 0.95), color: '#0052cc' },
-    { icon: '⚠️', label: 'Burnout probability',        prob: burnoutProb,    conf: burnout ? 88 : 40, color: '#ef4444' },
-    { icon: '⚡', label: 'Focus probability (today)',   prob: focusProb,      conf: burnout ? 85 : 45, color: '#06b6d4' },
+    { icon: '', label: 'Maintain streak this week', prob: streakProb,      conf: Math.min(95, 55 + streakDays), color: '#f97316' },
+    { icon: '', label: 'Complete syllabus on time',  prob: syllabusProb,   conf: Math.round(twin.confidence_level * 0.9), color: '#0052cc' },
+    { icon: '', label: `Forgetting risk: ${forgettingSubject}`, prob: forgettingRisk, conf: subjects ? 82 : 30, color: '#ef4444' },
+    { icon: '', label: 'Goal failure probability',   prob: goalFailRisk,   conf: Math.round(twin.prediction_reliability * 0.85), color: '#f59e0b' },
+    { icon: '', label: 'Expected quiz score (next week)', prob: quizScoreNext, conf: Math.round(twin.confidence_level), color: '#10b981' },
+    { icon: '', label: 'Exam readiness',             prob: examReadiness,  conf: Math.round(twin.confidence_level * 0.95), color: '#0052cc' },
+    { icon: '', label: 'Burnout probability',        prob: burnoutProb,    conf: burnout ? 88 : 40, color: '#ef4444' },
+    { icon: '', label: 'Focus probability (today)',   prob: focusProb,      conf: burnout ? 85 : 45, color: '#06b6d4' },
   ];
 
   return (
     <div style={{ ...x.card, ...x.fullWidth }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-        <span style={{ fontSize: '1rem' }}>🔮</span>
+        <span style={{ fontSize: '1rem' }}></span>
         <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Predictive AI Engine</h3>
         <span style={{ marginLeft: 'auto', fontSize: '0.62rem', color: '#64748b' }}>Confidence-weighted predictions</span>
       </div>
@@ -1288,7 +1288,7 @@ function AskMyTwinSection({
       const streakMsg = streak > 0 ? ` Your ${streak}-day streak is at risk.` : '';
       const dropPct   = Math.round(2.5 + (100 - twin.consistency_score) * 0.08);
       const cascadePct = Math.round(12 + (100 - twin.consistency_score) * 0.18);
-      return `⚠️ Simulating: "Skip studying today"\n\nMy twin model projects the following outcomes:\n\n• Academic score may drop by ~${dropPct}% within 3 days without recovery.${streakMsg}\n• ${cascadePct}% probability this leads to consecutive missed days based on your pattern.\n• Knowledge retention in ${subjects?.weakest?.subject ?? 'your weakest subject'} would decline fastest.\n\n✅ Recommendation: If unavoidable, activate a Streak Shield and schedule a recovery session tomorrow. Even 30 minutes is significantly better than nothing.`;
+      return `Simulating: "Skip studying today"\n\nMy twin model projects the following outcomes:\n\n• Academic score may drop by ~${dropPct}% within 3 days without recovery.${streakMsg}\n• ${cascadePct}% probability this leads to consecutive missed days based on your pattern.\n• Knowledge retention in ${subjects?.weakest?.subject ?? 'your weakest subject'} would decline fastest.\n\nRecommendation: If unavoidable, activate a Streak Shield and schedule a recovery session tomorrow. Even 30 minutes is significantly better than nothing.`;
     }
 
     if (ql.includes('extra') || (ql.includes('more') && ql.includes('hour'))) {
@@ -1296,13 +1296,13 @@ function AskMyTwinSection({
       const hours  = match ? parseFloat(match[1]) : 2;
       const boost  = Math.min(15, Math.round(hours * 3.2));
       const burnRisk = Math.min(95, Math.round((burnout?.burnout_score ?? 25) + hours * 12));
-      return `📈 Simulating: "Study ${hours} extra hours daily"\n\nProjected outcomes over 14 days:\n\n• Academic score: +${boost}% improvement (projected)\n• Consistency score: +${Math.round(hours * 2.5)} points\n• Burnout probability rises to ${burnRisk}% — monitor this closely.\n\n🎯 Sweet spot: ${hours <= 2 ? 'This is sustainable with proper breaks.' : 'Consider 1.5h extra maximum to balance performance and wellness.'}\n\n⚡ Recommendation: Use the Focus Timer, take 10-min breaks every 45 minutes, and log your wellness check-in daily.`;
+      return `Simulating: "Study ${hours} extra hours daily"\n\nProjected outcomes over 14 days:\n\n• Academic score: +${boost}% improvement (projected)\n• Consistency score: +${Math.round(hours * 2.5)} points\n• Burnout probability rises to ${burnRisk}% — monitor this closely.\n\nSweet spot: ${hours <= 2 ? 'This is sustainable with proper breaks.' : 'Consider 1.5h extra maximum to balance performance and wellness.'}\n\nRecommendation: Use the Focus Timer, take 10-min breaks every 45 minutes, and log your wellness check-in daily.`;
     }
 
     if (ql.includes('quiz') && (ql.includes('more') || ql.includes('increase') || ql.includes('50'))) {
       const current = Math.round(avgQuiz);
       const projected = Math.min(97, Math.round(current * 1.1 + 5));
-      return `🧩 Simulating: "Increase quizzes by 50%"\n\nBased on your current accuracy of ~${current}%:\n\n• Projected accuracy in 3 weeks: ~${projected}%\n• Knowledge retention: +18% improvement expected\n• Academic score boost: +${Math.round(6 + current * 0.04)} points\n• Twin fidelity: Will improve significantly with more quiz data\n\n📊 The spaced repetition effect kicks in after 10+ quiz sessions. Your twin learns your weak areas and will prioritize them automatically.`;
+      return `Simulating: "Increase quizzes by 50%"\n\nBased on your current accuracy of ~${current}%:\n\n• Projected accuracy in 3 weeks: ~${projected}%\n• Knowledge retention: +18% improvement expected\n• Academic score boost: +${Math.round(6 + current * 0.04)} points\n• Twin fidelity: Will improve significantly with more quiz data\n\nThe spaced repetition effect kicks in after 10+ quiz sessions. Your twin learns your weak areas and will prioritize them automatically.`;
     }
 
     const weakSubj = subjects?.weakest?.subject;
@@ -1310,28 +1310,28 @@ function AskMyTwinSection({
       const score    = subjects!.weakest!.avg_score;
       const dailyMin = subjects!.weakest!.recommended_daily_minutes;
       const boost    = Math.round(dailyMin * 0.45);
-      return `🎯 Simulating: "Focus only on ${weakSubj}"\n\nCurrent mastery: ${score.toFixed(0)}%\n\nProjected after 7-day focused study (${dailyMin} min/day):\n\n• ${weakSubj} score: +${boost}% improvement\n• Overall academic score: +${Math.round(boost * 0.3)}% lift\n• Forgetting risk: Reduced significantly\n• Recommended daily minimum: ${dailyMin} minutes\n\n⚡ Warning: Neglecting other subjects for more than 10 days may cause regression. Balance is key.`;
+      return `Simulating: "Focus only on ${weakSubj}"\n\nCurrent mastery: ${score.toFixed(0)}%\n\nProjected after 7-day focused study (${dailyMin} min/day):\n\n• ${weakSubj} score: +${boost}% improvement\n• Overall academic score: +${Math.round(boost * 0.3)}% lift\n• Forgetting risk: Reduced significantly\n• Recommended daily minimum: ${dailyMin} minutes\n\nWarning: Neglecting other subjects for more than 10 days may cause regression. Balance is key.`;
     }
 
     if (ql.includes('burnout') || ql.includes('burn out') || ql.includes('tired') || ql.includes('exhausted')) {
       const score = burnout?.burnout_score ?? 40;
       const risk  = burnout?.risk_level ?? 'medium';
-      return `🔥 Burnout Analysis:\n\nCurrent burnout score: ${score}/100 (${risk.toUpperCase()} RISK)\n\n${risk === 'high'
-        ? `⚠️ HIGH RISK DETECTED.\n• Immediate action required: limit study to 1.5h today.\n• Sleep ≥8h tonight is critical.\n• ${Math.round(45 + score * 0.3)}% probability of performance drop within 5 days if unchecked.`
+      return `Burnout Analysis:\n\nCurrent burnout score: ${score}/100 (${risk.toUpperCase()} RISK)\n\n${risk === 'high'
+        ? `HIGH RISK DETECTED.\n• Immediate action required: limit study to 1.5h today.\n• Sleep ≥8h tonight is critical.\n• ${Math.round(45 + score * 0.3)}% probability of performance drop within 5 days if unchecked.`
         : risk === 'medium'
-        ? `🟡 MEDIUM RISK.\n• Sustainable with minor adjustments.\n• Add 10-min breaks every 45 minutes.\n• ${Math.round(25 + score * 0.2)}% burnout escalation risk if pattern continues.`
-        : `✅ LOW RISK.\n• You are in a healthy productivity zone.\n• Maintain sleep, breaks, and current study rhythm.\n• ${Math.round(8 + score * 0.15)}% baseline burnout probability.`}\n\nLog your wellness check-in daily for the most accurate burnout tracking.`;
+        ? `MEDIUM RISK.\n• Sustainable with minor adjustments.\n• Add 10-min breaks every 45 minutes.\n• ${Math.round(25 + score * 0.2)}% burnout escalation risk if pattern continues.`
+        : `LOW RISK.\n• You are in a healthy productivity zone.\n• Maintain sleep, breaks, and current study rhythm.\n• ${Math.round(8 + score * 0.15)}% baseline burnout probability.`}\n\nLog your wellness check-in daily for the most accurate burnout tracking.`;
     }
 
     if (ql.includes('exam') || ql.includes('ready') || ql.includes('readiness') || ql.includes('prepared')) {
       const predScore = twin.future_twin?.predicted_exam_score ?? Math.round(twin.academic_score * 0.88);
       const readPct   = Math.round(twin.academic_score);
-      return `🏆 Exam Readiness Report:\n\nCurrent readiness: ${readPct}%\nPredicted exam score (30 days): ${predScore}/100\n\nStrength areas: ${twin.strengths.slice(0, 2).join(', ') || 'Building up'}\nFocus areas: ${twin.areas_to_improve.slice(0, 2).join(', ') || 'Continue current progress'}\n${subjects?.weakest ? `\nHighest-impact improvement: ${subjects.weakest.subject} at ${subjects.weakest.avg_score.toFixed(0)}% (${subjects.weakest.recommended_daily_minutes} min/day recommended)` : ''}\n\nTo reach ${Math.min(95, predScore + 10)}%: Maintain streak, hit 80%+ quiz accuracy, and study consistently for ${Math.max(14, Math.round((90 - twin.academic_score) * 0.8))} more days.`;
+      return `Exam Readiness Report:\n\nCurrent readiness: ${readPct}%\nPredicted exam score (30 days): ${predScore}/100\n\nStrength areas: ${twin.strengths.slice(0, 2).join(', ') || 'Building up'}\nFocus areas: ${twin.areas_to_improve.slice(0, 2).join(', ') || 'Continue current progress'}\n${subjects?.weakest ? `\nHighest-impact improvement: ${subjects.weakest.subject} at ${subjects.weakest.avg_score.toFixed(0)}% (${subjects.weakest.recommended_daily_minutes} min/day recommended)` : ''}\n\nTo reach ${Math.min(95, predScore + 10)}%: Maintain streak, hit 80%+ quiz accuracy, and study consistently for ${Math.max(14, Math.round((90 - twin.academic_score) * 0.8))} more days.`;
     }
 
     if (ql.includes('streak') || ql.includes('maintain') || ql.includes('keep going')) {
       const prob = Math.min(98, 50 + streak * 2);
-      return `🔥 Streak Analysis:\n\nCurrent streak: ${streak} days\nWeekly maintenance probability: ${prob}%\n\nStreak milestones:\n• 7 days → +1 Shield, +50 XP bonus\n• 30 days → +2 Shields, +150 XP bonus\n• 100 days → +3 Shields, +500 XP bonus\n\nYou are ${streak >= 7 ? 'above' : `${7 - streak} days away from`} the 7-day milestone.\n\n⚡ Your twin estimates a ${Math.round(100 - (100 - twin.consistency_score) * 0.7)}% probability of breaking your all-time record if you maintain current habits for ${Math.max(3, 30 - streak)} more days.`;
+      return `Streak Analysis:\n\nCurrent streak: ${streak} days\nWeekly maintenance probability: ${prob}%\n\nStreak milestones:\n• 7 days → +1 Shield, +50 XP bonus\n• 30 days → +2 Shields, +150 XP bonus\n• 100 days → +3 Shields, +500 XP bonus\n\nYou are ${streak >= 7 ? 'above' : `${7 - streak} days away from`} the 7-day milestone.\n\nYour twin estimates a ${Math.round(100 - (100 - twin.consistency_score) * 0.7)}% probability of breaking your all-time record if you maintain current habits for ${Math.max(3, 30 - streak)} more days.`;
     }
 
     const insight = twin.ai_insights[Math.floor(Math.random() * Math.max(1, twin.ai_insights.length))]

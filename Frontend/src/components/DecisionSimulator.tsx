@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+﻿﻿import { useState, useCallback } from 'react';
 
 /* ── Types (local, mirrors DPT interfaces — no cross-page imports) ── */
 interface TwinInfo {
@@ -331,9 +331,7 @@ export default function DecisionSimulator({ twin, subjects, progress }: Props) {
       <div style={{ ...CARD, padding:'1.75rem' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:'1rem' }}>
           <div>
-            <h2 style={{ margin:'0 0 0.4rem', fontSize:'1.4rem', fontWeight:800, color:'#FFFFFF', letterSpacing:'-0.3px' }}>
-              🧠 Decision Simulator
-            </h2>
+            <h2 style={{ margin:'0 0 0.4rem', fontSize:'1.4rem', fontWeight:800, color:'#FFFFFF', letterSpacing:'-0.3px' }}>Decision Simulator</h2>
             <p style={{ margin:0, color:'#9CA3AF', fontSize:'0.88rem', maxWidth:480 }}>
               See how your Digital Twin predicts your likely choices based on your historical behavior and learning patterns.
             </p>
@@ -380,7 +378,7 @@ export default function DecisionSimulator({ twin, subjects, progress }: Props) {
             transition:'all 0.2s',
           }}
         >
-          {loading ? '◈ Analysing patterns…' : '⚡ Predict My Decision'}
+          {loading ? '◈ Analysing patterns…' : 'Predict My Decision'}
         </button>
         <p style={{ margin:'0.6rem 0 0', fontSize:'0.7rem', color:'#6B7280', textAlign:'center' as const }}>Ctrl+Enter to predict · Uses your real Twin data</p>
       </div>
@@ -388,7 +386,7 @@ export default function DecisionSimulator({ twin, subjects, progress }: Props) {
       {/* ── Loading pulse ── */}
       {loading && (
         <div style={{ ...CARD, textAlign:'center' as const, padding:'2.5rem' }}>
-          <div style={{ fontSize:'2.5rem', marginBottom:'0.75rem', animation:'float 1.4s ease-in-out infinite' }}>🧠</div>
+          <div style={{ fontSize:'2.5rem', marginBottom:'0.75rem', animation:'float 1.4s ease-in-out infinite' }}></div>
           <p style={{ color:'#9CA3AF', margin:'0 0 0.4rem', fontWeight:600 }}>Consulting your Digital Twin…</p>
           <p style={{ color:'#6B7280', margin:0, fontSize:'0.8rem' }}>Analysing {twin?.data_points ?? 0} data points</p>
         </div>
@@ -456,22 +454,18 @@ export default function DecisionSimulator({ twin, subjects, progress }: Props) {
               <div style={{ display:'flex', gap:'0.75rem', justifyContent:'center' }}>
                 <button
                   onClick={() => recordFeedback(result.id, 'yes')}
-                  style={{ padding:'0.7rem 2rem', borderRadius:12, background:'rgba(16,185,129,0.15)', border:'1px solid rgba(16,185,129,0.35)', color:'#34d399', fontWeight:800, fontSize:'0.88rem', cursor:'pointer', fontFamily:'inherit' }}>
-                  ✓ Yes
-                </button>
+                  style={{ padding:'0.7rem 2rem', borderRadius:12, background:'rgba(16,185,129,0.15)', border:'1px solid rgba(16,185,129,0.35)', color:'#34d399', fontWeight:800, fontSize:'0.88rem', cursor:'pointer', fontFamily:'inherit' }}>Yes</button>
                 <button
                   onClick={() => recordFeedback(result.id, 'no')}
-                  style={{ padding:'0.7rem 2rem', borderRadius:12, background:'rgba(239,68,68,0.12)', border:'1px solid rgba(239,68,68,0.3)', color:'#f87171', fontWeight:800, fontSize:'0.88rem', cursor:'pointer', fontFamily:'inherit' }}>
-                  ✗ No
-                </button>
+                  style={{ padding:'0.7rem 2rem', borderRadius:12, background:'rgba(239,68,68,0.12)', border:'1px solid rgba(239,68,68,0.3)', color:'#f87171', fontWeight:800, fontSize:'0.88rem', cursor:'pointer', fontFamily:'inherit' }}>No</button>
               </div>
             </div>
           ) : (
             <div style={{ ...CARD, textAlign:'center' as const }}>
               {result.feedback === 'yes' ? (
-                <p style={{ margin:0, color:'#34d399', fontWeight:700 }}>✓ Great! Prediction confidence calibrated upward.</p>
+                <p style={{ margin:0, color:'#34d399', fontWeight:700 }}>Great! Prediction confidence calibrated upward.</p>
               ) : (
-                <p style={{ margin:0, color:'#f87171', fontWeight:700 }}>✗ Noted. Twin will factor this into future predictions.</p>
+                <p style={{ margin:0, color:'#f87171', fontWeight:700 }}>Noted. Twin will factor this into future predictions.</p>
               )}
             </div>
           )}
@@ -503,7 +497,7 @@ export default function DecisionSimulator({ twin, subjects, progress }: Props) {
                   <span style={{ fontSize:'0.78rem', color:'#D1D5DB', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' as const }} title={rec.question}>{rec.question}</span>
                   <span style={{ fontSize:'0.78rem', color:'#FFFFFF', fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' as const }}>{rec.prediction}</span>
                   <span style={{ fontSize:'0.78rem', fontWeight:700, color: rec.feedback === 'yes' ? '#34d399' : rec.feedback === 'no' ? '#f87171' : '#6B7280' }}>
-                    {rec.feedback === 'yes' ? '✓ Correct' : rec.feedback === 'no' ? '✗ Wrong' : '—'}
+                    {rec.feedback === 'yes' ? 'Correct' : rec.feedback === 'no' ? 'Wrong' : '—'}
                   </span>
                   <span style={{ fontSize:'0.78rem', color:'#9CA3AF' }}>{rec.confidence}%</span>
                 </div>

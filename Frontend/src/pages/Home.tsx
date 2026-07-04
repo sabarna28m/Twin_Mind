@@ -2,48 +2,61 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { Brain, Target, Shield, Award, Bot, FileText, Briefcase, Calendar, TrendingUp, Sparkles, Star } from 'lucide-react';
+import {
+  Brain, Target, Shield, Award, Bot, TrendingUp,
+  Sparkles, Plus, ArrowUpRight,
+} from 'lucide-react';
 import './Home.css';
 
+/* ── Data ── */
 const FEATURES = [
-  { icon: <TrendingUp className="w-6 h-6" />, title: 'Predictive Analytics', desc: 'ML models analyse your learning velocity and predict exam performance weeks in advance, so you can intervene early.' },
-  { icon: <Brain className="w-6 h-6" />, title: 'Digital Twin AI', desc: 'Your personal AI model learns your study patterns, strengths, and knowledge gaps to adapt recommendations in real time.' },
-  { icon: <Target className="w-6 h-6" />, title: 'Smart Focus Sessions', desc: 'Pomodoro timers, deep work modes, and real-time concentration analytics to maximise every study session.' },
-  { icon: <Shield className="w-6 h-6" />, title: 'Burnout Guardian', desc: 'Proactive early-warning system detecting cognitive fatigue patterns before burnout sets in.' },
-  { icon: <Award className="w-6 h-6" />, title: 'Gamified Learning', desc: 'XP system, achievement badges, skill trees, and competitive battles with peers to make studying engaging.' },
-  { icon: <Bot className="w-6 h-6" />, title: 'AI Mentor & Coach', desc: 'Multi-agent AI with specialised tutors per subject, providing Socratic guidance and personalised explanations.' }
+  { icon: <TrendingUp size={20} />, label: 'Analytics', title: 'Predictive Analytics', desc: 'ML models analyse your learning velocity and predict exam performance weeks in advance.' },
+  { icon: <Brain size={20} />,      label: 'Core AI',   title: 'Digital Twin AI',       desc: 'Your personal AI model learns your study patterns, strengths, and knowledge gaps in real time.' },
+  { icon: <Target size={20} />,     label: 'Focus',     title: 'Smart Focus Sessions',  desc: 'Pomodoro timers, deep work modes, and real-time concentration analytics to maximise every session.' },
+  { icon: <Shield size={20} />,     label: 'Wellness',  title: 'Burnout Guardian',       desc: 'Proactive early-warning system detecting cognitive fatigue patterns before burnout sets in.' },
+  { icon: <Award size={20} />,      label: 'Gamify',    title: 'Gamified Learning',      desc: 'XP system, achievement badges, skill trees, and competitive battles with peers.' },
+  { icon: <Bot size={20} />,        label: 'Mentor',    title: 'AI Mentor & Coach',      desc: 'Multi-agent AI with specialised tutors per subject, providing Socratic guidance.' },
+];
+
+const STEPS = [
+  { num: '01', title: 'Create your profile', desc: 'Sign up and tell us about your subjects, goals, and study schedule.' },
+  { num: '02', title: 'Let the Twin learn', desc: 'Log daily check-ins. Your AI digital twin analyses patterns and builds a model of you.' },
+  { num: '03', title: 'Study smarter', desc: 'Get personalised predictions, burnout warnings, and adaptive recommendations every day.' },
 ];
 
 const TESTIMONIALS = [
   { text: "TwinMind helped me go from struggling with interview answers to landing my first tech role — in six months of consistent practice.", author: "Ananya Patel", role: "M.Sc. Computer Science" },
   { text: "The burnout guardian literally saved my semester. It knew I was crashing before I did and forced me to take a breather.", author: "James Chen", role: "Undergraduate Student" },
-  { text: "Very organized platform. Love the ability to see my digital twin's health mirror my own study habits.", author: "Sarah Jenkins", role: "Self-Taught Developer" }
+  { text: "Very organized platform. Love the ability to see my digital twin's health mirror my own study habits.", author: "Sarah Jenkins", role: "Self-Taught Developer" },
+  { text: "The gamification kept me hooked. Earning XP for completing focus sessions made studying feel like a game instead of a chore.", author: "Priya Sharma", role: "Data Science Student" },
 ];
 
-const TECH = [
-  { name: 'React 19', icon: '⚛️' },
-  { name: 'Next.js', icon: 'N' },
-  { name: 'FastAPI', icon: '🚀' },
-  { name: 'TypeScript', icon: 'TS' },
-  { name: 'PostgreSQL', icon: '🐘' }
+const FAQ = [
+  { q: 'What is a Digital Twin?', a: 'Your digital twin is a personal AI model that mirrors your study behaviour, strengths, and knowledge gaps. It learns from your daily check-ins and provides predictions, recommendations, and early warnings tailored to you.' },
+  { q: 'Is TwinMind free to use?', a: 'Yes. TwinMind is free for all core features including the digital twin, focus sessions, burnout detection, and gamification. Premium analytics may be offered in the future.' },
+  { q: 'How does the Burnout Guardian work?', a: 'It analyses patterns in your study hours, stress levels, and consistency over time. When it detects early signs of cognitive fatigue, it prompts you to take a break before burnout sets in.' },
+  { q: 'Can I use TwinMind for any subject?', a: 'Absolutely. TwinMind is subject-agnostic. You add your own courses and topics, and the AI adapts its recommendations to whatever you are studying.' },
+  { q: 'What data do you collect?', a: 'Only what you log: study hours, attendance, assignment completion, and stress levels. We do not track browsing, keystrokes, or any data outside the app.' },
 ];
 
+/* ── Animation variants ── */
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] } },
 };
 
-const staggerContainer = {
+const stagger = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
+  visible: { opacity: 1, transition: { staggerChildren: 0.09 } },
 };
 
+/* ═══════════════════════════════════════
+   HOME COMPONENT
+   ═══════════════════════════════════════ */
 export default function Home() {
   const { token } = useAuth();
   const [navScrolled, setNavScrolled] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setNavScrolled(window.scrollY > 20);
@@ -52,144 +65,335 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="saasable-root">
-      {/* ── NAV ── */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4 pointer-events-none">
-        <nav className={`pointer-events-auto flex items-center justify-between px-6 py-3 w-full max-w-6xl transition-all duration-300 ${navScrolled ? 'saasable-nav' : ''}`}>
-          <Link to="/" className="flex items-center gap-2 text-slate-900 no-underline font-bold text-xl">
-            <div style={{ width: 32, height: 23, overflow: 'hidden', flexShrink: 0 }}>
-              <img src="/assets/twinmind-logo.png" alt="TwinMind" style={{ width: 32, height: 'auto', display: 'block' }} />
-            </div>
+    <div className="synth-root">
+
+      {/* ═══ NAV ═══ */}
+      <div className="synth-nav-wrap">
+        <nav className={`synth-nav ${navScrolled ? 'scrolled' : ''}`}>
+          <Link to="/" className="synth-nav-logo">
+            <img src="/assets/twinmind-logo.png" alt="" />
             <span>TwinMind</span>
           </Link>
-          
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <Link to="/" className="hover:text-slate-900 transition-colors">Home</Link>
-            <Link to="/about" className="hover:text-slate-900 transition-colors">About</Link>
-            <a href="#features" className="hover:text-slate-900 transition-colors">Features</a>
-            {token && <Link to="/dashboard" className="hover:text-slate-900 transition-colors">Dashboard</Link>}
+
+          <div className="synth-nav-links">
+            <a href="#features">Features</a>
+            <a href="#how">How It Works</a>
+            <a href="#testimonials">Testimonials</a>
+            <Link to="/about">About</Link>
+            {token && <Link to="/dashboard">Dashboard</Link>}
           </div>
 
-          <div className="flex items-center gap-3">
-            <a href="https://github.com/sabarna28m/Twin_Mind" target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" /></svg>
+          <div className="synth-nav-actions">
+            <a
+              href="https://github.com/sabarna28m/Twin_Mind"
+              target="_blank"
+              rel="noreferrer"
+              className="synth-github-btn"
+              aria-label="GitHub"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3-.3 6-1.5 6-6.5a5.5 5.5 0 0 0-1.5-3.8 5.5 5.5 0 0 0-.1-3.8s-1.2-.4-3.9 1.4a13.3 13.3 0 0 0-7 0c-2.7-1.8-3.9-1.4-3.9-1.4a5.5 5.5 0 0 0-.1 3.8 5.5 5.5 0 0 0-1.5 3.8c0 5 3 6.2 6 6.5a4.8 4.8 0 0 0-1 3.2v4"/><path d="M9 22v-4a4.8 4.8 0 0 0-1-3.2"/></svg>
             </a>
             {token ? (
-              <Link to="/dashboard" className="saasable-btn-primary">Dashboard</Link>
+              <Link to="/dashboard" className="synth-btn-primary">
+                Dashboard <ArrowUpRight size={14} />
+              </Link>
             ) : (
-              <Link to="/register" className="saasable-btn-primary">Start Free</Link>
+              <Link to="/register" className="synth-btn-primary">
+                Get Started <ArrowUpRight size={14} />
+              </Link>
             )}
           </div>
         </nav>
       </div>
 
-      {/* ── HERO ── */}
-      <section className="pt-36 pb-20 px-6 text-center max-w-4xl mx-auto">
-        <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="flex flex-col items-center">
-          <motion.div variants={fadeUp} className="saasable-pill mb-8">
-            <span className="text-slate-500">Your AI Study Companion</span>
-            <span className="flex items-center gap-1 text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded-full text-xs">
-              <Sparkles className="w-3 h-3" /> Possibilities
-            </span>
+      {/* ═══ HERO ═══ */}
+      <section className="synth-hero">
+        <motion.div
+          className="synth-hero-content"
+          initial="hidden" animate="visible" variants={stagger}
+        >
+          <motion.div variants={fadeUp} className="synth-hero-eyebrow">
+            <Sparkles /> AI Learning Platform
           </motion.div>
-          
-          <motion.h1 variants={fadeUp} className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.1] mb-6">
-            Intelligent AI Platform for <br/> <span className="text-slate-700">Lifelong Learners</span>
+
+          <motion.h1 variants={fadeUp}>
+            Your Intelligent
+            <br />
+            Companion for
+            <br />
+            Modern Learning
           </motion.h1>
 
-          <motion.div variants={fadeUp} className="flex justify-center mb-6">
-            <svg width="120" height="20" viewBox="0 0 120 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-300/50">
-              <path d="M0 10C10 10 10 0 20 0C30 0 30 10 40 10C50 10 50 20 60 20C70 20 70 10 80 10C90 10 90 0 100 0C110 0 110 10 120 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </motion.div>
-
-          <motion.p variants={fadeUp} className="text-lg text-slate-500 leading-relaxed max-w-2xl mx-auto mb-10">
-            Design your optimal study routine and track your mental wellbeing with ease using our intelligent multi-agent ecosystem.
+          <motion.p variants={fadeUp} className="synth-hero-sub">
+            Streamline your study routine, predict your performance, and prevent
+            burnout with a powerful AI digital twin designed for lifelong learners.
           </motion.p>
 
-          <motion.div variants={fadeUp} className="flex flex-wrap items-center justify-center gap-4 mb-16">
-            <Link to="/register" className="saasable-btn-primary">
-              <Sparkles className="w-4 h-4" /> Start Learning
+          <motion.div variants={fadeUp} className="synth-hero-ctas">
+            <Link to="/register" className="synth-btn-primary">
+              Start Now <ArrowUpRight size={14} />
             </Link>
+            <a href="#features" className="synth-btn-secondary">
+              View Features
+            </a>
           </motion.div>
+        </motion.div>
 
-          <motion.div variants={fadeUp} className="flex flex-wrap items-center justify-center gap-3">
-            {TECH.map(t => (
-              <div key={t.name} className="saasable-pill bg-white">
-                <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold">{t.icon}</span>
-                <span className="text-slate-700 font-medium">{t.name}</span>
-              </div>
+        {/* Glassmorphic 3D visual */}
+        <motion.div
+          className="synth-hero-visual"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
+          <div className="synth-glass-orb" />
+          <div className="synth-glass-orb" />
+          <div className="synth-glass-orb" />
+        </motion.div>
+      </section>
+
+      {/* ═══ STATS STRIP ═══ */}
+      <motion.div
+        className="synth-stats"
+        initial="hidden" whileInView="visible"
+        viewport={{ once: true, margin: '-60px' }}
+        variants={stagger}
+      >
+        {[
+          { number: '10K+', label: 'Active Learners' },
+          { number: '500K+', label: 'Focus Sessions' },
+          { number: '95%', label: 'Satisfaction Rate' },
+          { number: '24/7', label: 'AI Availability' },
+        ].map(s => (
+          <motion.div key={s.label} variants={fadeUp} className="synth-stat">
+            <div className="synth-stat-number">{s.number}</div>
+            <div className="synth-stat-label">{s.label}</div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* ═══ FEATURES ═══ */}
+      <section id="features" className="synth-section">
+        <motion.div
+          initial="hidden" whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={stagger}
+        >
+          <motion.div variants={fadeUp} className="synth-section-eyebrow">Platform Capabilities</motion.div>
+          <motion.h2 variants={fadeUp} className="synth-section-title">
+            Everything you need to study smarter, not harder
+          </motion.h2>
+          <motion.p variants={fadeUp} className="synth-section-desc">
+            Six AI-powered tools that work together to optimise your learning journey from day one.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          className="synth-features-grid"
+          initial="hidden" whileInView="visible"
+          viewport={{ once: true, margin: '-40px' }}
+          variants={stagger}
+        >
+          {FEATURES.map(f => (
+            <motion.div key={f.title} variants={fadeUp} className="synth-feature-card">
+              <div className="synth-feature-icon">{f.icon}</div>
+              <div className="synth-feature-label">{f.label}</div>
+              <h3 className="synth-feature-title">{f.title}</h3>
+              <p className="synth-feature-desc">{f.desc}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* ═══ HOW IT WORKS ═══ */}
+      <section id="how" className="synth-section" style={{ borderTop: '1px solid var(--synth-gray-200)' }}>
+        <motion.div
+          className="synth-how-grid"
+          initial="hidden" whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={stagger}
+        >
+          <div>
+            <motion.div variants={fadeUp} className="synth-section-eyebrow">How It Works</motion.div>
+            <motion.h2 variants={fadeUp} className="synth-section-title">
+              Get started in three simple steps
+            </motion.h2>
+            <motion.p variants={fadeUp} className="synth-section-desc" style={{ marginBottom: 32 }}>
+              No complex setup. Sign up, log your first check-in, and let the AI do the rest.
+            </motion.p>
+            <motion.div variants={fadeUp}>
+              <Link to="/register" className="synth-btn-primary">
+                Start Now <ArrowUpRight size={14} />
+              </Link>
+            </motion.div>
+          </div>
+
+          <div className="synth-steps">
+            {STEPS.map((s, i) => (
+              <motion.div key={s.num} variants={fadeUp} className="synth-step">
+                <div className="synth-step-header">
+                  <span className="synth-step-num">{s.num}</span>
+                  <span className="synth-step-title">{s.title}</span>
+                </div>
+                <p className="synth-step-desc">{s.desc}</p>
+              </motion.div>
             ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ═══ TESTIMONIALS ═══ */}
+      <section id="testimonials" className="synth-section" style={{ background: 'var(--synth-gray-50)' }}>
+        <motion.div
+          initial="hidden" whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={stagger}
+        >
+          <motion.div variants={fadeUp} className="synth-section-eyebrow">Testimonials</motion.div>
+          <motion.h2 variants={fadeUp} className="synth-section-title">
+            Trusted by learners worldwide
+          </motion.h2>
+        </motion.div>
+
+        <motion.div
+          className="synth-testimonials-grid"
+          initial="hidden" whileInView="visible"
+          viewport={{ once: true, margin: '-40px' }}
+          variants={stagger}
+        >
+          {TESTIMONIALS.map((t, i) => (
+            <motion.div key={i} variants={fadeUp} className="synth-testimonial-card">
+              <p className="synth-testimonial-text">"{t.text}"</p>
+              <div className="synth-testimonial-author">
+                <div className="synth-testimonial-avatar">
+                  {t.author.split(' ').map(w => w[0]).join('')}
+                </div>
+                <div>
+                  <div className="synth-testimonial-name">{t.author}</div>
+                  <div className="synth-testimonial-role">{t.role}</div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* ═══ FAQ ═══ */}
+      <section className="synth-section">
+        <motion.div
+          initial="hidden" whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={stagger}
+        >
+          <motion.div variants={fadeUp} className="synth-section-eyebrow">FAQ</motion.div>
+          <motion.h2 variants={fadeUp} className="synth-section-title">
+            Frequently asked questions
+          </motion.h2>
+        </motion.div>
+
+        <div className="synth-faq-list">
+          {FAQ.map((item, i) => (
+            <div key={i} className="synth-faq-item">
+              <button
+                className="synth-faq-q"
+                aria-expanded={openFaq === i}
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+              >
+                <span>{item.q}</span>
+                <Plus size={18} />
+              </button>
+              <div className={`synth-faq-a ${openFaq === i ? 'open' : ''}`}>
+                <p>{item.a}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ CTA BANNER ═══ */}
+      <section style={{ borderTop: '1px solid var(--synth-gray-200)' }}>
+        <motion.div
+          className="synth-cta-banner"
+          initial="hidden" whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={stagger}
+        >
+          <motion.div variants={fadeUp} className="synth-section-eyebrow" style={{ textAlign: 'center' }}>
+            Ready to Start?
+          </motion.div>
+          <motion.h2 variants={fadeUp}>
+            Transform how you learn — today
+          </motion.h2>
+          <motion.div variants={fadeUp} className="synth-cta-buttons">
+            <Link to="/register" className="synth-btn-primary">
+              Start Free <ArrowUpRight size={14} />
+            </Link>
+            <Link to="/about" className="synth-btn-secondary">
+              Learn More
+            </Link>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section id="features" className="py-24 px-6 bg-white border-t border-slate-100">
-        <div className="max-w-6xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer} className="text-center mb-16">
-            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-4">
-              Comprehensive AI Toolkit Tailored to your Need
-            </motion.h2>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {FEATURES.map((f, i) => (
-              <motion.div key={f.title} variants={fadeUp} className="saasable-card">
-                <div className="saasable-icon-circle">
-                  {f.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">{f.title}</h3>
-                <p className="text-slate-500 leading-relaxed">{f.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      <section className="py-24 px-6 bg-slate-50">
-        <div className="max-w-6xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer} className="text-center mb-16">
-            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-4">
-              See What Our Students Are Saying
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-lg text-slate-500 max-w-2xl mx-auto">
-              Trusted by learners worldwide, hear how TwinMind helps bring their academic goals to life.
-            </motion.p>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t, i) => (
-              <motion.div key={i} variants={fadeUp} className="saasable-card flex flex-col h-full">
-                <div className="flex items-center gap-1 text-blue-500 mb-4">
-                  {[...Array(5)].map((_, idx) => <Star key={idx} className="w-4 h-4 fill-current" />)}
-                </div>
-                <h4 className="font-semibold text-slate-900 mb-2">Customer Support</h4>
-                <p className="text-slate-500 leading-relaxed flex-grow mb-6">"{t.text}"</p>
-                <div>
-                  <p className="font-semibold text-slate-900">{t.author}</p>
-                  <p className="text-sm text-slate-500">{t.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── FOOTER ── */}
-      <footer className="py-12 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="saasable-footer flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-500 font-medium">Copyright © 2026 TwinMind</span>
-            </div>
-            <div className="flex items-center gap-6">
-              <Link to="/about" className="text-sm text-slate-500 hover:text-slate-900 font-medium transition-colors">About Us</Link>
-              <a href="#" className="text-sm text-slate-500 hover:text-slate-900 font-medium transition-colors">Privacy Policy</a>
-              <a href="#" className="text-sm text-slate-500 hover:text-slate-900 font-medium transition-colors">Terms of Service</a>
+      {/* ═══ FOOTER ═══ */}
+      <footer className="synth-footer">
+        <div className="synth-footer-inner">
+          <div className="synth-footer-brand">
+            <Link to="/" className="synth-nav-logo" style={{ color: '#e5e5e5' }}>
+              <img
+                src="/assets/twinmind-logo.png"
+                alt=""
+                style={{ filter: 'brightness(0) invert(1)' }}
+              />
+              <span>TwinMind</span>
+            </Link>
+            <p>
+              AI-powered learning companion. Study smarter, predict performance,
+              and prevent burnout with your personal digital twin.
+            </p>
+            <div className="synth-footer-socials">
+              <a href="https://github.com/sabarna28m/Twin_Mind" target="_blank" rel="noreferrer" aria-label="GitHub">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3-.3 6-1.5 6-6.5a5.5 5.5 0 0 0-1.5-3.8 5.5 5.5 0 0 0-.1-3.8s-1.2-.4-3.9 1.4a13.3 13.3 0 0 0-7 0c-2.7-1.8-3.9-1.4-3.9-1.4a5.5 5.5 0 0 0-.1 3.8 5.5 5.5 0 0 0-1.5 3.8c0 5 3 6.2 6 6.5a4.8 4.8 0 0 0-1 3.2v4"/><path d="M9 22v-4a4.8 4.8 0 0 0-1-3.2"/></svg>
+              </a>
+              <a href="#" aria-label="Twitter"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg></a>
+              <a href="#" aria-label="LinkedIn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>
             </div>
           </div>
+
+          <div className="synth-footer-col">
+            <h4>Product</h4>
+            <ul>
+              <li><a href="#features">Features</a></li>
+              <li><a href="#how">How It Works</a></li>
+              <li><a href="#testimonials">Testimonials</a></li>
+              <li><a href="#faq">FAQ</a></li>
+            </ul>
+          </div>
+
+          <div className="synth-footer-col">
+            <h4>Platform</h4>
+            <ul>
+              <li><Link to="/register">Sign Up</Link></li>
+              <li><Link to="/login">Log In</Link></li>
+              <li><Link to="/about">About Us</Link></li>
+            </ul>
+          </div>
+
+          <div className="synth-footer-col">
+            <h4>Legal</h4>
+            <ul>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Cookie Policy</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="synth-footer-bottom">
+          <span>© {new Date().getFullYear()} TwinMind. All rights reserved.</span>
+          <a href="https://github.com/sabarna28m/Twin_Mind" target="_blank" rel="noreferrer">
+            Open Source on GitHub
+          </a>
         </div>
       </footer>
     </div>
