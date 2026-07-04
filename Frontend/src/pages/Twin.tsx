@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -283,6 +283,8 @@ const TAB_CONFIG = {
 type TabDays = 30 | 60 | 90;
 
 function FutureTwinCard({ twin }: { twin: TwinState }) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const [activeTab, setActiveTab] = useState<TabDays>(30);
   const prevFt = useRef<FutureTwin | null>(null);
 
@@ -304,8 +306,17 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
     { label: 'Consistency', cur: twin.consistency_score, fut: ft.consistency_score, grad: SCORE_GRADS[3] },
   ];
 
+  const glassStyle = {
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+  };
+
   return (
-    <div style={{ ...s.card, ...s.fullWidth, padding: '1.25rem 1.5rem' }}>
+    <div className="synth-hover-card" style={{ ...s.card, ...s.fullWidth, padding: '1.25rem 1.5rem', ...glassStyle }}>
       {/* Header row with tabs */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.1rem', flexWrap: 'wrap', gap: '0.6rem' }}>
         <h3 style={{ ...s.cardTitle, marginBottom: 0 }}>Future Twin</h3>
@@ -478,6 +489,17 @@ function HeatBar({ label, value, desc }: { label: string; value: number; desc: s
 
 // ── Main Evolution Dashboard ───────────────────────────────────────────
 function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
+  const glassStyle = {
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+  };
+
   const [activeLayers, setActiveLayers] = useState<Set<LayerKey>>(
     new Set(LAYERS.map(l => l.key))
   );
@@ -505,7 +527,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
   return (
     <>
       {/* ── 1. Twin Intelligence Score header ── */}
-      <div style={{ ...s.card, ...s.fullWidth, padding: '1.5rem' }}>
+      <div className="synth-hover-card" style={{ ...s.card, ...s.fullWidth, padding: '1.5rem', ...glassStyle }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
           <span style={{ fontSize: '1.1rem' }}>◈</span>
           <h3 style={{ ...s.cardTitle, marginBottom: 0 }}>Digital Twin Evolution Dashboard</h3>
@@ -579,7 +601,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
       </div>
 
       {/* ── 2. Multi-layer evolution graph ── */}
-      <div style={{ ...s.card, ...s.fullWidth }}>
+      <div className="synth-hover-card" style={{ ...s.card, ...s.fullWidth, ...glassStyle }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
             <h3 style={{ ...s.cardTitle, marginBottom: '0.2rem' }}>Multi-Layer Evolution Graph</h3>
@@ -656,7 +678,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
       <div style={{ ...s.fullWidth, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="mob-twin-row">
 
         {/* Timeline */}
-        <div style={s.card}>
+        <div className="synth-hover-card" style={{ ...s.card, ...glassStyle }}>
           <h3 style={s.cardTitle}>Evolution Timeline</h3>
           {twin.evolution_timeline.length === 0 ? (
             <p style={{ color: '#64748b', fontSize: '0.82rem' }}>Log more check-ins to build your evolution story.</p>
@@ -684,7 +706,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
         </div>
 
         {/* Cognitive Heatmap */}
-        <div style={s.card}>
+        <div className="synth-hover-card" style={{ ...s.card, ...glassStyle }}>
           <div style={{ marginBottom: '1rem' }}>
             <h3 style={{ ...s.cardTitle, marginBottom: '0.2rem' }}>Cognitive Heatmap</h3>
             <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b' }}>
@@ -715,7 +737,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
 
       {/* ── 4. AI Insights ── */}
       {twin.ai_insights.length > 0 && (
-        <div style={{ ...s.card, ...s.fullWidth }}>
+        <div className="synth-hover-card" style={{ ...s.card, ...s.fullWidth, ...glassStyle }}>
           <div style={{ marginBottom: '1rem' }}>
             <h3 style={{ ...s.cardTitle, marginBottom: '0.2rem' }}>AI Twin Insights</h3>
             <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b' }}>
@@ -736,7 +758,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
       )}
 
       {/* ── 5. Twin Evolution Explanation card ── */}
-      <div style={{ ...s.card, ...s.fullWidth }}>
+      <div className="synth-hover-card" style={{ ...s.card, ...s.fullWidth, ...glassStyle }}>
         <h3 style={{ ...s.cardTitle, marginBottom: '1rem' }}>What These Metrics Mean</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0.7rem' }} className="mob-twin-row">
           {[
@@ -789,6 +811,17 @@ function TwinFidelityBanner({
   learningData: LearningEntry[];
   progress: import('../utils/gamification').GamificationProgress | null;
 }) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
+  const glassStyle = {
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+  };
+
   const knowledgeFid = subjects ? Math.min(95, 55 + (subjects.strongest ? 15 : 0) + (subjects.weakest ? 15 : 0)) : 18;
   const behaviorFid  = Math.min(95, 25 + learningData.length * 2.8);
   const predFid      = twin.prediction_reliability;
@@ -807,7 +840,7 @@ function TwinFidelityBanner({
   const fidelityColor = overall >= 80 ? '#10b981' : overall >= 55 ? '#f59e0b' : '#ef4444';
 
   return (
-    <div style={{ ...x.card, ...x.fullWidth, padding: '1.25rem 1.5rem' }}>
+    <div className="synth-hover-card" style={{ ...x.card, ...x.fullWidth, padding: '1.25rem 1.5rem', ...glassStyle }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
         {/* Overall score */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
@@ -872,6 +905,17 @@ function ExtendedModelsSection({
   streakData: StreakStatus | null;
   progress: import('../utils/gamification').GamificationProgress | null;
 }) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
+  const glassStyle = {
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+  };
+
   const [tab, setTab] = useState<ModelTab>('knowledge');
 
   const tabs: { key: ModelTab; label: string; icon: string; color: string }[] = [
@@ -954,7 +998,7 @@ function ExtendedModelsSection({
   const activeColor = tabs.find(t => t.key === tab)?.color ?? '#6366f1';
 
   return (
-    <div style={{ ...x.card, ...x.fullWidth }}>
+    <div className="synth-hover-card" style={{ ...x.card, ...x.fullWidth, ...glassStyle }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
         <span style={{ fontSize: '1rem' }}></span>
         <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Twin Model Analytics</h3>
@@ -1197,6 +1241,17 @@ function PredictionCenterSection({
   burnout: BurnoutData | null;
   streakData: StreakStatus | null;
 }) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
+  const glassStyle = {
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+  };
+
   const streakDays = streakData?.streak_days ?? 0;
   const streakProb = Math.min(98, 50 + streakDays * 2);
   const syllabusProb = Math.round(twin.consistency_score * 0.85);
@@ -1220,7 +1275,7 @@ function PredictionCenterSection({
   ];
 
   return (
-    <div style={{ ...x.card, ...x.fullWidth }}>
+    <div className="synth-hover-card" style={{ ...x.card, ...x.fullWidth, ...glassStyle }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
         <span style={{ fontSize: '1rem' }}></span>
         <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Predictive AI Engine</h3>
@@ -1262,6 +1317,17 @@ function AskMyTwinSection({
   learningData: LearningEntry[];
   streakData: StreakStatus | null;
 }) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
+  const glassStyle = {
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+  };
+
   const [input,    setInput]    = useState('');
   const [messages, setMessages] = useState<{ q: string; a: string }[]>([]);
   const [thinking, setThinking] = useState(false);
@@ -1353,7 +1419,7 @@ function AskMyTwinSection({
   }
 
   return (
-    <div style={{ ...x.card, ...x.fullWidth }}>
+    <div className="synth-hover-card" style={{ ...x.card, ...x.fullWidth, ...glassStyle }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
         <span style={{ fontSize: '1rem' }}>◈</span>
         <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Ask My Twin — What-If Simulator</h3>

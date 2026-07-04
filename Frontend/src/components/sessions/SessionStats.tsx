@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Clock, CheckCircle, BarChart2, Flame, Trophy, Target } from 'lucide-react';
 import type { Session } from '../../types/sessions';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface Props { sessions: Session[]; }
 
@@ -42,6 +43,8 @@ function computeLongestStreak(sessions: Session[]): number {
 }
 
 export default function SessionStats({ sessions }: Props) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const completed  = sessions.filter(s => s.status === 'completed');
   const totalMins  = sessions.reduce((a, s) => a + (s.duration_minutes || 0), 0);
   const totalHours = (totalMins / 60).toFixed(1);
@@ -61,12 +64,14 @@ export default function SessionStats({ sessions }: Props) {
     { icon: <Target size={18} />,      value: `${compRate}%`, unit: '', label: 'Completion',   color: '#34d399' },
   ];
 
+  const s = getStyles(isDark);
+
   return (
     <div style={s.wrap}>
       <p style={s.heading}>Your Stats</p>
       <div style={s.grid}>
         {stats.map(st => (
-          <div key={st.label} style={s.cell} className="glass-panel">
+          <div key={st.label} style={s.cell} className="synth-hover-card">
             <span style={{ ...s.icon, display: 'flex', color: st.color }}>{st.icon}</span>
             <p style={{ ...s.val, color: st.color }}>{st.value}{st.unit}</p>
             <p style={s.lbl}>{st.label}</p>
@@ -77,17 +82,22 @@ export default function SessionStats({ sessions }: Props) {
   );
 }
 
-const s: Record<string, React.CSSProperties> = {
+function getStyles(isDark: boolean): Record<string, React.CSSProperties> {
+  return {
   wrap:    { display: 'flex', flexDirection: 'column', gap: '0.75rem' },
   heading: { margin: 0, fontSize: '0.78rem', fontWeight: 700, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.08em' },
   grid:    { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' },
   cell:    {
-    padding: '0.85rem 0.65rem', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', textAlign: 'center',
-    background: 'rgba(10,16,32,0.75)', border: '1px solid #e2e8f0',
-    backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+    padding: '0.85rem 0.65rem', borderRadius: '24px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)', textAlign: 'center',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.18rem',
   },
   icon: { fontSize: '1.1rem', lineHeight: 1 },
   val:  { margin: 0, fontSize: '1.3rem', fontWeight: 800, lineHeight: 1.1 },
-  lbl:  { margin: 0, fontSize: '0.6rem', color: '#475569', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' },
-};
+  lbl:  { margin: 0, fontSize: '0.6rem', color: isDark ? '#475569' : 'var(--text)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' },
+  };
+}

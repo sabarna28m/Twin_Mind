@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Square, RotateCcw, Zap } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import api from '../../services/api';
 import type { Session } from '../../types/sessions';
 
@@ -93,6 +94,8 @@ function TimeField({ label, value, max, disabled, onChange }: TimeFieldProps) {
 
 export default function SessionTimer({ subjects, onComplete }: Props) {
   const { token } = useAuth();
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const headers = { Authorization: `Bearer ${token}` };
 
   const [sessionTitle, setSessionTitle] = useState('');
@@ -224,9 +227,10 @@ export default function SessionTimer({ subjects, onComplete }: Props) {
   const displayTime = isActive || status === 'completed'
     ? `${pad(rH)}:${pad(rM)}:${pad(rS)}`
     : `${pad(inputH)}:${pad(inputM)}:${pad(inputS)}`;
+  const s = getStyles(isDark);
 
   return (
-    <div style={s.card} className="glass-panel stat-card-premium">
+    <div style={s.card} className="synth-hover-card stat-card-premium">
       {/* Ambient orbs */}
       <div style={s.orb1} /><div style={s.orb2} />
 
@@ -375,14 +379,17 @@ const tf: Record<string, React.CSSProperties> = {
   input: { width: '56px', textAlign: 'center', padding: '0.38rem 0.2rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '9px', color: 'var(--text-h)', fontSize: '1.2rem', fontWeight: 700, fontFamily: 'ui-monospace,Consolas,monospace', outline: 'none' },
 };
 
-const s: Record<string, React.CSSProperties> = {
+function getStyles(isDark: boolean): Record<string, React.CSSProperties> {
+  return {
   card: {
     position: 'relative', overflow: 'hidden',
-    background: 'rgba(10,16,32,0.82)',
-    border: '1px solid rgba(0,212,255,0.12)',
-    borderRadius: '22px', padding: '1.5rem 1.25rem',
-    backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
-    boxShadow: '0 8px 48px rgba(0,0,0,0.1)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+    borderRadius: '24px', padding: '1.5rem 1.25rem',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.1rem',
   },
   orb1: { position: 'absolute', top: '-50px', right: '-50px', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 70%)', pointerEvents: 'none' },
@@ -454,5 +461,6 @@ const s: Record<string, React.CSSProperties> = {
   },
   coachName: { margin: 0, fontSize: '0.78rem', fontWeight: 700, color: '#334155' },
   coachDot:  { display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', marginLeft: '0.3rem' },
-  coachMsg:  { margin: 0, fontSize: '0.78rem', color: 'rgba(226,232,240,0.82)', lineHeight: 1.55, fontStyle: 'italic' },
-};
+  coachMsg:  { margin: 0, fontSize: '0.78rem', color: isDark ? 'rgba(226,232,240,0.82)' : 'var(--text-m)', lineHeight: 1.55, fontStyle: 'italic' },
+  };
+}

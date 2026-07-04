@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -95,6 +95,8 @@ const nb: Record<string, React.CSSProperties> = {
 
 // ── Next Goal Panel ─────────────────────────────────────────────────────────────
 function NextGoalPanel({ badges }: { badges: Achievement[] }) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const candidates = useMemo(() =>
     badges
       .filter(b => !b.earned && !b.hidden && b.progress_target > 1 && b.progress_current > 0)
@@ -106,7 +108,15 @@ function NextGoalPanel({ badges }: { badges: Achievement[] }) {
   if (!candidates.length) return null;
 
   return (
-    <div style={ng.wrap}>
+    <div className="synth-hover-card" style={{
+      ...ng.wrap,
+      boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+      background: isDark
+        ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+        : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+      backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+      border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+    }}>
       <p style={ng.title}> Next Goals</p>
       <div style={ng.list}>
         {candidates.map(b => {
@@ -154,6 +164,8 @@ const ng: Record<string, React.CSSProperties> = {
 
 // ── Badge Card ──────────────────────────────────────────────────────────────────
 function BadgeCard({ badge, isNew }: { badge: Achievement; isNew: boolean }) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const rm  = RARITY_META[badge.rarity] ?? RARITY_META.common;
   const cm  = CATEGORY_META[badge.category] ?? CATEGORY_META.onboarding;
   const isSecret = badge.hidden && !badge.earned;
@@ -167,14 +179,26 @@ function BadgeCard({ badge, isNew }: { badge: Achievement; isNew: boolean }) {
     badge.earned && badge.rarity === 'epic' ? 'epic-earned' : '',
   ].filter(Boolean).join(' ') || undefined;
 
+  const glassStyle = {
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+  };
+
   return (
     <div
-      className={cardClass}
+      className={cardClass ? `${cardClass} synth-hover-card` : 'synth-hover-card'}
       style={{
         ...bc.card,
+        ...glassStyle,
         ...(badge.earned ? {
-          borderColor: rm.color + '55',
-          background: `linear-gradient(145deg, ${rm.color}12 0%, ${rm.color}05 100%)`,
+          borderColor: rm.color + (isDark ? '60' : '80'),
+          background: isDark
+            ? `linear-gradient(145deg, ${rm.color}15 0%, ${rm.color}05 100%), rgba(15,23,42,0.65)`
+            : `linear-gradient(145deg, ${rm.color}25 0%, ${rm.color}10 100%), rgba(255,255,255,0.55)`,
         } : isSecret ? bc.secret : bc.locked),
       }}
     >
@@ -420,7 +444,15 @@ export default function Achievements() {
 
           {/* ── Completion chip ── */}
           {!loading && (
-            <div style={s.completionCard}>
+            <div style={{
+              ...s.completionCard,
+              boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+              background: isDark
+                ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+                : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+              backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+              border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+            }} className="synth-hover-card">
               <div style={s.completionMain}>
                 <span style={s.completionNum}>{earnedCount}</span>
                 <span style={s.completionOf}>/ {totalCount}</span>

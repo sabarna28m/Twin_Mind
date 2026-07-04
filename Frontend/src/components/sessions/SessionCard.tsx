@@ -1,5 +1,6 @@
 import { Trash2, Clock, CheckCircle, Circle } from 'lucide-react';
 import type { Session } from '../../types/sessions';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface Props {
   session: Session;
@@ -22,12 +23,15 @@ function formatDuration(mins: number) {
 }
 
 export default function SessionCard({ session, onToggle, onDelete, index = 0 }: Props) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   const done = session.status === 'completed';
+  const s = getStyles(isDark);
 
   return (
     <div
-      style={{ ...s.card, animationDelay: `${index * 0.04}s`, borderColor: done ? 'rgba(16,185,129,0.15)' : '#e2e8f0' }}
-      className="animate-fade-in glass-panel"
+      style={{ ...s.card, animationDelay: `${index * 0.04}s`, borderColor: done ? (isDark ? 'rgba(16,185,129,0.3)' : 'rgba(16,185,129,0.4)') : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)') }}
+      className="animate-fade-in synth-hover-card"
     >
       {/* Left: status toggle */}
       <button
@@ -44,7 +48,7 @@ export default function SessionCard({ session, onToggle, onDelete, index = 0 }: 
 
       {/* Middle: info */}
       <div style={s.info}>
-        <p style={{ ...s.title, textDecoration: done ? 'none' : undefined, color: done ? 'rgba(226,232,240,0.75)' : 'var(--text-h)' }}>
+        <p style={{ ...s.title, textDecoration: done ? 'none' : undefined, color: done ? (isDark ? 'rgba(226,232,240,0.5)' : 'rgba(0,0,0,0.5)') : 'var(--text-h)' }}>
           {session.title}
         </p>
         <div style={s.meta}>
@@ -79,14 +83,17 @@ export default function SessionCard({ session, onToggle, onDelete, index = 0 }: 
   );
 }
 
-const s: Record<string, React.CSSProperties> = {
+function getStyles(isDark: boolean): Record<string, React.CSSProperties> {
+  return {
   card: {
     display: 'flex', alignItems: 'center', gap: '0.85rem',
-    padding: '0.95rem 1.1rem', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
-    background: 'rgba(10,16,32,0.7)',
-    border: '1px solid',
-    backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-    transition: 'border-color 0.2s, background 0.2s',
+    padding: '0.95rem 1.1rem', borderRadius: '24px', boxShadow: isDark ? '0 4px 16px rgba(0,0,0,0.3)' : '0 4px 16px rgba(0, 212, 255, 0.05)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(255, 255, 255, 0.55)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    transition: 'border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s',
   },
   statusBtn: {
     background: 'none', border: 'none', cursor: 'pointer', padding: '0.1rem',
@@ -127,4 +134,5 @@ const s: Record<string, React.CSSProperties> = {
     borderRadius: '7px', display: 'flex', alignItems: 'center',
     transition: 'color 0.18s', fontFamily: 'inherit',
   },
-};
+  };
+}

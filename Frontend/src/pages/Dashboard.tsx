@@ -125,8 +125,8 @@ function StudyAreaChart({ data }: { data: { date: string; hours: number; label: 
       <svg viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: '100%' }} preserveAspectRatio="xMidYMid meet">
         <defs>
           <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#0a0a0a" stopOpacity="0.1" />
-            <stop offset="100%" stopColor="#0a0a0a" stopOpacity="0.0" />
+            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.0" />
           </linearGradient>
         </defs>
         {/* Grid lines */}
@@ -142,11 +142,11 @@ function StudyAreaChart({ data }: { data: { date: string; hours: number; label: 
         {/* Area */}
         <path d={areaPath} fill="url(#areaGrad)" />
         {/* Line */}
-        <path d={linePath} fill="none" stroke="#0a0a0a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={linePath} fill="none" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         {/* Dots */}
         {points.map((p, i) => (
           <g key={i}>
-            <circle cx={p.x} cy={p.y} r="4" style={{ fill: 'var(--ui-surface)', stroke: '#0a0a0a' }} strokeWidth="2" />
+            <circle cx={p.x} cy={p.y} r="4" style={{ fill: 'var(--ui-surface)', stroke: '#38bdf8' }} strokeWidth="2" />
             <text x={p.x} y={py + chartH + 16} textAnchor="middle" fontSize="11" style={{ fill: 'var(--ui-text-muted)' }} fontWeight="500">{data[i].label}</text>
           </g>
         ))}

@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -133,8 +133,17 @@ function HeatmapCell({ s, onClick }: { s: SubjectSummary; onClick: () => void })
 function DetectionCard({ icon, label, subject, score, detail, color }: {
   icon: string; label: string; subject?: string; score?: number; detail: string; color: string;
 }) {
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   return (
-    <div style={{ ...dc.card, borderColor: `${color}60`, background: `${color}18` }}>
+    <div className="synth-hover-card" style={{
+      ...dc.card,
+      borderColor: `${color}60`,
+      background: isDark
+        ? `linear-gradient(135deg, ${color}15 0%, ${color}05 100%), rgba(15, 23, 42, 0.65)`
+        : `linear-gradient(135deg, ${color}20 0%, ${color}10 100%), rgba(255, 255, 255, 0.55)`,
+      backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    }}>
       <div style={{ ...dc.iconBox, background: `${color}22`, color }}>{icon}</div>
       <p style={{ ...dc.label, color: `${color}cc` }}>{label}</p>
       {subject && <p style={{ ...dc.subject, color }}>{subject}</p>}
@@ -498,6 +507,15 @@ export default function SubjectAnalysis() {
   const { colorScheme } = useTheme();
   const isDark = colorScheme === 'dark';
   const profileSubjects = studentProfile?.subjects ?? [];
+  const pCardStyle: React.CSSProperties = {
+    ...p.card,
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+    backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+  };
   const [analysis, setAnalysis]         = useState<Analysis | null>(null);
   const [loading, setLoading]           = useState(true);
   const [selected, setSelected]         = useState<SubjectSummary | null>(null);
@@ -597,7 +615,7 @@ export default function SubjectAnalysis() {
         ) : analysis && withData.length > 0 ? (
           <>
             {/* ── AI SUMMARY CARD ── */}
-            <section style={{ background: 'var(--bg-elevated)', border: '1.5px solid rgba(99,102,241,0.28)', borderRadius: '20px', padding: '1.75rem', backdropFilter: 'blur(32px)', boxShadow: 'var(--glow-card)', position: 'relative', overflow: 'hidden' }}>
+            <section className="synth-hover-card" style={{ ...pCardStyle, border: '1.5px solid rgba(99,102,241,0.28)', padding: '1.75rem', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 0% 0%, rgba(99,102,241,0.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.9rem' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'rgba(99,102,241,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.95rem' }}>◈</div>
@@ -615,7 +633,7 @@ export default function SubjectAnalysis() {
             </section>
 
             {/* ── SUBJECT OVERVIEW ── */}
-            <section style={p.card}>
+            <section style={pCardStyle} className="synth-hover-card">
               <h2 style={{ ...p.cardTitle, marginBottom: '1.1rem' }}> Subject Overview</h2>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '1rem' }}>
                 {withData.map(s => {
@@ -687,7 +705,7 @@ export default function SubjectAnalysis() {
             </div>
 
             {/* ── SUBJECT PRIORITY RANKING ── */}
-            <section style={p.card}>
+            <section style={pCardStyle} className="synth-hover-card">
               <h2 style={p.cardTitle}> Subject Priority Ranking</h2>
               <p style={{ margin: '-0.4rem 0 0.9rem', fontSize: '0.78rem', color: 'var(--text-m)', lineHeight: 1.5 }}>AI-ranked by current score, days since last revision, quiz accuracy, focus time, and Digital Twin prediction.</p>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.45rem', marginTop: '0.85rem' }}>
@@ -715,7 +733,7 @@ export default function SubjectAnalysis() {
             </section>
 
             {/* ── Subject Heatmap ── */}
-            <section style={p.card}>
+            <section style={pCardStyle} className="synth-hover-card">
               <div style={p.cardHead}>
                 <h2 style={p.cardTitle}> Subject Heatmap</h2>
                 <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' as const }}>
@@ -734,7 +752,7 @@ export default function SubjectAnalysis() {
             </section>
 
             {/* ── Trend Chart ── */}
-            <section style={p.card}>
+            <section style={pCardStyle} className="synth-hover-card">
               <div style={p.cardHead}>
                 <h2 style={p.cardTitle}> Performance Trend</h2>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' as const }}>
@@ -803,7 +821,7 @@ export default function SubjectAnalysis() {
             )}
 
             {/* ── TREND ANALYSIS ── */}
-            <section style={p.card}>
+            <section style={pCardStyle} className="synth-hover-card">
               <h2 style={p.cardTitle}> Trend Analysis</h2>
               <p style={{ margin: '-0.4rem 0 1rem', fontSize: '0.78rem', color: '#64748b' }}>Score change from previous record to current performance.</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '0.85rem' }}>
@@ -846,7 +864,7 @@ export default function SubjectAnalysis() {
             </section>
 
             {/* ── DIGITAL TWIN IMPACT ── */}
-            <section style={{ background: 'rgba(4,8,22,0.93)', border: '1.5px solid rgba(99,102,241,0.25)', borderRadius: '20px', padding: '1.75rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', position: 'relative', overflow: 'hidden' }}>
+            <section className="synth-hover-card" style={{ ...pCardStyle, border: '1.5px solid rgba(99,102,241,0.25)', padding: '1.75rem', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 100% 100%, rgba(99,102,241,0.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
                 <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(99,102,241,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>◈</div>
@@ -897,7 +915,7 @@ export default function SubjectAnalysis() {
 
             {/* ── Action Plans ── */}
             {Object.keys(analysis.action_plans).length > 0 && (
-              <section style={p.card}>
+              <section style={pCardStyle} className="synth-hover-card">
                 <h2 style={p.cardTitle}> AI Recovery Plans</h2>
                 <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.65rem', marginTop: '0.85rem' }}>
                   {Object.entries(analysis.action_plans).map(([subj, plan]) => {
@@ -961,7 +979,7 @@ export default function SubjectAnalysis() {
 
         {/* ── Records List ── always shown when there are records */}
         {records.length > 0 && (
-          <section style={p.card}>
+          <section style={pCardStyle} className="synth-hover-card">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem', flexWrap: 'wrap' as const, gap: '0.5rem' }}>
               <h2 style={{ ...p.cardTitle, margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}><FileText size={16} /> All Records ({records.length})</h2>
               <button style={p.addBtn} onClick={() => setShowAdd(true)}>+ Add Record</button>

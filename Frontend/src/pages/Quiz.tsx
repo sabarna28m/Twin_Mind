@@ -29,6 +29,7 @@ export default function Quiz() {
   ];
 
   const currentTabLabel = TABS.find(tb => tb.key === tab)?.label ?? t('quiz_tab_modes');
+  const s = getStyles(isDark);
 
   return (
     <div className={isDark ? 'assessment-dark' : 'assessment-light'} style={s.shell}>
@@ -96,7 +97,7 @@ export default function Quiz() {
             <p style={s.sectionLabel}>{t('quiz_choose_type')}</p>
             <div style={s.modesGrid}>
               {/* Practice Quiz */}
-              <button onClick={() => setView('practice')} style={s.modeCard}>
+              <button onClick={() => setView('practice')} style={s.modeCard} className="synth-hover-card">
                 <div style={s.modeCardGlow} />
                 <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}><BookOpen size={22} color="#fff" /></div>
                 <p style={s.modeTitle}>{t('quiz_practice_title')}</p>
@@ -115,7 +116,7 @@ export default function Quiz() {
               </button>
 
               {/* Focus Mode */}
-              <button onClick={() => setView('focus')} style={{ ...s.modeCard, borderColor: 'var(--border)' }}>
+              <button onClick={() => setView('focus')} style={s.modeCard} className="synth-hover-card">
                 <div style={{ ...s.modeCardGlow, background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 65%)' }} />
                 <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#00D4FF,#7c3aed)' }}><Eye size={22} color="#fff" /></div>
                 <p style={{ ...s.modeTitle, color: 'var(--accent)' }}>{t('quiz_focus_title')}</p>
@@ -141,8 +142,8 @@ export default function Quiz() {
                 { icon: <BookOpen size={22} />, label: 'Upload, analyze & generate quizzes from study materials', tab: 'resources' as Tab, color: '#10b981' },
                 { icon: <FileText size={22} />, label: 'Analyze exam paper patterns & generate new papers',       tab: 'papers'    as Tab, color: '#f59e0b' },
               ].map(item => (
-                <button key={item.tab} onClick={() => setTab(item.tab)} style={{
-                  ...s.quickCard, borderColor: `${item.color}30`,
+                <button key={item.tab} onClick={() => setTab(item.tab)} className="synth-hover-card" style={{
+                  ...s.quickCard, border: isDark ? `1px solid ${item.color}30` : `1px solid rgba(255,255,255,0.5)`,
                 }}>
                   <span style={{ display: 'flex', alignItems: 'center', color: item.color }}>{item.icon}</span>
                   <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 600,
@@ -165,7 +166,8 @@ export default function Quiz() {
   );
 }
 
-const s: Record<string, React.CSSProperties> = {
+function getStyles(isDark: boolean): Record<string, React.CSSProperties> {
+  return {
   shell: {
     minHeight: '100svh', background: 'var(--bg)',
     display: 'flex', flexDirection: 'column', fontFamily: 'var(--sans)',
@@ -223,9 +225,15 @@ const s: Record<string, React.CSSProperties> = {
   modeCard: {
     position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
     gap: '0.6rem', padding: '1.5rem 1.25rem',
-    background: 'var(--bg-elevated)', border: '1px solid var(--border)',
-    borderRadius: '24px', boxShadow: 'var(--glow-card)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const,
-    transition: 'border-color 0.2s, transform 0.15s', overflow: 'hidden',
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+    borderRadius: '24px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)', 
+    cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const,
+    overflow: 'hidden',
   },
   modeCardGlow: {
     position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -250,8 +258,16 @@ const s: Record<string, React.CSSProperties> = {
   quickRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.6rem' },
   quickCard: {
     display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.45rem',
-    padding: '0.9rem 1rem', background: 'var(--bg-elevated)', border: '1px solid var(--border)',
-    borderRadius: '24px', boxShadow: 'var(--glow-card)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const,
-    transition: 'background 0.18s', minHeight: '110px',
+    padding: '0.9rem 1rem', 
+    background: isDark
+      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
+    backdropFilter: 'blur(24px) saturate(150%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(150%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+    borderRadius: '24px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' as const,
+    minHeight: '110px',
   },
-};
+  };
+}
