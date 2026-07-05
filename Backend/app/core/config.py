@@ -6,11 +6,8 @@ class Settings(BaseSettings):
     debug: bool = False
     api_v1_prefix: str = "/api/v1"
 
-    # CORS — comma-separated in env: CORS_ORIGINS=https://twinmind.vercel.app,http://localhost:5173
-    cors_origins: list[str] = [
-        "http://localhost:5173",
-        "http://localhost:5174",
-    ]
+    # CORS — comma-separated in env: CORS_ORIGINS=["*"]
+    cors_origins: list[str] = ["*"]
 
     # Supabase PostgreSQL connection string
     # Get from: Supabase Dashboard → Settings → Database → Transaction pooler
