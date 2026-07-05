@@ -240,8 +240,8 @@
 
 .synth-hero-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
+  grid-template-columns: 1fr;
+  text-align: center;
   align-items: center;
 }
 
@@ -263,6 +263,12 @@
   display: flex;
   gap: 16px;
   margin-top: 40px;
+  justify-content: center;
+}
+
+.synth-hero-content .synth-lead {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* HERO MOCKUP VISUAL */

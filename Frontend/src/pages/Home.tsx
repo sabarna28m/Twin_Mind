@@ -104,9 +104,7 @@ export default function Home() {
               initial="hidden" animate="visible" variants={stagger}
             >
               <div className="synth-hero-content">
-                <motion.div variants={fadeUp} className="synth-pill">
-                  <span>TwinMind AI Platform</span>
-                </motion.div>
+
                 
                 <motion.h1 variants={fadeUp} className="synth-display">
                   Your Intelligent<br />
@@ -129,29 +127,7 @@ export default function Home() {
                 </motion.div>
               </div>
 
-              <motion.div 
-                className="synth-hero-visual"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="synth-mockup">
-                  <div className="synth-mockup-header">
-                    <span className="synth-dot"></span>
-                    <span className="synth-dot"></span>
-                    <span className="synth-dot"></span>
-                  </div>
-                  <div className="synth-mockup-body">
-                    {/* Placeholder for dashboard visual */}
-                    <div className="synth-mockup-line"></div>
-                    <div className="synth-mockup-line short"></div>
-                    <div className="synth-mockup-grid">
-                      <div className="synth-mockup-box"></div>
-                      <div className="synth-mockup-box"></div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+
             </motion.div>
           </div>
         </section>
