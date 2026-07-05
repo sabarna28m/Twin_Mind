@@ -110,7 +110,7 @@ const s: Record<string, React.CSSProperties> = {
     width: '220px', height: '220px', borderRadius: '50%', pointerEvents: 'none',
   },
   iconWrap: {
-    width: '52px', height: '52px', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+    width: '52px', height: '52px', borderRadius: '24px',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     boxShadow: '0 4px 16px rgba(0,0,0,0.35)', flexShrink: 0,
   },

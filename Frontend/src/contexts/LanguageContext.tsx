@@ -215,7 +215,7 @@ const T: Record<LangCode, Translations> = {
     simulate_subtitle_nodata: 'No check-in data — using defaults. Complete a check-in for a personalised baseline.',
     simulate_card_hint: 'Drag sliders to explore "what if" changes',
     simulate_study_day: 'Study Hours / day', simulate_sleep_h: 'Sleep Duration',
-    simulate_score_compare: 'Score Comparison', simulate_running: 'Running simulation…',
+    simulate_score_compare: 'Score Comparison',
     simulate_whatif: 'What-If', simulate_impact_break: 'Impact Breakdown',
     simulate_impact_desc: 'How each factor contributes to the What-If score',
     simulate_whatif_recs: 'What-If Recommendations',
@@ -264,7 +264,7 @@ const T: Record<LangCode, Translations> = {
   hi: {
     nav_sessions: 'सत्र', nav_notes: 'नोट्स', nav_materials: 'सामग्री',
     nav_progress: 'प्रगति', nav_checkin: 'चेक-इन', nav_achievements: 'उपलब्धियां',
-    nav_quiz: 'क्विज़', nav_simulate: 'सिमुलेट', nav_mentor: 'मेंटर', nav_twin: 'ट्विन', nav_career: 'करिअर', nav_comm_twin: 'संवाद', nav_career: 'करियर', nav_comm_twin: 'कम्युनिकेशन',
+    nav_quiz: 'क्विज़', nav_simulate: 'सिमुलेट', nav_mentor: 'मेंटर', nav_twin: 'ट्विन', nav_career: 'करियर', nav_comm_twin: 'कम्युनिकेशन',
     sign_out: 'साइन आउट', loading: 'लोड हो रहा है…', live: 'लाइव',
     save: 'सहेजें', cancel: 'रद्द करें', delete: 'हटाएं', close: 'बंद करें',
     back_dashboard: '← डैशबोर्ड',
@@ -862,7 +862,7 @@ const T: Record<LangCode, Translations> = {
   mr: {
     nav_sessions: 'सत्रे', nav_notes: 'नोट्स', nav_materials: 'साहित्य',
     nav_progress: 'प्रगती', nav_checkin: 'चेक-इन', nav_achievements: 'उपलब्धी',
-    nav_quiz: 'प्रश्नमंजुषा', nav_simulate: 'अनुकरण', nav_mentor: 'मार्गदर्शक', nav_twin: 'ट्विन', nav_career: 'करिअर', nav_comm_twin: 'संवाद', nav_career: 'करियर', nav_comm_twin: 'कम्युनिकेशन',
+    nav_quiz: 'प्रश्नमंजुषा', nav_simulate: 'अनुकरण', nav_mentor: 'मार्गदर्शक', nav_twin: 'ट्विन', nav_career: 'करिअर', nav_comm_twin: 'संवाद',
     sign_out: 'साइन आउट', loading: 'लोड होत आहे…', live: 'लाइव्ह',
     save: 'जतन करा', cancel: 'रद्द करा', delete: 'हटवा', close: 'बंद करा',
     back_dashboard: '← डॅशबोर्ड',

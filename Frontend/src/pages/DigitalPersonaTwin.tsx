@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -1442,10 +1442,6 @@ export default function DigitalPersonaTwin() {
    SHARED STYLE TOKENS
 ═══════════════════════════════════════════════════════════════════════ */
 const C: React.CSSProperties = {
-  background: '#ffffff',
-  border: '1px solid #e2e8f0',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.04)',
-  borderRadius: '24px',
   background:'rgba(8,12,30,0.82)', border:'1px solid rgba(255,255,255,0.14)',
   borderRadius:20, padding:'1.6rem', backdropFilter:'blur(10px)',
   boxShadow:'0 4px 24px rgba(0,0,0,0.6)',

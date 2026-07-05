@@ -1,4 +1,4 @@
-﻿import type { IntegrityWarning } from '../../services/integrityEngine';
+import type { IntegrityWarning } from '../../services/integrityEngine';
 import { MAX_WARNINGS } from '../../services/integrityEngine';
 
 interface Props {
@@ -111,7 +111,7 @@ const w: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'flex-start', gap: '0.65rem',
     padding: '0.85rem 1rem',
     background: 'rgba(10,16,32,0.95)', backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(239,68,68,0.35)', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+    border: '1px solid rgba(239,68,68,0.35)', borderRadius: '24px',
     boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
   },
   toastTitle: { margin: '0 0 0.2rem', fontSize: '0.78rem', fontWeight: 800, color: '#ef4444' },

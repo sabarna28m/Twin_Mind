@@ -1,4 +1,4 @@
-﻿/**
+/**
  * InterviewEngine — Digital Twin Interview Intelligence System.
  *
  * Fully domain-aware: Medical → clinical questions, Law → legal rounds,
@@ -531,7 +531,7 @@ function MockInterviewView({ career, domain, onComplete }: {
   const [listening, setListening]  = useState(false);
   const [wpm, setWpm]              = useState(0);
   const [fillers, setFillers]      = useState(0);
-  const recogRef  = useRef<SpeechRecognition | null>(null);
+  const recogRef  = useRef<any>(null);
   const silenceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const liveRef   = useRef('');
   const bottomRef = useRef<HTMLDivElement>(null);
