@@ -31,7 +31,7 @@ export default function SessionCard({ session, onToggle, onDelete, index = 0 }: 
   return (
     <div
       style={{ ...s.card, animationDelay: `${index * 0.04}s`, borderColor: done ? (isDark ? 'rgba(16,185,129,0.3)' : 'rgba(16,185,129,0.4)') : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)') }}
-      className="animate-fade-in synth-hover-card"
+      className="animate-fade-in glass-card glass-hover glass-babyblue"
     >
       {/* Left: status toggle */}
       <button

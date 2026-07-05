@@ -277,7 +277,7 @@ export default function CheckIn() {
       <main style={s.main}>
         <h1 style={s.pageTitle} className="ci-page-title">{t('checkin_title')}</h1>
 
-        <section style={s.formCard} className="ci-card">
+        <section className="glass-card glass-hover glass-amber ci-card" style={s.formCard} >
           <div style={s.formHeader}>
             <h2 style={s.formTitle} className="ci-section-title">{isEditing ? `Editing entry for ${date}` : "Log today's learning"}</h2>
             {isEditing && <span style={s.editBadge}>Editing existing entry</span>}
@@ -344,7 +344,7 @@ export default function CheckIn() {
                   <button type="button" onClick={openSurvey} style={s.retakeSurveyBtn}>{t('checkin_retake')}</button>
                 </div>
               ) : (
-                <button type="button" onClick={openSurvey} style={s.takeSurveyBtn} className="ci-survey-btn">
+                <button className="glass-btn ci-survey-btn" type="button" onClick={openSurvey}  style={s.takeSurveyBtn} >
                   {t('checkin_take_survey')}
                 </button>
               )}
@@ -356,14 +356,14 @@ export default function CheckIn() {
                 style={s.textarea} className="ci-textarea" rows={2} placeholder={t('checkin_notes_ph')} />
             </label>
 
-            <button type="submit" disabled={saving} style={s.submitBtn} className="ci-submit-btn">
+            <button className="glass-btn ci-submit-btn" type="submit" disabled={saving}  style={s.submitBtn} >
               {saving ? t('checkin_submitting') : isEditing ? t('checkin_update') : t('checkin_submit')}
             </button>
           </form>
         </section>
 
         {sparkData.length > 1 && (
-          <section style={s.panel} className="ci-card">
+          <section className="glass-card glass-hover glass-cyan ci-card" style={s.panel} >
             <h2 style={s.panelTitle} className="ci-section-title">{t('simulate_study_hours')} — last {sparkData.length} entries</h2>
             <div style={s.spark}>
               {sparkData.map((e, i) => (
@@ -379,7 +379,7 @@ export default function CheckIn() {
           </section>
         )}
 
-        <section style={s.panel} className="ci-card">
+        <section className="glass-card glass-hover glass-babyblue ci-card" style={s.panel} >
           <h2 style={s.panelTitle} className="ci-section-title">{t('checkin_history_title')}</h2>
           {loading ? (
             <p style={s.empty}>{t('loading')}</p>
@@ -542,7 +542,7 @@ export default function CheckIn() {
                     style={s.retakeBtn}>
                     {t('checkin_retake')}
                   </button>
-                  <button type="button" onClick={applySurveyScore} style={s.applyBtn} className="ci-submit-btn">
+                  <button className="glass-btn ci-submit-btn" type="button" onClick={applySurveyScore}  style={s.applyBtn} >
                     {t('checkin_apply_score')} ({mappedStress}/10)
                   </button>
                 </div>
@@ -565,7 +565,7 @@ const s: Record<string, React.CSSProperties> = {
   main: { flex: 1, padding: '2.5rem 2rem', maxWidth: '860px', width: '100%', margin: '0 auto', boxSizing: 'border-box', textAlign: 'left' },
   pageTitle: { margin: '0 0 2rem', fontSize: '2rem', fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' },
 
-  formCard: { border: '1px solid var(--border)', borderRadius: '20px', padding: '2rem', marginBottom: '1.75rem', background: 'var(--bg-elevated)', boxShadow: 'var(--glow-card)' },
+  formCard: {  borderRadius: '20px', padding: '2rem', marginBottom: '1.75rem',   },
   formHeader: { display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' as const },
   formTitle: { margin: 0, fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-h)' },
   editBadge: { fontSize: '0.75rem', fontWeight: 600, padding: '0.2rem 0.6rem', background: 'var(--accent-bg)', color: 'var(--accent)', border: '1px solid var(--accent-border)', borderRadius: '99px' },
@@ -574,20 +574,20 @@ const s: Record<string, React.CSSProperties> = {
   row: { display: 'flex', gap: '1rem' },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' },
   label: { display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-m)', letterSpacing: '0.01em' },
-  input: { padding: '0.75rem 1rem', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '0.9375rem', color: 'var(--text-h)', background: 'var(--bg-elevated)', outline: 'none', height: '48px', boxSizing: 'border-box' as const, fontFamily: 'inherit', transition: 'border-color 0.15s, box-shadow 0.15s' },
-  textarea: { padding: '0.75rem 1rem', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '0.875rem', color: 'var(--text-h)', background: 'var(--bg-elevated)', outline: 'none', resize: 'vertical' as const, fontFamily: 'inherit', lineHeight: '1.6', transition: 'border-color 0.15s, box-shadow 0.15s' },
+  input: { padding: '0.75rem 1rem',  borderRadius: '12px', fontSize: '0.9375rem', color: 'var(--text-h)',  outline: 'none', height: '48px', boxSizing: 'border-box' as const, fontFamily: 'inherit', transition: 'border-color 0.15s, box-shadow 0.15s' },
+  textarea: { padding: '0.75rem 1rem',  borderRadius: '12px', fontSize: '0.875rem', color: 'var(--text-h)',  outline: 'none', resize: 'vertical' as const, fontFamily: 'inherit', lineHeight: '1.6', transition: 'border-color 0.15s, box-shadow 0.15s' },
 
   stressLabel: { margin: '0 0 0.6rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-m)' },
   takeSurveyBtn: { padding: '0.875rem 1.25rem', background: 'var(--accent-bg)', border: '2px dashed var(--accent-border)', borderRadius: '12px', color: 'var(--accent)', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', width: '100%', textAlign: 'center' as const, transition: 'filter 0.15s, box-shadow 0.15s' },
   surveyDoneRow: { display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' as const },
   surveyDoneBadge: { padding: '0.35rem 0.9rem', borderRadius: '10px', border: '1px solid', fontSize: '0.875rem', fontWeight: 700 },
-  retakeSurveyBtn: { padding: '0.35rem 0.75rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-m)', fontSize: '0.78rem', cursor: 'pointer', fontFamily: 'inherit' },
+  retakeSurveyBtn: { padding: '0.35rem 0.75rem', background: 'transparent',  borderRadius: '8px', color: 'var(--text-m)', fontSize: '0.78rem', cursor: 'pointer', fontFamily: 'inherit' },
 
   msgOk: { margin: '0 0 1rem', padding: '0.65rem 1rem', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '10px', color: '#16a34a', fontSize: '0.875rem' },
   msgErr: { margin: '0 0 1rem', padding: '0.65rem 1rem', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', color: '#dc2626', fontSize: '0.875rem' },
   submitBtn: { alignSelf: 'flex-start', padding: '0.75rem 1.75rem', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '0.9375rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'filter 0.15s, box-shadow 0.15s' },
 
-  panel: { border: '1px solid var(--border)', borderRadius: '20px', padding: '2rem', marginBottom: '1.75rem', background: 'var(--bg-elevated)', boxShadow: 'var(--glow-card)' },
+  panel: {  borderRadius: '20px', padding: '2rem', marginBottom: '1.75rem',   },
   panelTitle: { margin: '0 0 1.25rem', fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-h)' },
   spark: { display: 'flex', alignItems: 'flex-end', gap: '4px', height: '80px', paddingTop: '8px' },
   sparkCol: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' },
@@ -607,7 +607,7 @@ const s: Record<string, React.CSSProperties> = {
 
   // Survey modal
   overlay: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem' },
-  surveyModal: { background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '20px', width: '100%', maxWidth: '540px', boxShadow: '0 24px 64px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column', maxHeight: '90vh', overflow: 'hidden' },
+  surveyModal: {   borderRadius: '20px', width: '100%', maxWidth: '540px', boxShadow: '0 24px 64px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column', maxHeight: '90vh', overflow: 'hidden' },
   surveyHeader: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '1.5rem 1.5rem 1rem', borderBottom: '1px solid var(--border)', flexShrink: 0 },
   surveyTitle: { margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-h)' },
   surveySub: { margin: '0.25rem 0 0', fontSize: '0.75rem', color: 'var(--text)' },
@@ -622,13 +622,13 @@ const s: Record<string, React.CSSProperties> = {
   questionNum: { margin: '0 0 0.3rem', fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' },
   questionText: { margin: '0 0 1.125rem', fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-h)', lineHeight: '1.55' },
   optionsWrap: { display: 'flex', flexDirection: 'column', gap: '0.4rem' },
-  optionCard: { display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 1rem', border: '1px solid var(--border)', borderRadius: '12px', background: 'var(--bg-elevated)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.12s', textAlign: 'left' as const, width: '100%' },
+  optionCard: { display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 1rem',  borderRadius: '12px',  cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.12s', textAlign: 'left' as const, width: '100%' },
   optionSelected: { border: '1px solid var(--accent)', background: 'var(--accent-bg)' },
   optionNum: { width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700, flexShrink: 0, border: '1px solid', transition: 'all 0.12s' },
   optionLabel: { fontSize: '0.875rem', transition: 'all 0.12s' },
 
   surveyNav: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.875rem 1.5rem 1.25rem', borderTop: '1px solid var(--border)', gap: '0.5rem', flexShrink: 0 },
-  navBtn: { padding: '0.5rem 0.9rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.82rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' },
+  navBtn: { padding: '0.5rem 0.9rem', background: 'transparent',  borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.82rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' },
   navBtnNext: { padding: '0.5rem 1.1rem', background: 'var(--accent)', border: 'none', borderRadius: '10px', color: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' },
   navDots: { display: 'flex', alignItems: 'center', gap: '5px', flex: 1, justifyContent: 'center' },
   navDot: { width: '7px', height: '7px', borderRadius: '50%', transition: 'background 0.2s', flexShrink: 0 },
@@ -647,6 +647,6 @@ const s: Record<string, React.CSSProperties> = {
   mappedVal: { fontSize: '0.82rem', fontWeight: 700, marginLeft: '0.4rem' },
   rangesNote: { margin: 0, fontSize: '0.68rem', color: 'var(--text)', opacity: 0.65 },
   resultsFooter: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem', padding: '0.875rem 1.5rem 1.25rem', borderTop: '1px solid var(--border)', flexShrink: 0 },
-  retakeBtn: { padding: '0.55rem 1.1rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' },
+  retakeBtn: { padding: '0.55rem 1.1rem', background: 'transparent',  borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' },
   applyBtn: { padding: '0.55rem 1.25rem', background: 'var(--accent)', border: 'none', borderRadius: '10px', color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' },
 };

@@ -138,7 +138,7 @@ export default function Register() {
         {GOOGLE_CLIENT_ID && (
           <div className="flex items-center gap-4 my-7">
             <div className="flex-1 h-px bg-slate-200"></div>
-            <span className="text-xs font-semibold text-slate-400 italic">or</span>
+            <span className="text-xs font-semibold text-slate-600 italic">or</span>
             <div className="flex-1 h-px bg-slate-200"></div>
           </div>
         )}
@@ -158,7 +158,7 @@ export default function Register() {
           </div>
         )}
 
-        <p className="mt-6 text-center text-[0.85rem] text-slate-500">
+        <p className="mt-6 text-center text-[0.85rem] text-slate-600">
           {t('register_have_account') || 'Already have an account?'} <Link to="/login" className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors">{t('register_signin') || 'Sign in'}</Link>
         </p>
       </motion.div>

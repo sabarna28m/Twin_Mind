@@ -197,7 +197,7 @@ function Tag({ text, color }:{text:string;color:string}) {
 }
 function ScCard({ label, value, color, icon }:{label:string;value:number;color:string;icon:string}) {
   return (
-    <div style={{ background:CARD2,border:`1px solid ${color}25`,borderRadius:14,padding:'1rem',textAlign:'center' }}>
+    <div className="glass-card glass-hover glass-cyan" style={{ borderRadius:14,padding:'1rem',textAlign:'center' }}>
       <div style={{ fontSize:'1.3rem',marginBottom:3 }}>{icon}</div>
       <div style={{ fontSize:'0.67rem',color:MUTED,textTransform:'uppercase',letterSpacing:1,marginBottom:4 }}>{label}</div>
       <div style={{ fontSize:'1.7rem',fontWeight:800,color,lineHeight:1 }}>{value}</div>
@@ -219,7 +219,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
           {label:'Confidence',    v:r.confidence_score,    c:sc(r.confidence_score)    },
           {label:'Overall',       v:r.overall_score,       c:sc(r.overall_score)       },
         ].map(({label,v,c}) => (
-          <div key={label} style={{ background:CARD,border:`1px solid ${c}25`,borderRadius:12,padding:'0.7rem',textAlign:'center' }}>
+          <div key={label} className="glass-card glass-hover glass-babyblue" style={{ border:`1px solid ${c}25`,borderRadius:12,padding:'0.7rem',textAlign:'center' }}>
             <div style={{ fontSize:'0.62rem',color:MUTED,marginBottom:2 }}>{label}</div>
             <div style={{ fontSize:'1.4rem',fontWeight:800,color:c }}>{v}</div>
             <Bar value={v} color={c} height={3} />
@@ -229,7 +229,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
 
       {/* Grammar correction */}
       {r.grammar_error_count > 0 && (
-        <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem' }}>
+        <div className="glass-card glass-hover glass-mint" style={{ borderRadius:14,padding:'1.1rem' }}>
           <div style={{ color:AMBER,fontWeight:700,fontSize:'0.82rem',marginBottom:'0.65rem' }}> Grammar Corrections ({r.grammar_error_count})</div>
           {r.grammar_errors.slice(0,4).map((e,i) => (
             <div key={i} style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:8,padding:'0.5rem',background:'var(--bg-surface)',borderRadius:8 }}>
@@ -249,7 +249,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
 
       {/* Filler words */}
       {r.filler_word_count > 0 && (
-        <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem' }}>
+        <div className="glass-card glass-hover glass-lavender" style={{ borderRadius:14,padding:'1.1rem' }}>
           <div style={{ color:PURPLE,fontWeight:700,fontSize:'0.82rem',marginBottom:'0.6rem' }}> Filler Words Detected</div>
           <div style={{ display:'flex',flexWrap:'wrap',gap:6 }}>
             {r.filler_words.map(f => <Tag key={f.word} text={`"${f.word}" ×${f.count}`} color={PURPLE} />)}
@@ -271,11 +271,11 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
 
       {/* Strengths / Weaknesses */}
       <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem' }}>
-        <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem' }}>
+        <div className="glass-card glass-hover glass-peach" style={{ borderRadius:14,padding:'1rem' }}>
           <div style={{ color:GREEN,fontWeight:700,fontSize:'0.78rem',marginBottom:'0.55rem' }}> Strengths</div>
           {r.strengths.map((s,i) => <div key={i} style={{ color:MUTED,fontSize:'0.8rem',marginBottom:3 }}>• {s}</div>)}
         </div>
-        <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem' }}>
+        <div className="glass-card glass-hover glass-rose" style={{ borderRadius:14,padding:'1rem' }}>
           <div style={{ color:AMBER,fontWeight:700,fontSize:'0.78rem',marginBottom:'0.55rem' }}> Improve</div>
           {r.weaknesses.map((w,i) => <div key={i} style={{ color:MUTED,fontSize:'0.8rem',marginBottom:3 }}>• {w}</div>)}
         </div>
@@ -283,7 +283,7 @@ function SpeechResultCards({ r }:{r:SpeechResult}) {
 
       {/* Pronunciation tips */}
       {r.pronunciation_tips.length > 0 && (
-        <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem' }}>
+        <div className="glass-card glass-hover glass-cyan" style={{ borderRadius:14,padding:'1rem' }}>
           <div style={{ color:TEAL,fontWeight:700,fontSize:'0.78rem',marginBottom:'0.55rem' }}> Pronunciation Tips</div>
           {r.pronunciation_tips.map((t,i) => <div key={i} style={{ color:MUTED,fontSize:'0.8rem',marginBottom:3 }}>→ {t}</div>)}
         </div>
@@ -362,7 +362,7 @@ function TwinSection() {
           const label = k==='30d'?'30 Days':k==='90d'?'90 Days':'180 Days';
           const color = [CYAN,INDIGO,GREEN][i];
           return (
-            <div key={k} style={{ background:CARD,border:`1px solid ${color}25`,borderRadius:18,padding:'1.25rem' }}>
+            <div key={k} className="glass-card glass-hover glass-babyblue" style={{ borderRadius:18,padding:'1.25rem' }}>
               <div style={{ color,fontWeight:800,marginBottom:'0.65rem' }}>{label} Ahead</div>
               <div style={{ fontSize:'2rem',fontWeight:900,color,marginBottom:'0.5rem' }}>{p.overall_score}</div>
               <Tag text={p.level_label} color={color} />
@@ -383,7 +383,7 @@ function TwinSection() {
 
       {/* Score history */}
       {data.score_history.length >= 2 && (
-        <div style={{ background:CARD,border:BORDER,borderRadius:18,padding:'1.5rem' }}>
+        <div className="glass-card glass-hover glass-mint" style={{ borderRadius:18,padding:'1.5rem' }}>
           <div style={{ color:TEXT,fontWeight:700,marginBottom:'1rem' }}>Communication Twin Evolution</div>
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={data.score_history}>
@@ -405,7 +405,7 @@ function TwinSection() {
 
       {/* Recent activity */}
       {data.recent_activities.length > 0 && (
-        <div style={{ background:CARD,border:BORDER,borderRadius:16,padding:'1.25rem' }}>
+        <div className="glass-card glass-hover glass-lavender" style={{ borderRadius:16,padding:'1.25rem' }}>
           <div style={{ color:TEXT,fontWeight:700,marginBottom:'0.85rem' }}>Recent Activity</div>
           {data.recent_activities.slice(0,5).map((a,i) => (
             <div key={i} style={{ display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.5rem 0',borderBottom:i<4?'1px solid var(--border-subtle)':'none' }}>
@@ -467,7 +467,7 @@ function ImageSection() {
   return (
     <div style={{ display:'flex',flexDirection:'column',gap:'1.5rem' }}>
       {/* Controls */}
-      <div style={{ background:CARD,border:BORDER,borderRadius:18,padding:'1.25rem',display:'flex',gap:'1rem',alignItems:'flex-end',flexWrap:'wrap' }}>
+      <div className="glass-card glass-hover glass-peach" style={{ borderRadius:18,padding:'1.25rem',display:'flex',gap:'1rem',alignItems:'flex-end',flexWrap:'wrap' }}>
         <div>
           <div style={{ color:MUTED,fontSize:'0.73rem',marginBottom:5 }}>Difficulty</div>
           <div style={{ display:'flex',gap:6 }}>
@@ -491,7 +491,7 @@ function ImageSection() {
         <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1.5rem' }}>
           {/* Image + task */}
           <div style={{ display:'flex',flexDirection:'column',gap:'1rem' }}>
-            <div style={{ background:CARD,border:BORDER,borderRadius:16,overflow:'hidden' }}>
+            <div className="glass-card glass-hover glass-rose" style={{ borderRadius:16,overflow:'hidden' }}>
               {!imgLoaded && <div style={{ height:260,display:'flex',alignItems:'center',justifyContent:'center',color:MUTED }}>Loading image…</div>}
               <img src={challenge.image_url} alt={challenge.topic} onLoad={()=>setImgLoaded(true)}
                 style={{ width:'100%',display:imgLoaded?'block':'none',height:260,objectFit:'cover' }} />
@@ -507,7 +507,7 @@ function ImageSection() {
           </div>
           {/* Recording */}
           <div>
-            <div style={{ background:CARD,border:BORDER,borderRadius:16,padding:'1.25rem' }}>
+            <div className="glass-card glass-hover glass-cyan" style={{ borderRadius:16,padding:'1.25rem' }}>
               <div style={{ color:TEXT,fontWeight:700,marginBottom:'0.5rem' }}>Your Description</div>
               <div style={{ color:MUTED,fontSize:'0.8rem',marginBottom:'0.85rem' }}>Record or type your description. Be detailed — describe objects, mood, colors, story.</div>
               <VoiceRecorder onTranscript={evaluate} placeholder="Describe what you observe in this image in detail. Use descriptive language…" />
@@ -527,7 +527,7 @@ function ImageSection() {
               {label:'Observation Score',     v:result.observation_score,     color:sc(result.observation_score)     },
               {label:'Communication Clarity', v:result.communication_clarity, color:sc(result.communication_clarity) },
             ].map(({label,v,color})=>(
-              <div key={label} style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem',textAlign:'center' }}>
+              <div key={label} className="glass-card glass-hover glass-babyblue" style={{ borderRadius:14,padding:'1.1rem',textAlign:'center' }}>
                 <div style={{ fontSize:'0.7rem',color:MUTED,textTransform:'uppercase',letterSpacing:1 }}>{label}</div>
                 <div style={{ fontSize:'2.2rem',fontWeight:900,color,margin:'4px 0' }}>{v}%</div>
                 <Bar value={v} color={color} height={4} />
@@ -537,11 +537,11 @@ function ImageSection() {
 
           {/* Elements */}
           <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem' }}>
-            <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem' }}>
+            <div className="glass-card glass-hover glass-mint" style={{ borderRadius:14,padding:'1rem' }}>
               <div style={{ color:GREEN,fontWeight:700,fontSize:'0.8rem',marginBottom:'0.55rem' }}> Elements Described</div>
               <div style={{ display:'flex',flexWrap:'wrap',gap:5 }}>{result.elements_mentioned.map(e=><Tag key={e} text={e} color={GREEN}/>)}</div>
             </div>
-            <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem' }}>
+            <div className="glass-card glass-hover glass-lavender" style={{ borderRadius:14,padding:'1rem' }}>
               <div style={{ color:RED,fontWeight:700,fontSize:'0.8rem',marginBottom:'0.55rem' }}> Elements Missed</div>
               <div style={{ display:'flex',flexWrap:'wrap',gap:5 }}>{result.elements_missed.map(e=><Tag key={e} text={e} color={RED}/>)}</div>
             </div>
@@ -614,7 +614,7 @@ function TasksSection() {
       {task && (
         <div style={{ display:'flex',flexDirection:'column',gap:'1.25rem' }}>
           {/* Task card */}
-          <div style={{ background:CARD,border:BORDER,borderRadius:18,padding:'1.5rem' }}>
+          <div className="glass-card glass-hover glass-peach" style={{ borderRadius:18,padding:'1.5rem' }}>
             <div style={{ display:'flex',gap:'0.75rem',alignItems:'flex-start',marginBottom:'0.75rem' }}>
               <div style={{ flex:1 }}>
                 <div style={{ display:'flex',gap:8,marginBottom:6 }}>
@@ -633,7 +633,7 @@ function TasksSection() {
           </div>
 
           {/* Voice recorder */}
-          <div style={{ background:CARD,border:BORDER,borderRadius:16,padding:'1.25rem' }}>
+          <div className="glass-card glass-hover glass-rose" style={{ borderRadius:16,padding:'1.25rem' }}>
             <div style={{ color:TEXT,fontWeight:700,marginBottom:'0.5rem' }}>Your Response</div>
             <div style={{ color:MUTED,fontSize:'0.8rem',marginBottom:'0.85rem' }}>Speak for at least {task.time_suggestion}. Be confident and clear.</div>
             <VoiceRecorder onTranscript={evaluate} placeholder={`Respond to: ${task.prompt}`} />
@@ -666,7 +666,7 @@ function GrammarSection() {
 
   return (
     <div style={{ display:'flex',flexDirection:'column',gap:'1.5rem' }}>
-      <div style={{ background:CARD,border:BORDER,borderRadius:18,padding:'1.5rem' }}>
+      <div className="glass-card glass-hover glass-cyan" style={{ borderRadius:18,padding:'1.5rem' }}>
         <div style={{ color:TEXT,fontWeight:700,marginBottom:'0.75rem' }}>Grammar Analysis Engine</div>
         <div style={{ color:MUTED,fontSize:'0.82rem',marginBottom:'0.85rem' }}>Type or paste any text. The AI will detect all grammar errors, show corrections, and explain every rule.</div>
         <textarea value={text} onChange={e=>setText(e.target.value)} rows={7}
@@ -683,7 +683,7 @@ function GrammarSection() {
       {result && (
         <div style={{ display:'flex',flexDirection:'column',gap:'1.25rem' }}>
           {/* Score header */}
-          <div style={{ display:'grid',gridTemplateColumns:'auto 1fr auto',gap:'1.5rem',background:CARD,border:BORDER,borderRadius:16,padding:'1.25rem',alignItems:'center' }}>
+          <div className="glass-card glass-hover glass-babyblue" style={{ display:'grid',gridTemplateColumns:'auto 1fr auto',gap:'1.5rem',borderRadius:16,padding:'1.25rem',alignItems:'center' }}>
             <div style={{ position:'relative',display:'inline-flex',alignItems:'center',justifyContent:'center' }}>
               <ScoreRing score={result.score} color={sc(result.score)} size={90} />
               <div style={{ position:'absolute',textAlign:'center' }}>
@@ -705,7 +705,7 @@ function GrammarSection() {
 
           {/* Corrected text */}
           {result.corrected_text !== result.original_text && (
-            <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem' }}>
+            <div className="glass-card glass-hover glass-mint" style={{ borderRadius:14,padding:'1.1rem' }}>
               <div style={{ color:GREEN,fontWeight:700,fontSize:'0.82rem',marginBottom:8 }}> Corrected Version</div>
               <div style={{ background:`${GREEN}08`,border:`1px solid ${GREEN}25`,borderRadius:8,padding:'0.75rem',color:TEXT,fontSize:'0.87rem',lineHeight:1.7 }}>{result.corrected_text}</div>
             </div>
@@ -714,7 +714,7 @@ function GrammarSection() {
           {result.errors.length===0 ? (
             <div style={{ background:`${GREEN}0a`,border:`1px solid ${GREEN}30`,borderRadius:12,padding:'1rem',textAlign:'center',color:GREEN,fontWeight:700 }}> Perfect grammar! No errors detected.</div>
           ) : (
-            <div style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1.1rem' }}>
+            <div className="glass-card glass-hover glass-lavender" style={{ borderRadius:14,padding:'1.1rem' }}>
               <div style={{ color:TEXT,fontWeight:700,marginBottom:'1rem' }}>Error Breakdown</div>
               {result.errors.map((e,i)=>(
                 <div key={i} style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginBottom:10,padding:'0.65rem',background:'var(--bg-surface)',borderRadius:10 }}>
@@ -766,7 +766,7 @@ function VocabSection() {
         const colors=[CYAN,INDIGO,PURPLE,TEAL,PINK];
         const c=colors[i%colors.length];
         return (
-          <div key={w.word} style={{ background:CARD,border:`1px solid ${c}25`,borderRadius:18,overflow:'hidden' }}>
+          <div key={w.word} className="glass-card glass-hover glass-peach" style={{ border:`1px solid ${c}25`,borderRadius:18,overflow:'hidden' }}>
             <div onClick={()=>setExpanded(open?null:w.word)} style={{ padding:'1.1rem 1.25rem',cursor:'pointer',display:'flex',alignItems:'center',gap:'0.75rem' }}>
               <div style={{ width:36,height:36,borderRadius:10,background:`${c}22`,border:`1px solid ${c}44`,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:900,color:c,fontSize:'0.88rem',flexShrink:0 }}>{i+1}</div>
               <div style={{ flex:1 }}>
@@ -846,7 +846,7 @@ function AnalyticsSection() {
           {label:'Weekly Growth',   v:`+${data.weekly_growth}`,    c:AMBER },
           {label:'Monthly Growth',  v:`+${data.monthly_growth}`,   c:INDIGO},
         ].map(({label,v,c})=>(
-          <div key={label} style={{ background:CARD,border:BORDER,borderRadius:14,padding:'1rem',textAlign:'center' }}>
+          <div key={label} className="glass-card glass-hover glass-rose" style={{ borderRadius:14,padding:'1rem',textAlign:'center' }}>
             <div style={{ fontSize:'0.7rem',color:MUTED,textTransform:'uppercase',letterSpacing:1 }}>{label}</div>
             <div style={{ color:c,fontWeight:800,fontSize:'1.2rem',marginTop:4 }}>{v}</div>
           </div>
@@ -854,7 +854,7 @@ function AnalyticsSection() {
       </div>
 
       {/* Skill Radar */}
-      <div style={{ background:CARD,border:BORDER,borderRadius:16,padding:'1.5rem' }}>
+      <div className="glass-card glass-hover glass-cyan" style={{ borderRadius:16,padding:'1.5rem' }}>
         <div style={{ color:TEXT,fontWeight:700,marginBottom:'1rem' }}>Communication Skills Radar</div>
         <ResponsiveContainer width="100%" height={260}>
           <RadarChart data={radarData}>
@@ -876,7 +876,7 @@ function AnalyticsSection() {
         </div>
       ) : (
         <>
-          <div style={{ background:CARD,border:BORDER,borderRadius:16,padding:'1.5rem' }}>
+          <div className="glass-card glass-hover glass-babyblue" style={{ borderRadius:16,padding:'1.5rem' }}>
             <div style={{ color:TEXT,fontWeight:700,marginBottom:'1rem' }}>Overall Score Timeline</div>
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={data.score_history}>
@@ -895,7 +895,7 @@ function AnalyticsSection() {
             </ResponsiveContainer>
           </div>
 
-          <div style={{ background:CARD,border:BORDER,borderRadius:16,padding:'1.5rem' }}>
+          <div className="glass-card glass-hover glass-mint" style={{ borderRadius:16,padding:'1.5rem' }}>
             <div style={{ color:TEXT,fontWeight:700,marginBottom:'1rem' }}>Skill Breakdown Trend</div>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={data.score_history}>
@@ -946,7 +946,7 @@ function CoachSection() {
       </div>
 
       {/* Daily plan */}
-      <div style={{ background:CARD,border:BORDER,borderRadius:18,padding:'1.5rem' }}>
+      <div className="glass-card glass-hover glass-lavender" style={{ borderRadius:18,padding:'1.5rem' }}>
         <div style={{ color:TEXT,fontWeight:700,marginBottom:'1.25rem' }}>Today's Practice Plan</div>
         {data.daily_plan.map((activity,i)=>{
           const c = FOCUS_COLORS[activity.focus_area] || INDIGO;

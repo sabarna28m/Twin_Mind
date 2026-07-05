@@ -64,14 +64,15 @@ export default function SessionStats({ sessions }: Props) {
     { icon: <Target size={18} />,      value: `${compRate}%`, unit: '', label: 'Completion',   color: '#34d399' },
   ];
 
+  const pastels = ['glass-cyan', 'glass-babyblue', 'glass-mint', 'glass-lavender', 'glass-peach', 'glass-amber'];
   const s = getStyles(isDark);
 
   return (
     <div style={s.wrap}>
       <p style={s.heading}>Your Stats</p>
       <div style={s.grid}>
-        {stats.map(st => (
-          <div key={st.label} style={s.cell} className="synth-hover-card">
+        {stats.map((st, i) => (
+          <div key={st.label} style={s.cell} className={`glass-card glass-hover ${pastels[i % pastels.length]}`}>
             <span style={{ ...s.icon, display: 'flex', color: st.color }}>{st.icon}</span>
             <p style={{ ...s.val, color: st.color }}>{st.value}{st.unit}</p>
             <p style={s.lbl}>{st.label}</p>

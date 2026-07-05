@@ -257,7 +257,7 @@ const T: Record<LangCode, Translations> = {
     quiz_bc_learning: 'Learning Hub',
     /* twin additions */
     twin_sub: 'A living model of your academic self, built from your data.',
-    twin_loading: 'Loading your twin…', twin_log_checkin: 'Log Check-in',
+    twin_loading: 'Loading your twin…',
     twin_level_prefix: 'Level',
   },
 

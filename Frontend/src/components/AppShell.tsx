@@ -20,53 +20,42 @@ import { BACKEND_URL } from '../lib/config';
 const BACKEND = BACKEND_URL;
 
 const PAGE_TITLES: Record<string, string> = {
-  '/dashboard':    'Dashboard',
-  '/sessions':     'Focus Sessions',
-  '/notes':        'Smart Notes',
-  '/progress':     'Progress Analytics',
-  '/predict':      'Performance Trends',
-  '/mentor':       'AI Mentor',
-  '/twin':         'Digital Twin',
+  '/dashboard': 'Dashboard',
+  '/sessions': 'Focus Sessions',
+  '/notes': 'Smart Notes',
+  '/progress': 'Progress Analytics',
+  '/predict': 'Performance Trends',
+  '/mentor': 'AI Mentor',
+  '/twin': 'Digital Twin',
   '/twin-profile': 'Digital Twin',
-  '/twin-legacy':  'Digital Twin',
-  '/checkin':      'Daily Check-in',
-  '/burnout':      'Burnout Analysis',
+  '/twin-legacy': 'Digital Twin',
+  '/checkin': 'Daily Check-in',
+  '/burnout': 'Burnout Analysis',
   '/achievements': 'Achievements',
-  '/quiz':         'Assessment Hub',
-  '/videos':       'Video Recommender',
-  '/subjects':     'Subject Analysis',
-  '/career':       'Career Twin',
-  '/comm-twin':    'Communication Twin',
-  '/simulate':     'What-if Simulator',
-  '/study-planner':'Study Planner',
-  '/shield':       'Shield Center',
-  '/profile':      'Profile & Settings',
-  '/shop':         'XP Shop',
-  '/battles':      'Battles',
-  '/skill-tree':   'Skill Tree',
+
+  '/quiz': 'Assessment Hub',
+  '/videos': 'Video Recommender',
+  '/subjects': 'Subject Analysis',
+  '/career': 'Career Twin',
+  '/comm-twin': 'Communication Twin',
+  '/simulate': 'What-if Simulator',
+  '/study-planner': 'Study Planner',
+  '/shield': 'Shield Center',
+  '/profile': 'Profile & Settings',
+  '/shop': 'XP Shop',
+  '/battles': 'Battles',
+  '/skill-tree': 'Skill Tree',
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function SidebarNavItem({ icon: Icon, label, to, active }: { icon: React.ComponentType<any>; label: string; to: string; active: boolean }) {
   return (
-    <Link to={to} style={{ textDecoration: 'none' }}>
-      <motion.div
-        whileHover={{ x: 4, backgroundColor: 'rgba(255,255,255,0.06)' }}
-        style={{
-          display: 'flex', alignItems: 'center', gap: '12px',
-          padding: '10px 20px', margin: '2px 12px', borderRadius: '10px',
-          color: active ? '#FFFFFF' : 'rgba(255,255,255,0.70)',
-          background: active
-            ? 'linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(255, 255, 255, 0.12))'
-            : 'transparent',
-          borderLeft: active ? '3px solid rgba(56, 189, 248, 0.6)' : '3px solid transparent',
-          fontSize: '0.875rem', fontWeight: active ? 600 : 400,
-          transition: 'all 0.2s ease', cursor: 'pointer',
-        }}
-      >
-        <Icon size={18} style={{ opacity: active ? 1 : 0.65, flexShrink: 0 }} />
+    <Link to={to} style={{ textDecoration: 'none', outline: 'none' }}>
+      <div className={`nav-pill ${active ? 'active-pill' : ''}`}>
+        <Icon size={18} className="nav-icon" style={{ opacity: 0.65, flexShrink: 0, transition: 'all 0.3s' }} />
         <span>{label}</span>
-      </motion.div>
+      </div>
     </Link>
   );
 }
@@ -78,22 +67,13 @@ function SidebarAccordion({ icon: Icon, label, children, defaultOpen = false }: 
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div>
-      <motion.div
-        onClick={() => setOpen(!open)}
-        whileHover={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
-        style={{
-          display: 'flex', alignItems: 'center', gap: '12px',
-          padding: '10px 20px', margin: '2px 12px', borderRadius: '10px',
-          color: 'rgba(255,255,255,0.75)', fontSize: '0.875rem', fontWeight: 500,
-          cursor: 'pointer', transition: 'all 0.2s ease', userSelect: 'none',
-        }}
-      >
-        <Icon size={18} style={{ opacity: 0.6, flexShrink: 0 }} />
+      <div className="nav-pill" onClick={() => setOpen(!open)}>
+        <Icon size={18} className="nav-icon" style={{ opacity: 0.6, flexShrink: 0, transition: 'all 0.3s' }} />
         <span style={{ flex: 1 }}>{label}</span>
         <motion.div animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.2 }}>
           <ChevronRight size={14} style={{ opacity: 0.5 }} />
         </motion.div>
-      </motion.div>
+      </div>
       <AnimatePresence>
         {open && (
           <motion.div
@@ -107,39 +87,39 @@ function SidebarAccordion({ icon: Icon, label, children, defaultOpen = false }: 
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </div >
   );
 }
 
 const secLabel: React.CSSProperties = {
-  padding: '16px 20px 6px', fontSize: '0.7rem', fontWeight: 600,
-  color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.08em',
+  padding: '20px 24px 8px', fontSize: '0.68rem', fontWeight: 700,
+  color: 'rgba(148, 163, 184, 0.6)', textTransform: 'uppercase', letterSpacing: '0.12em',
 };
 
 const NAV = {
   learning: [
-    { icon: Zap,           label: 'Focus Sessions',     to: '/sessions' },
-    { icon: FileText,      label: 'Notes',              to: '/notes' },
-    { icon: Brain,         label: 'Assessment Hub',     to: '/quiz' },
-    { icon: Video,         label: 'Video Recommender',  to: '/videos' },
+    { icon: Zap, label: 'Focus Sessions', to: '/sessions' },
+    { icon: FileText, label: 'Notes', to: '/notes' },
+    { icon: Brain, label: 'Assessment Hub', to: '/quiz' },
+    { icon: Video, label: 'Video Recommender', to: '/videos' },
   ],
   performance: [
-    { icon: BarChart2,     label: 'Progress Analytics', to: '/progress' },
-    { icon: Trophy,        label: 'Progress Report',    to: '/achievements' },
-    { icon: Layers,        label: 'Subject Analysis',   to: '/subjects' },
-    { icon: TrendingUp,    label: 'Performance Trends', to: '/predict' },
+    { icon: BarChart2, label: 'Progress Analytics', to: '/progress' },
+    { icon: Trophy, label: 'Progress Report', to: '/achievements' },
+    { icon: Layers, label: 'Subject Analysis', to: '/subjects' },
+    { icon: TrendingUp, label: 'Performance Trends', to: '/predict' },
   ],
   aiTools: [
-    { icon: MessageCircle, label: 'AI Mentor',          to: '/mentor' },
-    { icon: Brain,         label: 'Digital Twin',       to: '/twin' },
-    { icon: Rocket,        label: 'Career Twin',        to: '/career' },
-    { icon: Mic2,          label: 'Communication Twin', to: '/comm-twin' },
-    { icon: Shield,        label: 'Burnout Analysis',   to: '/burnout' },
-    { icon: Zap,           label: 'What-if Simulator',  to: '/simulate' },
+    { icon: MessageCircle, label: 'AI Mentor', to: '/mentor' },
+    { icon: Brain, label: 'Digital Twin', to: '/twin' },
+    { icon: Rocket, label: 'Career Twin', to: '/career' },
+    { icon: Mic2, label: 'Communication Twin', to: '/comm-twin' },
+    { icon: Shield, label: 'Burnout Analysis', to: '/burnout' },
+    { icon: Zap, label: 'What-if Simulator', to: '/simulate' },
   ],
   account: [
-    { icon: User,          label: 'Profile & Settings', to: '/profile' },
-    { icon: Award,         label: 'Achievements',       to: '/achievements' },
+    { icon: User, label: 'Profile & Settings', to: '/profile' },
+    { icon: Award, label: 'Achievements', to: '/achievements' },
   ],
 };
 
@@ -193,11 +173,11 @@ export default function AppShell() {
   const navigate = useNavigate();
   const [challengeOpen, setChallengeOpen] = useState(false);
 
-  const avatarSrc   = user?.avatar_url ? BACKEND + user.avatar_url : null;
-  const pageTitle   = PAGE_TITLES[location.pathname] ?? 'TwinMind';
+  const avatarSrc = user?.avatar_url ? BACKEND + user.avatar_url : null;
+  const pageTitle = PAGE_TITLES[location.pathname] ?? 'TwinMind';
   const isDashboard = location.pathname === '/dashboard';
-  const isActive    = (path: string) => location.pathname === path;
-  const isDark      = colorScheme === 'dark';
+  const isActive = (path: string) => location.pathname === path;
+  const isDark = colorScheme === 'dark';
 
   return (
     <div style={{
@@ -222,7 +202,7 @@ export default function AppShell() {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="app-shell-sidebar"
         style={{
-          background: isDark 
+          background: isDark
             ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%), rgba(11, 18, 32, 0.75)'
             : 'linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(124, 58, 237, 0.04) 100%), rgba(15, 23, 42, 0.85)',
           backdropFilter: 'blur(24px) saturate(150%)',
@@ -233,32 +213,17 @@ export default function AppShell() {
         }}
       >
         {/* Brand */}
-        <div style={{
-          padding: '24px 24px 20px',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-        }}>
-          <Link
-            to="/"
-            className="brand-link"
-            style={{
-              display: 'flex', alignItems: 'center', gap: '12px',
-              textDecoration: 'none', color: 'inherit',
-            }}
-          >
-            {/* Logo PNG clipped to symbol only (text at bottom ~28% is hidden) */}
-            <div style={{ width: 40, height: 29, overflow: 'hidden', flexShrink: 0 }}>
-              <img
-                src="/assets/twinmind-logo.png"
-                alt="TwinMind logo"
-                style={{ width: 40, height: 'auto', display: 'block' }}
-              />
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit', outline: 'none' }}>
+          <div className="sidebar-logo-container">
+            <div style={{ width: 34, height: 26, overflow: 'hidden', flexShrink: 0, filter: 'drop-shadow(0 0 6px rgba(0,212,255,0.5))' }}>
+              <img src="/assets/twinmind-logo.png" alt="TwinMind logo" style={{ width: 34, height: 'auto', display: 'block' }} />
             </div>
-            <span style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em' }}>TwinMind</span>
-          </Link>
-        </div>
+            <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(to right, #fff, #A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>TwinMind</span>
+          </div>
+        </Link>
 
         {/* Nav */}
-        <nav style={{ flex: 1, overflowY: 'auto', padding: '16px 0', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <nav className="app-shell-sidebar-nav" style={{ flex: 1, overflowY: 'auto', padding: '16px 0 24px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <SidebarNavItem icon={LayoutDashboard} label="Dashboard" to="/dashboard" active={isActive('/dashboard')} />
 
           <div style={secLabel}>Learning</div>
@@ -283,27 +248,21 @@ export default function AppShell() {
           </SidebarAccordion>
 
           <div style={secLabel}>Study Planner</div>
-          <SidebarNavItem icon={Calendar}      label="Study Planner" to="/study-planner" active={isActive('/study-planner')} />
-          <SidebarNavItem icon={ClipboardCheck} label="Check-in"     to="/checkin"       active={isActive('/checkin')} />
+          <SidebarNavItem icon={Calendar} label="Study Planner" to="/study-planner" active={isActive('/study-planner')} />
+          <SidebarNavItem icon={ClipboardCheck} label="Check-in" to="/checkin" active={isActive('/checkin')} />
 
           <div style={secLabel}>Account</div>
           <SidebarAccordion icon={User} label="Account">
             {NAV.account.map(item => (
               <SidebarNavItem key={item.to} icon={item.icon} label={item.label} to={item.to} active={isActive(item.to)} />
             ))}
-            <motion.div
+            <div
               onClick={logout}
-              whileHover={{ x: 4, backgroundColor: 'rgba(239,68,68,0.1)' }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '12px',
-                padding: '10px 20px', margin: '2px 12px', borderRadius: '10px',
-                color: 'rgba(255,255,255,0.65)', fontSize: '0.875rem',
-                cursor: 'pointer', transition: 'all 0.2s ease',
-              }}
+              className="nav-pill"
             >
-              <LogOut size={18} style={{ opacity: 0.6 }} />
+              <LogOut size={18} className="nav-icon" style={{ opacity: 0.6, flexShrink: 0, transition: 'all 0.3s' }} />
               <span>Logout</span>
-            </motion.div>
+            </div>
           </SidebarAccordion>
         </nav>
       </motion.aside>
@@ -416,8 +375,8 @@ export default function AppShell() {
               {avatarSrc
                 ? <img src={avatarSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#3b82f6' }}>
-                    {user?.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() ?? 'TM'}
-                  </span>
+                  {user?.full_name?.split(' ')?.map(n => n[0]).join('').slice(0, 2).toUpperCase() ?? 'TM'}
+                </span>
               }
             </Link>
           </div>
@@ -439,6 +398,67 @@ export default function AppShell() {
         }
         .brand-link { cursor: pointer; transition: opacity 0.18s ease, transform 0.18s ease; }
         .brand-link:hover { opacity: 0.82; transform: scale(1.02); }
+
+        /* Premium Glass Sidebar Styles */
+        .app-shell-sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .app-shell-sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+        .app-shell-sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+        .app-shell-sidebar-nav::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+        .nav-pill {
+          display: flex; align-items: center; gap: 14px;
+          padding: 10px 16px; margin: 2px 14px; border-radius: 16px;
+          color: rgba(255,255,255,0.65);
+          font-size: 0.85rem; font-weight: 500;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer;
+          border: 1px solid transparent;
+          position: relative;
+        }
+        .nav-pill:hover {
+          background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+          transform: translateY(-2px);
+          color: #fff;
+          border-color: rgba(255,255,255,0.08);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.15), 0 0 16px rgba(0,212,255,0.04);
+        }
+        .nav-pill:hover .nav-icon {
+          transform: scale(1.1);
+          color: #00D4FF;
+          filter: drop-shadow(0 0 6px rgba(0,212,255,0.5));
+          opacity: 1 !important;
+        }
+
+        .active-pill {
+          color: #ffffff;
+          background: linear-gradient(135deg, rgba(0, 212, 255, 0.12) 0%, rgba(124, 58, 237, 0.08) 100%);
+          border: 1px solid rgba(255,255,255,0.12);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 0 0 1px rgba(255,255,255,0.04);
+          font-weight: 600;
+        }
+        .active-pill::before {
+          content: ''; position: absolute; left: -1px; top: 25%; height: 50%; width: 3px;
+          border-radius: 0 4px 4px 0; background: #00D4FF;
+          box-shadow: 0 0 10px #00D4FF;
+        }
+        .active-pill .nav-icon {
+          opacity: 1 !important;
+          color: #00D4FF;
+          filter: drop-shadow(0 0 6px rgba(0,212,255,0.4));
+        }
+
+        .sidebar-logo-container {
+          padding: 14px; margin: 24px 20px 10px;
+          background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 18px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.03);
+          display: flex; align-items: center; justify-content: center; gap: 12px;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .sidebar-logo-container:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.2), 0 0 20px rgba(0,212,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.08);
+        }
       `}</style>
     </div>
   );

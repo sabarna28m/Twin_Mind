@@ -54,7 +54,7 @@ const FEATURE_LABELS: Record<string, string> = {
 function ScoreBadge({ label, detail, dim }: { label: string; detail: PredDetail; dim?: boolean }) {
   const color = RISK_COLOR[detail.risk_level];
   return (
-    <div style={{ ...sc.scoreCard, opacity: dim ? 0.55 : 1 }} className="sim-score-card">
+    <div className="glass-card glass-hover glass-peach sim-score-card" style={{ ...sc.scoreCard, opacity: dim ? 0.55 : 1 }} >
       <p style={sc.scoreCardLabel} className="sim-score-label">{label}</p>
       <p style={{ ...sc.scoreNum, color }}>{detail.predicted_score}</p>
       <p style={sc.scoreRange} className="sim-score-range">
@@ -74,7 +74,7 @@ function DeltaBadge({ delta, pct }: { delta: number; pct: number }) {
   const border = up ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
   const sign   = up ? '+' : '';
   return (
-    <div style={{ ...sc.delta, background: bg, border: `1px solid ${border}`, color }}>
+    <div className="glass-card" style={{ ...sc.delta, background: bg, border: `1px solid ${border}`, color }}>
       <span style={sc.deltaNum}>{sign}{delta} pts</span>
       <span style={sc.deltaPct}>{sign}{pct}%</span>
     </div>
@@ -191,7 +191,7 @@ export default function Simulate() {
 
         <div style={sc.layout}>
           {/* ── Slider panel ─────────────────────────────────── */}
-          <section style={sc.card} className="sim-card">
+          <section className="glass-card glass-hover glass-cyan sim-card" style={sc.card} >
             <h2 style={sc.cardTitle} className="sim-card-title">{t('simulate_hypothetical')}</h2>
             <p style={sc.cardSub} className="sim-card-sub">{t('simulate_card_hint')}</p>
 
@@ -231,7 +231,7 @@ export default function Simulate() {
             <button
               onClick={() => setHypo(current)}
               style={sc.resetBtn}
-              className="sim-reset-btn"
+              className="glass-btn sim-reset-btn"
             >
               {t('simulate_reset')}
             </button>
@@ -240,7 +240,7 @@ export default function Simulate() {
           {/* ── Results panel ────────────────────────────────── */}
           <div style={sc.resultCol}>
             {/* Score comparison */}
-            <section style={sc.card} className="sim-card">
+            <section className="glass-card glass-hover glass-babyblue sim-card" style={sc.card} >
               <h2 style={sc.cardTitle} className="sim-card-title">{t('simulate_score_compare')}</h2>
               {loading && !result && <p style={sc.loadingMsg} className="sim-loading">{t('simulate_running')}</p>}
               {result && (
@@ -263,7 +263,7 @@ export default function Simulate() {
 
             {/* Feature contributions comparison */}
             {result && (
-              <section style={sc.card} className="sim-card">
+              <section className="glass-card glass-hover glass-mint sim-card" style={sc.card} >
                 <h2 style={sc.cardTitle} className="sim-card-title">{t('simulate_impact_break')}</h2>
                 <p style={sc.cardSub} className="sim-card-sub">{t('simulate_impact_desc')}</p>
                 <div style={sc.barList}>
@@ -299,7 +299,7 @@ export default function Simulate() {
 
             {/* Recommendations */}
             {result && (
-              <section style={sc.card} className="sim-card">
+              <section className="glass-card glass-hover glass-lavender sim-card" style={sc.card} >
                 <h2 style={sc.cardTitle} className="sim-card-title">{t('simulate_whatif_recs')}</h2>
                 <ul style={sc.recList}>
                   {result.hypothetical.recommendations.map((rec, i) => (
@@ -341,7 +341,7 @@ const sc: Record<string, React.CSSProperties> = {
   },
 
   layout:    { display: 'grid', gridTemplateColumns: '340px 1fr', gap: '1.5rem', alignItems: 'start' },
-  card:      { border: '1px solid var(--border)', borderRadius: '20px', padding: '1.75rem', background: 'var(--bg-elevated)', boxShadow: 'var(--glow-card)' },
+  card:      {  borderRadius: '20px', padding: '1.75rem',   },
   cardTitle: { margin: '0 0 0.25rem', fontSize: '1rem', fontWeight: 700, color: 'var(--text-h)' },
   cardSub:   { margin: '0 0 1.25rem', fontSize: '0.8125rem', color: 'var(--text)' },
 
@@ -362,7 +362,7 @@ const sc: Record<string, React.CSSProperties> = {
 
   resetBtn: {
     marginTop: '0.75rem', padding: '0.55rem 1.25rem',
-    background: 'transparent', border: '1px solid var(--border)',
+     
     borderRadius: '10px', fontSize: '0.85rem', color: 'var(--text)',
     cursor: 'pointer', fontFamily: 'inherit', transition: 'border-color 0.15s, background 0.15s, color 0.15s',
   },
@@ -371,7 +371,7 @@ const sc: Record<string, React.CSSProperties> = {
   scoreRow:    { display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.875rem' },
   scoreCard:   {
     flex: 1, textAlign: 'center' as const,
-    border: '1px solid var(--border)', borderRadius: '14px', padding: '1.1rem 0.75rem',
+     borderRadius: '14px', padding: '1.1rem 0.75rem',
     background: 'var(--bg-surface)',
   },
   scoreCardLabel: { margin: '0 0 0.3rem', fontSize: '0.72rem', textTransform: 'uppercase' as const, letterSpacing: '0.6px', color: 'var(--text)', fontWeight: 600 },

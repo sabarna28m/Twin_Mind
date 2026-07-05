@@ -205,7 +205,7 @@ function PredCard({ icon, label, prob, conf, color, riskLevel, trend }: { icon:s
   const ta = trend==='up'?'↑':trend==='down'?'↓':'→';
   const tc = trend==='up'?'#10b981':trend==='down'?'#ef4444':'#475569';
   return (
-    <div className="stat-card-premium" style={{ padding:'1.1rem', background:`${color}07`, border:`1px solid ${color}1e`, borderRadius:16 }}>
+    <div className="glass-card glass-hover glass-babyblue" style={{ padding:'1.1rem', background:`${color}07`, border:`1px solid ${color}1e`, borderRadius:16 }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'0.6rem' }}>
         <span style={{ fontSize:'1.2rem' }}>{icon}</span>
         <div style={{ display:'flex', gap:'0.3rem', flexWrap:'wrap', justifyContent:'flex-end' }}>
@@ -1405,7 +1405,7 @@ export default function DigitalPersonaTwin() {
                         {label:'Consistency',    value:`${Math.round(twin.consistency_score)}%`, color:'#10b981'},
                         {label:'Data Points',    value:`${twin.data_points}`, color:'#f59e0b'},
                       ].map(s=>(
-                        <div key={s.label} className="stat-card-premium" style={{ ...C, textAlign:'center', padding:'1.1rem' }}>
+                        <div key={s.label} className="glass-card glass-hover glass-mint" style={{ ...C, textAlign:'center', padding:'1.1rem' }}>
                           <p style={{ margin:'0 0 0.25rem', fontSize:'0.6rem', fontWeight:700, color: '#64748b', letterSpacing:'0.07em', textTransform:'uppercase' as const }}>{s.label}</p>
                           <p style={{ margin:0, fontSize:'1.3rem', fontWeight:900, color:s.color }}>{s.value}</p>
                         </div>

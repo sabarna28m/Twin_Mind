@@ -56,6 +56,7 @@ import Mentor from './pages/Mentor';
 import Twin from './pages/Twin';
 import DigitalPersonaTwin from './pages/DigitalPersonaTwin';
 import Achievements from './pages/Achievements';
+
 import Quiz from './pages/Quiz';
 import Battles from './pages/Battles';
 import ForgotPassword from './pages/ForgotPassword';
@@ -70,7 +71,7 @@ import SkillTree from './pages/SkillTree';
 import Shop from './pages/Shop';
 import StudyPlanner from './pages/StudyPlanner';
 import ShieldCenter from './pages/ShieldCenter';
-import About from './pages/About';
+
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 
@@ -103,7 +104,7 @@ export default function App() {
             <Route path="/register"        element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password"  element={<ResetPassword />} />
-            <Route path="/about"           element={<About />} />
+
 
             {/* Profile setup — protected but skips profile-exists check */}
             <Route
@@ -130,6 +131,7 @@ export default function App() {
               <Route path="/checkin"       element={<CheckIn />} />
               <Route path="/shop"          element={<Shop />} />
               <Route path="/achievements"  element={<Achievements />} />
+
               <Route path="/quiz"          element={<Quiz />} />
               <Route path="/battles"       element={<Battles />} />
               <Route path="/videos"        element={<StudyVideos />} />

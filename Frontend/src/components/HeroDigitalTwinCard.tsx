@@ -84,7 +84,7 @@ export default function HeroDigitalTwinCard() {
   const s = getStyles(isDark);
 
   return (
-    <div style={s.wrap} className="synth-hover-card">
+    <div style={s.wrap} className="glass-card glass-hover glass-cyan">
       <div style={s.accentLine} />
 
       {/* Header */}

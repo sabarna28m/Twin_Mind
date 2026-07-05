@@ -97,7 +97,7 @@ export default function Quiz() {
             <p style={s.sectionLabel}>{t('quiz_choose_type')}</p>
             <div style={s.modesGrid}>
               {/* Practice Quiz */}
-              <button onClick={() => setView('practice')} style={s.modeCard} className="synth-hover-card">
+              <button onClick={() => setView('practice')} style={s.modeCard} className="glass-card glass-hover glass-rose">
                 <div style={s.modeCardGlow} />
                 <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}><BookOpen size={22} color="#fff" /></div>
                 <p style={s.modeTitle}>{t('quiz_practice_title')}</p>
@@ -116,7 +116,7 @@ export default function Quiz() {
               </button>
 
               {/* Focus Mode */}
-              <button onClick={() => setView('focus')} style={s.modeCard} className="synth-hover-card">
+              <button onClick={() => setView('focus')} style={s.modeCard} className="glass-card glass-hover glass-cyan">
                 <div style={{ ...s.modeCardGlow, background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 65%)' }} />
                 <div style={{ ...s.modeIcon, background: 'linear-gradient(135deg,#00D4FF,#7c3aed)' }}><Eye size={22} color="#fff" /></div>
                 <p style={{ ...s.modeTitle, color: 'var(--accent)' }}>{t('quiz_focus_title')}</p>
@@ -142,7 +142,7 @@ export default function Quiz() {
                 { icon: <BookOpen size={22} />, label: 'Upload, analyze & generate quizzes from study materials', tab: 'resources' as Tab, color: '#10b981' },
                 { icon: <FileText size={22} />, label: 'Analyze exam paper patterns & generate new papers',       tab: 'papers'    as Tab, color: '#f59e0b' },
               ].map(item => (
-                <button key={item.tab} onClick={() => setTab(item.tab)} className="synth-hover-card" style={{
+                <button key={item.tab} onClick={() => setTab(item.tab)} className="glass-card glass-hover glass-babyblue" style={{
                   ...s.quickCard, border: isDark ? `1px solid ${item.color}30` : `1px solid rgba(255,255,255,0.5)`,
                 }}>
                   <span style={{ display: 'flex', alignItems: 'center', color: item.color }}>{item.icon}</span>

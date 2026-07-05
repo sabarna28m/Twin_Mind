@@ -103,7 +103,7 @@ export default function Login() {
               <Lock size={28} className="text-blue-600" />
             </div>
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight text-center mb-2">Two-Step Verification</h2>
-            <p className="text-sm text-slate-500 text-center leading-relaxed">
+            <p className="text-sm text-slate-600 text-center leading-relaxed">
               Enter the 6-digit code from your authenticator app,<br />or use a backup recovery code.
             </p>
           </div>
@@ -143,7 +143,7 @@ export default function Login() {
 
           <button
             onClick={() => { clearTwoFAChallenge(); setError(''); }}
-            className="block mx-auto mt-6 text-sm text-slate-500 hover:text-slate-900 transition-colors font-semibold"
+            className="block mx-auto mt-6 text-sm text-slate-600 hover:text-slate-900 transition-colors font-semibold"
           >
             ← Back to login
           </button>
@@ -185,7 +185,7 @@ export default function Login() {
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
               <span className="text-[0.8rem] font-bold text-slate-700">{t('login_password') || 'Password'}</span>
-              <Link to="/forgot-password" className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors">
+              <Link to="/forgot-password" className="text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors">
                 {t('login_forgot') || 'Forgot?'}
               </Link>
             </div>
@@ -217,7 +217,7 @@ export default function Login() {
         {GOOGLE_CLIENT_ID && (
           <div className="flex items-center gap-4 my-7">
             <div className="flex-1 h-px bg-slate-200"></div>
-            <span className="text-xs font-semibold text-slate-400 italic">or</span>
+            <span className="text-xs font-semibold text-slate-600 italic">or</span>
             <div className="flex-1 h-px bg-slate-200"></div>
           </div>
         )}
@@ -237,7 +237,7 @@ export default function Login() {
           </div>
         )}
 
-        <p className="mt-6 text-center text-[0.85rem] text-slate-500">
+        <p className="mt-6 text-center text-[0.85rem] text-slate-600">
           {t('login_no_account') || "Don't you have an account?"} <Link to="/register" className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors">{t('login_create') || 'Sign Up'}</Link>
         </p>
       </motion.div>

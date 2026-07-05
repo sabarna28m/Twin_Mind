@@ -405,7 +405,7 @@ export default function SmartDailyMission({ layout = 'vertical' }: { layout?: 'v
   }, []);
 
   return (
-    <div style={dm.wrap} className="synth-hover-card">
+    <div style={dm.wrap} className="glass-card glass-hover glass-mint">
       <div style={dm.orb} />
       <ConfettiBurst key={confettiKey} active={showConfetti} />
       <div style={{ position: 'relative', zIndex: 30 }}>

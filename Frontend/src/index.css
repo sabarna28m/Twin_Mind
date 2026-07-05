@@ -4632,3 +4632,100 @@ html[data-color-scheme="light"] .dpt-svg-track { stroke: var(--border) !importan
   --glass-bg: var(--bg-elevated);
   --assessment-icon: var(--text-m);
 }
+
+
+/* GLOBAL GLASSMORPHISM UI */
+.glass-card {
+  backdrop-filter: blur(24px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06) !important;
+  border-radius: 24px !important;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s, background 0.3s !important;
+}
+
+html[data-color-scheme="dark"] .glass-card {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* PASTEL THEMES (Light mode) */
+html[data-color-scheme="light"] .glass-cyan { background: linear-gradient(135deg, rgba(0, 212, 255, 0.35) 0%, rgba(124, 58, 237, 0.25) 100%), rgba(255, 255, 255, 0.55) !important; }
+html[data-color-scheme="light"] .glass-babyblue { background: linear-gradient(135deg, rgba(135, 206, 235, 0.4) 0%, rgba(0, 119, 182, 0.25) 100%), rgba(255, 255, 255, 0.55) !important; }
+html[data-color-scheme="light"] .glass-mint { background: linear-gradient(135deg, rgba(16, 185, 129, 0.33) 0%, rgba(52, 211, 153, 0.25) 100%), rgba(255, 255, 255, 0.55) !important; }
+html[data-color-scheme="light"] .glass-lavender { background: linear-gradient(135deg, rgba(167, 139, 250, 0.35) 0%, rgba(139, 92, 246, 0.25) 100%), rgba(255, 255, 255, 0.55) !important; }
+html[data-color-scheme="light"] .glass-peach { background: linear-gradient(135deg, rgba(251, 146, 60, 0.33) 0%, rgba(244, 114, 182, 0.25) 100%), rgba(255, 255, 255, 0.55) !important; }
+html[data-color-scheme="light"] .glass-rose { background: linear-gradient(135deg, rgba(244, 63, 94, 0.3) 0%, rgba(225, 29, 72, 0.25) 100%), rgba(255, 255, 255, 0.55) !important; }
+html[data-color-scheme="light"] .glass-amber { background: linear-gradient(135deg, rgba(245, 158, 11, 0.33) 0%, rgba(217, 119, 6, 0.25) 100%), rgba(255, 255, 255, 0.55) !important; }
+
+/* DARK MODE THEMES */
+html[data-color-scheme="dark"] .glass-cyan, 
+html[data-color-scheme="dark"] .glass-babyblue, 
+html[data-color-scheme="dark"] .glass-mint, 
+html[data-color-scheme="dark"] .glass-lavender, 
+html[data-color-scheme="dark"] .glass-peach, 
+html[data-color-scheme="dark"] .glass-rose, 
+html[data-color-scheme="dark"] .glass-amber { 
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(15, 23, 42, 0.65) !important; 
+}
+
+/* HOVER EFFECT */
+.glass-hover:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12) !important;
+}
+html[data-color-scheme="light"] .glass-hover:hover {
+  filter: brightness(1.05);
+}
+
+/* GLASS BUTTONS */
+.glass-btn {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 99px !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  color: var(--text-h) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease !important;
+}
+.glass-btn:hover {
+  transform: scale(1.03) translateY(-1px) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 100%) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), 0 0 12px rgba(255, 255, 255, 0.5) !important;
+}
+html[data-color-scheme="dark"] .glass-btn {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+html[data-color-scheme="dark"] .glass-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* GLASS INPUTS */
+.glass-input {
+  background: rgba(255, 255, 255, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  color: var(--text-h) !important;
+  transition: all 0.3s ease !important;
+  outline: none !important;
+}
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(0, 212, 255, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15) !important;
+}
+html[data-color-scheme="dark"] .glass-input {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+html[data-color-scheme="dark"] .glass-input:focus {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(0, 212, 255, 0.4) !important;
+}

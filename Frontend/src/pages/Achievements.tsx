@@ -108,7 +108,7 @@ function NextGoalPanel({ badges }: { badges: Achievement[] }) {
   if (!candidates.length) return null;
 
   return (
-    <div className="synth-hover-card" style={{
+    <div className="glass-card glass-hover glass-lavender" style={{
       ...ng.wrap,
       boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
       background: isDark
@@ -190,7 +190,7 @@ function BadgeCard({ badge, isNew }: { badge: Achievement; isNew: boolean }) {
 
   return (
     <div
-      className={cardClass ? `${cardClass} synth-hover-card` : 'synth-hover-card'}
+      className={cardClass ? `${cardClass} glass-card glass-hover glass-peach` : 'glass-card glass-hover glass-peach'}
       style={{
         ...bc.card,
         ...glassStyle,
@@ -452,7 +452,7 @@ export default function Achievements() {
                 : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
               backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
               border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
-            }} className="synth-hover-card">
+            }} className="glass-card glass-hover glass-peach">
               <div style={s.completionMain}>
                 <span style={s.completionNum}>{earnedCount}</span>
                 <span style={s.completionOf}>/ {totalCount}</span>

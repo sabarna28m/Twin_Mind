@@ -320,7 +320,7 @@ export default function Burnout() {
         <div style={p.twoCol} className="burnout-two-col">
 
           {/* Left: Score widget */}
-          <section style={p.card}>
+          <section className="glass-card glass-hover glass-cyan" style={p.card}>
             <div style={p.cardHead}>
               <h2 style={p.cardTitle}>{t('burnout_score_title')}</h2>
               {displayed && (
@@ -386,7 +386,7 @@ export default function Burnout() {
           </section>
 
           {/* Right: Check-in form */}
-          <section style={p.card}>
+          <section className="glass-card glass-hover glass-babyblue" style={p.card}>
             <div style={p.cardHead}>
               <h2 style={p.cardTitle}>{t('burnout_checkin_title')}</h2>
               <span style={p.dateBadge}>{new Date().toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
@@ -486,7 +486,7 @@ export default function Burnout() {
 
               {formErr && <p style={p.errorBox}>{formErr}</p>}
 
-              <button type="submit" disabled={submitting} style={{ ...p.submitBtn, opacity: submitting ? 0.7 : 1 }}>
+              <button type="submit" disabled={submitting} className="glass-btn" style={{ ...p.submitBtn, opacity: submitting ? 0.7 : 1 }}>
                 {submitting ? t('loading') : t('burnout_submit')}
               </button>
             </form>
@@ -494,7 +494,7 @@ export default function Burnout() {
         </div>
 
         {/* ── AI Recommendations ── */}
-        <section id="recommendations" style={p.card}>
+        <section className="glass-card glass-hover glass-mint" id="recommendations" style={p.card}>
           <h2 style={p.cardTitle}>{t('burnout_recs')}</h2>
           <div style={p.recGrid} className="burnout-rec-grid">
             {(displayedRecs.length > 0
@@ -512,7 +512,7 @@ export default function Burnout() {
 
         {/* ── AI Twin Message ── */}
         {(displayedTwin || displayed) && (
-          <section style={p.card}>
+          <section className="glass-card glass-hover glass-lavender" style={p.card}>
             <div style={p.twinHead}>
               <div style={p.twinAvatar}>◈</div>
               <div>
@@ -531,7 +531,7 @@ export default function Burnout() {
         )}
 
         {/* ── Burnout Trend ── */}
-        <section style={p.card}>
+        <section className="glass-card glass-hover glass-peach" style={p.card}>
           <div style={p.cardHead}>
             <h2 style={p.cardTitle}><TrendingUp size={16} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle', color: '#6366f1' }} />{t('burnout_trend')}</h2>
             <div style={p.toggleGroup}>
@@ -596,7 +596,7 @@ export default function Burnout() {
 
         {/* ── Notifications ── */}
         {notifications.length > 0 && (
-          <section style={p.card}>
+          <section className="glass-card glass-hover glass-rose" style={p.card}>
             <h2 style={p.cardTitle}><Bell size={16} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle', color: '#6366f1' }} />Notifications</h2>
             <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '0.55rem' }}>
               {notifications.map(n => (

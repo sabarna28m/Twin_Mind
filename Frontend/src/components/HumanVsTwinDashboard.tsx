@@ -364,7 +364,7 @@ export default function HumanVsTwinDashboard() {
                 <ReferenceLine y={80} stroke="#10b981" strokeDasharray="4 3" strokeOpacity={0.4}
                   label={{ value: '80%', fill: '#10b981', fontSize: 8, position: 'right' }} />
                 <Bar dataKey="accuracy" fill="rgba(99,102,241,0.4)" radius={[4,4,0,0]}
-                  label={{ position: 'top', fontSize: 8, fill: '#818cf8', formatter: (v: number) => `${Math.round(v)}%` }} />
+                  label={{ position: 'top', fontSize: 8, fill: '#818cf8', formatter: (v: any) => `${Math.round(v)}%` }} />
                 <Line type="monotone" dataKey="accuracy" stroke="#818cf8" strokeWidth={2} dot={false} />
               </ComposedChart>
             </ResponsiveContainer>

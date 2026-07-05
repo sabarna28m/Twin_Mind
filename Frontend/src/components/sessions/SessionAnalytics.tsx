@@ -48,7 +48,7 @@ export default function SessionAnalytics({ sessions }: Props) {
     <div style={s.wrap}>
 
       {/* Weekly chart */}
-      <div style={s.panel} className="glass-panel">
+      <div style={s.panel} className="glass-card glass-lavender">
         <div style={s.panelHead}>
           <span style={s.panelTitle}>Weekly Focus Time</span>
           <span style={s.panelBadge}>Last 7 days</span>
@@ -88,7 +88,7 @@ export default function SessionAnalytics({ sessions }: Props) {
 
       {/* Top subjects */}
       {subjects.length > 0 && (
-        <div style={s.panel} className="glass-panel">
+        <div style={s.panel} className="glass-card glass-lavender">
           <div style={s.panelHead}>
             <span style={s.panelTitle}>Top Subjects</span>
             <span style={s.panelBadge}>By time spent</span>
@@ -121,8 +121,7 @@ const s: Record<string, React.CSSProperties> = {
   wrap: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   panel: {
     padding: '1.25rem',
-    background: 'rgba(10,16,32,0.75)', border: '1px solid #e2e8f0',
-    borderRadius: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.04)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    
   },
   panelHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' },
   panelTitle:{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-h)', margin: 0 },

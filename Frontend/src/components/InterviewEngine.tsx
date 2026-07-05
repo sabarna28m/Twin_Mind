@@ -601,8 +601,8 @@ function MockInterviewView({ career, domain, onComplete }: {
 
   // Voice recognition
   function startListening() {
-    const SR = (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition
-            || (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
+    const SR = (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).SpeechRecognition
+            || (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).webkitSpeechRecognition;
     if (!SR) { alert('Voice recognition not supported in this browser. Use Chrome.'); return; }
     const r = new SR();
     r.continuous = true; r.interimResults = true; r.lang = 'en-IN';

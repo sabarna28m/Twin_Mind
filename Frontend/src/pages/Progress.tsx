@@ -353,7 +353,7 @@ export default function Progress() {
                 { label: t('progress_avg_study'),  value: `${summary.avg_study_hours}h`,          sub: t('progress_per_day'),    grad: 'linear-gradient(135deg,#3b82f6,#6366f1)' },
                 { label: t('progress_avg_score'),  value: avgScore || '—',                        sub: t('progress_last_12w'),   grad: 'linear-gradient(135deg,#f59e0b,#f97316)' },
               ].map(c => (
-                <div key={c.label} style={s.statCard} className="synth-hover-card">
+                <div key={c.label} style={s.statCard} className="glass-card glass-hover glass-lavender">
                   <p style={{ margin: '0 0 0.4rem', fontSize: '0.72rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{c.label}</p>
                   <p style={{ margin: '0 0 0.2rem', fontSize: '1.65rem', fontWeight: 800, background: c.grad, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent', display: 'inline-block' }}>{c.value}</p>
                   <p style={{ margin: 0, fontSize: '0.7rem', color: '#334155' }}>{c.sub}</p>
@@ -362,7 +362,7 @@ export default function Progress() {
             </div>
 
             {/* ── Study heatmap ── */}
-            <div style={{ ...s.card, marginBottom: '1.25rem' }} className="synth-hover-card">
+            <div style={{ ...s.card, marginBottom: '1.25rem' }} className="glass-card glass-hover glass-peach">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h2 style={s.cardTitle}>{t('progress_heatmap')}</h2>
                 <span style={{ fontSize: '0.72rem', color: '#475569' }}>{t('progress_heatmap_sub')}</span>
@@ -377,7 +377,7 @@ export default function Progress() {
             {/* ── Charts row ── */}
             <div style={s.twoCol} className="mob-two-col">
               {/* Weekly trend */}
-              <div style={s.card} className="synth-hover-card">
+              <div style={s.card} className="glass-card glass-peach">
                 <h2 style={s.cardTitle}>{t('progress_weekly_trend')}</h2>
                 {summary.weekly_summaries.length < 2 ? (
                   <p style={s.empty}>{t('progress_weekly_min')}</p>
@@ -414,7 +414,7 @@ export default function Progress() {
               </div>
 
               {/* Monthly bars */}
-              <div style={s.card} className="synth-hover-card">
+              <div style={s.card} className="glass-card glass-peach">
                 <h2 style={s.cardTitle}>{t('progress_monthly')}</h2>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={summary.monthly_summaries} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
@@ -440,7 +440,7 @@ export default function Progress() {
             {/* ── Bottom row: subjects + best/worst ── */}
             <div style={s.twoCol} className="mob-two-col">
               {/* Subject performance */}
-              <div style={s.card} className="synth-hover-card">
+              <div style={s.card} className="glass-card glass-peach">
                 <h2 style={s.cardTitle}>{t('progress_subjects')}</h2>
                 {summary.subject_performance.length === 0 ? (
                   <p style={s.empty}>{t('progress_no_subjects')}</p>
@@ -467,7 +467,7 @@ export default function Progress() {
               {/* Best / worst week + session stats */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 {summary.best_week && summary.worst_week && (
-                  <div style={s.card} className="synth-hover-card">
+                  <div style={s.card} className="glass-card glass-peach">
                     <h2 style={s.cardTitle}>Highlight Weeks</h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
                       <div style={{ padding: '0.7rem 0.9rem', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '10px' }}>
@@ -485,7 +485,7 @@ export default function Progress() {
                 )}
 
                 {/* Session stats */}
-                <div style={s.card} className="synth-hover-card">
+                <div style={s.card} className="glass-card glass-peach">
                   <h2 style={s.cardTitle}>Session Stats</h2>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.7rem' }}>
                     {[
@@ -505,7 +505,7 @@ export default function Progress() {
             </div>
 
             {/* ── Sleep & stress averages ── */}
-            <div style={{ ...s.card, marginBottom: 0 }} className="synth-hover-card">
+            <div style={{ ...s.card, marginBottom: 0 }} className="glass-card glass-rose">
               <h2 style={s.cardTitle}>Wellness Averages</h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.75rem' }} className="mob-wellness-row">
                 {[

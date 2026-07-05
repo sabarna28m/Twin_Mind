@@ -852,7 +852,7 @@ export default function AIFocusDetector() {
                 </div>
 
                 {/* Score panel */}
-                <div className="glass-panel stat-card-premium" style={s.scoreCard}>
+                <div className="glass-panel glass-card glass-hover glass-lavender" style={s.scoreCard}>
                   <div style={{ ...s.orb, background: `radial-gradient(circle, ${color}22 0%, transparent 70%)` }} />
                   <div style={{ position: 'relative', zIndex: 1 }}>
                     <ScoreRing score={score} color={color} size={174} />

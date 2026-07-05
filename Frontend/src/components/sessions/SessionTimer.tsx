@@ -230,7 +230,7 @@ export default function SessionTimer({ subjects, onComplete }: Props) {
   const s = getStyles(isDark);
 
   return (
-    <div style={s.card} className="synth-hover-card stat-card-premium">
+    <div style={s.card} className="glass-card glass-hover glass-peach">
       {/* Ambient orbs */}
       <div style={s.orb1} /><div style={s.orb2} />
 
@@ -248,7 +248,7 @@ export default function SessionTimer({ subjects, onComplete }: Props) {
           placeholder="Session title (e.g. Calculus Chapter 4)"
           value={sessionTitle}
           onChange={e => setSessionTitle(e.target.value)}
-          style={s.metaInput}
+          style={s.metaInput} className="glass-input"
           disabled={isActive}
         />
         {subjects.length > 0 ? (
@@ -267,7 +267,7 @@ export default function SessionTimer({ subjects, onComplete }: Props) {
             placeholder="Subject (optional)"
             value={sessionSubject}
             onChange={e => setSessionSubject(e.target.value)}
-            style={s.metaInput}
+            style={s.metaInput} className="glass-input"
             disabled={isActive}
           />
         )}
@@ -336,23 +336,23 @@ export default function SessionTimer({ subjects, onComplete }: Props) {
       {/* ── Controls ── */}
       <div style={s.controls}>
         {status === 'ready' && (
-          <button style={{ ...s.btn, ...s.btnPrimary }} onClick={handleStart} disabled={(inputH + inputM + inputS) === 0} className="focus-ctrl-btn">
+          <button style={{ ...s.btn, ...s.btnPrimary }} className="glass-btn focus-ctrl-btn" onClick={handleStart} disabled={(inputH + inputM + inputS) === 0} >
             <Play size={16} fill="currentColor" />Start
           </button>
         )}
         {status === 'running' && (<>
-          <button style={{ ...s.btn, ...s.btnAmber }} onClick={handlePause} className="focus-ctrl-btn"><Pause size={16} fill="currentColor" />Pause</button>
-          <button style={{ ...s.btn, ...s.btnDanger }} onClick={handleStop} className="focus-ctrl-btn"><Square size={16} fill="currentColor" />Stop</button>
+          <button style={{ ...s.btn, ...s.btnAmber }} className="glass-btn focus-ctrl-btn" onClick={handlePause} ><Pause size={16} fill="currentColor" />Pause</button>
+          <button style={{ ...s.btn, ...s.btnDanger }} className="glass-btn focus-ctrl-btn" onClick={handleStop} ><Square size={16} fill="currentColor" />Stop</button>
         </>)}
         {status === 'paused' && (<>
-          <button style={{ ...s.btn, ...s.btnPrimary }} onClick={handleResume} className="focus-ctrl-btn"><Play size={16} fill="currentColor" />Resume</button>
-          <button style={{ ...s.btn, ...s.btnDanger }} onClick={handleStop} className="focus-ctrl-btn"><Square size={16} fill="currentColor" />Stop</button>
+          <button style={{ ...s.btn, ...s.btnPrimary }} className="glass-btn focus-ctrl-btn" onClick={handleResume} ><Play size={16} fill="currentColor" />Resume</button>
+          <button style={{ ...s.btn, ...s.btnDanger }} className="glass-btn focus-ctrl-btn" onClick={handleStop} ><Square size={16} fill="currentColor" />Stop</button>
         </>)}
         {status === 'completed' && (
-          <button style={{ ...s.btn, ...s.btnSuccess }} onClick={handleReset} className="focus-ctrl-btn"><RotateCcw size={16} />New Session</button>
+          <button style={{ ...s.btn, ...s.btnSuccess }} className="glass-btn focus-ctrl-btn" onClick={handleReset} ><RotateCcw size={16} />New Session</button>
         )}
         {(status === 'ready' || status === 'paused') && (
-          <button style={{ ...s.btn, ...s.btnGhost }} onClick={handleReset} className="focus-ctrl-btn"><RotateCcw size={16} />Reset</button>
+          <button style={{ ...s.btn, ...s.btnGhost }} className="glass-btn focus-ctrl-btn" onClick={handleReset} ><RotateCcw size={16} />Reset</button>
         )}
       </div>
 
@@ -376,7 +376,7 @@ const tf: Record<string, React.CSSProperties> = {
   wrap:  { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' },
   label: { fontSize: '0.6rem', fontWeight: 700, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.08em' },
   adj:   { width: '32px', height: '22px', background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.18)', borderRadius: '5px', color: '#00D4FF', fontSize: '0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' },
-  input: { width: '56px', textAlign: 'center', padding: '0.38rem 0.2rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '9px', color: 'var(--text-h)', fontSize: '1.2rem', fontWeight: 700, fontFamily: 'ui-monospace,Consolas,monospace', outline: 'none' },
+  input: { width: '56px', textAlign: 'center', padding: '0.38rem 0.2rem',  borderRadius: '9px', color: 'var(--text-h)', fontSize: '1.2rem', fontWeight: 700, fontFamily: 'ui-monospace,Consolas,monospace', outline: 'none' },
 };
 
 function getStyles(isDark: boolean): Record<string, React.CSSProperties> {
@@ -385,11 +385,12 @@ function getStyles(isDark: boolean): Record<string, React.CSSProperties> {
     position: 'relative', overflow: 'hidden',
     background: isDark
       ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%), rgba(15, 23, 42, 0.65)'
-      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%), rgba(255, 255, 255, 0.55)',
-    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+      : 'linear-gradient(135deg, rgba(0, 212, 255, 0.3) 0%, rgba(124, 58, 237, 0.25) 100%), rgba(255, 255, 255, 0.45)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0, 212, 255, 0.4)',
     borderRadius: '24px', padding: '1.5rem 1.25rem',
     backdropFilter: 'blur(24px) saturate(150%)', WebkitBackdropFilter: 'blur(24px) saturate(150%)',
-    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0, 212, 255, 0.08)',
+    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 16px 40px rgba(0, 212, 255, 0.18), 0 0 0 1px rgba(0, 212, 255, 0.15)',
+    transform: isDark ? 'none' : 'translateY(-4px)',
     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.1rem',
   },
   orb1: { position: 'absolute', top: '-50px', right: '-50px', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 70%)', pointerEvents: 'none' },
@@ -405,7 +406,7 @@ function getStyles(isDark: boolean): Record<string, React.CSSProperties> {
   metaRow: { display: 'flex', flexDirection: 'column', gap: '0.55rem', width: '100%', position: 'relative', zIndex: 2, transition: 'opacity 0.3s' },
   metaInput: {
     width: '100%', boxSizing: 'border-box', padding: '0.55rem 0.85rem',
-    background: '#f8fafc', border: '1px solid #e2e8f0',
+    
     borderRadius: '10px', color: 'var(--text-h)', fontSize: '0.82rem', fontFamily: 'inherit',
     outline: 'none',
   },

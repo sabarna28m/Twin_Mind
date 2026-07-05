@@ -221,7 +221,7 @@ function Tag({ text, color }: { text:string; color:string }) {
 
 function ScoreCard({ label, value, color, icon }: { label:string; value:number; color:string; icon:ReactNode }) {
   return (
-    <div style={{ background:CARD2, border:`1px solid ${color}30`, borderRadius:16, padding:'1.1rem', textAlign:'center' }}>
+    <div className="glass-card glass-hover glass-cyan" style={{  border:`1px solid ${color}30`, borderRadius:16, padding:'1.1rem', textAlign:'center' }}>
       <div style={{ display:'flex', justifyContent:'center', marginBottom:4, color }}>{icon}</div>
       <div style={{ fontSize:'0.7rem', color:MUTED, textTransform:'uppercase', letterSpacing:1, marginBottom:4 }}>{label}</div>
       <div style={{ fontSize:'1.8rem', fontWeight:800, color, lineHeight:1 }}>{value}</div>
@@ -282,7 +282,7 @@ function CareerTwinSection() {
       {/* Second row: Employability + Predictions */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.25rem' }}>
         {/* Employability gauges */}
-        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+        <div className="glass-card glass-hover glass-babyblue" style={{   borderRadius:20, padding:'1.5rem' }}>
           <div style={{ color:TEXT, fontWeight:700, marginBottom:'1.2rem' }}>Readiness Scores</div>
           {[
             { label:'Employability Score',   value:data.employability_score,  color:GREEN  },
@@ -308,7 +308,7 @@ function CareerTwinSection() {
         </div>
 
         {/* Predictions */}
-        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+        <div className="glass-card glass-hover glass-mint" style={{   borderRadius:20, padding:'1.5rem' }}>
           <div style={{ color:TEXT, fontWeight:700, marginBottom:'1.2rem' }}>Future State Predictions</div>
           {(['3m','6m','12m'] as const).map((key, i) => {
             const pred = data.predictions[key];
@@ -344,7 +344,7 @@ function CareerTwinSection() {
 
       {/* Score history chart */}
       {data.score_history.length >= 2 && (
-        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+        <div className="glass-card glass-hover glass-lavender" style={{   borderRadius:20, padding:'1.5rem' }}>
           <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Career Twin Evolution</div>
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={data.score_history}>
@@ -393,7 +393,7 @@ function OverviewSection() {
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.5rem' }}>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.5rem' }}>
-        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.75rem', display:'flex', alignItems:'center', gap:'1.75rem' }}>
+        <div className="glass-card glass-hover glass-peach" style={{   borderRadius:20, padding:'1.75rem', display:'flex', alignItems:'center', gap:'1.75rem' }}>
           <div style={{ position:'relative', display:'inline-flex', alignItems:'center', justifyContent:'center' }}>
             <ScoreRing score={data.score} color={gc} size={130} />
             <div style={{ position:'absolute', textAlign:'center' }}>
@@ -407,7 +407,7 @@ function OverviewSection() {
             <div style={{ color:MUTED, fontSize:'0.82rem', marginTop:8, lineHeight:1.6 }}>{data.job_readiness_probability >= 0.8 ? 'Excellent — nearly job-ready.' : data.job_readiness_probability >= 0.6 ? 'Good — keep building.' : 'Developing — focus on gaps.'}</div>
           </div>
         </div>
-        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem', display:'flex', flexDirection:'column', gap:'1rem' }}>
+        <div className="glass-card glass-hover glass-rose" style={{   borderRadius:20, padding:'1.5rem', display:'flex', flexDirection:'column', gap:'1rem' }}>
           <div>
             <div style={{ color:GREEN, fontSize:'0.75rem', fontWeight:700, textTransform:'uppercase', letterSpacing:1, marginBottom:8 }}>✓ Strengths</div>
             <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>{data.strengths.map(s => <Tag key={s} text={s} color={GREEN} />)}</div>
@@ -418,7 +418,7 @@ function OverviewSection() {
           </div>
         </div>
       </div>
-      <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+      <div className="glass-card glass-hover glass-cyan" style={{   borderRadius:20, padding:'1.5rem' }}>
         <div style={{ color:TEXT, fontWeight:700, marginBottom:'1.2rem' }}>Performance Breakdown</div>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.9rem 2.5rem' }}>
           {Object.entries(data.component_scores).map(([k,v]) => {
@@ -507,7 +507,7 @@ function ResumeUploadSection() {
         ))}
       </div>
 
-      <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+      <div className="glass-card glass-hover glass-babyblue" style={{   borderRadius:20, padding:'1.5rem' }}>
         <input placeholder="Target role (e.g. AI Engineer)" value={role} onChange={e=>setRole(e.target.value)}
           style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.6rem 1rem', color:TEXT, fontSize:'0.88rem', marginBottom:'1rem', boxSizing:'border-box' }} />
 
@@ -567,7 +567,7 @@ function ResumeUploadSection() {
               { label:'Content',         value:result.content_score,    color:scoreColor(result.content_score)    },
               { label:'Keywords',        value:result.keyword_score,    color:scoreColor(result.keyword_score)    },
             ].map(({ label, value, color }) => (
-              <div key={label} style={{ background:CARD, border:BORDER, borderRadius:14, padding:'0.85rem', textAlign:'center' }}>
+              <div key={label} className="glass-card glass-hover glass-mint" style={{   borderRadius:14, padding:'0.85rem', textAlign:'center' }}>
                 <div style={{ fontSize:'0.68rem', color:MUTED, textTransform:'uppercase', letterSpacing:1 }}>{label}</div>
                 <div style={{ fontSize:'1.8rem', fontWeight:800, color, margin:'4px 0' }}>{value}</div>
                 <Bar value={value} color={color} height={3} />
@@ -585,11 +585,11 @@ function ResumeUploadSection() {
 
           {/* Strengths / Weaknesses */}
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+            <div className="glass-card glass-hover glass-lavender" style={{   borderRadius:14, padding:'1.1rem' }}>
               <div style={{ color:GREEN, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>✓ Strengths</div>
               {result.strengths.map((s,i) => <div key={i} style={{ color:MUTED, fontSize:'0.81rem', marginBottom:4 }}>• {s}</div>)}
             </div>
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+            <div className="glass-card glass-hover glass-peach" style={{   borderRadius:14, padding:'1.1rem' }}>
               <div style={{ color:RED, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>✗ Weaknesses</div>
               {result.weaknesses.map((w,i) => <div key={i} style={{ color:MUTED, fontSize:'0.81rem', marginBottom:4 }}>• {w}</div>)}
             </div>
@@ -599,13 +599,13 @@ function ResumeUploadSection() {
           {(result.grammar_issues.length > 0 || result.formatting_issues.length > 0) && (
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
               {result.grammar_issues.length > 0 && (
-                <div style={{ background:CARD, border:`1px solid ${AMBER}30`, borderRadius:14, padding:'1.1rem' }}>
+                <div className="glass-card glass-hover glass-rose" style={{  border:`1px solid ${AMBER}30`, borderRadius:14, padding:'1.1rem' }}>
                   <div style={{ color:AMBER, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>✎ Grammar Issues</div>
                   {result.grammar_issues.map((g,i) => <div key={i} style={{ color:MUTED, fontSize:'0.81rem', marginBottom:4 }}>• {g}</div>)}
                 </div>
               )}
               {result.formatting_issues.length > 0 && (
-                <div style={{ background:CARD, border:`1px solid ${AMBER}30`, borderRadius:14, padding:'1.1rem' }}>
+                <div className="glass-card glass-hover glass-cyan" style={{  border:`1px solid ${AMBER}30`, borderRadius:14, padding:'1.1rem' }}>
                   <div style={{ color:AMBER, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>⊞ Formatting Issues</div>
                   {result.formatting_issues.map((f,i) => <div key={i} style={{ color:MUTED, fontSize:'0.81rem', marginBottom:4 }}>• {f}</div>)}
                 </div>
@@ -614,7 +614,7 @@ function ResumeUploadSection() {
           )}
 
           {/* Section-by-section */}
-          <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.25rem' }}>
+          <div className="glass-card glass-hover glass-babyblue" style={{   borderRadius:16, padding:'1.25rem' }}>
             <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Section-by-Section Analysis</div>
             {result.sections.map(sec => {
               const c = scoreColor(sec.score);
@@ -640,7 +640,7 @@ function ResumeUploadSection() {
 
           {/* Bullet improvements */}
           {result.bullet_improvements.length > 0 && (
-            <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.25rem' }}>
+            <div className="glass-card glass-hover glass-mint" style={{   borderRadius:16, padding:'1.25rem' }}>
               <div style={{ color:TEXT, fontWeight:700, marginBottom:'0.25rem' }}>Bullet Point Improvements</div>
               <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:'1rem' }}>Click a card to see Before → After</div>
               <div style={{ display:'flex', flexDirection:'column', gap:'0.85rem' }}>
@@ -676,7 +676,7 @@ function ResumeUploadSection() {
 
           {/* Missing keywords */}
           {result.missing_keywords.length > 0 && (
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+            <div className="glass-card glass-hover glass-lavender" style={{   borderRadius:14, padding:'1.1rem' }}>
               <div style={{ color:AMBER, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>Missing Keywords</div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
                 {result.missing_keywords.map(k => <Tag key={k} text={k} color={AMBER} />)}
@@ -685,7 +685,7 @@ function ResumeUploadSection() {
           )}
 
           {/* Suggestions */}
-          <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+          <div className="glass-card glass-hover glass-peach" style={{   borderRadius:14, padding:'1.1rem' }}>
             <div style={{ color:CYAN, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem', display:'flex', alignItems:'center', gap:4 }}><Lightbulb size={14} style={{ flexShrink:0 }} /> Suggestions</div>
             {result.suggestions.map((s,i) => <div key={i} style={{ color:MUTED, fontSize:'0.82rem', marginBottom:4 }}>→ {s}</div>)}
           </div>
@@ -797,7 +797,7 @@ function LinkedInSection() {
           ))}
         </div>
 
-        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem', display:'flex', flexDirection:'column', gap:'0.75rem' }}>
+        <div className="glass-card glass-hover glass-rose" style={{   borderRadius:20, padding:'1.5rem', display:'flex', flexDirection:'column', gap:'0.75rem' }}>
           <input placeholder="Target role (e.g. AI Engineer)" value={role} onChange={e=>setRole(e.target.value)}
             style={{ width:'100%', background:'rgba(255,255,255,0.04)', border:BORDER, borderRadius:10, padding:'0.6rem 1rem', color:TEXT, fontSize:'0.88rem', boxSizing:'border-box' }} />
 
@@ -920,7 +920,7 @@ function LinkedInSection() {
 
         {/* Section scores */}
         {d.sections.length > 0 && (
-          <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.25rem' }}>
+          <div className="glass-card glass-hover glass-cyan" style={{   borderRadius:16, padding:'1.25rem' }}>
             <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Section-by-Section Analysis</div>
             {d.sections.map(sec => {
               const c = sc(sec.score);
@@ -941,13 +941,13 @@ function LinkedInSection() {
 
         {/* Generated content */}
         {d.suggested_headline && (
-          <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+          <div className="glass-card glass-hover glass-babyblue" style={{   borderRadius:14, padding:'1.1rem' }}>
             <div style={{ color:CYAN, fontWeight:700, fontSize:'0.83rem', marginBottom:8 }}>Suggested Headline</div>
             <div style={{ background:`${CYAN}08`, border:`1px solid ${CYAN}25`, borderRadius:8, padding:'0.75rem', color:TEXT, fontSize:'0.9rem', lineHeight:1.6 }}>{d.suggested_headline}</div>
           </div>
         )}
         {d.suggested_about && (
-          <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+          <div className="glass-card glass-hover glass-mint" style={{   borderRadius:14, padding:'1.1rem' }}>
             <div style={{ color:CYAN, fontWeight:700, fontSize:'0.83rem', marginBottom:8 }}>Suggested About Section</div>
             <div style={{ background:`${CYAN}06`, border:`1px solid ${CYAN}20`, borderRadius:8, padding:'0.85rem', color:MUTED, fontSize:'0.86rem', lineHeight:1.75 }}>{d.suggested_about}</div>
           </div>
@@ -963,7 +963,7 @@ function LinkedInSection() {
             { label:'Important Projects',      items:d.important_projects,      color:PURPLE },
             { label:'Learning Priorities',     items:d.learning_priorities,     color:INDIGO },
           ].map(({ label, items, color }) => items.length > 0 && (
-            <div key={label} style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1rem' }}>
+            <div key={label} className="glass-card glass-hover glass-lavender" style={{   borderRadius:14, padding:'1rem' }}>
               <div style={{ color, fontWeight:700, fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:0.8, marginBottom:'0.55rem' }}>{label}</div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>{items.map(item => <Tag key={item} text={item} color={color} />)}</div>
             </div>
@@ -1031,7 +1031,7 @@ function LinkedInSection() {
     return (
       <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
         {/* Upload panel */}
-        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+        <div className="glass-card glass-hover glass-peach" style={{   borderRadius:20, padding:'1.5rem' }}>
           <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Add Achievement or Certificate</div>
           <div style={{ display:'flex', gap:6, marginBottom:'1rem' }}>
             {[{id:'file' as const, label:'Upload File'}, {id:'manual' as const, label:'Manual Entry'}].map(m => (
@@ -1099,7 +1099,7 @@ function LinkedInSection() {
               const open = expandedId === a.id;
               const avgScore = Math.round((a.impact_score + a.career_value_score + a.recruiter_appeal_score) / 3);
               return (
-                <div key={a.id} style={{ background:CARD, border:BORDER, borderRadius:16, overflow:'hidden' }}>
+                <div key={a.id} className="glass-card glass-hover glass-rose" style={{   borderRadius:16, overflow:'hidden' }}>
                   <div onClick={() => setExpandedId(open ? null : a.id)} style={{ padding:'1rem 1.25rem', cursor:'pointer', display:'flex', alignItems:'center', gap:'0.85rem' }}>
                     <div style={{ width:42, height:42, borderRadius:10, background:`${PURPLE}22`, border:`1px solid ${PURPLE}44`, display:'flex', alignItems:'center', justifyContent:'center', color:PURPLE, flexShrink:0 }}>
                       {a.achievement_type==='certificate'?<GraduationCap size={20}/>:a.achievement_type==='internship'?<Briefcase size={20}/>:a.achievement_type==='project'?<Code2 size={20}/>:a.achievement_type==='hackathon'?<Zap size={20}/>:a.achievement_type==='award'?<Trophy size={20}/>:<FileText size={20}/>}
@@ -1191,7 +1191,7 @@ function LinkedInSection() {
     return (
       <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
         {/* Checklist */}
-        <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+        <div className="glass-card glass-hover glass-cyan" style={{   borderRadius:20, padding:'1.5rem' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem' }}>
             <div style={{ color:TEXT, fontWeight:700 }}>Optimization Checklist</div>
             <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
@@ -1215,7 +1215,7 @@ function LinkedInSection() {
 
         {/* Before / After improvements */}
         {improvements.length > 0 && (
-          <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.5rem' }}>
+          <div className="glass-card glass-hover glass-babyblue" style={{   borderRadius:20, padding:'1.5rem' }}>
             <div style={{ color:TEXT, fontWeight:700, marginBottom:'0.5rem' }}>Before → After Improvements</div>
             <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:'1rem' }}>Click a card to expand</div>
             {improvements.map((imp, i) => {
@@ -1279,7 +1279,7 @@ function LinkedInSection() {
           const p = twinData.predictions[key];
           if (!p) return null;
           return (
-            <div key={key} style={{ background:CARD, border:`1px solid ${color}30`, borderRadius:18, padding:'1.5rem' }}>
+            <div key={key} className="glass-card glass-hover glass-mint" style={{  border:`1px solid ${color}30`, borderRadius:18, padding:'1.5rem' }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem' }}>
                 <div style={{ color:color, fontWeight:800, fontSize:'1rem' }}>{label} Ahead</div>
                 <div style={{ display:'flex', gap:6 }}>
@@ -1400,7 +1400,7 @@ function InterviewSection() {
   }
 
   if (!started) return (
-    <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'2.5rem', maxWidth:500, margin:'0 auto', textAlign:'center' }}>
+    <div className="glass-card glass-hover glass-lavender" style={{   borderRadius:20, padding:'2.5rem', maxWidth:500, margin:'0 auto', textAlign:'center' }}>
       <Mic size={48} style={{ marginBottom:'1rem', color: MUTED }} />
       <div style={{ color:TEXT, fontWeight:700, fontSize:'1.2rem', marginBottom:'0.5rem' }}>AI Mock Interview</div>
       <div style={{ color:MUTED, fontSize:'0.85rem', lineHeight:1.6, marginBottom:'1.5rem' }}>
@@ -1463,7 +1463,7 @@ function InterviewSection() {
         <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:'0.5rem' }}>
             {Object.entries(scores).map(([k,v]) => (
-              <div key={k} style={{ background:CARD, border:BORDER, borderRadius:12, padding:'0.65rem', textAlign:'center' }}>
+              <div key={k} className="glass-card glass-hover glass-peach" style={{   borderRadius:12, padding:'0.65rem', textAlign:'center' }}>
                 <div style={{ fontSize:'0.68rem', color:MUTED, textTransform:'capitalize' }}>{k.replace('_',' ')}</div>
                 <div style={{ fontSize:'1.5rem', fontWeight:800, color:v>=75?GREEN:v>=55?AMBER:RED }}>{v}</div>
               </div>
@@ -1471,11 +1471,11 @@ function InterviewSection() {
           </div>
           {(strengths.length > 0 || improvements.length > 0) && (
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem' }}>
-              <div style={{ background:CARD, border:BORDER, borderRadius:12, padding:'1rem' }}>
+              <div className="glass-card glass-hover glass-rose" style={{   borderRadius:12, padding:'1rem' }}>
                 <div style={{ color:GREEN, fontWeight:700, fontSize:'0.8rem', marginBottom:6 }}>✓ Strengths</div>
                 {strengths.map((s,i) => <div key={i} style={{ color:MUTED, fontSize:'0.8rem' }}>• {s}</div>)}
               </div>
-              <div style={{ background:CARD, border:BORDER, borderRadius:12, padding:'1rem' }}>
+              <div className="glass-card glass-hover glass-cyan" style={{   borderRadius:12, padding:'1rem' }}>
                 <div style={{ color:AMBER, fontWeight:700, fontSize:'0.8rem', marginBottom:6 }}>Improve</div>
                 {improvements.map((imp,i) => <div key={i} style={{ color:MUTED, fontSize:'0.8rem' }}>• {imp}</div>)}
               </div>
@@ -1534,7 +1534,7 @@ function CodingSection() {
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.5rem' }}>
-      <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.25rem', display:'flex', gap:'1rem', flexWrap:'wrap', alignItems:'flex-end' }}>
+      <div className="glass-card glass-hover glass-babyblue" style={{   borderRadius:20, padding:'1.25rem', display:'flex', gap:'1rem', flexWrap:'wrap', alignItems:'flex-end' }}>
         <div>
           <div style={{ color:MUTED, fontSize:'0.73rem', marginBottom:5 }}>Difficulty</div>
           <div style={{ display:'flex', gap:6 }}>
@@ -1565,7 +1565,7 @@ function CodingSection() {
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.5rem' }}>
           {/* Left: Problem */}
           <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
-            <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.25rem' }}>
+            <div className="glass-card glass-hover glass-mint" style={{   borderRadius:16, padding:'1.25rem' }}>
               <div style={{ display:'flex', gap:'0.5rem', alignItems:'center', marginBottom:'0.75rem' }}>
                 <span style={{ color:TEXT, fontWeight:700, fontSize:'0.95rem' }}>{challenge.title}</span>
                 <Tag text={challenge.difficulty} color={diffColor(challenge.difficulty)} />
@@ -1574,7 +1574,7 @@ function CodingSection() {
               <div style={{ color:MUTED, fontSize:'0.85rem', lineHeight:1.75, whiteSpace:'pre-wrap' }}>{challenge.problem}</div>
             </div>
             {challenge.examples.length > 0 && (
-              <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.1rem' }}>
+              <div className="glass-card glass-hover glass-lavender" style={{   borderRadius:16, padding:'1.1rem' }}>
                 <div style={{ color:TEXT, fontWeight:600, marginBottom:'0.6rem', fontSize:'0.85rem' }}>Examples</div>
                 {challenge.examples.map((ex,i)=>(
                   <div key={i} style={{ background:'rgba(255,255,255,0.03)', borderRadius:8, padding:'0.6rem', marginBottom:6, fontFamily:'monospace', fontSize:'0.8rem' }}>
@@ -1586,7 +1586,7 @@ function CodingSection() {
               </div>
             )}
             {challenge.constraints.length > 0 && (
-              <div style={{ background:CARD, border:BORDER, borderRadius:12, padding:'0.9rem' }}>
+              <div className="glass-card glass-hover glass-peach" style={{   borderRadius:12, padding:'0.9rem' }}>
                 <div style={{ color:TEXT, fontWeight:600, fontSize:'0.8rem', marginBottom:4 }}>Constraints</div>
                 {challenge.constraints.map((c,i)=><div key={i} style={{ color:MUTED, fontSize:'0.78rem' }}>• {c}</div>)}
               </div>
@@ -1608,7 +1608,7 @@ function CodingSection() {
 
           {/* Right: Editor */}
           <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
-            <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.1rem', display:'flex', flexDirection:'column', gap:'0.65rem' }}>
+            <div className="glass-card glass-hover glass-rose" style={{   borderRadius:16, padding:'1.1rem', display:'flex', flexDirection:'column', gap:'0.65rem' }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <span style={{ color:TEXT, fontWeight:600, fontSize:'0.85rem' }}>Solution Editor</span>
                 <select value={lang} onChange={e=>setLang(e.target.value)}
@@ -1628,7 +1628,7 @@ function CodingSection() {
             {evalLoading && <Loader text="AI is reviewing your solution…" />}
 
             {evalResult && (
-              <div style={{ background:CARD, border:`1px solid ${evalResult.is_correct?GREEN:AMBER}40`, borderRadius:16, padding:'1.25rem' }}>
+              <div className="glass-card glass-hover glass-cyan" style={{  border:`1px solid ${evalResult.is_correct?GREEN:AMBER}40`, borderRadius:16, padding:'1.25rem' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'0.85rem' }}>
                   <span style={{ fontWeight:700, color:evalResult.is_correct?GREEN:AMBER }}>
                     {evalResult.is_correct?'✓ Accepted':'◎ Needs Work'}
@@ -1674,7 +1674,7 @@ function SkillGapSection() {
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.5rem' }}>
-      <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.25rem', display:'flex', gap:'1rem', alignItems:'flex-end', flexWrap:'wrap' }}>
+      <div className="glass-card glass-hover glass-babyblue" style={{   borderRadius:20, padding:'1.25rem', display:'flex', gap:'1rem', alignItems:'flex-end', flexWrap:'wrap' }}>
         <div style={{ flex:1 }}>
           <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:5 }}>Target Career / Role</div>
           <select value={target} onChange={e=>setTarget(e.target.value)}
@@ -1692,7 +1692,7 @@ function SkillGapSection() {
 
       {result && (
         <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
-          <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.5rem', display:'flex', alignItems:'center', gap:'1.5rem' }}>
+          <div className="glass-card glass-hover glass-mint" style={{   borderRadius:16, padding:'1.5rem', display:'flex', alignItems:'center', gap:'1.5rem' }}>
             <div style={{ position:'relative', display:'inline-flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
               <ScoreRing score={result.compatibility_score} color={result.compatibility_score>=70?GREEN:result.compatibility_score>=45?AMBER:RED} size={90} />
               <div style={{ position:'absolute', textAlign:'center' }}>
@@ -1706,25 +1706,25 @@ function SkillGapSection() {
           </div>
 
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+            <div className="glass-card glass-hover glass-lavender" style={{   borderRadius:14, padding:'1.1rem' }}>
               <div style={{ color:GREEN, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>✓ Current Skills</div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.current_skills.map(s=><Tag key={s} text={s} color={GREEN}/>)}</div>
             </div>
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+            <div className="glass-card glass-hover glass-peach" style={{   borderRadius:14, padding:'1.1rem' }}>
               <div style={{ color:RED, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem' }}>Missing Skills</div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.missing_skills.map(s=><Tag key={s} text={s} color={RED}/>)}</div>
             </div>
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+            <div className="glass-card glass-hover glass-rose" style={{   borderRadius:14, padding:'1.1rem' }}>
               <div style={{ color:AMBER, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem', display:'flex', alignItems:'center', gap:4 }}><GraduationCap size={14} style={{ flexShrink:0 }} /> Missing Certifications</div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.missing_certifications.map(c=><Tag key={c} text={c} color={AMBER}/>)}</div>
             </div>
-            <div style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1.1rem' }}>
+            <div className="glass-card glass-hover glass-cyan" style={{   borderRadius:14, padding:'1.1rem' }}>
               <div style={{ color:PURPLE, fontWeight:700, fontSize:'0.82rem', marginBottom:'0.65rem', display:'flex', alignItems:'center', gap:4 }}><Code2 size={14} style={{ flexShrink:0 }} /> Missing Projects</div>
               <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>{result.missing_projects.map(p=><Tag key={p} text={p} color={PURPLE}/>)}</div>
             </div>
           </div>
 
-          <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.25rem' }}>
+          <div className="glass-card glass-hover glass-babyblue" style={{   borderRadius:16, padding:'1.25rem' }}>
             <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>5-Step Learning Plan</div>
             {result.learning_plan.map((step,i)=>(
               <div key={i} style={{ display:'flex', gap:'0.85rem', padding:'0.75rem', background:'rgba(255,255,255,0.03)', borderRadius:12, border:BORDER, marginBottom:'0.6rem' }}>
@@ -1769,7 +1769,7 @@ function RecommendationsSection() {
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
         {data.recommendations.map((rec,i)=>(
-          <div key={rec.role} style={{ background:CARD, border:i===0?`1px solid ${CYAN}40`:BORDER, borderRadius:16, padding:'1.25rem', position:'relative', overflow:'hidden' }}>
+          <div key={rec.role} className="glass-card glass-hover glass-mint" style={{  border:i===0?`1px solid ${CYAN}40`:BORDER, borderRadius:16, padding:'1.25rem', position:'relative', overflow:'hidden' }}>
             {i===0 && <div style={{ position:'absolute', top:0, right:0, background:`${CYAN}22`, padding:'2px 10px', borderRadius:'0 16px 0 10px', fontSize:'0.68rem', color:CYAN, fontWeight:700 }}>TOP MATCH</div>}
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'0.65rem' }}>
               <div style={{ color:TEXT, fontWeight:700, fontSize:'0.92rem' }}>{rec.role}</div>
@@ -1806,7 +1806,7 @@ function JobMatchSection() {
         const c = m.match_percent>=80?GREEN:m.match_percent>=65?CYAN:m.match_percent>=50?AMBER:RED;
         const open = expanded===m.role;
         return (
-          <div key={m.role} style={{ background:CARD, border:i===0?`1px solid ${c}40`:BORDER, borderRadius:16, overflow:'hidden' }}>
+          <div key={m.role} className="glass-card glass-hover glass-lavender" style={{  border:i===0?`1px solid ${c}40`:BORDER, borderRadius:16, overflow:'hidden' }}>
             <div onClick={()=>setExpanded(open?null:m.role)} style={{ padding:'1.1rem 1.25rem', cursor:'pointer', display:'flex', alignItems:'center', gap:'1rem' }}>
               {i===0 && <Trophy size={18} style={{ color:CYAN, flexShrink:0 }} />}
               <div style={{ flex:1 }}>
@@ -1885,7 +1885,7 @@ function RoadmapSection() {
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:'1.5rem' }}>
-      <div style={{ background:CARD, border:BORDER, borderRadius:20, padding:'1.25rem', display:'flex', gap:'1rem', alignItems:'flex-end', flexWrap:'wrap' }}>
+      <div className="glass-card glass-hover glass-peach" style={{   borderRadius:20, padding:'1.25rem', display:'flex', gap:'1rem', alignItems:'flex-end', flexWrap:'wrap' }}>
         <div style={{ flex:1 }}>
           <div style={{ color:MUTED, fontSize:'0.78rem', marginBottom:5 }}>Target Career</div>
           <select value={target} onChange={e=>setTarget(e.target.value)}
@@ -1907,14 +1907,14 @@ function RoadmapSection() {
               { label:'Target Career',    value:data.target_career,    color:CYAN   },
               { label:'Estimated Time',   value:data.estimated_time,   color:AMBER  },
             ].map(({ label, value, color })=>(
-              <div key={label} style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1rem', textAlign:'center' }}>
+              <div key={label} className="glass-card glass-hover glass-rose" style={{   borderRadius:14, padding:'1rem', textAlign:'center' }}>
                 <div style={{ fontSize:'0.7rem', color:MUTED, textTransform:'uppercase', letterSpacing:1 }}>{label}</div>
                 <div style={{ color, fontWeight:700, fontSize:'0.92rem', marginTop:4 }}>{value}</div>
               </div>
             ))}
           </div>
 
-          <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.5rem' }}>
+          <div className="glass-card glass-hover glass-cyan" style={{   borderRadius:16, padding:'1.5rem' }}>
             <div style={{ color:TEXT, fontWeight:700, marginBottom:'1.25rem' }}>Your Personalized Roadmap</div>
             {data.steps.map((step,i)=>{
               const isCurrent = step.status==='current';
@@ -1950,7 +1950,7 @@ function RoadmapSection() {
 
           {/* Monthly milestones */}
           {data.monthly_milestones.length > 0 && (
-            <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.25rem' }}>
+            <div className="glass-card glass-hover glass-babyblue" style={{   borderRadius:16, padding:'1.25rem' }}>
               <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Monthly Milestones</div>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'0.75rem' }}>
                 {data.monthly_milestones.map((m,i)=>{
@@ -2002,7 +2002,7 @@ function AnalyticsSection() {
           { label:'Consistency',     value:`${data.consistency_score}%`,   color:GREEN  },
           { label:'Top Improvement', value:data.top_improvement,           color:AMBER  },
         ].map(({ label, value, color })=>(
-          <div key={label} style={{ background:CARD, border:BORDER, borderRadius:14, padding:'1rem', textAlign:'center' }}>
+          <div key={label} className="glass-card glass-hover glass-mint" style={{   borderRadius:14, padding:'1rem', textAlign:'center' }}>
             <div style={{ fontSize:'0.7rem', color:MUTED, textTransform:'uppercase', letterSpacing:1 }}>{label}</div>
             <div style={{ color, fontWeight:700, fontSize:'0.92rem', marginTop:4 }}>{value}</div>
           </div>
@@ -2018,7 +2018,7 @@ function AnalyticsSection() {
       ) : (
         <>
           {/* Career Twin trend */}
-          <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.5rem' }}>
+          <div className="glass-card glass-hover glass-lavender" style={{   borderRadius:16, padding:'1.5rem' }}>
             <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Career Twin Evolution</div>
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={data.career_twin_trend}>
@@ -2038,7 +2038,7 @@ function AnalyticsSection() {
           </div>
 
           {/* Score breakdown */}
-          <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.5rem' }}>
+          <div className="glass-card glass-hover glass-peach" style={{   borderRadius:16, padding:'1.5rem' }}>
             <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Score Breakdown Trend</div>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={data.score_breakdown_trend}>
@@ -2059,7 +2059,7 @@ function AnalyticsSection() {
 
       {/* Skill radar */}
       {data.skill_radar.length > 0 && (
-        <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.5rem' }}>
+        <div className="glass-card glass-hover glass-rose" style={{   borderRadius:16, padding:'1.5rem' }}>
           <div style={{ color:TEXT, fontWeight:700, marginBottom:'1rem' }}>Skill Coverage Radar</div>
           <ResponsiveContainer width="100%" height={260}>
             <RadarChart data={data.skill_radar}>
@@ -2084,7 +2084,7 @@ function ResourceHub() {
     <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'1rem' }}>
       {RESOURCES.map(res=>(
         <a key={res.name} href={res.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration:'none' }}>
-          <div style={{ background:CARD, border:BORDER, borderRadius:16, padding:'1.25rem', cursor:'pointer', transition:'transform 0.2s, border-color 0.2s', height:'100%', boxSizing:'border-box' }}
+          <div className="glass-card glass-hover glass-cyan" style={{   borderRadius:16, padding:'1.25rem', cursor:'pointer', transition:'transform 0.2s, border-color 0.2s', height:'100%', boxSizing:'border-box' }}
             onMouseEnter={e=>{(e.currentTarget as HTMLDivElement).style.transform='translateY(-3px)';(e.currentTarget as HTMLDivElement).style.borderColor='rgba(255,255,255,0.18)';}}
             onMouseLeave={e=>{(e.currentTarget as HTMLDivElement).style.transform='none';(e.currentTarget as HTMLDivElement).style.borderColor='rgba(255,255,255,0.08)';}}>
             <div style={{ display:'flex', alignItems:'center', gap:'0.65rem', marginBottom:'0.65rem' }}>

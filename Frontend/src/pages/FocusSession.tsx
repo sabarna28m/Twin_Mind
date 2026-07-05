@@ -332,7 +332,7 @@ export default function FocusSession() {
           </div>
 
           {/* ─── Timer card ─── */}
-          <div style={s.timerCard} className="glass-panel stat-card-premium">
+          <div style={s.timerCard} className="glass-panel glass-card glass-hover glass-cyan">
             {/* Ambient orbs */}
             <div style={s.orb1} />
             <div style={s.orb2} />

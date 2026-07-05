@@ -316,7 +316,7 @@ function FutureTwinCard({ twin }: { twin: TwinState }) {
   };
 
   return (
-    <div className="synth-hover-card" style={{ ...s.card, ...s.fullWidth, padding: '1.25rem 1.5rem', ...glassStyle }}>
+    <div className="glass-card glass-hover glass-mint" style={{ ...s.card, ...s.fullWidth, padding: '1.25rem 1.5rem', ...glassStyle }}>
       {/* Header row with tabs */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.1rem', flexWrap: 'wrap', gap: '0.6rem' }}>
         <h3 style={{ ...s.cardTitle, marginBottom: 0 }}>Future Twin</h3>
@@ -527,7 +527,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
   return (
     <>
       {/* ── 1. Twin Intelligence Score header ── */}
-      <div className="synth-hover-card" style={{ ...s.card, ...s.fullWidth, padding: '1.5rem', ...glassStyle }}>
+      <div className="glass-card glass-hover glass-lavender" style={{ ...s.card, ...s.fullWidth, padding: '1.5rem', ...glassStyle }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
           <span style={{ fontSize: '1.1rem' }}>◈</span>
           <h3 style={{ ...s.cardTitle, marginBottom: 0 }}>Digital Twin Evolution Dashboard</h3>
@@ -601,7 +601,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
       </div>
 
       {/* ── 2. Multi-layer evolution graph ── */}
-      <div className="synth-hover-card" style={{ ...s.card, ...s.fullWidth, ...glassStyle }}>
+      <div className="glass-card glass-hover glass-peach" style={{ ...s.card, ...s.fullWidth, ...glassStyle }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
             <h3 style={{ ...s.cardTitle, marginBottom: '0.2rem' }}>Multi-Layer Evolution Graph</h3>
@@ -678,7 +678,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
       <div style={{ ...s.fullWidth, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="mob-twin-row">
 
         {/* Timeline */}
-        <div className="synth-hover-card" style={{ ...s.card, ...glassStyle }}>
+        <div className="glass-card glass-hover glass-rose" style={{ ...s.card, ...glassStyle }}>
           <h3 style={s.cardTitle}>Evolution Timeline</h3>
           {twin.evolution_timeline.length === 0 ? (
             <p style={{ color: '#64748b', fontSize: '0.82rem' }}>Log more check-ins to build your evolution story.</p>
@@ -706,7 +706,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
         </div>
 
         {/* Cognitive Heatmap */}
-        <div className="synth-hover-card" style={{ ...s.card, ...glassStyle }}>
+        <div className="glass-card glass-hover glass-cyan" style={{ ...s.card, ...glassStyle }}>
           <div style={{ marginBottom: '1rem' }}>
             <h3 style={{ ...s.cardTitle, marginBottom: '0.2rem' }}>Cognitive Heatmap</h3>
             <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b' }}>
@@ -737,7 +737,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
 
       {/* ── 4. AI Insights ── */}
       {twin.ai_insights.length > 0 && (
-        <div className="synth-hover-card" style={{ ...s.card, ...s.fullWidth, ...glassStyle }}>
+        <div className="glass-card glass-hover glass-babyblue" style={{ ...s.card, ...s.fullWidth, ...glassStyle }}>
           <div style={{ marginBottom: '1rem' }}>
             <h3 style={{ ...s.cardTitle, marginBottom: '0.2rem' }}>AI Twin Insights</h3>
             <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b' }}>
@@ -758,7 +758,7 @@ function DigitalTwinEvolutionDashboard({ twin }: { twin: TwinState }) {
       )}
 
       {/* ── 5. Twin Evolution Explanation card ── */}
-      <div className="synth-hover-card" style={{ ...s.card, ...s.fullWidth, ...glassStyle }}>
+      <div className="glass-card glass-hover glass-mint" style={{ ...s.card, ...s.fullWidth, ...glassStyle }}>
         <h3 style={{ ...s.cardTitle, marginBottom: '1rem' }}>What These Metrics Mean</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0.7rem' }} className="mob-twin-row">
           {[
@@ -840,7 +840,7 @@ function TwinFidelityBanner({
   const fidelityColor = overall >= 80 ? '#10b981' : overall >= 55 ? '#f59e0b' : '#ef4444';
 
   return (
-    <div className="synth-hover-card" style={{ ...x.card, ...x.fullWidth, padding: '1.25rem 1.5rem', ...glassStyle }}>
+    <div className="glass-card glass-hover glass-lavender" style={{ ...x.card, ...x.fullWidth, padding: '1.25rem 1.5rem', ...glassStyle }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
         {/* Overall score */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
@@ -998,7 +998,7 @@ function ExtendedModelsSection({
   const activeColor = tabs.find(t => t.key === tab)?.color ?? '#6366f1';
 
   return (
-    <div className="synth-hover-card" style={{ ...x.card, ...x.fullWidth, ...glassStyle }}>
+    <div className="glass-card glass-hover glass-peach" style={{ ...x.card, ...x.fullWidth, ...glassStyle }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
         <span style={{ fontSize: '1rem' }}></span>
         <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Twin Model Analytics</h3>
@@ -1275,7 +1275,7 @@ function PredictionCenterSection({
   ];
 
   return (
-    <div className="synth-hover-card" style={{ ...x.card, ...x.fullWidth, ...glassStyle }}>
+    <div className="glass-card glass-hover glass-rose" style={{ ...x.card, ...x.fullWidth, ...glassStyle }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
         <span style={{ fontSize: '1rem' }}></span>
         <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Predictive AI Engine</h3>
@@ -1419,7 +1419,7 @@ function AskMyTwinSection({
   }
 
   return (
-    <div className="synth-hover-card" style={{ ...x.card, ...x.fullWidth, ...glassStyle }}>
+    <div className="glass-card glass-hover glass-cyan" style={{ ...x.card, ...x.fullWidth, ...glassStyle }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
         <span style={{ fontSize: '1rem' }}>◈</span>
         <h3 style={{ ...x.cardTitle, marginBottom: 0 }}>Ask My Twin — What-If Simulator</h3>
@@ -1609,7 +1609,7 @@ export default function Twin() {
 
             {/* ── Level & XP card ── */}
             {progress && (
-              <div style={{ ...s.card, ...s.fullWidth, marginBottom: 0, ...glassStyle }} className="synth-hover-card animate-slide-up">
+              <div style={{ ...s.card, ...s.fullWidth, marginBottom: 0, ...glassStyle }} className="glass-card glass-hover glass-babyblue animate-slide-up">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' as const }}>
                   {/* Level badge */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
@@ -1690,7 +1690,7 @@ export default function Twin() {
             )}
 
             {/* Avatar card */}
-            <div style={{ ...s.avatarCard, ...glassStyle }} className="synth-hover-card animate-slide-up mob-twin-avatar">
+            <div style={{ ...s.avatarCard, ...glassStyle }} className="glass-card glass-hover glass-mint animate-slide-up mob-twin-avatar">
               {/* Avatar with rings + particles */}
               <div style={{ position: 'relative', width: '130px', height: '130px', marginBottom: '1rem' }}>
                 <Particles riskLevel={twin.risk_level} />
@@ -1787,7 +1787,7 @@ export default function Twin() {
             </div>
 
             {/* Vitals card */}
-            <div style={{ ...s.card, ...glassStyle }} className="synth-hover-card animate-slide-up mob-twin-vitals">
+            <div style={{ ...s.card, ...glassStyle }} className="glass-card glass-hover glass-lavender animate-slide-up mob-twin-vitals">
               <h3 style={s.cardTitle}>Twin Vitals</h3>
               <ScoreBar label="Overall Score"       value={twin.overall_score}    grad={SCORE_GRADS[0]} delay={0} />
               <ScoreBar label="Academic Performance" value={twin.academic_score}   grad={SCORE_GRADS[1]} delay={100} />

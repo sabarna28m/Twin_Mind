@@ -177,9 +177,6 @@ export default function MobileNav({ isOpen, onClose, userName, avatarSrc, onLogo
 
         {/* Footer */}
         <div style={st.drawerFooter}>
-          <Link to="/about" style={st.aboutLink} onClick={onClose}>
-            About TwinMind
-          </Link>
           <button style={st.logoutBtn} onClick={() => { onLogout(); onClose(); }}>
             <LogOut size={15} />
             Sign out
@@ -290,11 +287,5 @@ const st: Record<string, React.CSSProperties> = {
     background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
     color: '#fca5a5', fontSize: '0.87rem', fontWeight: 600,
     cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.18s',
-  },
-  aboutLink: {
-    display: 'block', textAlign: 'center' as const,
-    padding: '0.45rem', marginBottom: '0.5rem',
-    fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.06em',
-    color: 'rgba(59,130,246,0.7)', textDecoration: 'none',
   },
 };

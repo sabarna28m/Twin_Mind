@@ -497,7 +497,7 @@ export default function StudyPlanner() {
 
 
         {/* ── KPI strip ── */}
-        <div style={{ background: 'var(--ui-surface)', borderBottom: '1.5px solid rgba(var(--primary-rgb),0.12)', backdropFilter: 'blur(20px)', padding: '1rem 1.5rem', flexShrink: 0 }}>
+        <div className="glass-card glass-hover glass-cyan" style={{   padding: '1rem 1.5rem', flexShrink: 0 }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div>
@@ -539,12 +539,12 @@ export default function StudyPlanner() {
         </div>
 
         {/* ── Tab bar ── */}
-        <div style={{ background: 'var(--ui-surface)', borderBottom: '1px solid rgba(var(--primary-rgb),0.1)', backdropFilter: 'blur(16px)' }}>
+        <div className="glass-card glass-hover glass-babyblue" style={{   }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem', display: 'flex', gap: '0.1rem' }}>
             {TABS.map(tab => {
               const active = activeTab === tab.id;
               return (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                <button className="glass-btn" key={tab.id} onClick={() => setActiveTab(tab.id)}
                   style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.7rem 1.05rem', background: 'none', border: 'none', borderBottom: active ? '2px solid var(--primary)' : '2px solid transparent', color: active ? 'var(--primary)' : 'var(--ui-text-muted)', fontFamily: 'inherit', fontSize: '0.82rem', fontWeight: active ? 700 : 500, cursor: 'pointer', transition: 'all 0.15s', marginBottom: '-1px' }}>
                   {tab.icon} {tab.label}
                 </button>
@@ -641,7 +641,7 @@ export default function StudyPlanner() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
 
                   {/* ── MONTHLY MISSION CARD ── */}
-                  <div style={{ background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.3)', borderRadius: '20px', padding: '1.75rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', position: 'relative', overflow: 'hidden' }}>
+                  <div className="glass-card glass-hover glass-mint" style={{ border: '1.5px solid rgba(var(--primary-rgb),0.3)', borderRadius: '20px', padding: '1.75rem',   position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 0% 0%, rgba(var(--primary-rgb),0.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
                       <div>
@@ -771,7 +771,7 @@ export default function StudyPlanner() {
                                 <span style={{ fontSize: '0.68rem', padding: '0.22rem 0.65rem', background: `${wk.color}12`, color: wk.color, borderRadius: '8px', fontWeight: 700, border: `1px solid ${wk.color}25` }}>📝 {wk.quizNote}</span>
                                 <span style={{ fontSize: '0.68rem', padding: '0.22rem 0.65rem', background: 'var(--ui-border)', color: 'var(--ui-text-muted)', borderRadius: '8px', border: '1px solid var(--ui-border)' }}>{wk.mustComplete.length} tasks</span>
                               </div>
-                              <button onClick={() => { setSelectedWeek(wk.num); setActiveTab('weekly'); }}
+                              <button className="glass-btn" onClick={() => { setSelectedWeek(wk.num); setActiveTab('weekly'); }}
                                 style={{ fontSize: '0.75rem', fontWeight: 700, color: wk.color, background: `${wk.color}12`, border: `1px solid ${wk.color}28`, borderRadius: '8px', padding: '0.28rem 0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
                                 {isNow ? 'View Today\'s Schedule →' : isDone ? 'View Week →' : 'Preview Week →'}
                               </button>
@@ -791,7 +791,7 @@ export default function StudyPlanner() {
                           const color = MONTH_COLORS[gi % MONTH_COLORS.length];
                           const topics = getTopicsFor(goal.subject).slice(0, 3);
                           return (
-                            <div key={goal.id} style={{ background: 'var(--ui-surface)', border: `1.5px solid ${color}28`, borderRadius: '16px', padding: '1.15rem', backdropFilter: 'blur(24px)', boxShadow: '0 8px 28px rgba(0,0,0,0.5)' }}>
+                            <div className="glass-card glass-hover glass-lavender" key={goal.id} style={{ border: `1.5px solid ${color}28`, borderRadius: '16px', padding: '1.15rem',   }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                                 <h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>{goal.subject}</h3>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.42rem' }}>
@@ -820,7 +820,7 @@ export default function StudyPlanner() {
                   )}
 
                   {/* ── AI INSIGHT PANEL ── */}
-                  <div style={{ background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.22)', borderRadius: '18px', padding: '1.35rem 1.5rem', backdropFilter: 'blur(28px)', boxShadow: '0 12px 40px rgba(0,0,0,0.6)' }}>
+                  <div className="glass-card glass-hover glass-peach" style={{ border: '1.5px solid rgba(var(--primary-rgb),0.22)', borderRadius: '18px', padding: '1.35rem 1.5rem',   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.85rem' }}>
                       <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(var(--primary-rgb),0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>◈</div>
                       <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>AI Insight</span>
@@ -851,7 +851,7 @@ export default function StudyPlanner() {
               {/* Week selector */}
               <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                 {([1,2,3,4] as WeekNum[]).map(w => (
-                  <button key={w} onClick={() => { setSelectedWeek(w); setSelectedDay(0); }}
+                  <button className="glass-btn" key={w} onClick={() => { setSelectedWeek(w); setSelectedDay(0); }}
                     style={{ padding: '0.38rem 0.85rem', borderRadius: '8px', border: `1.5px solid ${selectedWeek === w ? 'rgba(var(--primary-rgb),0.55)' : 'var(--ui-border)'}`, background: selectedWeek === w ? 'rgba(var(--primary-rgb),0.16)' : 'var(--ui-border)', color: selectedWeek === w ? 'var(--primary)' : 'var(--ui-text-muted)', fontFamily: 'inherit', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
                     Week {w}{w === weekOfMonth() ? ' · Now' : ''}
                   </button>
@@ -868,7 +868,7 @@ export default function StudyPlanner() {
                     const dayNonBreak = day.blocks.filter(b => b.type !== 'break');
                     const dayDone = dayNonBreak.length > 0 && dayNonBreak.every(b => completedIds[b.id]);
                     return (
-                      <button key={day.dayKey} onClick={() => setSelectedDay(di)}
+                      <button className="glass-btn" key={day.dayKey} onClick={() => setSelectedDay(di)}
                         style={{ flexShrink: 0, padding: '0.6rem 0.85rem', borderRadius: '12px', border: `1.5px solid ${active ? 'rgba(var(--primary-rgb),0.55)' : today ? 'rgba(var(--primary-rgb),0.25)' : 'var(--ui-border)'}`, background: active ? 'rgba(var(--primary-rgb),0.14)' : today ? 'rgba(var(--primary-rgb),0.05)' : 'var(--ui-border)', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center', minWidth: '78px', transition: 'all 0.15s' }}>
                         <p style={{ margin: '0 0 0.05rem', fontSize: '0.6rem', fontWeight: 700, color: active || today ? 'var(--primary)' : 'var(--ui-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{day.dayName.slice(0, 3)}{today ? ' ·' : ''}</p>
                         <p style={{ margin: '0 0 0.22rem', fontSize: '0.62rem', color: 'var(--ui-text-muted)' }}>{new Date(day.dayKey + 'T12:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>
@@ -881,7 +881,7 @@ export default function StudyPlanner() {
 
               {/* No schedule state */}
               {!currentDay && (
-                <div style={{ padding: '3rem', textAlign: 'center', background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '18px', backdropFilter: 'blur(28px)' }}>
+                <div className="glass-card glass-hover glass-rose" style={{ padding: '3rem', textAlign: 'center', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '18px',  }}>
                   <p style={{ fontSize: '2.5rem', margin: '0 0 0.6rem' }}>🧠</p>
                   <p style={{ margin: '0 0 0.4rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>No AI schedule yet</p>
                   <p style={{ margin: '0 0 1.25rem', fontSize: '0.83rem', color: 'var(--ui-text-muted)' }}>Generate your personalised plan to see an hour-by-hour daily schedule with exact topics.</p>
@@ -891,7 +891,7 @@ export default function StudyPlanner() {
 
               {/* Day stats */}
               {currentDay && (
-                <div style={{ background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '16px', padding: '1rem 1.3rem', backdropFilter: 'blur(28px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.9rem' }}>
+                <div className="glass-card glass-hover glass-amber" style={{ border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '16px', padding: '1rem 1.3rem',  display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.9rem' }}>
                   <div>
                     <p style={{ margin: '0 0 0.08rem', fontSize: '1rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>{currentDay.dayName}</p>
                     <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--ui-text-muted)' }}>{currentDay.dayLabel} · {currentDay.blocks.length} blocks scheduled</p>
@@ -977,14 +977,14 @@ export default function StudyPlanner() {
             /* ══════ TWIN SIMULATION TAB ══════ */
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {!planner?.twinSim ? (
-                <div style={{ padding: '3rem', textAlign: 'center', background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '18px', backdropFilter: 'blur(28px)' }}>
+                <div className="glass-card glass-hover glass-cyan" style={{ padding: '3rem', textAlign: 'center', border: '1.5px solid rgba(var(--primary-rgb),0.2)', borderRadius: '18px',  }}>
                   <p style={{ fontSize: '2.5rem', margin: '0 0 0.6rem' }}>🧠</p>
                   <p style={{ margin: '0 0 0.4rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>No Twin Simulation yet</p>
                   <p style={{ margin: '0 0 1.25rem', fontSize: '0.83rem', color: 'var(--ui-text-muted)' }}>Generate your AI plan to run a Digital Twin simulation and see predicted outcomes before you start studying.</p>
                   <button onClick={generateAIPlan} disabled={generating} style={{ padding: '0.62rem 1.5rem', background: 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{generating ? 'Simulating…' : '✦ Run Twin Simulation'}</button>
                 </div>
               ) : simRunning ? (
-                <div style={{ padding: '2.5rem 1.5rem', background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.3)', borderRadius: '18px', backdropFilter: 'blur(40px)', textAlign: 'center' }}>
+                <div className="glass-card glass-hover glass-babyblue" style={{ padding: '2.5rem 1.5rem', border: '1.5px solid rgba(var(--primary-rgb),0.3)', borderRadius: '18px',  textAlign: 'center' }}>
                   <div style={{ width: '44px', height: '44px', border: '3px solid rgba(var(--primary-rgb),0.2)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 0.75s linear infinite', margin: '0 auto 1.1rem' }} />
                   <p style={{ margin: '0 0 0.35rem', fontWeight: 800, color: 'var(--primary)', fontSize: '1rem' }}>◈ Running Digital Twin Simulation…</p>
                   <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--ui-text-muted)' }}>Analysing habits · Projecting performance · Simulating outcomes</p>
@@ -992,7 +992,7 @@ export default function StudyPlanner() {
               ) : (
                 <>
                   {/* Completion probability hero */}
-                  <div style={{ background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.28)', borderRadius: '20px', padding: '2rem', backdropFilter: 'blur(32px)', boxShadow: '0 20px 60px rgba(0,0,0,0.7)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+                  <div className="glass-card glass-hover glass-mint" style={{ border: '1.5px solid rgba(var(--primary-rgb),0.28)', borderRadius: '20px', padding: '2rem',   textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(var(--primary-rgb),0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
                     <p style={{ margin: '0 0 0.3rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--ui-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Digital Twin Simulation Result</p>
                     <p style={{ margin: '0 0 0.1rem', fontSize: '4.2rem', fontWeight: 900, color: 'var(--primary)', lineHeight: 1, textShadow: '0 0 40px rgba(var(--primary-rgb),0.55)' }}>{planner.twinSim.completionProbability}%</p>
@@ -1020,7 +1020,7 @@ export default function StudyPlanner() {
                       { label: 'Most Likely Strength', value: planner.twinSim.predictedStrength,         color: '#34d399', icon: '💪' },
                       { label: 'Most Likely Weakness', value: planner.twinSim.predictedWeakness,         color: '#f87171', icon: '⚠️' },
                     ].map(s => (
-                      <div key={s.label} style={{ background: 'var(--ui-surface)', border: `1.5px solid ${s.color}25`, borderRadius: '16px', padding: '1.05rem', backdropFilter: 'blur(24px)', boxShadow: `0 8px 28px rgba(0,0,0,0.5), 0 0 14px ${s.color}0b` }}>
+                      <div className="glass-card glass-hover glass-lavender" key={s.label} style={{ border: `1.5px solid ${s.color}25`, borderRadius: '16px', padding: '1.05rem',  boxShadow: `0 8px 28px rgba(0,0,0,0.5), 0 0 14px ${s.color}0b` }}>
                         <p style={{ margin: '0 0 0.25rem', fontSize: '1rem' }}>{s.icon}</p>
                         <p style={{ margin: '0 0 0.15rem', fontSize: '1.05rem', fontWeight: 900, color: s.color, textShadow: `0 0 12px ${s.color}55`, lineHeight: 1.25, wordBreak: 'break-word' }}>{s.value}</p>
                         <p style={{ margin: 0, fontSize: '0.58rem', color: 'var(--ui-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
@@ -1029,7 +1029,7 @@ export default function StudyPlanner() {
                   </div>
 
                   {/* AI Recommendation */}
-                  <div style={{ background: 'var(--ui-surface)', border: '1.5px solid rgba(var(--primary-rgb),0.22)', borderRadius: '18px', padding: '1.3rem 1.5rem', backdropFilter: 'blur(28px)' }}>
+                  <div className="glass-card glass-hover glass-peach" style={{ border: '1.5px solid rgba(var(--primary-rgb),0.22)', borderRadius: '18px', padding: '1.3rem 1.5rem',  }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '0.8rem' }}>
                       <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(var(--primary-rgb),0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>◈</div>
                       <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--ui-text-h)' }}>AI Recommendation</span>
@@ -1086,7 +1086,7 @@ export default function StudyPlanner() {
       {/* Celebration popup */}
       {celebration && (
         <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }} onClick={() => setCelebration(null)}>
-          <div style={{ background: 'var(--ui-surface)', border: '2px solid rgba(var(--primary-rgb),0.4)', borderRadius: '24px', padding: '2.5rem 2rem', textAlign: 'center', maxWidth: '360px', width: '90%', boxShadow: '0 30px 80px rgba(0,0,0,0.85)', backdropFilter: 'blur(40px)', animation: 'popIn 0.3s ease' }} onClick={e => e.stopPropagation()}>
+          <div className="glass-card glass-hover glass-rose" style={{ border: '2px solid rgba(var(--primary-rgb),0.4)', borderRadius: '24px', padding: '2.5rem 2rem', textAlign: 'center', maxWidth: '360px', width: '90%',   animation: 'popIn 0.3s ease' }} onClick={e => e.stopPropagation()}>
             <p style={{ fontSize: '3rem', margin: '0 0 0.5rem' }}>🎉</p>
             <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.3rem', fontWeight: 900, color: 'var(--ui-text-h)' }}>{celebration.title}</h3>
             <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: 'var(--ui-text-muted)', lineHeight: 1.6 }}>{celebration.msg}</p>
@@ -1094,7 +1094,7 @@ export default function StudyPlanner() {
               <span style={{ fontSize: '0.9rem', fontWeight: 900, color: '#0f172a' }}>⭐ +{celebration.xp} XP</span>
             </div>
             <br />
-            <button onClick={() => setCelebration(null)} style={{ padding: '0.62rem 1.6rem', background: 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.9rem' }}>Awesome! 🚀</button>
+            <button className="glass-btn" onClick={() => setCelebration(null)} style={{ padding: '0.62rem 1.6rem', background: 'linear-gradient(135deg,var(--primary),rgba(var(--primary-rgb),0.7))', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.9rem' }}>Awesome! 🚀</button>
           </div>
         </div>
       )}

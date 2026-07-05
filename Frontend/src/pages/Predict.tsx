@@ -162,7 +162,7 @@ export default function Predict() {
 
         <div style={result ? s.layout2 : s.layout1}>
           {/* ── Input form ──────────────────────────────────────── */}
-          <section className="synth-hover-card" style={{ ...s.formCard, ...glassStyle }}>
+          <section className="glass-card glass-hover glass-rose" style={{ ...s.formCard, ...glassStyle }}>
             {prefilled && <p style={s.prefillNote}>{t('predict_prefilled')}</p>}
             {error && <p style={s.errorMsg}>{error}</p>}
 
@@ -224,7 +224,7 @@ export default function Predict() {
           {result && (
             <div style={s.resultCol}>
               {/* Score gauge */}
-              <section className="synth-hover-card" style={{ ...s.panel, ...glassStyle }}>
+              <section className="glass-card glass-hover glass-cyan" style={{ ...s.panel, ...glassStyle }}>
                 <ScoreGauge score={result.predicted_score} />
                 <p style={{ ...s.confRange, marginTop: '0.5rem' }}>
                   {t('predict_confidence')}: {result.confidence_range[0]}–{result.confidence_range[1]}
@@ -240,7 +240,7 @@ export default function Predict() {
               </section>
 
               {/* XGBoost Feature Importance */}
-              <section className="synth-hover-card" style={{ ...s.panel, ...glassStyle }}>
+              <section className="glass-card glass-hover glass-babyblue" style={{ ...s.panel, ...glassStyle }}>
                 <div style={s.panelHeader}>
                   <h2 style={s.panelTitle}>{t('predict_importance')}</h2>
                   <span style={s.xgbBadge}>XGBoost</span>
@@ -263,7 +263,7 @@ export default function Predict() {
               </section>
 
               {/* Recommendations */}
-              <section className="synth-hover-card" style={{ ...s.panel, ...glassStyle }}>
+              <section className="glass-card glass-hover glass-mint" style={{ ...s.panel, ...glassStyle }}>
                 <h2 style={{ ...s.panelTitle, marginBottom: '1rem' }}>{t('predict_recommendations')}</h2>
                 <ul style={s.recList}>
                   {result.recommendations.map((rec, i) => (
